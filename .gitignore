@@ -1,3 +1,7 @@
 /.fleet
 /.idea
 /.vscode
+.DS_Store
+*.gz
+.db_requirements
+RELEASE_INFO.txt

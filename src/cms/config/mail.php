@@ -103,7 +103,7 @@ return [
 
     'from' => [
         'address' => env('OUTBOX_SMTP_FROM'),
-        'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Verwerkingsregister')),
+        'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'OpenVWR')),
     ],
 
     /*
