@@ -38,7 +38,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Verwerkingsregister'),
+    'name' => env('APP_NAME', 'OpenVWR'),
 
     /*
     |--------------------------------------------------------------------------

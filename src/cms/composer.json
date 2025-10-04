@@ -1,11 +1,13 @@
 {
-    "name": "minvws/nl-rdo-dataprocessing-register-private",
+    "name": "sourcehaven-bv/openvwr",
     "type": "project",
-    "description": "minvws/nl-rdo-dataprocessing-register",
+    "description": "OpenVWR - Open Source Data Processing Register",
     "keywords": [
-        "minvws",
+        "openvwr",
         "dataprocessing",
-        "verwerkingsregister"
+        "register",
+        "privacy",
+        "gdpr"
     ],
     "license": "MIT",
     "require": {

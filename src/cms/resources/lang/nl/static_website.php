@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 return [
     'content' => [
-        'home_title' => 'Verwerkingsregister Rijksoverheid',
+        'home_title' => 'OpenVWR',
         'privacy_statement' => 'Privacyverklaring',
     ],
 

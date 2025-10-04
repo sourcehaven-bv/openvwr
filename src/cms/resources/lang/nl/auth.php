@@ -10,12 +10,12 @@ return [
     'email_sent' => 'E-mail verzonden',
 
     'snapshot_sign_subject' => 'Login link',
-    'snapshot_sign_login_text' => 'Hallo :userName, klik op de onderstaande knop om toegang te krijgen tot het Verwerkingsregister',
-    'snapshot_sign_login_button_text' => 'Naar het Verwerkingsregister',
+    'snapshot_sign_login_text' => 'Hallo :userName, klik op de onderstaande knop om toegang te krijgen tot OpenVWR',
+    'snapshot_sign_login_button_text' => 'Naar OpenVWR',
     'snapshot_sign_login_footer' => 'Deze link is geldig t/m: :validUntil',
 
     'confirm_login' => 'Inloggen',
-    'confirm_message' => 'Druk op de onderstaande knop om toegang te krijgen tot het Verwerkingsregister',
+    'confirm_message' => 'Druk op de onderstaande knop om toegang te krijgen tot OpenVWR',
 
     'snapshot_sign_confirm_message' => 'Hallo :userName, klik hieronder om het authenticatieproces te starten',
     'snapshot_sign_confirm_login' => 'Stuur login email',
