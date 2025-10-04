@@ -20,3 +20,4 @@ yarn-error.log
 /coverage
 /reports
 docker-compose.override.yml
+static-website/
