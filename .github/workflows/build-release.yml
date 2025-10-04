@@ -1,0 +1,49 @@
+name: Build Release
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+    outputs:
+      archive:
+        description: "The release archive filename"
+        value: ${{ jobs.build.outputs.archive }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: debian:13
+    outputs:
+      archive: ${{ steps.archive.outputs.ARCHIVE }}
+
+    steps:
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y git curl unzip nodejs npm php php-cli php-curl php-mbstring php-xml php-zip composer
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install just
+        uses: extractions/setup-just@v2
+
+      - name: Create release package
+        run: just release "${{ inputs.version }}"
+
+      - name: Find release archive
+        id: archive
+        run: |
+          ARCHIVE=$(ls openvwr-*.tar.gz | head -n 1)
+          echo "ARCHIVE=${ARCHIVE}" >> $GITHUB_OUTPUT
+          echo "NAME=${ARCHIVE%.tar.gz}" >> $GITHUB_OUTPUT
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.archive.outputs.NAME }}
+          path: ${{ steps.archive.outputs.ARCHIVE }}
+          retention-days: 7

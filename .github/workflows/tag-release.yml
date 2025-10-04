@@ -1,0 +1,47 @@
+name: Tag Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      alpha:
+        description: 'Mark as alpha release'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate version tag
+        id: version
+        run: |
+          if [ "${{ inputs.alpha }}" = "true" ]; then
+            VERSION=$(./scripts/generate-version-tag.sh --alpha)
+          else
+            VERSION=$(./scripts/generate-version-tag.sh)
+          fi
+
+          echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
+          echo "Generated version: ${VERSION}"
+
+      - name: Create and push tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a ${{ steps.version.outputs.VERSION }} -m "Release ${{ steps.version.outputs.VERSION }}"
+          git push origin ${{ steps.version.outputs.VERSION }}
+
+      - name: Summary
+        run: |
+          echo "### Release Tagged :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** \`${{ steps.version.outputs.VERSION }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Alpha:** ${{ inputs.alpha }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The release workflow will now build and publish this version." >> $GITHUB_STEP_SUMMARY
