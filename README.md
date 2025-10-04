@@ -1,8 +1,8 @@
-# Verwerkingsregister
+# OpenVWR
 
 ## Introduction
 
-This repository contains the Verwerkingsregister. This project has 2 main components:
+This repository contains OpenVWR (Open Data Processing Register). This project has 2 main components:
 
 **CMS**
 
@@ -66,7 +66,7 @@ As a result of these steps, you have created the static files for the public web
 
 1. Visit the project in your browser
 2. Login with the following credentials:
-    - Email: `admin@minvws.nl` (this user is added with the TestDataSeeder)
+    - Email: `admin@example.com` (this user is added with the TestDataSeeder)
 3. Open your local Mailpit instance to see the email that is send
 4. Click on the link in the email to login
 5. Add the 2FA code which you do not have
@@ -94,6 +94,76 @@ C. Create a new admin user with 2FA disabled
 
 Note: to actually use the CMS, you must have 2FA activated.
 
+## Deployment and Production Setup
+
+### System Requirements
+
+**PHP Requirements:**
+- PHP 8.4+
+- Extensions: fileinfo, pdo, sockets, zip
+- exiftool must be available on the server
+
+**External Tools for Public Website:**
+- Hugo **extended** version 0.121.1+ ([installation guide](https://gohugo.io/installation/))
+- Dart sass version 1.69.5+ ([installation guide](https://sass-lang.com/install/))
+
+### Initial Production Setup
+
+1. **Database Setup:**
+   - Process migrations in `database/sql` to create database tables
+   - Create admin user: `php artisan user:create-admin`
+
+2. **Shared Storage:**
+   - Create shared storage directories that will be shared across releases
+   - Set the path via `FILESYSTEM_SHARED_STORAGE_PATH` environment variable
+
+3. **Queue Worker:**
+   - Start a worker process that runs continuously: `php artisan queue:work --queue=high,default,low`
+   - The worker needs all the same environment variables as the main application
+   - Workers should be restarted after each deployment to load new code
+
+4. **Cron Job:**
+   - Set up a cron job that runs every minute: `php artisan schedule:run`
+   - See [Laravel scheduling documentation](https://laravel.com/docs/10.x/scheduling#running-the-scheduler)
+
+5. **Storage Link (Test Environment):**
+   - Run `php artisan storage:link` to make storage accessible
+
+### Post-Deployment Steps
+
+After each deployment, follow these steps:
+
+1. **Clear Caches:** `php artisan optimize:clear`
+2. **Restart Workers:** Restart all worker processes to load new code
+3. **Rebuild Websites:**
+   - `php artisan public-website:refresh`
+   - `php artisan static-website:refresh`
+
+### Environment Variables
+
+Key environment variables for production deployment:
+
+- `FILESYSTEM_SHARED_STORAGE_PATH` - Path to shared storage directory
+- `PUBLIC_WEBSITE_BASE_URL` - Base URL for the public website (can be relative path like `/public/subfolder` or `.` for root)
+- `PUBLIC_WEBSITE_BUILD_AFTER_HOOK` - Command/script to run after building static site
+- `STATIC_WEBSITE_BASE_URL` - Base URL for the static website
+- `STATIC_WEBSITE_BUILD_AFTER_HOOK` - Command/script to run after building static site
+- `FILESYSTEM_PUBLIC_WEBSITE_ROOT` - Directory where static website is built
+- `FILESYSTEM_STATIC_WEBSITE_ROOT` - Directory for static website files (default: `./storage/app/static-website`)
+
+**SMTP Configuration (for email):**
+- `OUTBOX_SMTP_HOST`
+- `OUTBOX_SMTP_PORT` (optional, defaults to 1025)
+- `OUTBOX_SMTP_USERNAME`
+- `OUTBOX_SMTP_PASSWORD`
+- `OUTBOX_SMTP_ENCRYPTION` (optional, defaults to `tls`)
+- `OUTBOX_SMTP_FROM`
+
+**Virus Scanning:**
+- `VIRUSSCANNER_SOCKET` - Path to ClamAV socket (default: `unix:///var/run/clamav/clamd.ctl`)
+
+See [docs/environment_variables.md](docs/environment_variables.md) for complete list of environment variables.
+
 ### Local CI checks
 
 The current CI workflow consists of static code analysis and automated tests. The latter requires a local 'testing' database.
@@ -108,16 +178,5 @@ Execute the following bin script to run all CI checks: `./bin/ci-local`
 
 ## Workflows
 
--   rdo-package.yml
-    -   Build the zip file (used by iRealisatie) for the dataprocessing register
-
-## License
-
-The source code is released under the [EUPL license](./LICENSES/EUPL-1.2.txt).
-The documentation is released under the [CC0 license](./LICENSES/CC0-1.0.txt).
-The EUPL 1.2 and the CC0 do not apply to photos, videos, infographics, fonts or other forms of media.
-Specifically the rijkslogo and rijkshuisstijl have specific [terms of use](./LICENSES/LicenseRef-Rijkshuisstijl.txt).
-Some images have a specific [terms of use from Unsplash](./LICENSES/LicenseRef-Unsplash.txt).
-
-This repository follows the [REUSE Specfication v3.3](https://reuse.software/spec/).
-Please see [REUSE.toml](./REUSE.toml) and the individual `*.license` files for copyright and license information.
+-   ci.yml
+    -   Continuous integration workflow with code analysis and automated tests
