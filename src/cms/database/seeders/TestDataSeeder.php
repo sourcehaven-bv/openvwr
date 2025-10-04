@@ -144,7 +144,7 @@ class TestDataSeeder extends Seeder
     {
         return [
             'name' => $name,
-            'email' => sprintf('%s@minvws.nl', Str::of($name)->slug()),
+            'email' => sprintf('%s@example.com', Str::of($name)->slug()),
         ];
     }
 

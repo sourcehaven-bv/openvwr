@@ -52,7 +52,7 @@ class UserCreateAdmin extends Command
             'name' => text(label: 'Name', default: 'admin', required: true),
             'email' => text(
                 label: 'Email address',
-                default: 'admin@minvws.nl',
+                default: 'admin@example.com',
                 required: true,
                 validate: function (string $email): ?string {
                     return match (true) {
@@ -62,7 +62,7 @@ class UserCreateAdmin extends Command
                     };
                 },
             ),
-            'organisation' => text(label: 'Organisation', default: 'MinVWS', required: true),
+            'organisation' => text(label: 'Organisation', default: 'Example Organization', required: true),
         ];
     }
 
