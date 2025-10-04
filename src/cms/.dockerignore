@@ -1,0 +1,5 @@
+node_modules
+storage/app/shared-storage
+storage/logs
+.env.local
+.env.*.local
