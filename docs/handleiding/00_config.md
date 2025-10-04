@@ -30,7 +30,7 @@ Ministerie van Volksgezondheid, Welzijn en Sport \
 Parnassusplein 5 | 2511 VX | Den Haag \
 Postbus 20350 | 2500 EJ | Den Haag
 
-Auteur: Tijn Schmits, t.schmits@example.com \
+Auteur: Tijn Schmits, t.schmits@minvws.nl \
 Document: Pandoc, Eisvogel - https://github.com/Wandmalfarbe/pandoc-latex-template
 
 \textcopyright 2024 iRealisatie - Ministerie van Volksgezondheid, Welzijn en Sport
