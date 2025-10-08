@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Config\Config;
-use App\Listeners\StaticWebsite\AfterBuildHandler;
 use App\Services\StaticWebsite\HugoFilesystem;
 use App\Services\StaticWebsite\HugoStaticWebsiteGenerator;
 use App\Services\StaticWebsite\StaticWebsiteCheckService;
@@ -59,18 +58,11 @@ class StaticWebsiteServiceProvider extends ServiceProvider
             ->needs('$baseUrl')
             ->giveConfig('static-website.base_url');
         $this->app->when(HugoStaticWebsiteGenerator::class)
-            ->needs('$hugoProjectPath')
-            ->giveConfig('static-website.hugo_project_path');
-        $this->app->when(HugoStaticWebsiteGenerator::class)
             ->needs('$hugoContentFolder')
             ->giveConfig('static-website.hugo_content_folder');
         $this->app->when(HugoStaticWebsiteGenerator::class)
-            ->needs('$staticWebsiteFolder')
-            ->giveConfig('static-website.static_website_folder');
-
-        $this->app->when(AfterBuildHandler::class)
-            ->needs('$afterBuildHook')
-            ->giveConfig('static-website.build_after_hook');
+            ->needs('$buildScriptPath')
+            ->giveConfig('static-website.build_script_path');
 
         $this->app->when([StaticWebsiteCheckService::class])
             ->needs('$baseUrl')
