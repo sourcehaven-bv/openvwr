@@ -10,17 +10,19 @@ use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Console\Command\Command;
 use Tests\Helpers\ConfigTestHelper;
 
-it('can run the hugo command', function (): void {
+it('can run the build script', function (): void {
     $filesystemDiskStaticWebsiteRoot = fake()->slug(1);
     $sourceFolder = fake()->slug(1);
-    $destinationFolder = fake()->slug(1);
     $baseUrl = fake()->url();
+    $buildScriptPath = base_path('static-website/build.sh');
+    $theme = 'rijkshuisstijl';
 
     ConfigTestHelper::set('filesystems.disks.static-website.root', $filesystemDiskStaticWebsiteRoot);
     ConfigTestHelper::set('static-website.hugo_content_folder', $sourceFolder);
-    ConfigTestHelper::set('static-website.static_website_folder', $destinationFolder);
     ConfigTestHelper::set('static-website.hugo_filesystem_disk', 'static-website');
     ConfigTestHelper::set('static-website.base_url', $baseUrl);
+    ConfigTestHelper::set('static-website.build_script_path', $buildScriptPath);
+    ConfigTestHelper::set('static-website.theme', $theme);
 
     $process = Process::fake();
 
@@ -29,15 +31,18 @@ it('can run the hugo command', function (): void {
     $process->assertRan(
         static function (PendingProcess $pendingProcess) use (
             $sourceFolder,
-            $destinationFolder,
             $baseUrl,
+            $buildScriptPath,
+            $theme,
         ): bool {
-            return $pendingProcess->command === sprintf(
-                'hugo -c %s -d %s -b %s -t rijkshuisstijl --cleanDestinationDir',
-                Storage::disk('static-website')->path($sourceFolder),
-                Storage::disk('static-website')->path($destinationFolder),
-                $baseUrl,
+            $expectedCommand = sprintf(
+                '%s %s %s %s',
+                escapeshellarg($buildScriptPath),
+                escapeshellarg(Storage::disk('static-website')->path($sourceFolder)),
+                escapeshellarg($baseUrl),
+                escapeshellarg($theme)
             );
+            return $pendingProcess->command === $expectedCommand;
         },
     );
 });

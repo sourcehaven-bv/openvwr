@@ -59,14 +59,14 @@ class StaticWebsiteServiceProvider extends ServiceProvider
             ->needs('$baseUrl')
             ->giveConfig('static-website.base_url');
         $this->app->when(HugoStaticWebsiteGenerator::class)
-            ->needs('$hugoProjectPath')
-            ->giveConfig('static-website.hugo_project_path');
-        $this->app->when(HugoStaticWebsiteGenerator::class)
             ->needs('$hugoContentFolder')
             ->giveConfig('static-website.hugo_content_folder');
         $this->app->when(HugoStaticWebsiteGenerator::class)
-            ->needs('$staticWebsiteFolder')
-            ->giveConfig('static-website.static_website_folder');
+            ->needs('$buildScriptPath')
+            ->giveConfig('static-website.build_script_path');
+        $this->app->when(HugoStaticWebsiteGenerator::class)
+            ->needs('$theme')
+            ->giveConfig('static-website.theme');
 
         $this->app->when(AfterBuildHandler::class)
             ->needs('$afterBuildHook')

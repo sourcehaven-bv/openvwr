@@ -20,8 +20,8 @@ class HugoStaticWebsiteGenerator implements StaticWebsiteGenerator
         private readonly LoggerInterface $logger,
         private readonly string $baseUrl,
         private readonly string $hugoContentFolder,
-        private readonly string $hugoProjectPath,
-        private readonly string $staticWebsiteFolder,
+        private readonly string $buildScriptPath,
+        private readonly string $theme,
     ) {
     }
 
@@ -31,17 +31,16 @@ class HugoStaticWebsiteGenerator implements StaticWebsiteGenerator
     public function generate(): void
     {
         $sourcePath = $this->filesystem->path($this->hugoContentFolder);
-        $destinationPath = $this->filesystem->path($this->staticWebsiteFolder);
 
         AdminLog::log('Generating static website files', [
             'baseUrl' => $this->baseUrl,
-            'hugoProjectPath' => $this->hugoProjectPath,
+            'buildScriptPath' => $this->buildScriptPath,
+            'theme' => $this->theme,
             'sourcePath' => $sourcePath,
-            'destinationPath' => $destinationPath,
         ]);
 
         try {
-            $this->generateStaticWebsite($sourcePath, $destinationPath);
+            $this->generateStaticWebsite($sourcePath);
         } catch (ProcessFailedException $processFailedException) {
             $message = sprintf('build process failed: %s', $processFailedException->getMessage());
             $this->logger->error($message, ['output' => $processFailedException->result->output()]);
@@ -52,20 +51,37 @@ class HugoStaticWebsiteGenerator implements StaticWebsiteGenerator
         AfterBuildEvent::dispatch();
     }
 
-    private function generateStaticWebsite(string $sourcePath, string $destinationPath): void
+    private function generateStaticWebsite(string $sourcePath): void
     {
-        $hugoCommand = sprintf(
-            'hugo -c %s -d %s -b %s -t rijkshuisstijl --cleanDestinationDir',
-            $sourcePath,
-            $destinationPath,
-            $this->baseUrl,
+        // Validate build script exists and is executable
+        if (!file_exists($this->buildScriptPath)) {
+            throw new BuildException(sprintf('Build script not found: %s', $this->buildScriptPath));
+        }
+
+        if (!is_executable($this->buildScriptPath)) {
+            throw new BuildException(sprintf('Build script is not executable: %s', $this->buildScriptPath));
+        }
+
+        // Build command with properly escaped arguments
+        // Note: destination path is determined by the build script itself
+        $command = sprintf(
+            '%s %s %s %s',
+            escapeshellarg($this->buildScriptPath),
+            escapeshellarg($sourcePath),
+            escapeshellarg($this->baseUrl),
+            escapeshellarg($this->theme)
         );
 
-        $result = Process::path($this->hugoProjectPath)
-            ->run($hugoCommand)
+        $this->logger->debug('Executing build script', [
+            'buildScript' => $this->buildScriptPath,
+            'command' => $command,
+        ]);
+
+        $result = Process::path(dirname($this->buildScriptPath))
+            ->run($command)
             ->throw();
 
-        $this->logger->debug('Generating static website files: Success!', [
+        $this->logger->debug('Build script executed successfully', [
             'output' => $result->output(),
         ]);
     }
