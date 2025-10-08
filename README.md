@@ -33,8 +33,41 @@ Directory: `/src/static-website/`
 ### Prerequisites
 
 -   An up-to-date [Docker (Desktop)](https://www.docker.com/products/docker-desktop/) installation
+-   [just](https://github.com/casey/just) command runner (optional but recommended)
 
-### Setup CMS
+### Quick Setup (Recommended)
+
+If you have [just](https://github.com/casey/just) installed, you can set up the entire development environment with a single command:
+
+```bash
+just setup
+```
+
+This will:
+1. Create the `.env` file from `.env.example`
+2. Install composer dependencies via Docker
+3. Build and start Docker containers
+4. Generate application key
+5. Create testing database
+6. Run migrations and seeders for both main and testing databases
+
+After setup completes, start the environment with:
+
+```bash
+just dev-up
+```
+
+See all available commands with:
+
+```bash
+just --list
+```
+
+### Manual Setup
+
+If you prefer to set up manually or don't have `just` installed:
+
+#### Setup CMS
 
 1. Open a new terminal at `/src/cms`
 2. Create an `.env` file by copying the `./.env.template` to `./.env` and optionally set the `SESSION_DRIVER` to `file`
@@ -100,6 +133,36 @@ C. Create a new admin user with 2FA disabled
    4. Visit your local default project url again and login (with the email you just added)
 
 Note: to actually use the CMS, you must have 2FA activated.
+
+## Development Commands (with just)
+
+Common development tasks can be run using `just`:
+
+```bash
+# Start development environment
+just dev-up
+
+# Stop development environment
+just dev-down
+
+# Open shell in container
+just dev-shell
+
+# View logs
+just dev-logs
+
+# Build frontend assets
+just dev-build
+
+# Run all tests
+just test
+
+# Run specific test
+just test-filter HugoStaticWebsiteGeneratorTest
+
+# Run tests with coverage
+just test-coverage
+```
 
 ## Deployment and Production Setup
 
