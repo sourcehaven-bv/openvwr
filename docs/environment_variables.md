@@ -119,8 +119,13 @@ The following environment variables are used to configure the application in `sr
 
 **STATIC:**
 
-- `STATIC_WEBSITE_BASE_URL`
-- `STATIC_WEBSITE_BUILD_AFTER_HOOK`
+- `STATIC_WEBSITE_BASE_URL` - Base URL for the static website
+- `STATIC_WEBSITE_BUILD_SCRIPT` - Path to build script (default: `<project-root>/static-website/build.sh`)
+
+**Build Script Environment Variables:**
+
+- `HUGO_THEME` - Hugo theme to use (default: `rijkshuisstijl`)
+- `HUGO_OUTPUT_DIR` - Where build script writes output (default: `./public`)
 
 **QUEUE:**
 

@@ -117,3 +117,11 @@ test-coverage:
 # View logs
 dev-logs:
     cd src/cms && ./vendor/bin/sail logs -f
+
+# Build the static website
+build-static:
+    cd src/cms && ./vendor/bin/sail artisan static-website:refresh
+
+# Open the static website in browser
+open-static:
+    open http://localhost:8080

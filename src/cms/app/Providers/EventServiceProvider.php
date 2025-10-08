@@ -9,7 +9,6 @@ use App\Events\StaticWebsite\BuildEvent;
 use App\Events\User\UserCreatedEvent;
 use App\Listeners\Media\MediaHasBeenAddedHandler;
 use App\Listeners\PostMediaUploadHandler;
-use App\Listeners\StaticWebsite\AfterBuildHandler;
 use App\Listeners\StaticWebsite\BuildHandler;
 use App\Listeners\User\Import\UserCreatedHandler;
 use App\Models\Avg\AvgProcessorProcessingRecord;
@@ -54,7 +53,6 @@ class EventServiceProvider extends ServiceProvider
 
         // static website
         BuildEvent::class => [BuildHandler::class],
-        AfterBuildEvent::class => [AfterBuildHandler::class],
     ];
 
     public function boot(): void
