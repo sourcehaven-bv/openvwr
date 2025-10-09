@@ -27,6 +27,7 @@ use function database_path;
 use function file_exists;
 use function file_get_contents;
 use function is_string;
+use function now;
 use function sprintf;
 
 /**

@@ -8,6 +8,7 @@ use Faker\Provider\Miscellaneous;
 use Illuminate\Support\Arr;
 
 use function sprintf;
+use function strtoupper;
 
 class MarkupProvider extends Miscellaneous
 {
