@@ -223,6 +223,20 @@ class AvgResponsibleProcessingRecordFactory extends Factory
         });
     }
 
+    public function withPublishedSnapshot(): self
+    {
+        return $this->afterCreating(function (AvgResponsibleProcessingRecord $avgResponsibleProcessingRecord): void {
+            Snapshot::factory()
+                ->for($avgResponsibleProcessingRecord, 'snapshotSource')
+                ->recycle($avgResponsibleProcessingRecord->organisation)
+                ->withSnapshotTransitions()
+                ->withSnapshotData(['forPublicWebsite' => true])
+                ->create([
+                    'state' => 'established',
+                ]);
+        });
+    }
+
     public function withStakeholders(?int $count = null): self
     {
         return $this->afterCreating(function (AvgResponsibleProcessingRecord $avgResponsibleProcessingRecord) use ($count): void {

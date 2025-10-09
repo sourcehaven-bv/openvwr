@@ -1,0 +1,45 @@
+{{ define "main" }}
+
+{{ $organisations := where $.Site.Pages "Type" "organisation" }}
+
+<section class="hero">
+  {{ $heroImage := resources.Get "images/home-hero.jpg" }}
+  <img src="{{ $heroImage.Permalink | relURL }}" alt="OpenVWR - Open source processing record management" width="1920" height="200" />
+  {{ partial "hero-links.html" . }}
+</section>
+
+{{ $trimmed_content := strings.TrimRight "\n" .Content }}
+{{ if $trimmed_content }}
+<section class="intro">
+  <div class="content-wrapper">
+      {{ .Content }}
+  </div>
+</section>
+{{ end }}
+
+<section class="organisations">
+  <div class="content-wrapper">
+    <div class="organisation-grid">
+      {{ $nodes := where $.Site.Pages "Type" "organisation" }}
+      {{ $nodes = where $nodes "Params.depth" 0 }}
+      {{ range $nodes }}
+        <a href="{{ .RelPermalink }}" class="organisation-card">
+          <div role="group">
+            {{ $imageAlt := .LinkTitle }}
+            {{- $fallbackImage := resources.Get "images/organisation-fallback.svg" }}
+            {{- with or (.Resources.Get "poster.jpeg") (.Resources.Get "poster.png") (.Resources.Get "poster.svg") }}
+              {{- with .Fill "300x192 Center webp" }}
+                <img src="{{ .Permalink | relURL }}" alt="{{ $imageAlt }}" width="{{ .Width }}" height="{{ .Height }}" loading="lazy"/>
+              {{- end }}
+            {{- else }}
+              <img src="{{ $fallbackImage.Permalink | relURL }}" alt="{{ $imageAlt }}" width="300" height="192" loading="lazy"/>
+            {{- end }}
+            <h4>{{ .LinkTitle }}</h4>
+          </div>
+        </a>
+      {{ end }}
+    </div>
+  </div>
+</section>
+
+{{ end }}

@@ -13,7 +13,7 @@ return [
     'hugo_filesystem_disk' => 'static-website',
 
     // the folder on the disk, used for static-content
-    'hugo_content_folder' => 'static-content',
+    'hugo_content_folder' => 'content',
 
     // Path to the build script that generates the static website
     // The build script determines where output files are written and which theme to use

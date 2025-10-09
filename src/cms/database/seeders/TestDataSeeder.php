@@ -34,7 +34,7 @@ class TestDataSeeder extends Seeder
     private function createOrganisations(): OrganisationCollection
     {
         $organisations = Organisation::factory()
-            ->withAllRelatedEntities()
+            ->withPublishedEntities()
             ->count(4)
             ->state(new Sequence(
                 [
@@ -88,6 +88,7 @@ class TestDataSeeder extends Seeder
             ))
             ->create([
                 'allowed_ips' => '*.*.*.*',
+                'public_from' => now()->subDay(),
             ]);
         Assert::isInstanceOf($organisations, OrganisationCollection::class);
 
@@ -153,7 +154,9 @@ class TestDataSeeder extends Seeder
         foreach ($organisations as $organisation) {
             PublicWebsiteTree::factory()
                 ->recycle($organisation)
-                ->create();
+                ->create([
+                    'public_from' => now()->subDay(),
+                ]);
         }
     }
 }

@@ -26,4 +26,14 @@ class SnapshotDataFactory extends Factory
             'public_markdown' => $this->faker->optional()->markdown(),
         ];
     }
+
+    public function forPublicWebsite(): self
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'public_frontmatter' => $this->faker->publicFrontmatter(),
+                'public_markdown' => $this->faker->markdown(),
+            ];
+        });
+    }
 }

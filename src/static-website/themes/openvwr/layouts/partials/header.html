@@ -1,0 +1,15 @@
+<header class="site-header">
+  <div class="header-content">
+    <div class="logo-and-title">
+      {{ partial "logo.html" . }}
+      <span class="site-title">
+        <a href="/">{{ $.Site.Title }}</a>
+      </span>
+    </div>
+
+    <div class="header-actions">
+      {{ partial "dark-mode-toggle.html" . }}
+      {{ partial "navigation.html" . }}
+    </div>
+  </div>
+</header>

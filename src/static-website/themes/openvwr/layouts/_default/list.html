@@ -1,0 +1,28 @@
+{{ define "main" }}
+<article class="content-wrapper">
+  <header>
+    <h1>{{ .Title }}</h1>
+  </header>
+
+  {{ with .Content }}
+  <section class="content">
+    {{ . }}
+  </section>
+  {{ end }}
+
+  {{ if .Pages }}
+  <section class="list">
+    {{ range .Pages }}
+    <article class="list-item">
+      <h2>
+        <a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>
+      </h2>
+      {{ with .Summary }}
+      <p>{{ . }}</p>
+      {{ end }}
+    </article>
+    {{ end }}
+  </section>
+  {{ end }}
+</article>
+{{ end }}

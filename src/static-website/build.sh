@@ -19,8 +19,9 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Configuration - these can be customized for your deployment
-THEME="${HUGO_THEME:-rijkshuisstijl}"
-DESTINATION_PATH="${HUGO_OUTPUT_DIR:-${SCRIPT_DIR}/public}"
+THEME="${HUGO_THEME:-openvwr}"
+# Default to storage directory for nginx serving, fall back to public for local dev
+DESTINATION_PATH="${HUGO_OUTPUT_DIR:-/var/www/html/storage/app/static-website}"
 
 echo "Building static website with Hugo..."
 echo "  Content path: ${CONTENT_PATH}"
@@ -33,10 +34,10 @@ echo "  Hugo project: ${SCRIPT_DIR}"
 cd "${SCRIPT_DIR}"
 
 hugo -c "${CONTENT_PATH}" \
-     -d "${DESTINATION_PATH}" \
-     -b "${BASE_URL}" \
-     -t "${THEME}" \
-     --cleanDestinationDir
+    -d "${DESTINATION_PATH}" \
+    -b "${BASE_URL}" \
+    -t "${THEME}" \
+    --cleanDestinationDir
 
 echo "Static website built successfully"
 
