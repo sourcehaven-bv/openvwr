@@ -1,6 +1,6 @@
 languageCode: nl-NL
 title: Verwerkingsregister
-theme: manon
+theme: openvwr
 markup:
   goldmark:
     renderer:
@@ -11,3 +11,5 @@ outputs:
     - JSON
 params:
   debug: false
+  darkMode: true
+  defaultTheme: auto

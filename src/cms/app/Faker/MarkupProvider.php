@@ -27,6 +27,26 @@ class MarkupProvider extends Miscellaneous
         ];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    public function publicFrontmatter(): array
+    {
+        $title = $this->generator->sentence(3);
+        $description = $this->generator->sentence();
+        $reference = strtoupper($this->generator->bothify('???#####'));
+
+        return [
+            'title' => $title,
+            'type' => 'processing-record',
+            'record' => [
+                'title' => $title,
+                'description' => $description,
+                'reference' => $reference,
+            ],
+        ];
+    }
+
     public function markdown(): string
     {
         $markdown = [

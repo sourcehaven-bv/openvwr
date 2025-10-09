@@ -1,0 +1,5 @@
+
+{{- if site.Params.debug -}}
+    {{- $comment := printf "<!-- start %s -->" . -}}
+    {{- $comment | safeHTML -}}
+{{- end -}}

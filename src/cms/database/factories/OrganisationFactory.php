@@ -71,6 +71,18 @@ class OrganisationFactory extends Factory
             ->withWpgProcessingRecords();
     }
 
+    public function withPublishedEntities(): self
+    {
+        return self::withUsers()
+            ->withAlgorithmRecords()
+            ->withAvgProcessorProcessingRecords()
+            ->withAvgResponsibleProcessingRecordsPublished()
+            ->withDataBreachRecords()
+            ->withDocuments()
+            ->withPosterImage()
+            ->withWpgProcessingRecords();
+    }
+
     public function withAlgorithmRecords(?int $count = null): self
     {
         return $this->afterCreating(function (Organisation $organisation) use ($count): void {
@@ -104,6 +116,32 @@ class OrganisationFactory extends Factory
                 ->withAllRelatedEntities()
                 ->count($count ?? $this->faker->randomDigitNotNull())
                 ->create();
+        });
+    }
+
+    public function withAvgResponsibleProcessingRecordsPublished(?int $count = null): self
+    {
+        return $this->afterCreating(function (Organisation $organisation) use ($count): void {
+            AvgResponsibleProcessingRecord::factory()
+                ->for($organisation)
+                ->recycle($organisation)
+                ->withAvgGoals()
+                ->withContactPersons()
+                ->withDataBreachRecords()
+                ->withDocuments()
+                ->withFgRemark()
+                ->withProcessors()
+                ->withReceivers()
+                ->withRemarks()
+                ->withResponsibles()
+                ->withStakeholders()
+                ->withSystems()
+                ->withTags()
+                ->withPublishedSnapshot()
+                ->count($count ?? $this->faker->randomDigitNotNull())
+                ->create([
+                    'public_from' => now()->subDay(),
+                ]);
         });
     }
 

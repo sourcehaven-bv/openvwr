@@ -1,17 +1,17 @@
 {
-    "title": "Algemene informatie",
+    "title": "Over OpenVWR",
     "links": [
         {
-            "label": "Algemene verordening gegevensbescherming (AVG)",
-            "url": "https://autoriteitpersoonsgegevens.nl/nl/onderwerpen/avg-europese-privacywetgeving"
+            "label": "Open source verwerkingsregister",
+            "url": "https://github.com/Sourcehaven-BV/openvwr"
         },
         {
-            "label": "Privacy en persoonsgegevens",
-            "url": "https://www.rijksoverheid.nl/onderwerpen/privacy-en-persoonsgegevens"
+            "label": "Transparantie in gegevensverwerking",
+            "url": "https://github.com/Sourcehaven-BV/openvwr#features"
         },
         {
-            "label": "Vragen over persoonsgegevens",
-            "url": "https://autoriteitpersoonsgegevens.nl/nl/over-privacy/persoonsgegevens"
+            "label": "Start met OpenVWR",
+            "url": "https://github.com/Sourcehaven-BV/openvwr#getting-started"
         }
     ]
 }

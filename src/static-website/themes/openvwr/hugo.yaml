@@ -1,0 +1,12 @@
+name: openvwr
+license: EUPL-1.2
+licenselink: https://github.com/Sourcehaven-BV/openvwr/blob/main/LICENSE
+description: A minimal, neutral Hugo theme with dark mode support for OpenVWR
+homepage: https://github.com/Sourcehaven-BV/openvwr
+tags:
+  - minimal
+  - neutral
+  - dark-mode
+  - accessible
+  - responsive
+min_version: 0.123.0

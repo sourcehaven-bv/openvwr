@@ -1,0 +1,14 @@
+{{ define "main" }}
+{{ partial "debug/mark-start" "layouts/processing-record/single"  }}
+
+
+<section>
+  <div>
+
+    {{ .Content }}
+
+  </div>
+</section>
+
+{{ partial "debug/mark-end" }}
+{{ end }}

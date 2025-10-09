@@ -1,0 +1,28 @@
+<footer class="site-footer">
+  <div class="footer-content">
+    <div class="footer-section">
+      <p>&copy; {{ now.Year }} {{ site.Title }}</p>
+    </div>
+
+    {{ with site.Menus.footer }}
+    <nav class="footer-nav" aria-label="Footer navigation">
+      <ul>
+        {{ range . }}
+        <li>
+          <a href="{{ .URL }}">{{ .Name }}</a>
+        </li>
+        {{ end }}
+      </ul>
+    </nav>
+    {{ end }}
+  </div>
+
+  {{ $now := time.Now }}
+  {{ $date := time.Format ":date_full" $now }}
+  {{ $time := time.Format ":time_full" $now }}
+  {{ $buildTimeComment := printf "<!-- build timestamp: %s - %s -->" $date $time }}
+  {{ $buildTimeComment | safeHTML }}
+</footer>
+
+{{ $script := resources.Get "dark-mode.js" | fingerprint }}
+<script src="{{ $script.Permalink | relURL }}" integrity="{{ $script.Data.Integrity }}"></script>

@@ -62,9 +62,14 @@ class SnapshotFactory extends Factory
     public function withSnapshotData(array $snapshotDataAttributes = []): static
     {
         return $this->afterCreating(static function (Snapshot $snapshot) use ($snapshotDataAttributes): void {
-            SnapshotData::factory()
-                ->for($snapshot)
-                ->create($snapshotDataAttributes);
+            $factory = SnapshotData::factory()->for($snapshot);
+
+            if (isset($snapshotDataAttributes['forPublicWebsite']) && $snapshotDataAttributes['forPublicWebsite']) {
+                unset($snapshotDataAttributes['forPublicWebsite']);
+                $factory = $factory->forPublicWebsite();
+            }
+
+            $factory->create($snapshotDataAttributes);
         });
     }
 }
