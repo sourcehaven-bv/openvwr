@@ -68,8 +68,6 @@ jobs:
           php -r "file_exists('.env') || copy('.env.example', '.env');"
 
       - name: Composer install
-        env:
-          COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ secrets.REPO_READ_ONLY_TOKEN }}"}}'
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
       - name: Prepare application
@@ -106,12 +104,6 @@ jobs:
         run: vendor/bin/phpmd app github ./phpmd.xml
 
       - name: Phpunit
-        run: vendor/bin/pest --coverage --min=100 --log-junit=reports/report-phpunit.xml --coverage-clover=reports/coverage-phpunit.xml
+        run: vendor/bin/pest --coverage --coverage-text --min=100 --log-junit=reports/report-phpunit.xml --coverage-clover=reports/coverage-phpunit.xml
         env:
           DB_PORT: ${{ job.services.postgres.ports[5432] }}
-
-      - name: Run SonarQube scan
-        uses: minvws/action-sonarqube@v1
-        with:
-          sonar-token: ${{ secrets.SONAR_TOKEN }}
-          project-base-dir: ./src/cms
