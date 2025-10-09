@@ -9,4 +9,8 @@ use App\Events\LogDispatchable;
 class AfterBuildEvent
 {
     use LogDispatchable;
+
+    public function __construct()
+    {
+    }
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Events\StaticWebsite\AfterBuildEvent;
 use App\Events\StaticWebsite\BuildEvent;
 use App\Events\User\UserCreatedEvent;
 use App\Listeners\Media\MediaHasBeenAddedHandler;
