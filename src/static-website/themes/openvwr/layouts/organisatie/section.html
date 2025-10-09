@@ -1,0 +1,59 @@
+{{ define "main" }}
+{{ partial "debug/mark-start" "layouts/organisation/section"  }}
+
+<section class="hero">
+  {{- with or (.Resources.Get "poster.jpeg") (resources.Get "images/organisation-fallback.jpeg") }}
+    {{- with .Fill "1920x480 webp" }}
+      <img src="{{ .Permalink }}" alt="{{ .Title }}" width="{{ .Width }}" height="{{ .Height }}" loading="lazy"/>
+    {{- end }}
+  {{- end }}
+
+  {{ partial "hero-links" }}
+</section>
+
+{{ $processingrecords := where .Pages "Type" "processing-record" }}
+{{- range $processingrecords }}
+<section class="organisation__navigation background-color-offset">
+  <div>
+    <nav aria-label="Navigatie voorbeeldlijst">
+      <ul>
+        <li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+      </ul>
+    </nav>
+  </div>
+</section>
+{{- end }}
+
+<section>
+  <div>
+    {{ .Content }}
+  </div>
+</section>
+
+{{ $nodes := where .Pages "Type" "organisation" }}
+{{ if $nodes }}
+<section>
+  <div>
+    <div class="column-3">
+        {{- range $nodes }}
+        <a href="{{ .RelPermalink }}">
+          <div role="group">
+            {{ $imageAlt := .LinkTitle }}
+            {{- with or (.Resources.Get "poster.jpeg") (resources.Get "images/organisation-fallback.jpeg") }}
+              {{- with .Fill "300x192 Center webp" }}
+                <img src="{{ .Permalink }}" alt="{{ $imageAlt }}" width="{{ .Width }}" height="{{ .Height }}" loading="lazy"/>
+              {{- end }}
+            {{- end }}
+            <h4>{{ .LinkTitle }}</h4>
+          </div>
+        </a>
+      {{ end }}
+    </div>
+  </div>
+</section>
+{{ end }}
+
+{{ partial "debug/mark-end" }}
+{{ end }}
+
+

@@ -1,0 +1,16 @@
+{{ if site.Params.debug }}
+{{ partial "debug/mark-start" "layouts/partials/debug/log-info"  }}
+<script>
+    console.table({
+        "Type": "{{ .Type }}",
+        "Kind": "{{ .Kind }}",
+        "Layout": "{{ or "-" .Layout }}",
+        "RelPermalink": "{{ .RelPermalink }}",
+        "Permalink": "{{ .Permalink }}",
+        "Path": "{{ with .File }}{{ .Path }}{{ else }}{{ .Path }}{{ end }}",
+        "Date": "{{ .Date }}",
+        "Draft": "{{ .Draft }}"
+    });
+</script>
+{{ partial "debug/mark-end" }}
+{{ end }}

@@ -1,0 +1,15 @@
+<div class="hero-links">
+  {{ $general := site.Data.general }}
+  {{ with $general }}
+  <div class="hero-tile">
+    <h4 class="hero-title">{{ .title }}</h4>
+    <nav>
+      <ul>
+        {{ range .links }}
+          <li><a href="{{ .url }}" aria-label="{{ .label }}" rel="external noopener">{{ .label }}</a></li>
+        {{ end }}
+      </ul>
+    </nav>
+  </div>
+  {{ end }}
+</div>
