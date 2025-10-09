@@ -18,6 +18,7 @@ use Illuminate\Support\Str;
 use Webmozart\Assert\Assert;
 
 use function __;
+use function now;
 use function sprintf;
 
 class TestDataSeeder extends Seeder
