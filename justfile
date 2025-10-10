@@ -125,3 +125,35 @@ build-static:
 # Open the static website in browser
 open-static:
     open http://localhost:8080
+
+# Code Quality & CI
+# ==================
+
+# Run all CI checks (code style, static analysis, tests)
+ci: ci-style ci-phpstan ci-phpmd test
+    @echo "✅ All CI checks passed!"
+
+# Fix code style issues automatically
+ci-fix:
+    @echo "🔧 Fixing code style issues..."
+    cd src/cms && ./vendor/bin/phpcbf
+    @echo "✅ Code style fixed"
+
+# Check code style (phpcs)
+ci-style:
+    @echo "🎨 Checking code style..."
+    cd src/cms && ./vendor/bin/phpcs -n
+
+# Run static analysis (phpstan)
+ci-phpstan:
+    @echo "🔍 Running static analysis..."
+    cd src/cms && ./vendor/bin/phpstan analyse
+
+# Run mess detector (phpmd)
+ci-phpmd:
+    @echo "🔍 Running mess detector..."
+    cd src/cms && ./vendor/bin/phpmd app github ./phpmd.xml
+
+# Run all checks and auto-fix what can be fixed
+ci-check: ci-fix ci-phpstan ci-phpmd test
+    @echo "✅ All checks complete!"

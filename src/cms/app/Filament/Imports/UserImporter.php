@@ -50,11 +50,11 @@ class UserImporter extends Importer
 
     public function resolveRecord(): User
     {
-         return User::withoutGlobalScopes()
-             ->firstOrNew([
-                 'email' => $this->data['email'],
-                 'deleted_at' => null,
-             ]);
+        return User::withoutGlobalScopes()
+            ->firstOrNew([
+                'email' => $this->data['email'],
+                'deleted_at' => null,
+            ]);
     }
 
     public static function getCompletedNotificationBody(Import $import): string

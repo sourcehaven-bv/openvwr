@@ -11,6 +11,10 @@ use Illuminate\Process\Exceptions\ProcessFailedException;
 use Illuminate\Support\Facades\Process;
 use Psr\Log\LoggerInterface;
 
+use function dirname;
+use function escapeshellarg;
+use function file_exists;
+use function is_executable;
 use function sprintf;
 
 class HugoStaticWebsiteGenerator implements StaticWebsiteGenerator
@@ -66,7 +70,7 @@ class HugoStaticWebsiteGenerator implements StaticWebsiteGenerator
             '%s %s %s',
             escapeshellarg($this->buildScriptPath),
             escapeshellarg($sourcePath),
-            escapeshellarg($this->baseUrl)
+            escapeshellarg($this->baseUrl),
         );
 
         $this->logger->debug('Executing build script', [

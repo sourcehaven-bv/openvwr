@@ -77,7 +77,7 @@ return [
             'throw' => false,
         ],
 
-         // only used to access the .db-requirements file in a docker-setup as volume (see config/sql-generator.php)
+        // only used to access the .db-requirements file in a docker-setup as volume (see config/sql-generator.php)
         'sql-generation-management' => [
             'driver' => 'local',
             'root' => storage_path('app/sql-generation-management'),
