@@ -2,7 +2,7 @@
 
 This directory contains the Hugo static website that displays published processing records (verwerkingen) from the OpenVWR CMS.
 
-The website uses the `openvwr` theme - a minimal, neutral theme with dark mode support.
+The website uses the `openvwr` theme - a minimal theme which can easily be expanded upon.
 
 ## Architecture
 
@@ -60,7 +60,6 @@ Configure these in the CMS `.env` file:
 A minimal, neutral theme with:
 
 - Clean, accessible design
-- Dark mode with localStorage persistence
 - System preference detection
 - Responsive layout
 - Processing record list and detail pages

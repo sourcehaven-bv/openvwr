@@ -1,0 +1,6 @@
+@mixin --card() {
+	padding: var(--default-padding);
+	margin: var(--default-margin);
+	border-radius: var(--default-border-radius);
+	box-shadow: var(--default-box-shadow);
+}
