@@ -39,50 +39,50 @@ class TestDataSeeder extends Seeder
             ->count(4)
             ->state(new Sequence(
                 [
-                    'name' => 'RIVM',
-                    'slug' => 'rivm',
+                    'name' => 'Nederlands Instituut voor Publieke Gezondheid',
+                    'slug' => 'nipg',
                     'register_entity_number_counter_id' => EntityNumberCounter::factory([
-                        'prefix' => 'RIVM',
+                        'prefix' => 'NIPG',
                         'type' => EntityNumberType::REGISTER,
                     ]),
                     'databreach_entity_number_counter_id' => EntityNumberCounter::factory([
-                        'prefix' => 'RIVMD',
+                        'prefix' => 'NIPGD',
                         'type' => EntityNumberType::DATABREACH,
                     ]),
                 ],
                 [
-                    'name' => 'Gezondheidsraad',
-                    'slug' => 'gezr',
+                    'name' => 'Centraal Planbureau voor Welzijn en Gezondheid',
+                    'slug' => 'cpwg',
                     'register_entity_number_counter_id' => EntityNumberCounter::factory([
-                        'prefix' => 'GEZR',
+                        'prefix' => 'CPWG',
                         'type' => EntityNumberType::REGISTER,
                     ]),
                     'databreach_entity_number_counter_id' => EntityNumberCounter::factory([
-                        'prefix' => 'GEZRD',
+                        'prefix' => 'CPWGD',
                         'type' => EntityNumberType::DATABREACH,
                     ]),
                 ],
                 [
-                    'name' => 'Sociaal en Cultureel Planbureau',
-                    'slug' => 'secp',
+                    'name' => 'Raad voor Maatschappelijke Veerkracht',
+                    'slug' => 'rmv',
                     'register_entity_number_counter_id' => EntityNumberCounter::factory([
-                        'prefix' => 'SECP',
+                        'prefix' => 'RMV',
                         'type' => EntityNumberType::REGISTER,
                     ]),
                     'databreach_entity_number_counter_id' => EntityNumberCounter::factory([
-                        'prefix' => 'SECPD',
+                        'prefix' => 'RMVD',
                         'type' => EntityNumberType::DATABREACH,
                     ]),
                 ],
                 [
-                    'name' => 'Rijksdienst voor Ondernemend Nederland',
-                    'slug' => 'rvon',
+                    'name' => 'Instituut voor Duurzame Samenleving en Zorg',
+                    'slug' => 'idsz',
                     'register_entity_number_counter_id' => EntityNumberCounter::factory([
-                        'prefix' => 'RVON',
+                        'prefix' => 'IDSZ',
                         'type' => EntityNumberType::REGISTER,
                     ]),
                     'databreach_entity_number_counter_id' => EntityNumberCounter::factory([
-                        'prefix' => 'RVOND',
+                        'prefix' => 'IDSZD',
                         'type' => EntityNumberType::DATABREACH,
                     ]),
                 ],
@@ -156,6 +156,8 @@ class TestDataSeeder extends Seeder
             PublicWebsiteTree::factory()
                 ->recycle($organisation)
                 ->create([
+                    'title' => $organisation->name,
+                    'slug' => $organisation->slug,
                     'public_from' => now()->subDay(),
                 ]);
         }
