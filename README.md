@@ -199,9 +199,7 @@ After each deployment, follow these steps:
 
 1. **Clear Caches:** `php artisan optimize:clear`
 2. **Restart Workers:** Restart all worker processes to load new code
-3. **Rebuild Websites:**
-   - `php artisan public-website:refresh`
-   - `php artisan static-website:refresh`
+3. **Rebuild Website:** `php artisan static-website:refresh`
 
 ### Environment Variables
 

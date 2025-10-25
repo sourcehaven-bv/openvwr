@@ -23,6 +23,3 @@
   {{ $buildTimeComment := printf "<!-- build timestamp: %s - %s -->" $date $time }}
   {{ $buildTimeComment | safeHTML }}
 </footer>
-
-{{ $script := resources.Get "dark-mode.js" | fingerprint }}
-<script src="{{ $script.Permalink | relURL }}" integrity="{{ $script.Data.Integrity }}"></script>
