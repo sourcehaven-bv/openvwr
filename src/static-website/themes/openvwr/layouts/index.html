@@ -1,45 +1,48 @@
 {{ define "main" }}
+{{ partial "debug/mark-start" "layouts/organisation/section"  }}
 
 {{ $organisations := where $.Site.Pages "Type" "organisation" }}
 
-<section class="hero">
-  {{ $heroImage := resources.Get "images/home-hero.jpg" }}
-  <img src="{{ $heroImage.Permalink | relURL }}" alt="OpenVWR - Open source processing record management" width="1920" height="200" />
+<section>
+  {{ $heroImage := resources.Get "images/home-hero.svg" }}
+  <img src="{{ $heroImage.Permalink | relURL }}" alt="Hero image" class="h-48 w-full object-cover"/>
+</section>
+
+<section class="container relative mb-28">
   {{ partial "hero-links.html" . }}
 </section>
 
 {{ $trimmed_content := strings.TrimRight "\n" .Content }}
 {{ if $trimmed_content }}
-<section class="intro">
-  <div class="content-wrapper">
+<section class="container">
+  <div class="markdown-content px-4">
       {{ .Content }}
   </div>
 </section>
 {{ end }}
 
-<section class="organisations">
-  <div class="content-wrapper">
-    <div class="organisation-grid">
-      {{ $nodes := where $.Site.Pages "Type" "organisation" }}
-      {{ $nodes = where $nodes "Params.depth" 0 }}
-      {{ range $nodes }}
-        <a href="{{ .RelPermalink }}" class="organisation-card">
-          <div role="group">
-            {{ $imageAlt := .LinkTitle }}
-            {{- $fallbackImage := resources.Get "images/organisation-fallback.svg" }}
-            {{- with or (.Resources.Get "poster.jpeg") (.Resources.Get "poster.png") (.Resources.Get "poster.svg") }}
-              {{- with .Fill "300x192 Center webp" }}
-                <img src="{{ .Permalink | relURL }}" alt="{{ $imageAlt }}" width="{{ .Width }}" height="{{ .Height }}" loading="lazy"/>
-              {{- end }}
-            {{- else }}
-              <img src="{{ $fallbackImage.Permalink | relURL }}" alt="{{ $imageAlt }}" width="300" height="192" loading="lazy"/>
+<section class="container py-2">
+  <div class="w-full grid  lg:grid-cols-3 gap-4 sm:grid-cols-1 md:grid-cols-2 ">
+    {{ $nodes := where $.Site.Pages "Type" "organisation" }}
+    {{ $nodes = where $nodes "Params.depth" 0 }}
+    {{ range $nodes }}
+      <a href="{{ .RelPermalink }}">
+        <div role="group" class="card p-8">
+          {{ $imageAlt := .LinkTitle }}
+          {{- $fallbackImage := resources.Get "images/organisation-fallback.jpeg" }}
+          {{- with or (.Resources.Get "poster.jpeg") (.Resources.Get "poster.png") (.Resources.Get "poster.svg") }}
+            {{- with .Fill "300x192 Center webp" }}
+              <img src="{{ .Permalink | relURL }}" alt="{{ $imageAlt }}" width="{{ .Width }}" height="{{ .Height }}" loading="lazy" class="w-full object-cover"/>
             {{- end }}
-            <h4>{{ .LinkTitle }}</h4>
-          </div>
-        </a>
-      {{ end }}
-    </div>
+          {{- else }}
+            <img src="{{ $fallbackImage.Permalink | relURL }}" alt="{{ $imageAlt }}" width="300" height="192" loading="lazy" class="w-full object-cover"/>
+          {{- end }}
+          <h4 class="text-[var(--color-secondary)] font-bold text-lg mt-2">{{ .LinkTitle }}</h4>
+        </div>
+      </a>
+    {{ end }}
   </div>
 </section>
 
+{{ partial "debug/mark-end" }}
 {{ end }}

@@ -44,13 +44,13 @@ hugo -c <content-path> -d <destination-path> -b <base-url> -t <theme> --cleanDes
 **Build Script Configuration:**
 The build script itself determines:
 - **Output location**: Via `HUGO_OUTPUT_DIR` env var (defaults to `./public`)
-- **Theme**: Via `HUGO_THEME` env var (defaults to `rijkshuisstijl`)
+- **Theme**: Via `HUGO_THEME` env var (defaults to `openvwr`)
 
 **Hugo Project Structure:**
 - Location: `/src/static-website/`
 - Build script: `build.sh`
 - Configuration: `hugo.yaml`
-- Theme: `themes/rijkshuisstijl/` (default)
+- Theme: `themes/openvwr/` (default)
 - Assets: `assets/css/hugo-pagination.scss`
 
 ### Step 3: Deployment Check
@@ -69,7 +69,7 @@ After the build completes:
 
 **Optional:**
 - `STATIC_WEBSITE_BUILD_SCRIPT` - Path to the build script (default: `<project-root>/static-website/build.sh`)
-- `STATIC_WEBSITE_THEME` - Theme to use for the static website (default: `rijkshuisstijl`)
+- `STATIC_WEBSITE_THEME` - Theme to use for the static website (default: `openvwr`)
 - `STATIC_WEBSITE_CHECK_BASE_URL` - URL to check for deployment verification (defaults to `STATIC_WEBSITE_BASE_URL`)
 - `STATIC_WEBSITE_CHECK_PROXY` - Proxy to use for deployment checks
 - `STATIC_WEBSITE_GENERATOR` - Generator to use (default: `hugo`, options: `hugo`, `fake`)
@@ -90,7 +90,7 @@ return [
     'hugo_content_folder' => 'static-content',
     'static_website_folder' => 'static-website',
     'build_script_path' => env('STATIC_WEBSITE_BUILD_SCRIPT', base_path('static-website/build.sh')),
-    'theme' => env('STATIC_WEBSITE_THEME', 'rijkshuisstijl'),
+    'theme' => env('STATIC_WEBSITE_THEME', 'openvwr'),
     'base_url' => env('STATIC_WEBSITE_BASE_URL'),
     'plan-check-job-delays' => [1, 2, 3, 5, 10], // minutes
 ];
@@ -202,7 +202,7 @@ Alternatively, you can create your own build script and set `STATIC_WEBSITE_BUIL
 **Hugo Project:**
 - Source: `/src/static-website/`
 - Config: `/src/static-website/hugo.yaml`
-- Theme: `/src/static-website/themes/rijkshuisstijl/`
+- Theme: `/src/static-website/themes/openvwr/`
 
 **Generated Content:**
 - Content files: `storage/app/static-content/`

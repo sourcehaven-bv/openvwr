@@ -1,11 +1,12 @@
-<footer class="site-footer">
-  <div class="footer-content">
-    <div class="footer-section">
-      <p>&copy; {{ now.Year }} {{ site.Title }}</p>
+<footer class="border-t mt-8">
+  <div  class="container py-8">
+
+    <div>
+      <p class="text-[var(--color-secondary)]">&copy; {{ now.Year }} {{ site.Title }}</p>
     </div>
 
     {{ with site.Menus.footer }}
-    <nav class="footer-nav" aria-label="Footer navigation">
+    <nav aria-label="Footer navigation">
       <ul>
         {{ range . }}
         <li>
@@ -15,6 +16,7 @@
       </ul>
     </nav>
     {{ end }}
+
   </div>
 
   {{ $now := time.Now }}

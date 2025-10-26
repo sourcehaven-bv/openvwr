@@ -18,8 +18,3 @@ SPDX-FileCopyrightText = [
 ]
 SPDX-License-Identifier = "CC0-1.0"
 
-[[annotations]]
-path = "src/**/themes/rijkshuisstijl"
-precedence = "aggregate"
-SPDX-FileCopyrightText = "iRealisatie - Ministerie van Volksgezondheid, Welzijn en Sport"
-SPDX-License-Identifier = "LicenseRef-Rijkshuisstijl"

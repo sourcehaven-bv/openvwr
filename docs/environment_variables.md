@@ -124,7 +124,7 @@ The following environment variables are used to configure the application in `sr
 
 **Build Script Environment Variables:**
 
-- `HUGO_THEME` - Hugo theme to use (default: `rijkshuisstijl`)
+- `HUGO_THEME` - Hugo theme to use (default: `openvwr`)
 - `HUGO_OUTPUT_DIR` - Where build script writes output (default: `./public`)
 
 **QUEUE:**
