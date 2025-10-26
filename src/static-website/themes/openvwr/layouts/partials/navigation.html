@@ -1,9 +1,9 @@
 {{ with site.Menus.main }}
-<nav class="main-nav" aria-label="Main navigation">
+<nav aria-label="Main navigation">
   <ul>
     {{ range . }}
     <li>
-      <a href="{{ .URL }}"{{ if $.IsMenuCurrent "main" . }} aria-current="page" class="active"{{ end }}>
+      <a href="{{ .URL }}"{{ if $.IsMenuCurrent "main" . }} aria-current="page"{{ end }}>
         {{ .Name }}
       </a>
     </li>
