@@ -1,34 +1,30 @@
 {{ define "main" }}
 {{ partial "debug/mark-start" "layouts/processing-record/single"  }}
 
-<section class="processing-record-list centered">
+<section class="container">
+  <ul class="flex flex-col gap-2">
+      {{ $records := where .Pages "Type" "processing-record" }}
+      {{ $paginator := .Paginate $records 10 }}
+      {{- range $paginator.Pages }}
+      <li class="card">
+        <a href="{{ .RelPermalink }}" aria-labelledby="title-{{ .Params.record.reference }}" aria-describedby="desc-{{ .Params.record.reference }}">
+          <div role="group">
+              <h2 class="text-lg font-bold text-[var(--color-primary)]">{{.Params.record.title}}</h2>
+              <p>{{.Params.record.description}}</p>
+
+              <p>
+                {{/*  organisatie: {{.Params.organisation}}<br>  */}}
+                Verwerkingsnummer: {{.Params.record.reference}}<br>
+                {{/*  Type: {{.Params.type}}<br>  */}}
+              </p>
+          </div>
+        </a>
+      </li>
+      {{- end }}
+  </ul>
+
   <div>
-
-    <ul class="list-reset">
-        {{ $records := where .Pages "Type" "processing-record" }}
-        {{ $paginator := .Paginate $records 10 }}
-        {{- range $paginator.Pages }}
-        <li>
-          <a href="{{ .RelPermalink }}" aria-labelledby="title-{{ .Params.record.reference }}" aria-describedby="desc-{{ .Params.record.reference }}">
-            <div class="card" role="group">
-                <h2 id="title-{{ .Params.record.reference }}">{{.Params.record.title}}</h2>
-                <p>{{.Params.record.description}}</p>
-
-                <p id="desc-{{ .Params.record.reference }}" class="processing-record-list__details">
-                  {{/*  organisatie: {{.Params.organisation}}<br>  */}}
-                  Verwerkingsnummer: {{.Params.record.reference}}<br>
-                  {{/*  Type: {{.Params.type}}<br>  */}}
-                </p>
-            </div>
-          </a>
-        </li>
-        {{- end }}
-    </ul>
-
-    <div class="hugo-pagination centered">
-      {{ template "_internal/pagination.html" . }}
-    </div>
-
+    {{ template "_internal/pagination.html" . }}
   </div>
 </section>
 

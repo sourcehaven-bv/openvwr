@@ -1,15 +1,13 @@
-<div class="hero-links">
-  {{ $general := site.Data.general }}
-  {{ with $general }}
-  <div class="hero-tile">
-    <h4 class="hero-title">{{ .title }}</h4>
-    <nav>
-      <ul>
-        {{ range .links }}
-          <li><a href="{{ .url }}" aria-label="{{ .label }}" rel="external noopener">{{ .label }}</a></li>
-        {{ end }}
-      </ul>
-    </nav>
-  </div>
-  {{ end }}
+{{ $general := site.Data.general }}
+{{ with $general }}
+<div class="card absolute -top-12">
+  <h4 class="mb-1 font-bold text-[var(--color-primary)]">{{ .title }}</h4>
+  <nav>
+    <ul class="list-disc ml-4">
+      {{ range .links }}
+        <li><a href="{{ .url }}" aria-label="{{ .label }}" rel="external noopener" class="hover:text-[var(--color-primary)]">{{ .label }}</a></li>
+      {{ end }}
+    </ul>
+  </nav>
 </div>
+{{ end }}

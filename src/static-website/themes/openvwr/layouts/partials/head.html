@@ -6,16 +6,15 @@
 <meta name="description" content="{{ . }}">
 {{ end }}
 
+{{/* Build Tailwind CSS via PostCSS (requires Node modules) */}}
+{{ $twInput := resources.Get "tailwind.css" }}
+{{ if $twInput }}
+	{{ $tw := $twInput | postCSS (dict "config" "postcss.config.js") | minify | fingerprint }}
+	<link rel="stylesheet" href="{{ $tw.Permalink | relURL }}" integrity="{{ $tw.Data.Integrity }}">
+{{ end }}
+
+{{/* Build theme SCSS as before */}}
 {{ $options := dict "targetPath" "css/main.css" "outputStyle" "compressed" }}
 {{ $styles := resources.Get "main.scss" | resources.ToCSS $options | fingerprint }}
-<link rel="stylesheet" href="{{ $styles.Permalink | relURL }}" integrity="{{ $styles.Data.Integrity }}">
 
-<script>
-  // Initialize dark mode before page renders to prevent flash
-  (function() {
-    const theme = localStorage.getItem('theme') || 'auto';
-    if (theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      document.documentElement.setAttribute('data-theme', 'dark');
-    }
-  })();
-</script>
+<link rel="stylesheet" href="{{ $styles.Permalink | relURL }}" integrity="{{ $styles.Data.Integrity }}">

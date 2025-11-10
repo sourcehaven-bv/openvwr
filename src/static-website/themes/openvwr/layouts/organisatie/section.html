@@ -1,40 +1,45 @@
 {{ define "main" }}
 {{ partial "debug/mark-start" "layouts/organisation/section"  }}
 
-<section class="hero">
+<section>
   {{- with or (.Resources.Get "poster.jpeg") (resources.Get "images/organisation-fallback.jpeg") }}
     {{- with .Fill "1920x480 webp" }}
-      <img src="{{ .Permalink }}" alt="{{ .Title }}" width="{{ .Width }}" height="{{ .Height }}" loading="lazy"/>
+      <img src="{{ .Permalink }}" alt="{{ .Title }}" width="{{ .Width }}" height="{{ .Height }}" loading="lazy" class="h-48 w-full object-cover"/>
     {{- end }}
   {{- end }}
-
-  {{ partial "hero-links" }}
 </section>
+
+<section class="container relative mb-28">
+  {{ partial "hero-links.html" . }}
+</section>
+
+{{ $trimmed_content := strings.TrimRight "\n" .Content }}
+{{ if $trimmed_content }}
+<section class="container">
+  <div class="markdown-content">
+      {{ .Content }}
+  </div>
+</section>
+{{ end }}
 
 {{ $processingrecords := where .Pages "Type" "processing-record" }}
 {{- range $processingrecords }}
-<section class="organisation__navigation background-color-offset">
+<section class="container">
   <div>
-    <nav aria-label="Navigatie voorbeeldlijst">
+    <nav aria-label="navigatie">
       <ul>
-        <li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+        <li><a href="{{ .RelPermalink }}" class="text-lg font-bold text-[var(--color-primary)]">{{ .Title }} &rArr;</a></li>
       </ul>
     </nav>
   </div>
 </section>
 {{- end }}
 
-<section>
-  <div>
-    {{ .Content }}
-  </div>
-</section>
-
 {{ $nodes := where .Pages "Type" "organisation" }}
 {{ if $nodes }}
 <section>
   <div>
-    <div class="column-3">
+    <div>
         {{- range $nodes }}
         <a href="{{ .RelPermalink }}">
           <div role="group">

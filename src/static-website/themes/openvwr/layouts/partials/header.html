@@ -1,15 +1,5 @@
-<header class="site-header">
-  <div class="header-content">
-    <div class="logo-and-title">
-      {{ partial "logo.html" . }}
-      <span class="site-title">
-        <a href="/">{{ $.Site.Title }}</a>
-      </span>
-    </div>
-
-    <div class="header-actions">
-      {{ partial "dark-mode-toggle.html" . }}
-      {{ partial "navigation.html" . }}
-    </div>
-  </div>
+<header class="container py-8 flex items-center gap-2">
+  {{ partial "logo.html" . }}
+  <a href="/"><h1 class="text-2xl font-bold text-[var(--color-primary)]">{{ $.Site.Title }}</h1></a>
+  {{ partial "navigation.html" . }}
 </header>
