@@ -7,6 +7,7 @@ namespace App\Filament\Forms\Components;
 use App\Components\Uuid\UuidInterface;
 use App\Facades\Authentication;
 use App\Filament\TenantScoped;
+use App\Rules\CurrentOrganisation;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
@@ -27,11 +28,13 @@ class SelectMultipleWithLookup extends Select
     public static function makeForRelationship(
         string $name,
         string $relationshipName,
+        string $model,
         string $titleAttribute,
     ): static {
         return parent::make($name)
             ->relationship($relationshipName, $titleAttribute, TenantScoped::getAsClosure())
             ->multiple()
+            ->rules([CurrentOrganisation::forModel($model)])
             ->searchable([$titleAttribute]);
     }
 
@@ -41,6 +44,7 @@ class SelectMultipleWithLookup extends Select
     public static function makeForRelationshipWithCreate(
         string $name,
         string $relationshipName,
+        string $model,
         array $formSchema,
         string $titleAttribute,
     ): static {
@@ -65,6 +69,7 @@ class SelectMultipleWithLookup extends Select
 
                 return $key->toString();
             })
+            ->rules([CurrentOrganisation::forModel($model)])
             ->multiple()
             ->searchable([$titleAttribute]);
     }

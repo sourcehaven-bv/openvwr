@@ -2,4 +2,4 @@
     /** @var App\Models\ContactPerson $record */
 @endphp
 
-{{ $record->name }} @if($record->email)&lt;{{ $record->email }}&gt;@endif
+{!! Str::toSingleLineEscapedString($record->name) !!} @if($record->email)&lt;{!! Str::toSingleLineEscapedString($record->email) !!}&gt;@endif

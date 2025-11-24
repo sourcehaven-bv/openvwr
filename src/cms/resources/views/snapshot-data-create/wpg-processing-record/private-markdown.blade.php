@@ -2,8 +2,8 @@
     /** @var App\Models\Wpg\WpgProcessingRecord $record */
 @endphp
 
-# {{ $record->name }}
+# {!! Str::toSingleLineEscapedString($record->name) !!}
 
 @foreach ($record->wpgGoals as $goal)
-- {{ $goal->description }}
+- {!! Str::toSingleLineEscapedString($goal->description) !!}
 @endforeach

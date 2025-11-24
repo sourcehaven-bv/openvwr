@@ -7,12 +7,15 @@ namespace App\Filament\Forms\Components\Upload;
 use App\Config\Config;
 use App\Enums\Media\MediaGroup;
 use App\Facades\Authentication;
+use App\Rules\ExtensionMimeType;
 use App\Rules\Virusscanner;
+use App\Services\Virusscanner\Virusscanner as VirusscannerService;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Mime\MimeTypesInterface;
 use Webmozart\Assert\Assert;
 
 use function __;
-use function app;
 
 class AttachmentFileField extends SpatieMediaLibraryFileUpload
 {
@@ -30,11 +33,17 @@ class AttachmentFileField extends SpatieMediaLibraryFileUpload
             ->multiple()
             ->acceptedFileTypes($types)
             ->maxSize(self::MEGABYTE * 20)
+            ->preserveFilenames()
             ->properties([
                 'organisation_id' => Authentication::organisation()->id->toString(),
             ])
             ->rules([
-                app()->get(Virusscanner::class),
+                static function (LoggerInterface $logger, MimeTypesInterface $mimeTypes): ExtensionMimeType {
+                    return new ExtensionMimeType($logger, $mimeTypes);
+                },
+                static function (LoggerInterface $logger, VirusscannerService $virusscanner): Virusscanner {
+                    return new Virusscanner($logger, $virusscanner);
+                },
             ])
             ->columnSpanFull();
     }

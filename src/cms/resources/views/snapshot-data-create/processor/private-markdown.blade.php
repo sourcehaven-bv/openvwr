@@ -2,4 +2,4 @@
     /** @var App\Models\Processor $record */
 @endphp
 
-{{ $record->name }} ({{ $record->email }})
+{!! Str::toSingleLineEscapedString($record->name) !!} ({!! Str::toSingleLineEscapedString($record->email) !!})

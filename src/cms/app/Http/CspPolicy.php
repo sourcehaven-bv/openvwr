@@ -26,7 +26,6 @@ class CspPolicy implements Preset
             ->add(Directive::IMG, Keyword::SELF)
             ->add(Directive::IMG, Scheme::BLOB)
             ->add(Directive::IMG, Scheme::DATA)
-            ->add(Directive::IMG, 'ui-avatars.com')
             ->add(Directive::MEDIA, Keyword::SELF)
             ->add(Directive::MEDIA, Keyword::UNSAFE_INLINE)
             ->add(Directive::SCRIPT, Keyword::SELF)

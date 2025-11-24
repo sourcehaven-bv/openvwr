@@ -42,7 +42,7 @@ De knop "Mandaathouders toevoegen" toont een lijst met Mandaathouders: deze zijn
 
 ## Goedkeuren\label{sec:goedkeuren}
 
-**Beschikbaar voor**: Privacy Officer
+**Beschikbaar voor**: (Chief) Privacy Officer
 
 Het goedkeuren van een versie kan op de detailpagina van de desbetreffende versie. Het goedkeuren van een versie wil
 
@@ -58,7 +58,7 @@ Is eenmaal een versie geselecteerd, dan kan een versie met de status "In review"
 
 ## Akkoord geven
 
-**Beschikbaar voor**: Mandaathouders
+**Beschikbaar voor**: Mandaathouder
 
 ![Akkoord geven\label{fig:akkoord_geven}](./imgs/03_goedkeuringsproces/07_personal-snapshot-approvals_akkoord_geven.png)
 
@@ -68,7 +68,7 @@ Een Mandaathouder kan akkoord geven op een versie door op de versie detailpagina
 
 ## Vaststellen
 
-**Beschikbaar voor**: Privacy Officer
+**Beschikbaar voor**: (Chief) Privacy Officer
 
 Deze stap is identiek aan Sectie \ref{sec:goedkeuren} "Goedkeuren", met als enige verschil dat het hier "Vaststellen" betreft.
 

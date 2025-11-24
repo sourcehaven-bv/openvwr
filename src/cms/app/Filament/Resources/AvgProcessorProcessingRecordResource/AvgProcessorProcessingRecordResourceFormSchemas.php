@@ -24,6 +24,11 @@ use App\Filament\Resources\ReceiverResource\ReceiverResourceForm;
 use App\Filament\Resources\ResponsibleResource\ResponsibleResourceForm;
 use App\Filament\Resources\SystemResource\SystemResourceForm;
 use App\Models\Avg\AvgProcessorProcessingRecordService;
+use App\Models\Document;
+use App\Models\Processor;
+use App\Models\Receiver;
+use App\Models\Responsible;
+use App\Models\System;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Grid;
@@ -80,6 +85,7 @@ class AvgProcessorProcessingRecordResourceFormSchemas
             SelectMultipleWithLookup::makeForRelationshipWithCreate(
                 'responsible_id',
                 'responsibles',
+                Responsible::class,
                 ResponsibleResourceForm::getSchema(),
                 'name',
             )
@@ -107,6 +113,7 @@ class AvgProcessorProcessingRecordResourceFormSchemas
             SelectMultipleWithLookup::makeForRelationshipWithCreate(
                 'processors',
                 'processors',
+                Processor::class,
                 ProcessorResourceForm::getSchema(),
                 'name',
             )
@@ -129,6 +136,7 @@ class AvgProcessorProcessingRecordResourceFormSchemas
             SelectMultipleWithLookup::makeForRelationshipWithCreate(
                 'receivers',
                 'receivers',
+                Receiver::class,
                 ReceiverResourceForm::getSchema(),
                 'description',
             )
@@ -226,7 +234,13 @@ class AvgProcessorProcessingRecordResourceFormSchemas
                 ->default(false)
                 ->live(),
 
-            SelectMultipleWithLookup::makeForRelationshipWithCreate('systems', 'systems', SystemResourceForm::getSchema(), 'description')
+            SelectMultipleWithLookup::makeForRelationshipWithCreate(
+                'systems',
+                'systems',
+                System::class,
+                SystemResourceForm::getSchema(),
+                'description',
+            )
                 ->label(__('system.model_plural'))
                 ->required()
                 ->visible(FormHelper::isFieldEnabled('has_systems')),
@@ -362,6 +376,7 @@ class AvgProcessorProcessingRecordResourceFormSchemas
             SelectMultipleWithLookup::makeForRelationshipWithCreate(
                 'document_id',
                 'documents',
+                Document::class,
                 DocumentResourceForm::getSchema(),
                 'name',
             )

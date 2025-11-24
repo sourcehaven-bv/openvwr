@@ -11,12 +11,12 @@ use App\Services\Snapshot\SnapshotDataMarkdownRenderer;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Actions\Action;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Webmozart\Assert\Assert;
 
 use function __;
 use function response;
-use function sprintf;
 
 class ExportToPdfAction extends Action
 {
@@ -28,6 +28,13 @@ class ExportToPdfAction extends Action
                 return $record->snapshotData !== null;
             })
             ->action(static function (Snapshot $record, SnapshotDataMarkdownRenderer $snapshotDataMarkdownRenderer): StreamedResponse {
+                $filename = Str::of($record->name)
+                    ->append('-')
+                    ->append((string) $record->version)
+                    ->slug()
+                    ->append('.pdf')
+                    ->toString();
+
                 return response()->streamDownload(static function () use ($record, $snapshotDataMarkdownRenderer): void {
                     Assert::isInstanceOf($record->snapshotData, SnapshotData::class);
 
@@ -49,7 +56,7 @@ class ExportToPdfAction extends Action
                     ]);
 
                     echo Pdf::loadHTML($html)->stream();
-                }, sprintf('%s-%s_.pdf', $record->name, $record->version));
+                }, $filename);
             });
     }
 }

@@ -20,6 +20,7 @@ it('can create a snapshot', function (): void {
     $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
         ->recycle($organisation)
+        ->withValidState()
         ->create();
 
     expect($avgResponsibleProcessingRecord->snapshots)
@@ -38,6 +39,26 @@ it('can create a snapshot', function (): void {
         ->toHaveCount(1);
 });
 
+it('cannot create a snapshot if validation fails', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create([
+            'avg_responsible_processing_record_service_id' => null,
+        ]);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->id,
+        ])
+        ->callAction('snapshot_create')
+        ->assertNotNotified(__('snapshot.created'));
+
+    $avgResponsibleProcessingRecord->refresh();
+    expect($avgResponsibleProcessingRecord->snapshots)
+        ->toHaveCount(0);
+});
+
 it('will notify po', function (): void {
     Mail::fake();
 
@@ -48,6 +69,7 @@ it('will notify po', function (): void {
         ->create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
         ->recycle($organisation)
+        ->withValidState()
         ->create();
 
     $this->asFilamentOrganisationUser($organisation)
@@ -70,6 +92,7 @@ it('will not notify po if unchecked', function (): void {
         ->create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
         ->recycle($organisation)
+        ->withValidState()
         ->create();
 
     $this->asFilamentOrganisationUser($organisation)

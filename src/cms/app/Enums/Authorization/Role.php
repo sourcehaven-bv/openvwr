@@ -44,22 +44,28 @@ enum Role: string
     /**
      * @return array<array-key, array<Role>>
      */
-    public static function organisationRoleGroups(): array
+    public static function organisationRoleGroups(bool $includeCpoRoles): array
     {
-        return [
-            [
+        $organisationRoleGroups = [];
+
+        if ($includeCpoRoles) {
+            $organisationRoleGroups[] = [
                 self::CHIEF_PRIVACY_OFFICER,
                 self::MANDATE_HOLDER,
-            ],
-            [
-                self::INPUT_PROCESSOR,
-                self::INPUT_PROCESSOR_DATABREACH,
-                self::PRIVACY_OFFICER,
-            ],
-            [
-                self::COUNSELOR,
-                self::DATA_PROTECTION_OFFICIAL,
-            ],
+            ];
+        }
+
+        $organisationRoleGroups[] = [
+            self::INPUT_PROCESSOR,
+            self::INPUT_PROCESSOR_DATABREACH,
+            self::PRIVACY_OFFICER,
         ];
+
+        $organisationRoleGroups[] = [
+            self::COUNSELOR,
+            self::DATA_PROTECTION_OFFICIAL,
+        ];
+
+        return $organisationRoleGroups;
     }
 }

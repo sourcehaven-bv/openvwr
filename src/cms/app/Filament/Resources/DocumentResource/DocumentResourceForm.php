@@ -10,7 +10,11 @@ use App\Filament\Forms\Components\DatePicker\DatePicker;
 use App\Filament\Forms\Components\Select\SelectSingleWithLookup;
 use App\Filament\Forms\Components\SelectMultipleWithLookup;
 use App\Filament\Forms\Components\Upload\AttachmentFileField;
+use App\Models\Algorithm\AlgorithmRecord;
+use App\Models\Avg\AvgResponsibleProcessingRecord;
+use App\Models\DataBreachRecord;
 use App\Models\DocumentType;
+use App\Models\Wpg\WpgProcessingRecord;
 use Carbon\CarbonImmutable;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Component;
@@ -128,6 +132,7 @@ class DocumentResourceForm
                 SelectMultipleWithLookup::makeForRelationship(
                     'avg_responsible_processing_record_id',
                     'avgResponsibleProcessingRecords',
+                    AvgResponsibleProcessingRecord::class,
                     'name',
                 )
                     ->label(__('avg_responsible_processing_record.model_plural'))
@@ -136,6 +141,7 @@ class DocumentResourceForm
                 SelectMultipleWithLookup::makeForRelationship(
                     'avg_processor_processing_record_id',
                     'avgProcessorProcessingRecords',
+                    AvgResponsibleProcessingRecord::class,
                     'name',
                 )
                     ->label(__('avg_processor_processing_record.model_plural'))
@@ -144,6 +150,7 @@ class DocumentResourceForm
                 SelectMultipleWithLookup::makeForRelationship(
                     'wpg_processing_record_id',
                     'WpgProcessingRecords',
+                    WpgProcessingRecord::class,
                     'name',
                 )
                     ->label(__('wpg_processing_record.model_plural'))
@@ -152,6 +159,7 @@ class DocumentResourceForm
                 SelectMultipleWithLookup::makeForRelationship(
                     'algorithm_record_id',
                     'AlgorithmRecords',
+                    AlgorithmRecord::class,
                     'name',
                 )
                     ->label(__('algorithm_record.model_plural'))
@@ -160,6 +168,7 @@ class DocumentResourceForm
                 SelectMultipleWithLookup::makeForRelationship(
                     'data_breach_record_id',
                     'DataBreachRecords',
+                    DataBreachRecord::class,
                     'name',
                 )
                     ->label(__('data_breach_record.model_plural'))

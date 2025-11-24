@@ -17,7 +17,7 @@ it('can build the options form with correct permission', function (array $permis
     $actionForm = $tagsInput->getCreateOptionActionForm(FilamentTestHelper::createTestForm());
 
     expect(!empty($actionForm)) // without permission, the array of form-fields is empty
-        ->toBe($expectsFormVisible);
+    ->toBe($expectsFormVisible);
 })->with([
     [[], false],
     [[Permission::TAG_CREATE], true],

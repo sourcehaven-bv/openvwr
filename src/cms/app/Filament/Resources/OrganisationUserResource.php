@@ -89,11 +89,11 @@ class OrganisationUserResource extends Resource
             Role::PRIVACY_OFFICER,
             Role::COUNSELOR,
             Role::DATA_PROTECTION_OFFICIAL,
-            Role::MANDATE_HOLDER,
         ]);
 
         if (Authorization::hasPermission(Permission::USER_ROLE_ORGANISATION_CPO_MANAGE)) {
             $organisationUserRoleOptions->prepend(Role::CHIEF_PRIVACY_OFFICER);
+            $organisationUserRoleOptions->prepend(Role::MANDATE_HOLDER);
         }
 
         return $organisationUserRoleOptions;

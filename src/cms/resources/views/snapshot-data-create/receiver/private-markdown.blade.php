@@ -1,4 +1,4 @@
 @php
     /** @var App\Models\Receiver $record */
 @endphp
-{{ $record->description }}
+{!! Str::toSingleLineEscapedString($record->description) !!}

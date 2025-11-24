@@ -148,5 +148,6 @@ return [
             ],
         ],
         'ip_range_invalid' => 'Mag alleen geldige IPv4 / IPv6 patronen bevatten (gescheiden door komma\'s of spaties).',
+        'mime_type_invalid' => ':Attribute is geen geldig bestand.',
     ],
 ];

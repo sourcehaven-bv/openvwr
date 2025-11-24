@@ -1,6 +1,5 @@
 @php
     use App\Models\States\Snapshot\Obsolete;
-    use \App\Facades\DateFormat;
     $snapshots = $getRecord()->snapshots()
         ->whereNot('state', Obsolete::$name)
         ->orderBy('created_at', 'desc')

@@ -9,6 +9,7 @@ use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\CreateAv
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecordService;
 use App\Models\Responsible;
+use App\Models\Tag;
 use App\Services\EntityNumberService;
 use Carbon\CarbonImmutable;
 use Tests\Helpers\Model\OrganisationTestHelper;
@@ -48,6 +49,122 @@ it('can create an entry', function (): void {
     $this->assertDatabaseHas(AvgResponsibleProcessingRecord::class, [
         'name' => $name,
     ]);
+});
+
+it('can create an entry with a new tag', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgResponsibleProcessingRecordService = AvgResponsibleProcessingRecordService::factory()
+        ->recycle($organisation)
+        ->create([
+            'enabled' => true,
+        ]);
+    $responsible = Responsible::factory()
+        ->recycle($organisation)
+        ->create();
+    $name = fake()->uuid();
+    $tagName = fake()->uuid();
+
+    $this->assertDatabaseEmpty('taggables');
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(CreateAvgResponsibleProcessingRecord::class)
+        ->fillForm([
+            'data_collection_source' => CoreEntityDataCollectionSource::PRIMARY->value,
+            'name' => $name,
+            'avg_responsible_processing_record_service_id' => $avgResponsibleProcessingRecordService->id->toString(),
+            'responsible_id' => [$responsible->id->toString()],
+        ])
+        ->call('mountFormComponentAction', 'data.tags', 'createOption')
+        ->set('mountedFormComponentActionsData.0.name', $tagName)
+        ->call('callMountedFormComponentAction')
+        ->assertHasNoFormErrors()
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    $this->assertDatabaseHas(AvgResponsibleProcessingRecord::class, [
+        'name' => $name,
+        'organisation_id' => $organisation->id,
+    ]);
+    $this->assertDatabaseHas(Tag::class, [
+        'name' => $tagName,
+        'organisation_id' => $organisation->id,
+    ]);
+    $this->assertDatabaseHas('taggables', [
+        'taggable_type' => AvgResponsibleProcessingRecord::class,
+    ]);
+});
+
+it('can create an entry with existing tags', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgResponsibleProcessingRecordService = AvgResponsibleProcessingRecordService::factory()
+        ->recycle($organisation)
+        ->create([
+            'enabled' => true,
+        ]);
+    $responsible = Responsible::factory()
+        ->recycle($organisation)
+        ->create();
+    $tag1 = Tag::factory()
+        ->recycle($organisation)
+        ->create();
+    $tag2 = Tag::factory()
+        ->recycle($organisation)
+        ->create();
+    $name = fake()->uuid();
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(CreateAvgResponsibleProcessingRecord::class)
+        ->fillForm([
+            'data_collection_source' => CoreEntityDataCollectionSource::PRIMARY->value,
+            'name' => $name,
+            'avg_responsible_processing_record_service_id' => $avgResponsibleProcessingRecordService->id->toString(),
+            'responsible_id' => [$responsible->id->toString()],
+            'tags' => [
+                $tag1->id->toString(),
+                $tag2->id->toString(),
+            ],
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    $this->assertDatabaseHas(AvgResponsibleProcessingRecord::class, [
+        'name' => $name,
+    ]);
+});
+
+it('can not create an entry with tags of another organisation', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgResponsibleProcessingRecordService = AvgResponsibleProcessingRecordService::factory()
+        ->recycle($organisation)
+        ->create([
+            'enabled' => true,
+        ]);
+    $responsible = Responsible::factory()
+        ->recycle($organisation)
+        ->create();
+    $tagSameOrganisation = Tag::factory()
+        ->recycle($organisation)
+        ->create();
+    $tagOtherOrganisation = Tag::factory()
+        ->create();
+    $name = fake()->uuid();
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(CreateAvgResponsibleProcessingRecord::class)
+        ->fillForm([
+            'data_collection_source' => CoreEntityDataCollectionSource::PRIMARY->value,
+            'name' => $name,
+            'avg_responsible_processing_record_service_id' => $avgResponsibleProcessingRecordService->id->toString(),
+            'responsible_id' => [$responsible->id->toString()],
+            'tags' => [
+                $tagSameOrganisation->id->toString(),
+                $tagOtherOrganisation->id->toString(),
+            ],
+        ])
+        ->call('create')
+        ->assertHasFormErrors(['tags']);
+
+    $this->assertDatabaseEmpty(AvgResponsibleProcessingRecord::class);
 });
 
 it('can use the publishFromNow action', function (): void {

@@ -26,7 +26,7 @@ class JsonImporter implements Importer
      *
      * @throws ImportFailedException
      */
-    public function import(string $zipFilename, string $input, string $factoryClass, UuidInterface $userId, string $organisationId): void
+    public function import(string $filename, string $input, string $factoryClass, UuidInterface $userId, string $organisationId): void
     {
         Log::info('starting input of json-data');
 
@@ -48,14 +48,12 @@ class JsonImporter implements Importer
         }
 
         Log::info('finished dispatching jobs', ['factoryClass' => $factoryClass]);
-        ImportFinishedJob::dispatch($zipFilename, $userId);
+        ImportFinishedJob::dispatch($filename, $userId);
     }
 
     private function removeUtf8ByteOrderMark(string $input): string
     {
-        $input = str_replace("\xEF\xBB\xBF", '', $input);
-
-        return $input;
+        return str_replace("\xEF\xBB\xBF", '', $input);
     }
 
     /**
