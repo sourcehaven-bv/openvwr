@@ -22,8 +22,8 @@ use Filament\Navigation\NavigationGroup as FilamentNavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Assets\Css;
-use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentAsset;
+use Filament\Support\Facades\FilamentColor;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;
@@ -54,6 +54,11 @@ class FilamentServiceProvider extends PanelProvider
 {
     public function boot(): void
     {
+        // Ensure primary color is set globally, including non-panel pages
+        FilamentColor::register([
+            'primary' => '#F84F39',
+        ]);
+
         FilamentAsset::register([
             Css::make('app', base_path('resources/css/app.css')),
         ]);
@@ -81,7 +86,7 @@ class FilamentServiceProvider extends PanelProvider
                 RouteFacade::get('/health', HealthController::class);
             })
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => '#F84F39',
             ])
             ->unsavedChangesAlerts()
             ->navigationGroups([
