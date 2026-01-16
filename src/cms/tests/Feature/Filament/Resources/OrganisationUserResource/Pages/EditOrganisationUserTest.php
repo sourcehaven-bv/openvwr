@@ -86,6 +86,82 @@ it('can edit a role for a user that is already linked to the organisation', func
         ->toBe($role);
 });
 
+it('can edit a role without assigning any roles', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditOrganisationUser::class, ['record' => $user->id])
+        ->fillForm([])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $user->refresh();
+    $organisationRoles = $user->organisationRoles;
+    expect($organisationRoles->count())
+        ->toBe(0);
+});
+
+it('can assign inputProcessor without cpoManage permissions', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisationWithPermissions($organisation, [
+        Permission::USER_ROLE_ORGANISATION_MANAGE,
+    ]);
+
+    $userToEdit = UserTestHelper::createForOrganisation($organisation);
+
+    $role = Role::INPUT_PROCESSOR;
+
+    $this->assertDatabaseMissing(OrganisationUserRole::class, [
+        'role' => $role->value,
+        'user_id' => $userToEdit->id,
+        'organisation_id' => $organisation->id,
+    ]);
+
+    $this->withFilamentSession($user, $organisation)
+        ->createLivewireTestable(EditOrganisationUser::class, ['record' => $userToEdit->id])
+        ->fillForm([
+            $role->value => true,
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $userToEdit->refresh();
+    $organisationRoles = $userToEdit->organisationRoles;
+    expect($organisationRoles->count())
+        ->toBe(1);
+});
+
+it('can not assign mandateHolder without cpoManage permissions', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisationWithPermissions($organisation, [
+        Permission::USER_ROLE_ORGANISATION_MANAGE,
+    ]);
+
+    $userToEdit = UserTestHelper::createForOrganisation($organisation);
+
+    $role = Role::MANDATE_HOLDER;
+
+    $this->assertDatabaseMissing(OrganisationUserRole::class, [
+        'role' => $role->value,
+        'user_id' => $userToEdit->id,
+        'organisation_id' => $organisation->id,
+    ]);
+
+    $this->withFilamentSession($user, $organisation)
+        ->createLivewireTestable(EditOrganisationUser::class, ['record' => $userToEdit->id])
+        ->fillForm([
+            $role->value => true,
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $userToEdit->refresh();
+    $organisationRoles = $userToEdit->organisationRoles;
+    expect($organisationRoles->count())
+        ->toBe(0);
+});
+
 it('can detach a user that is linked to an organisation', function (): void {
     $organisation = OrganisationTestHelper::create();
     $role = fake()->randomElement([

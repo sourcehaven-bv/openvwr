@@ -13,11 +13,11 @@ use Webmozart\Assert\Assert;
 
 use function fopen;
 
-class Virusscanner implements ValidationRule
+readonly class Virusscanner implements ValidationRule
 {
     public function __construct(
-        private readonly LoggerInterface $logger,
-        private readonly VirusscannerService $virusscannerService,
+        private LoggerInterface $logger,
+        private VirusscannerService $virusscannerService,
     ) {
     }
 

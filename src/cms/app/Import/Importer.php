@@ -12,5 +12,5 @@ interface Importer
     /**
      * @param class-string<Factory<Model>> $factoryClass
      */
-    public function import(string $zipFilename, string $input, string $factoryClass, UuidInterface $userId, string $organisationId): void;
+    public function import(string $filename, string $input, string $factoryClass, UuidInterface $userId, string $organisationId): void;
 }

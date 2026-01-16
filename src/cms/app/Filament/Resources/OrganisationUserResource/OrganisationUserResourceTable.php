@@ -33,8 +33,8 @@ class OrganisationUserResourceTable
                     ->label(__('user.organisation_roles'))
                     ->formatStateUsing(static function (User $user): string {
                         return $user->organisationRoles
-                            ->map(static function (OrganisationUserRole $rganisationUserRole): string {
-                                return __(sprintf('role.%s', $rganisationUserRole->role->value));
+                            ->map(static function (OrganisationUserRole $organisationUserRole): string {
+                                return __(sprintf('role.%s', $organisationUserRole->role->value));
                             })
                             ->join(', ');
                     }),

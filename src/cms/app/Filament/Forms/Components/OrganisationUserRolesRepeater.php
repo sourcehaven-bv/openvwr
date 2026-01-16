@@ -65,7 +65,7 @@ class OrganisationUserRolesRepeater extends Repeater
     {
         $organisationRoleToggleSections = [];
 
-        foreach (Role::organisationRoleGroups() as $organisationRoleGroup) {
+        foreach (Role::organisationRoleGroups(true) as $organisationRoleGroup) {
             $organisationRoleToggles = [];
 
             foreach ($organisationRoleGroup as $organisationRole) {

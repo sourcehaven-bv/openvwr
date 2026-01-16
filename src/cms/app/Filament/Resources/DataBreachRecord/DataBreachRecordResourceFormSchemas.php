@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DataBreachRecord;
 
+use App\Filament\Forms\Components\CheckboxList;
 use App\Filament\Forms\Components\DatePicker\DatePicker;
 use App\Filament\Forms\Components\Section\InformationBlockSection;
 use App\Filament\Forms\Components\SelectMultipleWithLookup;
@@ -12,7 +13,12 @@ use App\Filament\Forms\FormHelper;
 use App\Filament\Resources\DocumentResource\DocumentResourceForm;
 use App\Filament\Resources\ResponsibleResource\ResponsibleResourceForm;
 use App\Filament\TenantScoped;
-use Filament\Forms\Components\CheckboxList;
+use App\Models\Avg\AvgProcessorProcessingRecord;
+use App\Models\Avg\AvgResponsibleProcessingRecord;
+use App\Models\Document;
+use App\Models\Responsible;
+use App\Models\Wpg\WpgProcessingRecord;
+use App\Rules\CurrentOrganisation;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
@@ -66,6 +72,7 @@ class DataBreachRecordResourceFormSchemas
             SelectMultipleWithLookup::makeForRelationshipWithCreate(
                 'responsible_id',
                 'responsibles',
+                Responsible::class,
                 ResponsibleResourceForm::getSchema(),
                 'name',
             )
@@ -133,16 +140,17 @@ class DataBreachRecordResourceFormSchemas
             Textarea::make('involved_people')
                 ->label(__('data_breach_record.involved_people'))
                 ->required(),
-            CheckboxList::make('personal_data_categories')
+            CheckboxList::makeWithValidatedOptions('personal_data_categories', FormHelper::setValueAsKey($personalDataCategoriesOptions))
                 ->label(__('data_breach_record.personal_data_categories'))
-                ->options(FormHelper::setValueAsKey($personalDataCategoriesOptions))
                 ->live(),
             Textarea::make('personal_data_categories_other')
                 ->label(__('data_breach_record.personal_data_categories_other'))
                 ->visible(FormHelper::fieldValuesContainValue('personal_data_categories', 'Anders')),
-            CheckboxList::make('personal_data_special_categories')
+            CheckboxList::makeWithValidatedOptions(
+                'personal_data_special_categories',
+                FormHelper::setValueAsKey($personalDataSpecialCategoriesOptions),
+            )
                 ->label(__('data_breach_record.personal_data_special_categories'))
-                ->options(FormHelper::setValueAsKey($personalDataSpecialCategoriesOptions))
                 ->live(),
             Textarea::make('estimated_risk')
                 ->label(__('data_breach_record.estimated_risk'))
@@ -153,9 +161,11 @@ class DataBreachRecordResourceFormSchemas
             Toggle::make('reported_to_involved')
                 ->label(__('data_breach_record.reported_to_involved'))
                 ->live(),
-            CheckboxList::make('reported_to_involved_communication')
+            CheckboxList::makeWithValidatedOptions(
+                'reported_to_involved_communication',
+                FormHelper::setValueAsKey($reportedToInvolvedCommunicationOptions),
+            )
                 ->label(__('data_breach_record.reported_to_involved_communication'))
-                ->options(FormHelper::setValueAsKey($reportedToInvolvedCommunicationOptions))
                 ->visible(FormHelper::isFieldEnabled('reported_to_involved'))
                 ->live(),
             Textarea::make('reported_to_involved_communication_other')
@@ -179,14 +189,17 @@ class DataBreachRecordResourceFormSchemas
             Select::make('avgResponsibleProcessingRecords')
                 ->label(__('avg_responsible_processing_record.model_plural'))
                 ->relationship('avgResponsibleProcessingRecords', 'name', TenantScoped::getAsClosure())
+                ->rules([CurrentOrganisation::forModel(AvgResponsibleProcessingRecord::class)])
                 ->multiple(),
             Select::make('avgProcessorProcessingRecords')
                 ->label(__('avg_processor_processing_record.model_plural'))
                 ->relationship('avgProcessorProcessingRecords', 'name', TenantScoped::getAsClosure())
+                ->rules([CurrentOrganisation::forModel(AvgProcessorProcessingRecord::class)])
                 ->multiple(),
             Select::make('wpgProcessingRecords')
                 ->label(__('wpg_processing_record.model_plural'))
                 ->relationship('wpgProcessingRecords', 'name', TenantScoped::getAsClosure())
+                ->rules([CurrentOrganisation::forModel(WpgProcessingRecord::class)])
                 ->multiple(),
             InformationBlockSection::makeCollapsible(
                 __('information_blocks.data_breach_record.step_processing_records_title'),
@@ -204,6 +217,7 @@ class DataBreachRecordResourceFormSchemas
             SelectMultipleWithLookup::makeForRelationshipWithCreate(
                 'document_id',
                 'documents',
+                Document::class,
                 DocumentResourceForm::getSchema(),
                 'name',
             )

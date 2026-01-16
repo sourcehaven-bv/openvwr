@@ -65,9 +65,6 @@
         "swisnl/phpstan-faker": "^1.1"
     },
     "autoload": {
-        "files": [
-            "app/helpers.php"
-        ],
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
@@ -87,10 +84,8 @@
             "@php artisan optimize:clear"
         ],
         "post-update-cmd": [
-            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
-        ],
-        "post-root-package-install": [
-            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
+            "@php artisan optimize:clear"
         ],
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
@@ -111,6 +106,7 @@
         "reset": [
             "composer install",
             "rm -rf storage/app/livewire-tmp",
+            "rm -rf storage/app/shared-storage",
             "php artisan optimize:clear",
             "php artisan storage:link",
             "@reset-db",
@@ -140,6 +136,7 @@
         "test-reset": [
             "rm -rf storage/app/livewire-tmp",
             "php artisan optimize:clear",
+            "@reset-test-db",
             "php artisan test --parallel --recreate-databases"
         ]
     },

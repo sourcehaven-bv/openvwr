@@ -20,6 +20,10 @@ use App\Filament\Resources\DocumentResource\DocumentResourceForm;
 use App\Filament\Resources\ProcessorResource\ProcessorResourceForm;
 use App\Filament\Resources\ResponsibleResource\ResponsibleResourceForm;
 use App\Filament\Resources\SystemResource\SystemResourceForm;
+use App\Models\Document;
+use App\Models\Processor;
+use App\Models\Responsible;
+use App\Models\System;
 use App\Models\Wpg\WpgProcessingRecordService;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Component;
@@ -78,6 +82,7 @@ class WpgProcessingRecordResourceFormSchemas
             SelectMultipleWithLookup::makeForRelationshipWithCreate(
                 'responsible_id',
                 'responsibles',
+                Responsible::class,
                 ResponsibleResourceForm::getSchema(),
                 'name',
             )
@@ -105,6 +110,7 @@ class WpgProcessingRecordResourceFormSchemas
             SelectMultipleWithLookup::makeForRelationshipWithCreate(
                 'processors',
                 'processors',
+                Processor::class,
                 ProcessorResourceForm::getSchema(),
                 'name',
             )
@@ -268,6 +274,7 @@ class WpgProcessingRecordResourceFormSchemas
             SelectMultipleWithLookup::makeForRelationshipWithCreate(
                 'systems',
                 'systems',
+                System::class,
                 SystemResourceForm::getSchema(),
                 'description',
             )
@@ -366,6 +373,7 @@ class WpgProcessingRecordResourceFormSchemas
             SelectMultipleWithLookup::makeForRelationshipWithCreate(
                 'document_id',
                 'documents',
+                Document::class,
                 DocumentResourceForm::getSchema(),
                 'name',
             )

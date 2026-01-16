@@ -13,7 +13,6 @@ use App\Filament\Resources\OrganisationUserResource;
 use App\Models\OrganisationUserRole;
 use App\Models\User;
 use Closure;
-use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -39,13 +38,6 @@ class CreateOrganisationUser extends CreateRecord
 
     public function form(Form $form): Form
     {
-        $organisationRoles = OrganisationUserResource::getOrganisationUserRoleOptions();
-        $organisationUserRolesToggles = $organisationRoles->map(static function (Role $organisationUserRole): Toggle {
-            return Toggle::make($organisationUserRole->value)
-                ->label(__(sprintf('role.%s', $organisationUserRole->value)));
-        })->toArray();
-        Assert::allIsInstanceOf($organisationUserRolesToggles, Component::class);
-
         return $form->schema([
             Section::make(__('user.model_singular'))
                 ->schema([
@@ -100,15 +92,12 @@ class CreateOrganisationUser extends CreateRecord
     private static function getOrganisationRoleToggles(): array
     {
         $organisationRoleToggleSections = [];
+        $includeCpoRoles = Authorization::hasPermission(Permission::USER_ROLE_ORGANISATION_CPO_MANAGE);
 
-        foreach (Role::organisationRoleGroups() as $organisationRoleGroup) {
+        foreach (Role::organisationRoleGroups($includeCpoRoles) as $organisationRoleGroup) {
             $organisationRoleToggles = [];
 
             foreach ($organisationRoleGroup as $organisationRole) {
-                if (!Authorization::hasPermission(Permission::USER_ROLE_ORGANISATION_CPO_MANAGE)) {
-                    continue;
-                }
-
                 $organisationRoleToggles[] = Toggle::make($organisationRole->value)
                     ->label(__(sprintf('role.%s', $organisationRole->value)));
             }
@@ -136,8 +125,8 @@ class CreateOrganisationUser extends CreateRecord
         ]);
         $user->organisations()->attach($organisation);
         $user->save();
-
         $organisationRoles = OrganisationUserResource::getOrganisationUserRoleOptions();
+
         foreach ($organisationRoles as $organisationRole) {
             Assert::keyExists($data, $organisationRole->value);
             Assert::boolean($data[$organisationRole->value]);

@@ -10,13 +10,13 @@ use App\Enums\Authorization\Role;
 use App\Enums\Snapshot\SnapshotApprovalStatus;
 use App\Facades\Authentication;
 use App\Facades\Authorization;
+use App\Filament\Forms\Components\CheckboxList;
 use App\Filament\Resources\SnapshotResource\Pages\ViewSnapshot;
 use App\Models\Snapshot;
 use App\Models\SnapshotApproval;
 use App\Models\User;
 use App\Services\DateFormatService;
 use App\Services\Snapshot\SnapshotApprovalService;
-use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Component as FilamentFormComponent;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -124,26 +124,25 @@ class Approvals extends Component implements HasForms, HasTable
      */
     private function createRequestApprovalForm(): array
     {
-        return [
-            CheckboxList::make('user_ids')
-                ->label('')
-                ->options(function (): array {
-                    $assignedToUsers = $this->snapshot->snapshotApprovals()
-                        ->get(['assigned_to'])
-                        ->pluck('assigned_to')
-                        ->toArray();
+        $allowedUserIds = $this->snapshot->organisation->users()
+            ->whereHas('organisationRoles', static function (Builder $query): Builder {
+                return $query->where(['role' => Role::MANDATE_HOLDER]);
+            })
+            ->whereNot('user_id', Authentication::user()->id)
+            ->whereNotIn('user_id', $this->snapshot->snapshotApprovals()
+                ->get(['assigned_to'])
+                ->pluck('assigned_to')
+                ->toArray())
+            ->get()
+            ->pluck('name', 'id')
+            ->sort()
+            ->toArray();
+        Assert::isMap($allowedUserIds);
+        Assert::allString($allowedUserIds);
 
-                    return $this->snapshot->organisation->users()
-                        ->whereHas('organisationRoles', static function (Builder $query): Builder {
-                            return $query->where(['role' => Role::MANDATE_HOLDER]);
-                        })
-                        ->whereNot('user_id', Authentication::user()->id)
-                        ->whereNotIn('user_id', $assignedToUsers)
-                        ->get()
-                        ->pluck('name', 'id')
-                        ->sort()
-                        ->toArray();
-                }),
+        return [
+            CheckboxList::makeWithValidatedOptions('user_ids', $allowedUserIds)
+                ->label(''),
         ];
     }
 }

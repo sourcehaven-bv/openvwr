@@ -6,7 +6,7 @@ Na het inloggen komt u in het verwerkingsregister en ziet u links in het scherm 
 
 ## AVG Verantwoordelijke Verwerkingen, AVG Verwerker Verwerkingen, WPG Verantoordelijke Verwerkingen
 
-**Beschikbaar voor**: Invoerder, (Chief) Privacy Officer, Raadpleger, Functionaris Gegevensbescherming, Mandaathouder
+**Beschikbaar voor**: Invoerder, (Chief) Privacy Officer, Raadpleger (lezen), Functionaris Gegevensbescherming (lezen), Mandaathouder (lezen)
 
 In deze registers kunnen verwerkingen toegevoegd worden. Na het klikken op een register verschijnt er een overzicht van de verwerkingen in het register (Figuur \ref{fig:registers}) met de volgende kolommen waarop u de tabel kunt sorteren:
 
@@ -29,13 +29,13 @@ Eenmaal opgeslagen in het systeem zullen relaties met andere entiteiten zichtbaa
 
 ## Algoritmes
 
-**Beschikbaar voor**: Invoerder, (Chief) Privacy Officer, Raadpleger, Functionaris Gegevensbescherming, Mandaathouder
+**Beschikbaar voor**: Invoerder, (Chief) Privacy Officer, Raadpleger (lezen), Functionaris Gegevensbescherming (lezen), Mandaathouder (lezen)
 
 Het algoritmeregister werkt op identieke wijze als de verwerkingregisters. In de overzichtstabel zijn dezelfde kolommen zichtbaar omdat ze deze eigenschappen delen met de verwerkingen.
 
 ## Datalekken
 
-**Beschikbaar voor**: Invoerder Datalekken, (Chief) Privacy Officer
+**Beschikbaar voor**: Invoerder Datalekken, (Chief) Privacy Officer, Raadpleger (lezen), Functionaris Gegevensbescherming (lezen)
 
 In dit register kunnen datalekken toegevoegd worden. Na het klikken op het datalekregister verschijnt er een overzicht van alle datalekken in het register met de volgende kolommen waarop u de tabel kunt sorteren:
 

@@ -1,4 +1,3 @@
-@php use App\Facades\DateFormat; @endphp
 <span class="font-mono">{{ $publicWebsiteTree->slug }}</span>
 {{ $publicWebsiteTree->organisation?->name }}
 @if($publicWebsiteTree->public_from === null)

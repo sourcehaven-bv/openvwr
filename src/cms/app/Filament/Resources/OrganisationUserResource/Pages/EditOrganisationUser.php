@@ -6,9 +6,11 @@ namespace App\Filament\Resources\OrganisationUserResource\Pages;
 
 use App\Facades\Authentication;
 use App\Filament\Resources\OrganisationUserResource;
+use App\Models\OrganisationUser;
 use App\Models\OrganisationUserRole;
 use App\Models\User;
 use App\Models\UserRelatable;
+use App\Rules\CurrentOrganisation;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Resources\Pages\EditRecord;
@@ -17,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Webmozart\Assert\Assert;
 
 use function __;
+use function array_key_exists;
 
 class EditOrganisationUser extends EditRecord
 {
@@ -41,7 +44,8 @@ class EditOrganisationUser extends EditRecord
                                 ->withOrganisation(Authentication::organisation())
                                 ->orderBy('name')
                                 ->pluck('name', 'id');
-                        }),
+                        })
+                        ->rules([CurrentOrganisation::forModel(OrganisationUser::class, 'user_id')]),
                 ])
                 ->action(static function (array $data, Action $action, User $record): void {
                     UserRelatable::where('user_id', $record->id)
@@ -72,9 +76,11 @@ class EditOrganisationUser extends EditRecord
 
             foreach ($organisationRoles as $organisationRole) {
                 Assert::isArray($this->data);
-                Assert::keyExists($this->data, $organisationRole->value);
-                Assert::boolean($this->data[$organisationRole->value]);
+                if (!array_key_exists($organisationRole->value, $this->data)) {
+                    continue;
+                }
 
+                Assert::boolean($this->data[$organisationRole->value]);
                 if ($this->data[$organisationRole->value] !== true) {
                     continue;
                 }
