@@ -15,6 +15,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
 use function __;
+use function e;
 
 class ImportFinishedJob implements ShouldQueue
 {
@@ -24,7 +25,7 @@ class ImportFinishedJob implements ShouldQueue
     use SerializesModels;
 
     public function __construct(
-        public readonly string $zipFilename,
+        public readonly string $filename,
         public readonly UuidInterface $userId,
     ) {
         $this->onQueue(Queue::DEFAULT);
@@ -40,7 +41,7 @@ class ImportFinishedJob implements ShouldQueue
 
         Notification::make()
             ->title(__('import.finished'))
-            ->body($this->zipFilename)
+            ->body(e($this->filename))
             ->icon('heroicon-o-document-plus')
             ->success()
             ->sendToDatabase($user);

@@ -43,6 +43,7 @@ it('can create a snapshot', function (): void {
     $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
         ->recycle($organisation)
+        ->withValidState()
         ->create();
 
     expect($avgResponsibleProcessingRecord->snapshots->count())
@@ -350,6 +351,7 @@ it('does not create a snapshot on unsaved changes', function (): void {
     $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
         ->recycle($organisation)
+        ->withValidState()
         ->create();
 
     $this->asFilamentOrganisationUser($organisation)

@@ -4,13 +4,13 @@ Het portaal biedt een aantal overige functies zoals het kunnen importeren vanuit
 
 ## Import
 
-**Beschikbaar voor**: Privacy Officer
+**Beschikbaar voor**: (Chief) Privacy Officer
 
 Het [AVG Register Rijksoverheid](https://www.avgregisterrijksoverheid.nl/) biedt de mogelijkheid om exports te maken van verwerkingen. Deze zip-files zijn direct te importeren met de "import" functionaliteit.
 
 ## Export
 
-**Beschikbaar voor**: Privacy Officer
+**Beschikbaar voor**: (Chief) Privacy Officer
 
 Het Verwerkingsregister biedt de mogelijkheid om registers te exporteren naar een `.csv` of `.xlsx` bestand. De knop voor het exporteren zit boven de overzichtstabel van ieder register (Figuur \ref{fig:export}).
 
@@ -22,7 +22,7 @@ Is de export voltooid, dan zal er een notificatie getoond worden in het scherm r
 
 ## Opzoeklijsten
 
-**Beschikbaar voor**: Privacy Officer
+**Beschikbaar voor**: (Chief) Privacy Officer
 
 In het systeem zijn er meerdere velden waar er slechts een keuze mogelijk is uit een beperkte set opties. Onder "Opzoeklijsten" zijn deze velden te vinden en zijn hun opties aan te passen.
 

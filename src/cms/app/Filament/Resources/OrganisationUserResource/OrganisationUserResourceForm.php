@@ -47,15 +47,12 @@ class OrganisationUserResourceForm
     private static function getOrganisationRoleToggles(): array
     {
         $organisationRoleToggleSections = [];
+        $includeCpoRoles = Authorization::hasPermission(Permission::USER_ROLE_ORGANISATION_CPO_MANAGE);
 
-        foreach (Role::organisationRoleGroups() as $organisationRoleGroup) {
+        foreach (Role::organisationRoleGroups($includeCpoRoles) as $organisationRoleGroup) {
             $organisationRoleToggles = [];
 
             foreach ($organisationRoleGroup as $organisationRole) {
-                if (!Authorization::hasPermission(Permission::USER_ROLE_ORGANISATION_CPO_MANAGE)) {
-                    continue;
-                }
-
                 $organisationRoleToggles[] = Toggle::make($organisationRole->value)
                     ->label(__(sprintf('role.%s', $organisationRole->value)))
                     ->formatStateUsing(static function (User $record) use ($organisationRole): bool {

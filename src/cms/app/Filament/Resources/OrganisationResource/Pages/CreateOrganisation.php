@@ -9,6 +9,7 @@ use App\Enums\EntityNumberType;
 use App\Filament\Pages\CreateRecord;
 use App\Filament\Resources\OrganisationResource;
 use App\Models\EntityNumberCounter;
+use App\Models\ResponsibleLegalEntity;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -45,6 +46,7 @@ class CreateOrganisation extends CreateRecord
                     Select::make('responsible_legal_entity_id')
                         ->label(__('responsible_legal_entity.model_singular'))
                         ->relationship('responsibleLegalEntity', 'name')
+                        ->exists(ResponsibleLegalEntity::class, 'id')
                         ->required(),
                 ]),
             Step::make(__('organisation.entity_number_prefix'))

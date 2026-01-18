@@ -14,6 +14,7 @@ use App\Models\Algorithm\AlgorithmMetaSchema;
 use App\Models\Algorithm\AlgorithmPublicationCategory;
 use App\Models\Algorithm\AlgorithmStatus;
 use App\Models\Algorithm\AlgorithmTheme;
+use App\Models\Document;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -167,6 +168,7 @@ class AlgorithmRecordResourceFormSchemas
             SelectMultipleWithLookup::makeForRelationshipWithCreate(
                 'document_id',
                 'documents',
+                Document::class,
                 DocumentResourceForm::getSchema(),
                 'name',
             )

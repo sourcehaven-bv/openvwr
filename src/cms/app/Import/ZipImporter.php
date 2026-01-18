@@ -74,24 +74,24 @@ class ZipImporter
         for ($i = 0; $i < $numberOfFilesInZip; $i++) {
             $this->assertMaxZippedFilesize($this->zipArchive, $i);
 
-            $zipFilename = $this->zipArchive->getNameIndex($i);
-            Assert::string($zipFilename);
+            $filenameInZipArchive = $this->zipArchive->getNameIndex($i);
+            Assert::string($filenameInZipArchive);
 
-            $fileExtension = File::extension($zipFilename);
+            $fileExtension = File::extension($filenameInZipArchive);
             $tempfileName = sprintf('%s.%s', Uuid::generate()->toString(), $fileExtension);
 
             $tempfilePath = sprintf('%s/%s', $tempDir, $tempfileName);
 
             Log::info('renaming & extracting zip-file', [
-                'zipFilename' => $zipFilename,
+                'filenameInZipArchive' => $filenameInZipArchive,
                 'tempfilePath' => $tempfilePath,
             ]);
 
             try {
-                $this->zipArchive->renameName($zipFilename, $tempfileName);
+                $this->zipArchive->renameName($filenameInZipArchive, $tempfileName);
                 $this->zipArchive->extractTo($tempDir, $tempfileName);
 
-                $factoryClass = $this->getFactoryClass($zipFilename);
+                $factoryClass = $this->getFactoryClass($filenameInZipArchive);
                 if ($factoryClass === null) {
                     continue;
                 }
@@ -102,7 +102,7 @@ class ZipImporter
                 }
 
                 $fileContents = File::get($tempfilePath);
-                $importer->import($zipFilename, $fileContents, $factoryClass, $userId, $organisationId);
+                $importer->import($filenameInZipArchive, $fileContents, $factoryClass, $userId, $organisationId);
             } finally {
                 File::delete($tempfilePath);
             }

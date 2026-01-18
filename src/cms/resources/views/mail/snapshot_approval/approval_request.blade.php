@@ -9,10 +9,10 @@
     </p>
     <p>
         {{ __('snapshot.snapshot_source_type') }}: {{ __(sprintf('%s.model_singular', Str::snake(class_basename($snapshot->snapshot_source_type)))) }}<br>
-        {{ __('snapshot.snapshot_source_display_name') }}: {{ $snapshot->snapshotSource?->getDisplayName() }}<br>
+        {{ __('snapshot.snapshot_source_display_name') }}: {{ Str::mailSafe($snapshot->snapshotSource?->getDisplayName()) }}<br>
         <br>
-        {{ __('snapshot.name') }}: {{ $snapshot->name }}<br>
-        {{ __('snapshot.version') }}: {{ $snapshot->version }}<br>
+        {{ __('snapshot.name') }}: {{ Str::mailSafe($snapshot->name) }}<br>
+        {{ __('snapshot.version') }}: {{ Str::mailSafe($snapshot->version) }}<br>
     </p>
 </div>
 </x-mail::message>

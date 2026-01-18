@@ -24,6 +24,8 @@ use App\Models\Stakeholder;
 use App\Models\System;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+use function __;
+
 /**
  * @extends Factory<AvgProcessorProcessingRecord>
  */
@@ -49,7 +51,7 @@ class AvgProcessorProcessingRecordFactory extends Factory
             'pseudonymization' => $this->faker->text(),
 
             'outside_eu' => $this->faker->boolean(),
-            'country' => $this->faker->optional()->country(),
+            'country' => $this->faker->optional()->randomElement(__('general.country_options')),
             'outside_eu_protection_level' => $this->faker->boolean(),
             'outside_eu_protection_level_description' => $this->faker->text(),
             'decision_making' => $this->faker->boolean(),

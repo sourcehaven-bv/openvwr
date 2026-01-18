@@ -8,6 +8,7 @@ use App\Facades\Authentication;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\Pages\Login;
 use App\Filament\Pages\Profile;
+use App\Filament\SimpleAvatarProvider;
 use App\Http\Controllers\HealthController;
 use App\Http\Middleware\EnforceOneTimePassword;
 use App\Http\Middleware\IPAllowFilter;
@@ -88,6 +89,7 @@ class FilamentServiceProvider extends PanelProvider
             ->colors([
                 'primary' => '#F84F39',
             ])
+            ->defaultAvatarProvider(SimpleAvatarProvider::class)
             ->unsavedChangesAlerts()
             ->navigationGroups([
                 FilamentNavigationGroup::make()

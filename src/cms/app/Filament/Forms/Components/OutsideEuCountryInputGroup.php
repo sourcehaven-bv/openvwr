@@ -29,7 +29,8 @@ class OutsideEuCountryInputGroup extends Group
                 Select::make('country')
                     ->label(__('general.country'))
                     ->live()
-                    ->options(FormHelper::setValueAsKey($countryOptions)),
+                    ->options(FormHelper::setValueAsKey($countryOptions))
+                    ->in($countryOptions),
                 TextInput::make('country_other')
                     ->maxLength(255)
                     ->label($countryOtherTranslation)

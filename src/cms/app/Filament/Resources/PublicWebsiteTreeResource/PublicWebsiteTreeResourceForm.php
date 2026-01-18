@@ -8,6 +8,7 @@ use App\Components\Uuid\UuidInterface;
 use App\Enums\Media\MediaGroup;
 use App\Filament\Forms\Components\MarkdownEditor\MarkdownEditor;
 use App\Filament\Forms\Components\PublicFromField;
+use App\Models\Organisation;
 use App\Models\PublicWebsiteTree;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
@@ -71,7 +72,8 @@ class PublicWebsiteTreeResourceForm
                         // https://github.com/minvws/nl-rdo-dataprocessing-register-private/issues/1231
                         return $state;
                         // @codeCoverageIgnoreEnd
-                    }),
+                    })
+                    ->exists(Organisation::class, 'id'),
             ]);
     }
 }

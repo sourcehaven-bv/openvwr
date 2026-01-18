@@ -18,6 +18,7 @@ use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Webmozart\Assert\Assert;
 
@@ -25,6 +26,7 @@ use function __;
 use function array_key_exists;
 use function json_encode;
 use function md5;
+use function sprintf;
 use function str;
 
 use const JSON_UNESCAPED_UNICODE;
@@ -60,20 +62,31 @@ class CreateSnapshotAction extends Action
             ->action(static function (
                 ?array $data,
                 CreateSnapshotAction $action,
+                Component $livewire,
                 Model $record,
                 SnapshotFactory $snapshotFactory,
             ) use (
                 $snapshotData,
                 $savedDataHash,
             ): void {
-                $dataHash = self::createDataHash($snapshotData);
+                try {
+                    $livewire->validate();
+                } catch (ValidationException $validationException) {
+                    // @phpstan-ignore argument.type
+                    $livewire->dispatch('close-modal', id: sprintf('%s-action', $livewire->getId()));
 
+                    throw $validationException;
+                }
+
+                $dataHash = self::createDataHash($snapshotData);
                 if ($dataHash !== $savedDataHash) {
                     Notification::make()
                         ->title(__('snapshot.unsaved_changes'))
                         ->danger()
                         ->send();
 
+                    // @phpstan-ignore argument.type
+                    $livewire->dispatch('close-modal', id: sprintf('%s-action', $livewire->getId()));
                     $action->halt();
                 }
 
