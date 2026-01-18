@@ -240,5 +240,44 @@ Execute the following bin script to run all CI checks: `./bin/ci-local`
 
 ## Workflows
 
--   ci.yml
-    -   Continuous integration workflow with code analysis and automated tests
+### CI (`ci.yml`)
+
+Continuous integration workflow with code analysis and automated tests. Runs automatically on pull requests and pushes.
+
+### Release Workflows
+
+The release system uses date-based versioning (e.g., `v20260118`, `v20260118.1` for multiple releases on the same day).
+
+#### Creating a Release
+
+To create a new release, trigger the **Tag Release** workflow manually:
+
+1. Go to **Actions** → **Tag Release**
+2. Click **Run workflow**
+3. Choose options:
+   - **Mark as alpha release**: Check this for pre-release/testing versions (adds `-alpha` suffix)
+4. Click **Run workflow**
+
+This will:
+- Generate a version tag based on the current date (e.g., `v20260118`)
+- If a tag for today already exists, increment the patch number (e.g., `v20260118.1`)
+- Push the tag, which automatically triggers the Release workflow
+
+#### What Happens Automatically
+
+When a version tag is pushed (via Tag Release or manually):
+
+1. **Release workflow** (`release.yml`) is triggered
+2. **Build Release** (`build-release.yml`) creates the release package:
+   - Installs dependencies
+   - Runs `just release` to build the archive
+   - Creates `openvwr-<version>.tar.gz`
+3. A GitHub Release is created with auto-generated release notes
+
+#### Dev Builds
+
+Development builds are created automatically:
+- On every push to `main` branch
+- Can also be triggered manually via **Actions** → **Build Dev Release**
+
+Dev builds are tagged as `dev-<commit-hash>` and are available as workflow artifacts (retained for 7 days).
