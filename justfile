@@ -46,14 +46,14 @@ setup-env:
 # Install composer dependencies using Docker
 setup-deps:
     @echo "📦 Installing composer dependencies..."
-    @if [ ! -d src/cms/vendor ]; then \
+    @if [ ! -f src/cms/vendor/bin/sail ]; then \
         cd src/cms && docker run --rm \
             -u "$$(id -u):$$(id -g)" \
             -v "$$(pwd):/var/www/html" \
             -w /var/www/html \
             laravelsail/php84-composer:latest \
-            composer install --ignore-platform-reqs; \
-        echo "✅ Dependencies installed"; \
+            composer install --ignore-platform-reqs \
+        && echo "✅ Dependencies installed"; \
     else \
         echo "ℹ️  Dependencies already installed"; \
     fi
