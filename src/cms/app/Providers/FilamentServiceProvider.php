@@ -85,6 +85,7 @@ class FilamentServiceProvider extends PanelProvider
             ->profile(Profile::class)
             ->routes(static function (): void {
                 RouteFacade::get('/health', HealthController::class);
+                RouteFacade::get('/up', HealthController::class . '@up');
             })
             ->colors([
                 'primary' => '#F84F39',

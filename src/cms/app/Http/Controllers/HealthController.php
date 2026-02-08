@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 
 use function response;
+use function time;
 
 use const JSON_PRETTY_PRINT;
 
@@ -21,24 +22,45 @@ readonly class HealthController
     ) {
     }
 
+    public function up(): Response
+    {
+        $isHealthy = $this->databaseHealthService->isHealthy()
+            && $this->virusscanner->isHealthy();
+
+        return response(
+            '',
+            $isHealthy ? Response::HTTP_OK : Response::HTTP_SERVICE_UNAVAILABLE,
+        );
+    }
+
     public function __invoke(): JsonResponse
     {
-        $databaseHealth = $this->databaseHealthService->isHealthy();
-        $virusscannerHealth = $this->virusscanner->isHealthy();
-
-        $isHealthy = $databaseHealth && $virusscannerHealth;
+        $databaseHealthy = $this->databaseHealthService->isHealthy();
+        $virusscannerHealthy = $this->virusscanner->isHealthy();
 
         return response()->json(
             [
-                'healthy' => $isHealthy,
-                'externals' => [
-                    'database' => $databaseHealth,
-                    'virusscanner' => $virusscannerHealth,
+                'finishedAt' => time(),
+                'checkResults' => [
+                    [
+                        'name' => 'Database',
+                        'label' => 'Database Connection',
+                        'status' => $databaseHealthy ? 'ok' : 'failed',
+                        'notificationMessage' => $databaseHealthy ? '' : 'Database connection failed',
+                        'shortSummary' => $databaseHealthy ? 'Connected' : 'Failed',
+                        'meta' => [],
+                    ],
+                    [
+                        'name' => 'Virusscanner',
+                        'label' => 'Virus Scanner',
+                        'status' => $virusscannerHealthy ? 'ok' : 'failed',
+                        'notificationMessage' => $virusscannerHealthy ? '' : 'Virus scanner unavailable',
+                        'shortSummary' => $virusscannerHealthy ? 'Available' : 'Unavailable',
+                        'meta' => [],
+                    ],
                 ],
             ],
-            $isHealthy ? Response::HTTP_OK : Response::HTTP_SERVICE_UNAVAILABLE,
-            [],
-            JSON_PRETTY_PRINT,
+            options: JSON_PRETTY_PRINT,
         );
     }
 }
