@@ -27,10 +27,7 @@ readonly class HealthController
         $isHealthy = $this->databaseHealthService->isHealthy()
             && $this->virusscanner->isHealthy();
 
-        return response(
-            '',
-            $isHealthy ? Response::HTTP_OK : Response::HTTP_SERVICE_UNAVAILABLE,
-        );
+        return response('', $isHealthy ? Response::HTTP_OK : Response::HTTP_SERVICE_UNAVAILABLE);
     }
 
     public function __invoke(): JsonResponse

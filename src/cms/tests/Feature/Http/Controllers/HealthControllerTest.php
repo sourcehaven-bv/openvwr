@@ -7,6 +7,8 @@ namespace Tests\Feature\Http\Controllers;
 use App\Services\DatabaseHealthService;
 use App\Services\Virusscanner\Virusscanner;
 
+use function collect;
+use function expect;
 use function it;
 use function time;
 
@@ -27,22 +29,29 @@ it('returns 200 on /up when healthy', function (): void {
     $this->get('/up')->assertOk()->assertContent('');
 });
 
-it('returns 503 on /up when unhealthy', function (bool $databaseHealthy, bool $virusscannerHealthy): void {
+it('returns 503 on /up when database unhealthy', function (): void {
     $this->mock(DatabaseHealthService::class)
         ->shouldReceive('isHealthy')
         ->once()
-        ->andReturn($databaseHealthy);
+        ->andReturn(false);
+    $this->mock(Virusscanner::class)
+        ->shouldNotReceive('isHealthy');
+
+    $this->get('/up')->assertServiceUnavailable();
+});
+
+it('returns 503 on /up when virusscanner unhealthy', function (): void {
+    $this->mock(DatabaseHealthService::class)
+        ->shouldReceive('isHealthy')
+        ->once()
+        ->andReturn(true);
     $this->mock(Virusscanner::class)
         ->shouldReceive('isHealthy')
         ->once()
-        ->andReturn($virusscannerHealthy);
+        ->andReturn(false);
 
     $this->get('/up')->assertServiceUnavailable();
-})->with([
-    'database unhealthy' => [false, true],
-    'virusscanner unhealthy' => [true, false],
-    'all unhealthy' => [false, false],
-]);
+});
 
 it('returns health status in OhDear format', function (bool $databaseHealthy, bool $virusscannerHealthy): void {
     $this->mock(DatabaseHealthService::class)
@@ -60,7 +69,7 @@ it('returns health status in OhDear format', function (bool $databaseHealthy, bo
 
     $response->assertOk();
     $response->assertJsonStructure([
-        'finishedAt',
+        0 => 'finishedAt',
         'checkResults' => [
             '*' => ['name', 'label', 'status', 'notificationMessage', 'shortSummary', 'meta'],
         ],
