@@ -7,6 +7,8 @@ namespace Tests\Feature\Http\Controllers;
 use App\Services\DatabaseHealthService;
 use App\Services\Virusscanner\Virusscanner;
 
+use function collect;
+use function expect;
 use function it;
 use function time;
 
@@ -60,7 +62,7 @@ it('returns health status in OhDear format', function (bool $databaseHealthy, bo
 
     $response->assertOk();
     $response->assertJsonStructure([
-        'finishedAt',
+        0 => 'finishedAt',
         'checkResults' => [
             '*' => ['name', 'label', 'status', 'notificationMessage', 'shortSummary', 'meta'],
         ],
