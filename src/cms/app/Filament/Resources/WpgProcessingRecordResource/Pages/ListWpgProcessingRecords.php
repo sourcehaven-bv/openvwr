@@ -6,6 +6,7 @@ namespace App\Filament\Resources\WpgProcessingRecordResource\Pages;
 
 use App\Filament\Actions\ExportAction;
 use App\Filament\Exports\WpgProcessingRecordExporter;
+use App\Filament\Resources\Pages\Concerns\PersistsFiltersInSession;
 use App\Filament\Resources\WpgProcessingRecordResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -14,6 +15,8 @@ use function __;
 
 class ListWpgProcessingRecords extends ListRecords
 {
+    use PersistsFiltersInSession;
+
     protected static string $resource = WpgProcessingRecordResource::class;
 
     protected function getHeaderActions(): array

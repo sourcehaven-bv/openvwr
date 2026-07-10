@@ -32,6 +32,9 @@ it('can be saved', function (): void {
         ->recycle($organisation)
         ->create();
     $name = fake()->word();
+    $metaDateOfDevelopment = fake()->date();
+    $metaOwnerAlgorithm = fake()->name();
+    $metaProductOwnerAlgorithm = fake()->name();
 
     $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(EditAlgorithmRecord::class, [
@@ -39,13 +42,19 @@ it('can be saved', function (): void {
         ])
         ->fillForm([
             'name' => $name,
+            'meta_date_of_development' => $metaDateOfDevelopment,
+            'meta_owner_algorithm' => $metaOwnerAlgorithm,
+            'meta_product_owner_algorithm' => $metaProductOwnerAlgorithm,
         ])
         ->call('save')
         ->assertHasNoFormErrors();
 
     $algorithmRecord->refresh();
     expect($algorithmRecord->name)
-        ->toBe($name);
+        ->toBe($name)
+        ->and($algorithmRecord->meta_date_of_development?->toDateString())->toBe($metaDateOfDevelopment)
+        ->and($algorithmRecord->meta_owner_algorithm)->toBe($metaOwnerAlgorithm)
+        ->and($algorithmRecord->meta_product_owner_algorithm)->toBe($metaProductOwnerAlgorithm);
 });
 
 it('can be cloned', function (): void {

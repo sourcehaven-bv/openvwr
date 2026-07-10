@@ -16,9 +16,16 @@ use function in_array;
 
 readonly class ExtensionMimeType implements ValidationRule
 {
+    /**
+     * @param array<string, list<string>> $allowedExtensions map of mime-type → allowed extensions;
+     *                                                        when non-empty this allowlist is used
+     *                                                        instead of Symfony's broad MIME database,
+     *                                                        preventing disguised uploads (e.g. .bat as text/plain)
+     */
     public function __construct(
         private LoggerInterface $logger,
         private MimeTypesInterface $mimeTypes,
+        private array $allowedExtensions = [],
     ) {
     }
 
@@ -39,7 +46,10 @@ readonly class ExtensionMimeType implements ValidationRule
             return;
         }
 
-        $validExtensions = $this->mimeTypes->getExtensions($mimeType);
+        $validExtensions = $this->allowedExtensions !== []
+            ? ($this->allowedExtensions[$mimeType] ?? [])
+            : $this->mimeTypes->getExtensions($mimeType);
+
         $result = in_array($clientOriginalExtension, $validExtensions, true);
 
         if ($result === false) {

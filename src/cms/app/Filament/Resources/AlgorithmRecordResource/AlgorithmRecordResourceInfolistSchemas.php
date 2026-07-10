@@ -124,9 +124,45 @@ class AlgorithmRecordResourceInfolistSchemas
                 ->label(__('algorithm_record.meta_source_id')),
             TextareaEntry::make('meta_tags')
                 ->label(__('algorithm_record.meta_tags')),
+            DateEntry::make('meta_date_of_development')
+                ->label(__('algorithm_record.meta_date_of_development')),
+            TextEntry::make('meta_owner_algorithm')
+                ->label(__('algorithm_record.meta_owner_algorithm')),
+            TextEntry::make('meta_product_owner_algorithm')
+                ->label(__('algorithm_record.meta_product_owner_algorithm')),
             InformationBlockSection::makeCollapsible(
                 __('information_blocks.algorithm_record.step_meta_title'),
                 __('information_blocks.algorithm_record.step_meta_info'),
+            ),
+        ];
+    }
+
+    /**
+     * @return array<Component>
+     */
+    public static function getImpact(): array
+    {
+        return [
+            self::makeTextEntry('impact_with_consequences'),
+            self::makeTextEntry('impact_more_algorithms_applied'),
+            self::makeTextEntry('impact_effect_on_outcome'),
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.algorithm_record.step_impact_title'),
+                __('information_blocks.algorithm_record.step_impact_info'),
+            ),
+        ];
+    }
+
+    /**
+     * @return array<Component>
+     */
+    public static function getValidation(): array
+    {
+        return [
+            self::makeTextEntry('validation_answers_checked_by_product_owner'),
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.algorithm_record.step_validation_title'),
+                __('information_blocks.algorithm_record.step_validation_info'),
             ),
         ];
     }
@@ -144,5 +180,16 @@ class AlgorithmRecordResourceInfolistSchemas
                 __('information_blocks.algorithm_record.step_attachments_info'),
             ),
         ];
+    }
+
+    private static function makeTextEntry(string $name): TextEntry
+    {
+        return TextEntry::make($name)
+            ->label(__('algorithm_record.' . $name))
+            ->formatStateUsing(static fn (?bool $state): ?string => match ($state) {
+                true => (string) __('general.yes'),
+                false => (string) __('general.no'),
+                null => null,
+            });
     }
 }

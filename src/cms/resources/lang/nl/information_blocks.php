@@ -599,7 +599,15 @@ return [
 
         'step_meta_title' => 'Informatie over Metadata',
         'step_meta_info' => '
-            <p class="text-sm text-gray-500">Geef bij "Taal" aan in welke programmeertaal het algoritme is geschreven. Beschrijf bij "Schema" de structuur en opbouw van het algoritme. Vermeld bij "Landelijk-ID" het identificatienummer dat nationaal aan het algoritme is toegewezen. Noteer bij "Bron-ID" het identificatienummer van de specifieke bron van het algoritme. Voeg bij "Tags" relevante trefwoorden toe die het algoritme beschrijven.</p>',
+            <p class="text-sm text-gray-500">Geef bij "Taal" aan in welke programmeertaal het algoritme is geschreven. Beschrijf bij "Schema" de structuur en opbouw van het algoritme. Geef bij "Datum van ontwikkeling" aan wanneer een algoritme ontwikkeld is, helpt AI compliance officers bij overzicht recent of nog te ontwikkelen algoritmes. Geef bij "Eigenaar van het algoritme" aan wie de eindverantwoordelijk is (bijv. proceseigenaar). Geef bij "Product owner van het algoritme" aan wie operationeel verantwoordelijk is voor beheer en doorontwikkeling. Vermeld bij "Landelijk-ID" het identificatienummer dat nationaal aan het algoritme is toegewezen. Noteer bij "Bron-ID" het identificatienummer van de specifieke bron van het algoritme. Voeg bij "Tags" relevante trefwoorden toe die het algoritme beschrijven.</p>',
+
+        'step_impact_title' => 'Informatie over Impactvol algoritme',
+        'step_impact_info' => '
+            <p class="text-sm text-gray-500">Beantwoord de toetsvragen met een "Ja" of "Nee", <span class="font-bold">Let op:</span> als alle drie de vragen met "Ja" zijn beantwoord, moet het algoritme als impactvol worden aangemerkt en opgenomen worden in het (rijksbrede) algoritmeregister.</p>',
+
+        'step_validation_title' => 'Informatie over Validatie',
+        'step_validation_info' => '
+            <p class="text-sm text-gray-500">Antwoorden op de toetsvragen zijn gecontroleerd door product owner, doel is borging dat de classificatie is gevalideerd.</p>',
 
         'step_attachments_title' => 'Informatie over Documenten & Bijlagen',
         'step_attachments_info' => '

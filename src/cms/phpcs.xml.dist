@@ -109,7 +109,6 @@
     <rule ref="Universal.Files.SeparateFunctionsFromOO"/>
     <rule ref="Universal.FunctionDeclarations.RequireFinalMethodsInTraits"/>
     <rule ref="Universal.Lists.DisallowLongListSyntax"/>
-    <rule ref="Universal.Lists.DisallowShortListSyntax"/>
     <rule ref="Universal.Namespaces.DisallowDeclarationWithoutName"/>
     <rule ref="Universal.Namespaces.DisallowCurlyBraceSyntax"/>
     <rule ref="Universal.Namespaces.OneDeclarationPerFile"/>

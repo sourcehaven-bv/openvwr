@@ -27,6 +27,10 @@ class AlgorithmRecordResourceForm
                             ->schema(AlgorithmRecordResourceFormSchemas::getMechanics()),
                         Step::make(__('algorithm_record.step_meta'))
                             ->schema(AlgorithmRecordResourceFormSchemas::getMeta()),
+                        Step::make(__('algorithm_record.step_impact'))
+                            ->schema(AlgorithmRecordResourceFormSchemas::getImpact()),
+                        Step::make(__('algorithm_record.step_validation'))
+                            ->schema(AlgorithmRecordResourceFormSchemas::getValidation()),
                         Step::make(__('algorithm_record.step_attachments'))
                             ->schema(AlgorithmRecordResourceFormSchemas::getAttachments()),
                     ])
@@ -54,6 +58,14 @@ class AlgorithmRecordResourceForm
                     ->aside(),
                 Section::make(__('algorithm_record.step_meta'))
                     ->schema(AlgorithmRecordResourceFormSchemas::getMeta())
+                    ->compact()
+                    ->aside(),
+                Section::make(__('algorithm_record.step_impact'))
+                    ->schema(AlgorithmRecordResourceFormSchemas::getImpact())
+                    ->compact()
+                    ->aside(),
+                Section::make(__('algorithm_record.step_validation'))
+                    ->schema(AlgorithmRecordResourceFormSchemas::getValidation())
                     ->compact()
                     ->aside(),
                 Section::make(__('algorithm_record.step_attachments'))

@@ -60,6 +60,11 @@ final class Config
         return $configValue;
     }
 
+    public static function has(string $key): bool
+    {
+        return config()->has($key);
+    }
+
     private static function get(string $value, mixed $default = null): mixed
     {
         return config($value, $default);

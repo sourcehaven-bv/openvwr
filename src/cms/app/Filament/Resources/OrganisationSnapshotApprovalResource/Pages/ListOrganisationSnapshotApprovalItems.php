@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\OrganisationSnapshotApprovalResource\Pages;
 
 use App\Filament\Resources\OrganisationSnapshotApprovalResource;
+use App\Filament\Resources\Pages\Concerns\PersistsFiltersInSession;
 use App\Models\Builders\SnapshotBuilder;
 use App\Models\States\Snapshot\Approved;
 use App\Models\States\Snapshot\Established;
@@ -17,6 +18,8 @@ use function __;
 
 class ListOrganisationSnapshotApprovalItems extends ListRecords
 {
+    use PersistsFiltersInSession;
+
     public const string TAB_ID_ALL = 'all';
     public const string TAB_ID_ESTABLISHED_OBSOLETE = 'established-obsolete';
     public const string TAB_ID_INREVIEW_APPROVED = 'in_review-approved';

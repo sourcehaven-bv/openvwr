@@ -36,6 +36,9 @@ it('can create an entry', function (): void {
         ->recycle($organisation)
         ->create(['enabled' => true]);
     $name = fake()->uuid();
+    $metaDateOfDevelopment = fake()->date();
+    $metaOwnerAlgorithm = fake()->name();
+    $metaProductOwnerAlgorithm = fake()->name();
 
     $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(CreateAlgorithmRecord::class)
@@ -45,11 +48,17 @@ it('can create an entry', function (): void {
             'algorithm_publication_category_id' => $algorithmPublicationCategory->id,
             'algorithm_status_id' => $algorithmStatus->id,
             'algorithm_theme_id' => $algorithmTheme->id,
+            'meta_date_of_development' => $metaDateOfDevelopment,
+            'meta_owner_algorithm' => $metaOwnerAlgorithm,
+            'meta_product_owner_algorithm' => $metaProductOwnerAlgorithm,
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas(AlgorithmRecord::class, [
         'name' => $name,
+        'meta_date_of_development' => $metaDateOfDevelopment,
+        'meta_owner_algorithm' => $metaOwnerAlgorithm,
+        'meta_product_owner_algorithm' => $metaProductOwnerAlgorithm,
     ]);
 });

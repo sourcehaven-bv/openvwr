@@ -29,6 +29,10 @@ class AlgorithmRecordResourceInfolist
                             ->schema(AlgorithmRecordResourceInfolistSchemas::getMechanics()),
                         Tab::make(__('algorithm_record.step_meta'))
                             ->schema(AlgorithmRecordResourceInfolistSchemas::getMeta()),
+                        Tab::make(__('algorithm_record.step_impact'))
+                            ->schema(AlgorithmRecordResourceInfolistSchemas::getImpact()),
+                        Tab::make(__('algorithm_record.step_validation'))
+                            ->schema(AlgorithmRecordResourceInfolistSchemas::getValidation()),
                         Tab::make(__('algorithm_record.step_attachments'))
                             ->schema(AlgorithmRecordResourceInfolistSchemas::getAttachments()),
                     ]),
@@ -53,6 +57,14 @@ class AlgorithmRecordResourceInfolist
                     ->aside(),
                 Section::make(__('algorithm_record.step_meta'))
                     ->schema(AlgorithmRecordResourceInfolistSchemas::getMeta())
+                    ->compact()
+                    ->aside(),
+                Section::make(__('algorithm_record.step_impact'))
+                    ->schema(AlgorithmRecordResourceInfolistSchemas::getImpact())
+                    ->compact()
+                    ->aside(),
+                Section::make(__('algorithm_record.step_validation'))
+                    ->schema(AlgorithmRecordResourceInfolistSchemas::getValidation())
                     ->compact()
                     ->aside(),
                 Section::make(__('algorithm_record.step_attachments'))

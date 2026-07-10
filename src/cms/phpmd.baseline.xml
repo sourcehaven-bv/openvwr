@@ -10,6 +10,7 @@
   <violation rule="PHPMD\Rule\Design\LongParameterList" file="app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php" method="__construct"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php" method="create"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="app/Import/Factories/Wpg/WpgProcessingRecordFactory.php" method="create"/>
+  <violation rule="PHPMD\Rule\CleanCode\ErrorControlOperator" file="app/Jobs/Media/PruneMetaData.php" method="handle"/>
   <violation rule="PHPMD\Rule\Design\TooManyMethods" file="app/Models/Organisation.php"/>
   <violation rule="PHPMD\Rule\Design\TooManyPublicMethods" file="app/Models/Organisation.php"/>
   <violation rule="PHPMD\Rule\CleanCode\BooleanArgumentFlag" file="app/Routing/UrlGenerator.php"/>

@@ -110,19 +110,19 @@ class SnapshotSignLoginController extends Controller
 
     private function getOrganisationFromRequest(Request $request): Organisation
     {
-        return Organisation::where('id', $request->get('organisation_id'))
+        return Organisation::where('id', $request->query('organisation_id'))
             ->firstOrFail();
     }
 
     private function getSnapshotFromRequest(Request $request): Snapshot
     {
-        return Snapshot::where('id', $request->get('snapshot_id'))
+        return Snapshot::where('id', $request->query('snapshot_id'))
             ->firstOrFail();
     }
 
     private function getUserFromRequest(Request $request): User
     {
-        return User::where('id', $request->get('user_id'))
+        return User::where('id', $request->query('user_id'))
             ->firstOrFail();
     }
 

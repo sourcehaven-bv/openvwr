@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\PersonalSnapshotApprovalResource\Pages;
 
 use App\Facades\Authentication;
+use App\Filament\Resources\Pages\Concerns\PersistsFiltersInSession;
 use App\Filament\Resources\PersonalSnapshotApprovalResource;
 use App\Models\Builders\SnapshotApprovalBuilder;
 use App\Models\Builders\SnapshotBuilder;
@@ -15,6 +16,8 @@ use function __;
 
 class ListPersonalSnapshotApprovalItems extends ListRecords
 {
+    use PersistsFiltersInSession;
+
     public const string TAB_ID_ALL = 'all';
     public const string TAB_ID_REVIEWED = 'reviewed';
     public const string TAB_ID_UNREVIEWED = 'unreviewed';
