@@ -173,6 +173,9 @@ it('allows access when OTP is confirmed and the session is valid', function (): 
     // Opt-in tenant + user with a valid OTP session should fall through to
     // $next without a redirect — this is the happy path once step-up is done.
     $this->mock(OtpService::class)
+        ->shouldReceive('hasOtpConfirmed')
+        ->once()
+        ->andReturn(true)
         ->shouldReceive('hasValidSession')
         ->once()
         ->andReturn(true);
