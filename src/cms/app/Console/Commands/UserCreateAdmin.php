@@ -16,6 +16,7 @@ use Illuminate\Support\Str;
 use Throwable;
 
 use function filter_var;
+use function is_string;
 use function Laravel\Prompts\text;
 
 use const FILTER_VALIDATE_EMAIL;
