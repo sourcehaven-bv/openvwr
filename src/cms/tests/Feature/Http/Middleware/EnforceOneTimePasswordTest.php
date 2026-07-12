@@ -7,6 +7,7 @@ namespace Tests\Feature\Http\Middleware;
 use App\Http\Middleware\EnforceOneTimePassword;
 use App\Models\Organisation;
 use App\Models\User;
+use App\Services\OtpService;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\Helpers\ConfigTestHelper;
 
@@ -159,6 +160,34 @@ it('allows access when the tenant slug does not match any organisation', functio
     $this->be($user);
 
     $request = mockRequest(fake()->slug, ['tenant' => 'this-slug-does-not-exist']);
+
+    $middleware = new EnforceOneTimePassword();
+    $response = $middleware->handle($request, function (): Response {
+        return new Response('OK');
+    });
+
+    expect($response->getStatusCode())->toBe(200);
+});
+
+it('allows access when OTP is confirmed and the session is valid', function (): void {
+    // Opt-in tenant + user with a valid OTP session should fall through to
+    // $next without a redirect — this is the happy path once step-up is done.
+    $this->mock(OtpService::class)
+        ->shouldReceive('hasValidSession')
+        ->once()
+        ->andReturn(true);
+
+    $user = User::factory()
+        ->withOrganisation()
+        ->withValidOtpRegistration()
+        ->create();
+    $organisation = $user->organisations()->first();
+    $organisation->update(['otp_required' => true]);
+    $this->be($user);
+
+    $slug = $organisation->slug;
+
+    $request = mockRequest(sprintf('%s/%s', $slug, fake()->slug()), ['tenant' => $slug]);
 
     $middleware = new EnforceOneTimePassword();
     $response = $middleware->handle($request, function (): Response {
