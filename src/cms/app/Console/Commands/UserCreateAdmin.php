@@ -22,12 +22,21 @@ use const FILTER_VALIDATE_EMAIL;
 
 class UserCreateAdmin extends Command
 {
-    protected $signature = 'user:create-admin';
+    protected $signature = 'user:create-admin
+        {--name= : Name for the new admin (skips the prompt when set)}
+        {--email= : Email for the new admin (skips the prompt when set)}
+        {--organisation= : Organisation name to create or reuse (skips the prompt when set)}';
     protected $description = 'Create a new admin user';
 
     public function handle(): int
     {
-        $inputData = $this->getInputData();
+        try {
+            $inputData = $this->getInputData();
+        } catch (Throwable $throwable) {
+            $this->output->error($throwable->getMessage());
+
+            return self::FAILURE;
+        }
 
         try {
             $organisation = $this->createOrGetOrganisation($inputData['organisation']);
@@ -44,26 +53,71 @@ class UserCreateAdmin extends Command
     }
 
     /**
+     * Collect inputs, preferring CLI flags for unattended use (Ansible /
+     * bootstrap scripts). Any flag left out falls back to the interactive
+     * prompt so `php artisan user:create-admin` on a support shell keeps
+     * behaving as before.
+     *
      * @return array{'name': string, 'email': string, 'organisation': string}
      */
     private function getInputData(): array
     {
         return [
-            'name' => text(label: 'Name', default: 'admin', required: true),
-            'email' => text(
-                label: 'Email address',
-                default: 'admin@example.com',
-                required: true,
-                validate: function (string $email): ?string {
-                    return match (true) {
-                        $this->isInvalidEmail($email) => 'The email address must be valid.',
-                        $this->userWithEmailExists($email) => 'A user with this email address already exists',
-                        default => null,
-                    };
-                },
-            ),
-            'organisation' => text(label: 'Organisation', default: 'Example Organization', required: true),
+            'name' => $this->resolveName(),
+            'email' => $this->resolveEmail(),
+            'organisation' => $this->resolveOrganisation(),
         ];
+    }
+
+    private function resolveName(): string
+    {
+        $name = $this->option('name');
+        if (is_string($name) && $name !== '') {
+            return $name;
+        }
+
+        return text(label: 'Name', default: 'admin', required: true);
+    }
+
+    private function resolveEmail(): string
+    {
+        $email = $this->option('email');
+        if (is_string($email) && $email !== '') {
+            // Non-interactive path: same validation as the prompt, but as
+            // an exception so the command exits FAILURE instead of
+            // re-prompting into a closed stdin.
+            if ($this->isInvalidEmail($email)) {
+                throw new Exception('The email address must be valid.');
+            }
+            if ($this->userWithEmailExists($email)) {
+                throw new Exception('A user with this email address already exists');
+            }
+
+            return $email;
+        }
+
+        return text(
+            label: 'Email address',
+            default: 'admin@example.com',
+            required: true,
+            validate: function (string $email): ?string {
+                return match (true) {
+                    $this->isInvalidEmail($email) => 'The email address must be valid.',
+                    $this->userWithEmailExists($email) => 'A user with this email address already exists',
+                    default => null,
+                };
+            },
+        );
+    }
+
+    private function resolveOrganisation(): string
+    {
+        $organisation = $this->option('organisation');
+        if (is_string($organisation) && $organisation !== '') {
+            return $organisation;
+        }
+
+        return text(label: 'Organisation', default: 'Example Organization', required: true);
     }
 
     private function isInvalidEmail(string $email): bool
