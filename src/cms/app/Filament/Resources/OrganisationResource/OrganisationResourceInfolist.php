@@ -9,6 +9,7 @@ use App\Filament\Infolists\Components\EntityNumberPrefixEntry;
 use App\Filament\Infolists\Components\TextareaEntry;
 use App\Models\Organisation;
 use Filament\Infolists\Components\Component;
+use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
@@ -41,6 +42,9 @@ class OrganisationResourceInfolist
                         ->label(__('organisation.review_at_default_in_months')),
                     TextEntry::make('responsibleLegalEntity.name')
                         ->label(__('responsible_legal_entity.model_singular')),
+                    IconEntry::make('otp_required')
+                        ->label(__('organisation.otp_required'))
+                        ->boolean(),
                 ]),
             Section::make(__('organisation.section_prefix'))
                 ->columns()

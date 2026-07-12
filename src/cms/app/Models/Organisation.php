@@ -129,6 +129,7 @@ class Organisation extends Model implements HasMedia
         'register_entity_number_counter_id',
         'databreach_entity_number_counter_id',
         'public_from',
+        'otp_required',
     ];
 
     public function casts(): array
@@ -136,6 +137,7 @@ class Organisation extends Model implements HasMedia
         return [
             'allowed_email_domains' => 'array',
             'databreach_entity_number_counter_id' => UuidCast::class,
+            'otp_required' => 'boolean',
             'public_from' => 'datetime',
             'published_at' => 'datetime',
             'responsible_legal_entity_id' => UuidCast::class,

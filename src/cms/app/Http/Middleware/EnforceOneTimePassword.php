@@ -8,6 +8,7 @@ use App\Enums\RouteName;
 use App\Facades\Authentication;
 use App\Facades\Otp;
 use App\Filament\Pages\Profile;
+use App\Models\Organisation;
 use Closure;
 use Exception;
 use Filament\Facades\Filament;
@@ -34,6 +35,18 @@ class EnforceOneTimePassword
 
         $tenantId = $route->parameter('tenant');
         if (!is_string($tenantId)) {
+            return $next($request);
+        }
+
+        // OTP enforcement is a per-tenant toggle (default off) so an
+        // organisation can decide whether to require 2FA of its members.
+        // If the tenant slug doesn't resolve — typically because
+        // tenancy isn't wired up on this route — fall through and let
+        // downstream handlers deal with it; nothing 2FA-related to do.
+        $organisation = Organisation::query()
+            ->where('slug', $tenantId)
+            ->first();
+        if ($organisation === null || $organisation->otp_required !== true) {
             return $next($request);
         }
 
