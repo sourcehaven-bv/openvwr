@@ -22,6 +22,7 @@ use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException;
 
 use function __;
+use function array_merge;
 use function redirect;
 
 class OneTimePasswordValidation extends SimplePage
@@ -35,6 +36,13 @@ class OneTimePasswordValidation extends SimplePage
 
     #[Url]
     public ?string $next;
+
+    protected function getLayoutData(): array
+    {
+        return array_merge(parent::getLayoutData(), [
+            'hasDatabaseNotifications' => false,
+        ]);
+    }
 
     public function getTitle(): string
     {

@@ -104,6 +104,6 @@ class Import extends Page implements HasForms
             ->success()
             ->send();
 
-        $form?->fill();
+        $form->fill();
     }
 }

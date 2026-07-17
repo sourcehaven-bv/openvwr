@@ -41,7 +41,7 @@
   <div>
     <div>
         {{- range $nodes }}
-        <a href="{{ .RelPermalink }}">
+        {{ if .Params.public_url }}<a href="{{ .Params.public_url }}" target="_blank">{{ else }}<a href="{{ .RelPermalink }}">{{ end }}
           <div role="group">
             {{ $imageAlt := .LinkTitle }}
             {{- with or (.Resources.Get "poster.jpeg") (resources.Get "images/organisation-fallback.jpeg") }}

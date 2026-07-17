@@ -26,6 +26,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property ?UuidInterface $parent_id
  * @property string $title
  * @property string $slug
+ * @property ?string $public_url
  * @property ?CarbonImmutable $public_from
  * @property string $public_website_content
  *
@@ -49,6 +50,7 @@ class PublicWebsiteTree extends Model implements HasMedia
         'parent_id',
         'title',
         'slug',
+        'public_url',
         'public_from',
         'public_website_content',
     ];

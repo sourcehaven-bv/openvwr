@@ -46,6 +46,7 @@ return [
             Permission::CORE_ENTITY_VIEW->value,
             Permission::DATA_BREACH_RECORD_VIEW->value,
             Permission::DOCUMENT_VIEW->value,
+            Permission::EXPORT->value,
             Permission::MANAGEMENT_VIEW->value,
             Permission::RESPONSIBLE_VIEW->value,
             Permission::SNAPSHOT_VIEW->value,
@@ -143,6 +144,7 @@ return [
             Permission::TAG_VIEW->value,
             Permission::USER_ROLE_ORGANISATION_CPO_MANAGE->value,
             Permission::USER_ROLE_ORGANISATION_MANAGE->value,
+            Permission::OTP_DISABLE->value,
         ],
         Role::PRIVACY_OFFICER->value => [
             Permission::CORE_ENTITY_CREATE->value,
@@ -185,6 +187,7 @@ return [
             Permission::TAG_UPDATE->value,
             Permission::TAG_VIEW->value,
             Permission::USER_ROLE_ORGANISATION_MANAGE->value,
+            Permission::OTP_DISABLE->value,
         ],
     ],
 ];

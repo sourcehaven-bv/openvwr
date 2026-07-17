@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\TagResource\Pages;
 
+use App\Filament\Resources\Pages\Concerns\PersistsFiltersInSession;
 use App\Filament\Resources\TagResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListTags extends ListRecords
 {
+    use PersistsFiltersInSession;
+
     protected static string $resource = TagResource::class;
 
     protected function getHeaderActions(): array

@@ -9,7 +9,7 @@ use Tests\Helpers\ConfigTestHelper;
 it('can run the artisan sql-execute command', function (): void {
     $this->mock(DatabaseManager::class)
         ->shouldReceive('unprepared')
-        ->times(167);
+        ->times(169);
 
     $this->artisan('sql-execute')
         ->assertSuccessful();

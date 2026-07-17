@@ -19,7 +19,23 @@ class AlgorithmRecordExporter extends Exporter
     public static function getColumns(): array
     {
         return [
-            // naam verwerking
+            ...self::getProcessingNameColumns(),
+            ...self::getResponsibleUseColumns(),
+            ...self::getMechanicsColumns(),
+            ...self::getMetadataColumns(),
+            ...self::getImpactColumns(),
+            ...self::getValidationColumns(),
+            ...self::getDocumentColumns(),
+            ...self::getOtherColumns(),
+        ];
+    }
+
+    /**
+     * @return array<ExportColumn>
+     */
+    private static function getProcessingNameColumns(): array
+    {
+        return [
             ExportColumn::make('organisation.name')
                 ->label(__('organisation.model_singular')),
             ExportColumn::make('organisation.responsibleLegalEntity.name')
@@ -48,8 +64,15 @@ class AlgorithmRecordExporter extends Exporter
                 ->label(__('algorithm_record.public_page_link')),
             ExportColumn::make('source_link')
                 ->label(__('algorithm_record.source_link')),
+        ];
+    }
 
-            // verantwoord gebruik
+    /**
+     * @return array<ExportColumn>
+     */
+    private static function getResponsibleUseColumns(): array
+    {
+        return [
             ExportColumn::make('resp_goal_and_impact')
                 ->label(__('algorithm_record.resp_goal_and_impact')),
             ExportColumn::make('resp_considerations')
@@ -72,8 +95,15 @@ class AlgorithmRecordExporter extends Exporter
                 ->label(__('algorithm_record.resp_impact_test_links')),
             ExportColumn::make('resp_impact_tests_description')
                 ->label(__('algorithm_record.resp_impact_tests_description')),
+        ];
+    }
 
-            // werking
+    /**
+     * @return array<ExportColumn>
+     */
+    private static function getMechanicsColumns(): array
+    {
+        return [
             ExportColumn::make('oper_data_title')
                 ->label(__('algorithm_record.oper_data_title')),
             ExportColumn::make('oper_data')
@@ -86,8 +116,15 @@ class AlgorithmRecordExporter extends Exporter
                 ->label(__('algorithm_record.oper_supplier')),
             ExportColumn::make('oper_source_code_link')
                 ->label(__('algorithm_record.oper_source_code_link')),
+        ];
+    }
 
-            // metadata
+    /**
+     * @return array<ExportColumn>
+     */
+    private static function getMetadataColumns(): array
+    {
+        return [
             ExportColumn::make('meta_lang')
                 ->label(__('algorithm_record.meta_lang')),
             ExportColumn::make('meta_national_id')
@@ -96,13 +133,59 @@ class AlgorithmRecordExporter extends Exporter
                 ->label(__('algorithm_record.meta_source_id')),
             ExportColumn::make('meta_tags')
                 ->label(__('algorithm_record.meta_tags')),
+            ExportColumn::make('meta_date_of_development')
+                ->label(__('algorithm_record.meta_date_of_development')),
+            ExportColumn::make('meta_owner_algorithm')
+                ->label(__('algorithm_record.meta_owner_algorithm')),
+            ExportColumn::make('meta_product_owner_algorithm')
+                ->label(__('algorithm_record.meta_product_owner_algorithm')),
+        ];
+    }
 
-            // documenten
+    /**
+     * @return array<ExportColumn>
+     */
+    private static function getImpactColumns(): array
+    {
+        return [
+            ExportColumn::make('impact_with_consequences')
+                ->label(__('algorithm_record.impact_with_consequences')),
+            ExportColumn::make('impact_more_algorithms_applied')
+                ->label(__('algorithm_record.impact_more_algorithms_applied')),
+            ExportColumn::make('impact_effect_on_outcome')
+                ->label(__('algorithm_record.impact_effect_on_outcome')),
+        ];
+    }
+
+    /**
+     * @return array<ExportColumn>
+     */
+    private static function getValidationColumns(): array
+    {
+        return [
+            ExportColumn::make('validation_answers_checked_by_product_owner')
+                ->label(__('algorithm_record.validation_answers_checked_by_product_owner')),
+        ];
+    }
+
+    /**
+     * @return array<ExportColumn>
+     */
+    private static function getDocumentColumns(): array
+    {
+        return [
             ExportColumn::make('document_count')
                 ->label(__('document.model_plural'))
                 ->counts('documents'),
+        ];
+    }
 
-            // overig
+    /**
+     * @return array<ExportColumn>
+     */
+    private static function getOtherColumns(): array
+    {
+        return [
             ExportColumn::make('created_at')
                 ->label(__('general.created_at')),
             ExportColumn::make('updated_at')

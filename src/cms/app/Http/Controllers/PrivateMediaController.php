@@ -11,15 +11,17 @@ use App\Services\AuthenticationService;
 use App\Vendor\MediaLibrary\Media;
 use Filament\Facades\Filament;
 use Illuminate\Http\RedirectResponse;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException;
 
 use function abort;
 use function abort_if;
 use function redirect;
-use function response;
+use function str_contains;
+use function str_starts_with;
 
 class PrivateMediaController extends Controller
 {
@@ -28,7 +30,7 @@ class PrivateMediaController extends Controller
     ) {
     }
 
-    public function __invoke(string $id): RedirectResponse|BinaryFileResponse
+    public function __invoke(string $id): RedirectResponse|StreamedResponse
     {
         try {
             $user = $this->authenticationService->user();
@@ -54,7 +56,16 @@ class PrivateMediaController extends Controller
         }
 
         abort_if($user->cannot('view', $model), Response::HTTP_FORBIDDEN);
+        abort_if($media->validated_at === null, Response::HTTP_NOT_FOUND);
 
-        return response()->file($media->getPath());
+        $mimeType = $media->mime_type ?? 'application/octet-stream';
+        $contentType = str_starts_with($mimeType, 'text/') && !str_contains($mimeType, 'charset')
+            ? $mimeType . '; charset=UTF-8'
+            : $mimeType;
+
+        return Storage::disk($media->disk)->response(
+            $media->getPathRelativeToRoot(),
+            headers: ['Content-Type' => $contentType],
+        );
     }
 }

@@ -61,6 +61,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $meta_national_id
  * @property string|null $meta_source_id
  * @property string|null $meta_tags
+ * @property CarbonImmutable|null $meta_date_of_development
+ * @property string|null $meta_owner_algorithm
+ * @property string|null $meta_product_owner_algorithm
+ * @property bool|null $impact_with_consequences
+ * @property bool|null $impact_more_algorithms_applied
+ * @property bool|null $impact_effect_on_outcome
+ * @property bool|null $validation_answers_checked_by_product_owner
  * @property CarbonImmutable|null $public_from
  *
  * @property-read AlgorithmMetaSchema|null $algorithmMetaSchema
@@ -122,6 +129,14 @@ class AlgorithmRecord extends Model implements Cloneable, EntityNumerable, Snaps
         'meta_national_id',
         'meta_source_id',
         'meta_tags',
+        'meta_date_of_development',
+        'meta_owner_algorithm',
+        'meta_product_owner_algorithm',
+
+        'impact_with_consequences',
+        'impact_more_algorithms_applied',
+        'impact_effect_on_outcome',
+        'validation_answers_checked_by_product_owner',
     ];
 
     public function casts(): array
@@ -132,6 +147,11 @@ class AlgorithmRecord extends Model implements Cloneable, EntityNumerable, Snaps
             'algorithm_publication_category_id' => UuidCast::class,
             'algorithm_meta_schema_id' => UuidCast::class,
             'public_from' => 'datetime',
+            'meta_date_of_development' => 'date',
+            'impact_with_consequences' => 'boolean',
+            'impact_more_algorithms_applied' => 'boolean',
+            'impact_effect_on_outcome' => 'boolean',
+            'validation_answers_checked_by_product_owner' => 'boolean',
         ];
     }
 

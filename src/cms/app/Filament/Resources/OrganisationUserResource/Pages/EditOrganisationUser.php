@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\OrganisationUserResource\Pages;
 
 use App\Facades\Authentication;
+use App\Filament\Actions\User\OtpDisableAction;
 use App\Filament\Resources\OrganisationUserResource;
 use App\Models\OrganisationUser;
 use App\Models\OrganisationUserRole;
@@ -28,6 +29,7 @@ class EditOrganisationUser extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            OtpDisableAction::make(),
             Action::make('detach')
                 ->label(__('user.organisation_role_detach'))
                 ->color('danger')

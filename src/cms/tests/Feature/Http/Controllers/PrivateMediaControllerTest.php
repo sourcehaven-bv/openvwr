@@ -9,6 +9,7 @@ use App\Enums\RouteName;
 use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Document;
+use App\Models\PublicWebsiteTree;
 use App\Models\User;
 use App\Vendor\MediaLibrary\Media;
 use Illuminate\Support\Facades\Storage;
@@ -156,6 +157,26 @@ it('fails if no permission on parent model ', function (): void {
         ->assertForbidden();
 });
 
+it('returns not found when media is not yet validated', function (): void {
+    Storage::fake(ConfigTestHelper::get('media-library.filesystem_disk'));
+
+    $organisation = OrganisationTestHelper::create();
+    $media = Media::factory()->create([
+        'model_id' => $organisation->id,
+        'model_type' => $organisation::class,
+        'organisation_id' => $organisation->id,
+        'mime_type' => 'text/plain',
+        'validated_at' => null,
+    ]);
+
+    $filesystem = Storage::disk(ConfigTestHelper::get('media-library.filesystem_disk'));
+    $filesystem->put(sprintf('%s/%s/%s/%s', $organisation->id, $media->collection_name, $media->uuid, $media->file_name), 'test');
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->get(route(RouteName::MEDIA_PRIVATE, $media->uuid))
+        ->assertNotFound();
+});
+
 it('fails if organisation is deleted', function (): void {
     Storage::fake(ConfigTestHelper::get('media-library.filesystem_disk'));
 
@@ -177,6 +198,40 @@ it('fails if organisation is deleted', function (): void {
     $filesystem->put(sprintf('%s/%s/%s/%s', $organisation->id, $media->collection_name, $media->uuid, $media->file_name), 'test');
 
     SessionTestHelper::setOtpValid();
+    $this->be($user)
+        ->get(route(RouteName::MEDIA_PRIVATE, $media->uuid))
+        ->assertNotFound();
+});
+
+it('returns the media with the original content type for non-text mime types', function (): void {
+    Storage::fake(ConfigTestHelper::get('media-library.filesystem_disk'));
+
+    $organisation = OrganisationTestHelper::create();
+    $media = Media::factory()->create([
+        'model_id' => $organisation->id,
+        'model_type' => $organisation::class,
+        'organisation_id' => $organisation->id,
+        'mime_type' => 'application/pdf',
+    ]);
+
+    $filesystem = Storage::disk(ConfigTestHelper::get('media-library.filesystem_disk'));
+    $filesystem->put(sprintf('%s/%s/%s/%s', $organisation->id, $media->collection_name, $media->uuid, $media->file_name), 'test');
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->get(route(RouteName::MEDIA_PRIVATE, $media->uuid))
+        ->assertOk()
+        ->assertHeader('Content-Type', 'application/pdf');
+});
+
+it('returns not found when the media model has been deleted', function (): void {
+    $publicWebsiteTree = PublicWebsiteTree::factory()->create();
+    $media = Media::factory()->create([
+        'model_id' => $publicWebsiteTree->id,
+        'model_type' => $publicWebsiteTree::class,
+    ]);
+    $publicWebsiteTree->delete();
+
+    $user = User::factory()->create();
     $this->be($user)
         ->get(route(RouteName::MEDIA_PRIVATE, $media->uuid))
         ->assertNotFound();

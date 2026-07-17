@@ -16,8 +16,12 @@ use App\Models\Algorithm\AlgorithmStatus;
 use App\Models\Algorithm\AlgorithmTheme;
 use App\Models\Document;
 use Filament\Forms\Components\Component;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Get;
+use Illuminate\Support\HtmlString;
 
 use function __;
 
@@ -146,6 +150,14 @@ class AlgorithmRecordResourceFormSchemas
                 'name',
             )
                 ->label(__('algorithm_record.meta_schema')),
+            DatePicker::make('meta_date_of_development')
+                ->label(__('algorithm_record.meta_date_of_development')),
+            TextInput::make('meta_owner_algorithm')
+                ->label(__('algorithm_record.meta_owner_algorithm'))
+                ->required(),
+            TextInput::make('meta_product_owner_algorithm')
+                ->label(__('algorithm_record.meta_product_owner_algorithm'))
+                ->required(),
             TextInput::make('meta_national_id')
                 ->label(__('algorithm_record.meta_national_id')),
             TextInput::make('meta_source_id')
@@ -155,6 +167,49 @@ class AlgorithmRecordResourceFormSchemas
             InformationBlockSection::makeCollapsible(
                 __('information_blocks.algorithm_record.step_meta_title'),
                 __('information_blocks.algorithm_record.step_meta_info'),
+            ),
+        ];
+    }
+
+    /**
+     * @return array<Component>
+     */
+    public static function getImpact(): array
+    {
+        return [
+            self::makeRadio('impact_with_consequences'),
+            self::makeRadio('impact_more_algorithms_applied'),
+            self::makeRadio('impact_effect_on_outcome'),
+
+            Placeholder::make('impactvol_algorithm_message')
+                ->hiddenLabel()
+                ->content(new HtmlString(
+                    '<div class="rounded-md bg-warning-50 p-4 text-sm font-medium text-warning-800">'
+                    . __('algorithm_record.impact_algorithm_message')
+                    . '</div>',
+                ))
+                ->visible(static fn (Get $get): bool =>
+                    self::isYes($get('impact_with_consequences'))
+                    && self::isYes($get('impact_more_algorithms_applied'))
+                    && self::isYes($get('impact_effect_on_outcome'))),
+
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.algorithm_record.step_impact_title'),
+                __('information_blocks.algorithm_record.step_impact_info'),
+            ),
+        ];
+    }
+
+    /**
+     * @return array<Component>
+     */
+    public static function getValidation(): array
+    {
+        return [
+            self::makeRadio('validation_answers_checked_by_product_owner'),
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.algorithm_record.step_validation_title'),
+                __('information_blocks.algorithm_record.step_validation_info'),
             ),
         ];
     }
@@ -178,5 +233,22 @@ class AlgorithmRecordResourceFormSchemas
                 __('information_blocks.algorithm_record.step_attachments_info'),
             ),
         ];
+    }
+
+    private static function makeRadio(string $name): Radio
+    {
+        return Radio::make($name)
+            ->label(__('algorithm_record.' . $name))
+            ->options([
+                '1' => __('general.yes'),
+                '0' => __('general.no'),
+            ])
+            ->live()
+            ->nullable();
+    }
+
+    private static function isYes(mixed $value): bool
+    {
+        return $value === true || $value === 1 || $value === '1';
     }
 }
