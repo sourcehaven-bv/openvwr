@@ -15,6 +15,7 @@ use App\Http\Middleware\IPAllowFilter;
 use App\Models\Organisation;
 use Exception;
 use Filament\Facades\Filament;
+use Filament\FontProviders\LocalFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -81,6 +82,7 @@ class FilamentServiceProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('/')
+            ->font('Inter', asset('fonts/inter.css'), LocalFontProvider::class)
             ->login(Login::class)
             ->profile(Profile::class)
             ->routes(static function (): void {
