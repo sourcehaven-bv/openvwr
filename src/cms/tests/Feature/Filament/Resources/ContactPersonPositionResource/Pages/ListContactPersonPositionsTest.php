@@ -15,5 +15,6 @@ it('loads the list page', function (): void {
 
     $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(ListContactPersonPositions::class)
+        ->set('activeTab', 'all')
         ->assertCanSeeTableRecords($contactPersonPositions);
 });
