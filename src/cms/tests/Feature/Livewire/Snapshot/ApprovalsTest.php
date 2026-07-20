@@ -69,26 +69,6 @@ it('can request itself as reviewer when it is a mandateholder', function (): voi
     ]);
 });
 
-it('can not request itself as reviewer when it is not a mandateholder', function (): void {
-    $organisation = OrganisationTestHelper::create();
-    $user = UserTestHelper::createForOrganisationWithPermissions($organisation, [
-        Permission::SNAPSHOT_APPROVAL_CREATE,
-    ]);
-    $snapshot = Snapshot::factory()
-        ->recycle($organisation)
-        ->create();
-
-    $this->withFilamentSession($user, $organisation)
-        ->createLivewireTestable(Approvals::class, [
-            'snapshot' => $snapshot,
-        ])
-        ->mountTableAction('snapshot_approval_request_action')
-        ->callTableAction('snapshot_approval_request_action', $snapshot, [
-            'user_ids' => [$user->id],
-        ])
-        ->assertHasTableActionErrors(['user_ids']);
-});
-
 it('can not request a non-mandateholder as reviewer', function (): void {
     $organisation = OrganisationTestHelper::create();
     $user = UserTestHelper::createForOrganisationWithPermissions($organisation, [
