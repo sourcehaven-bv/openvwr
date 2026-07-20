@@ -104,15 +104,15 @@ dev-build:
 
 # Run tests
 test:
-    cd src/cms && ./vendor/bin/sail exec laravel.test ./vendor/bin/pest
+    cd src/cms && ./vendor/bin/sail exec web ./vendor/bin/pest
 
 # Run specific test
 test-filter filter:
-    cd src/cms && ./vendor/bin/sail exec laravel.test ./vendor/bin/pest --filter {{filter}}
+    cd src/cms && ./vendor/bin/sail exec web ./vendor/bin/pest --filter {{filter}}
 
 # Run tests with coverage
 test-coverage:
-    cd src/cms && ./vendor/bin/sail exec laravel.test ./vendor/bin/pest --coverage
+    cd src/cms && ./vendor/bin/sail exec web ./vendor/bin/pest --coverage
 
 # View logs
 dev-logs:
