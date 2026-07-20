@@ -128,7 +128,6 @@ class Approvals extends Component implements HasForms, HasTable
             ->whereHas('organisationRoles', static function (Builder $query): Builder {
                 return $query->where(['role' => Role::MANDATE_HOLDER]);
             })
-            ->whereNot('user_id', Authentication::user()->id)
             ->whereNotIn('user_id', $this->snapshot->snapshotApprovals()
                 ->get(['assigned_to'])
                 ->pluck('assigned_to')

@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Enums\Authorization\Permission;
 use App\Enums\Authorization\Role;
 use App\Livewire\Snapshot\Approvals;
+use App\Models\OrganisationUserRole;
 use App\Models\Snapshot;
 use App\Models\SnapshotApproval;
 use App\Models\User;
@@ -37,6 +38,55 @@ it('can request a mandateholder as reviewer', function (): void {
     $this->assertDatabaseHas(SnapshotApproval::class, [
         'assigned_to' => $approvalRequestUser->id,
     ]);
+});
+
+it('can request itself as reviewer when it is a mandateholder', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisationWithPermissions($organisation, [
+        Permission::SNAPSHOT_APPROVAL_CREATE,
+    ]);
+    OrganisationUserRole::factory()
+        ->for($user)
+        ->recycle($organisation)
+        ->create(['role' => Role::MANDATE_HOLDER]);
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create();
+
+    $this->withFilamentSession($user, $organisation)
+        ->createLivewireTestable(Approvals::class, [
+            'snapshot' => $snapshot,
+        ])
+        ->mountTableAction('snapshot_approval_request_action')
+        ->callTableAction('snapshot_approval_request_action', $snapshot, [
+            'user_ids' => [$user->id],
+        ])
+        ->assertHasNoTableActionErrors();
+
+    $this->assertDatabaseHas(SnapshotApproval::class, [
+        'assigned_to' => $user->id,
+        'requested_by' => $user->id,
+    ]);
+});
+
+it('can not request itself as reviewer when it is not a mandateholder', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisationWithPermissions($organisation, [
+        Permission::SNAPSHOT_APPROVAL_CREATE,
+    ]);
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create();
+
+    $this->withFilamentSession($user, $organisation)
+        ->createLivewireTestable(Approvals::class, [
+            'snapshot' => $snapshot,
+        ])
+        ->mountTableAction('snapshot_approval_request_action')
+        ->callTableAction('snapshot_approval_request_action', $snapshot, [
+            'user_ids' => [$user->id],
+        ])
+        ->assertHasTableActionErrors(['user_ids']);
 });
 
 it('can not request a non-mandateholder as reviewer', function (): void {
