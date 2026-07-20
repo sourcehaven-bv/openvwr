@@ -26,8 +26,6 @@ abstract class ListLookupListRecords extends ListRecords
     public function getTabs(): array
     {
         return [
-            'all' => Tab::make('all')
-                ->label(__('general.all')),
             'enabled' => Tab::make()
                 ->label(__('general.enabled'))
                 ->query(static function (Builder $query) {
@@ -38,6 +36,8 @@ abstract class ListLookupListRecords extends ListRecords
                 ->query(static function (Builder $query) {
                     return $query->where('enabled', false);
                 }),
+            'all' => Tab::make('all')
+                ->label(__('general.all')),
         ];
     }
 }

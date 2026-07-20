@@ -29,17 +29,7 @@ class ListOrganisationSnapshotApprovalItems extends ListRecords
     public function getTabs(): array
     {
         return [
-            'all' => Tab::make()
-                ->label(__('general.all')),
-            'established-obsolete' => Tab::make()
-                ->label(__('snapshot_approval.established-obsolete'))
-                ->modifyQueryUsing(static function (SnapshotBuilder $query): void {
-                    $query->whereIn('state', [
-                        Established::$name,
-                        Obsolete::$name,
-                    ]);
-                }),
-            'in_review-approved' => Tab::make()
+            self::TAB_ID_INREVIEW_APPROVED => Tab::make()
                 ->label(__('snapshot_approval.in_review-approved'))
                 ->modifyQueryUsing(static function (SnapshotBuilder $query): void {
                     $query->whereIn('state', [
@@ -47,6 +37,16 @@ class ListOrganisationSnapshotApprovalItems extends ListRecords
                         Approved::$name,
                     ]);
                 }),
+            self::TAB_ID_ESTABLISHED_OBSOLETE => Tab::make()
+                ->label(__('snapshot_approval.established-obsolete'))
+                ->modifyQueryUsing(static function (SnapshotBuilder $query): void {
+                    $query->whereIn('state', [
+                        Established::$name,
+                        Obsolete::$name,
+                    ]);
+                }),
+            self::TAB_ID_ALL => Tab::make()
+                ->label(__('general.all')),
         ];
     }
 }
