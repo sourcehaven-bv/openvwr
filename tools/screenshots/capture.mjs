@@ -128,6 +128,45 @@ const FIGURES = [
     },
   },
   {
+    name: 'export-complete',
+    file: '05_overige_functies/02_avg-responsible-processing-records_export_complete.png',
+    auth: true,
+    clip: '.fi-no-notification',
+    pad: 20,
+    // Not working yet - excluded from the default run, request it explicitly
+    // with --only export-complete to work on it.
+    //
+    // The export itself succeeds (41 rows, completed_at set) but the completion
+    // notification never becomes visible. On the sync queue Filament sends it
+    // as a persistent session notification rather than sendToDatabase(), so:
+    // the notifications table stays empty, and reloading consumes the flash.
+    // Polling the DOM for 48s after completion found nothing either.
+    // See vendor/filament/actions/src/Exports/Jobs/ExportCompletion.php:77-83.
+    skip: true,
+    async shoot(page) {
+      // Start from a clean slate so waitForExport tracks *this* run's export
+      // rather than returning immediately on a previous run's completed row.
+      tinker('DB::table("exports")->delete();');
+      await gotoRegister(page);
+      await page.getByRole('button', { name: /Exporteren/i }).first().click();
+      // The action opens a modal; the export only starts on the confirm inside
+      // it. Scope to the visible Filament modal: several dialogs exist in the
+      // DOM at once, so a bare role=dialog lookup is ambiguous.
+      await page
+        .locator('.fi-modal-footer-actions button')
+        .filter({ hasText: /^\s*Exporteren\s*$/ })
+        .first()
+        .click();
+      // On the sync queue Filament sends this as a persistent session
+      // notification (->send()), not sendToDatabase(): it arrives as a live
+      // toast in the same request. Do NOT reload here - that consumes the
+      // flash and the notification is gone for good.
+      // See vendor/filament/actions/src/Exports/Jobs/ExportCompletion.php.
+      await page.waitForSelector('.fi-no-notification', { timeout: 90000 });
+      await page.waitForTimeout(800); // let the toast finish animating in
+    },
+  },
+  {
     name: 'users',
     file: '04_beheer/01_users_edit.png',
     auth: true,
@@ -145,6 +184,23 @@ const tenantOf = (page) => {
   if (!slug) throw new Error(`could not determine tenant slug from ${page.url()}`);
   return slug;
 };
+
+/**
+ * Poll the exports table until the job finishes. QUEUE_CONNECTION=sync runs it
+ * inline, but the request still takes seconds; waiting on the row is more
+ * reliable than a fixed sleep.
+ */
+async function waitForExport(page, timeoutMs = 60000) {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    const done = tinker(
+      'echo optional(DB::table("exports")->orderByDesc("created_at")->first())->successful_rows ?? 0;',
+    );
+    if (Number(done) > 0) return;
+    await page.waitForTimeout(1500);
+  }
+  throw new Error('export did not complete within timeout');
+}
 
 async function gotoRegister(page) {
   await page.goto(`${BASE}/${tenantOf(page)}/avg-responsible-processing-records`, {
@@ -208,7 +264,8 @@ await context.addInitScript(annotate);
 
 const page = await context.newPage();
 let authed = false;
-const todo = FIGURES.filter((f) => !ONLY.length || ONLY.includes(f.name));
+// Skipped figures are excluded from a full run but still selectable by name.
+const todo = FIGURES.filter((f) => (ONLY.length ? ONLY.includes(f.name) : !f.skip));
 const failures = [];
 
 for (const fig of todo) {

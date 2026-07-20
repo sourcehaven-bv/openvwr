@@ -82,7 +82,15 @@ om een echte TOTP-code te laten berekenen uit het geseede secret.
 
 - Niet alle figuren uit de handleiding zijn geautomatiseerd. `FIGURES` bevat op
   dit moment een deel; de rest staat nog in de originele afbeeldingen.
-- De exportmelding (`05_overige_functies/02_..._export_complete.png`) werkt
-  lokaal niet: de `filament`-disk is een S3-disk die naar MinIO wijst, en die
-  draait niet in de Docker-loze setup. De export start wel, maar levert nul
-  rijen op. Draai die figuur op de Docker-setup, of configureer MinIO lokaal.
+- De exportmelding (`05_overige_functies/02_..._export_complete.png`) staat op
+  `skip: true` en wordt overgeslagen in een normale run. De export zelf slaagt
+  (41 rijen), maar de meldingstoast is niet te pakken te krijgen: op de
+  `sync`-queue verstuurt Filament die als sessiemelding in plaats van
+  `sendToDatabase()`, waardoor de `notifications`-tabel leeg blijft en een
+  reload de melding juist wist. Zie
+  `vendor/filament/actions/src/Exports/Jobs/ExportCompletion.php`. Werk eraan
+  met `--only export-complete`.
+
+Voor exports is `FILAMENT_FILESYSTEM_DISK=app` nodig (staat in
+`.env.nodocker.example`): standaard schrijft Filament naar een S3-disk die naar
+MinIO wijst, en die draait niet in deze setup. MinIO zelf is niet nodig.
