@@ -22,6 +22,7 @@ trait IsCloneable
     protected array $clone_exempt_attributes = [
         'entity_number_id',
         'import_id',
+        'origin_id',
     ];
 
     /**
