@@ -168,6 +168,33 @@ const FIGURES = [
     },
   },
   {
+    name: 'record-edit',
+    file: '02_registers/02_avg-responsible-processing-records_edit.png',
+    auth: true,
+    clip: '.fi-main',
+    async shoot(page) {
+      await gotoSeededRecord(page);
+    },
+  },
+  {
+    name: 'record-version',
+    file: '03_goedkeuringsproces/01_avg-responsible-processing-records_edit_versie.png',
+    auth: true,
+    // Top of the edit page: heading plus the "Versie aanmaken" action.
+    clip: '.fi-header',
+    pad: 24,
+    async shoot(page) {
+      await gotoSeededRecord(page);
+      await page.evaluate(() => {
+        const btn = [...document.querySelectorAll('button, a')].find((b) =>
+          /Versie aanmaken/i.test(b.textContent || ''),
+        );
+        if (!btn) throw new Error('"Versie aanmaken" button not found');
+        window.__annotate.arrow(btn, { side: 'left', length: 150 });
+      });
+    },
+  },
+  {
     name: 'organisation-snapshots',
     file: '03_goedkeuringsproces/05_organisation-snapshots.png',
     auth: true,
@@ -238,6 +265,26 @@ async function waitForExport(page, timeoutMs = 60000) {
     await page.waitForTimeout(1500);
   }
   throw new Error('export did not complete within timeout');
+}
+
+/**
+ * Open the record ScreenshotSeeder gives a version history (established v1 +
+ * in-review v2), which the goedkeuringsproces figures depend on. Resolved by
+ * name rather than id so it survives a reseed.
+ */
+async function gotoSeededRecord(page) {
+  const id = tinker(`
+    echo App\\Models\\Avg\\AvgResponsibleProcessingRecord::query()
+      ->whereHas("organisation", fn($q) => $q->where("slug", "nipg"))
+      ->where("name", "Afhandelen burgervragen en klachten")
+      ->firstOrFail()->id;
+  `);
+  await page.goto(`${BASE}/${tenantOf(page)}/avg-responsible-processing-records/${id}/edit`, {
+    waitUntil: 'networkidle',
+  });
+  // Wait for the record heading rather than a bare `form`: the page renders
+  // several forms and the first can be present before the record has loaded.
+  await page.waitForSelector('text=/Afhandelen burgervragen/i', { timeout: 30000 });
 }
 
 async function gotoRegister(page) {

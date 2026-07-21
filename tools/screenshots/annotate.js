@@ -105,32 +105,41 @@
     const base = forward ? span - head * 0.62 : head * 0.62;
     const tail = forward ? 0 : span;
 
-    const shaft = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    const shaftStart = Math.min(tail, base);
-    const shaftLen = Math.abs(base - tail);
-    if (horizontal) {
-      shaft.setAttribute('x', shaftStart);
-      shaft.setAttribute('y', mid - thickness / 2);
-      shaft.setAttribute('width', shaftLen);
-      shaft.setAttribute('height', thickness);
-    } else {
-      shaft.setAttribute('x', mid - thickness / 2);
-      shaft.setAttribute('y', shaftStart);
-      shaft.setAttribute('width', thickness);
-      shaft.setAttribute('height', shaftLen);
-    }
-    shaft.setAttribute('fill', color);
+    // One continuous polygon rather than a rect plus a triangle: a single
+    // outline can then carry a white halo, which keeps the arrow readable when
+    // it overlaps something in the same colour (the accent is also the primary
+    // button colour). Two overlapping shapes would each stroke their own edge
+    // and leave a seam through the middle.
+    const h = thickness / 2;
+    const hh = head / 2;
+    const pts = horizontal
+      ? [
+          [tail, mid - h],
+          [base, mid - h],
+          [base, mid - hh],
+          [tip, mid],
+          [base, mid + hh],
+          [base, mid + h],
+          [tail, mid + h],
+        ]
+      : [
+          [mid - h, tail],
+          [mid - h, base],
+          [mid - hh, base],
+          [mid, tip],
+          [mid + hh, base],
+          [mid + h, base],
+          [mid + h, tail],
+        ];
 
-    const headEl = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-    headEl.setAttribute(
-      'points',
-      horizontal
-        ? `${tip},${mid} ${base},${mid - head / 2} ${base},${mid + head / 2}`
-        : `${mid},${tip} ${mid - head / 2},${base} ${mid + head / 2},${base}`
-    );
-    headEl.setAttribute('fill', color);
+    const arrowEl = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    arrowEl.setAttribute('points', pts.map((p) => p.join(',')).join(' '));
+    arrowEl.setAttribute('fill', color);
+    // NOTE: on a target the same colour as the accent (primary buttons are also
+    // #F84F39) the arrow tip has little contrast. Prefer pointing at such a
+    // button from a neutral background, or pass a different `color`.
 
-    svg.append(shaft, headEl);
+    svg.append(arrowEl);
     layer().appendChild(svg);
     return svg;
   }
