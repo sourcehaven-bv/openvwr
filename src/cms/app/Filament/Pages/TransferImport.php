@@ -26,11 +26,14 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Livewire\Attributes\Locked;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Webmozart\Assert\Assert;
 
 use function __;
 use function app;
+use function basename;
 use function collect;
 use function fopen;
 use function is_array;
@@ -52,8 +55,14 @@ class TransferImport extends Page implements HasForms
     /** @var ?array<TemporaryUploadedFile> $files */
     public ?array $files = null;
 
+    // Server-authoritative: set only by analyse(). #[Locked] prevents the client from
+    // tampering with the uploaded bundle path, which would otherwise allow importing
+    // another organisation's export zip or traversing to arbitrary files on the disk.
+    #[Locked]
     public ?string $bundlePath = null;
+    #[Locked]
     public ?string $sourceOrganisation = null;
+    #[Locked]
     public ?string $exportedAt = null;
 
     /** @var array<string, array<string, mixed>> $items */
@@ -177,9 +186,29 @@ class TransferImport extends Page implements HasForms
         return $items;
     }
 
+    /**
+     * Resolve the stored bundle path to a safe location inside the import directory.
+     * Defence in depth on top of #[Locked]: rejects anything that is not a plain
+     * upload filename in transfer/imports/, so no path traversal or foreign disk
+     * location can be reached even if the property were somehow tampered with.
+     */
+    private function safeBundlePath(): ?string
+    {
+        if ($this->bundlePath === null) {
+            return null;
+        }
+
+        $expected = sprintf('%s/%s', self::IMPORT_DIRECTORY, basename($this->bundlePath));
+
+        return $this->bundlePath === $expected && Str::isUuid(basename($this->bundlePath, '.zip'))
+            ? $expected
+            : null;
+    }
+
     public function import(): void
     {
-        Assert::notNull($this->bundlePath);
+        $bundlePath = $this->safeBundlePath();
+        Assert::notNull($bundlePath);
 
         $plan = [];
         foreach ($this->items as $id => $item) {
@@ -192,7 +221,7 @@ class TransferImport extends Page implements HasForms
         }
 
         TransferImportJob::dispatch(
-            $this->bundlePath,
+            $bundlePath,
             $plan,
             Authentication::organisation()->id,
             Authentication::user()->id,
@@ -209,8 +238,10 @@ class TransferImport extends Page implements HasForms
 
     public function cancel(): void
     {
-        if ($this->bundlePath !== null) {
-            Storage::disk(self::DISK)->delete($this->bundlePath);
+        $bundlePath = $this->safeBundlePath();
+
+        if ($bundlePath !== null) {
+            Storage::disk(self::DISK)->delete($bundlePath);
         }
 
         $this->reset('bundlePath', 'sourceOrganisation', 'exportedAt', 'items');
