@@ -24,11 +24,4 @@ abstract class LookupListModel extends Model implements TenantAware
         'name',
         'enabled',
     ];
-
-    public function casts(): array
-    {
-        return [
-            'id' => 'string',
-        ];
-    }
 }
