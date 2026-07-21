@@ -9,9 +9,8 @@
  * The app is passwordless: login is email -> signed magic link. Rather than
  * scrape mail, we mint a signed URL through artisan.
  *
- * Prerequisites: the app running locally (see
- * docs/local_development_without_docker.md), seeded with TestDataSeeder and
- * ScreenshotSeeder.
+ * Prerequisites: the app running locally, seeded with TestDataSeeder and
+ * ScreenshotSeeder. See tools/screenshots/README.md.
  *
  * Usage:
  *   node capture.mjs                     # all figures, into docs/handleiding/imgs
@@ -82,12 +81,18 @@ function totp(secret, when = Date.now()) {
 /**
  * Figure definitions.
  *
- *   file  - path under docs/handleiding/imgs, so the mapping to the manual is explicit
- *   clip  - CSS selector to crop to. Element-based rather than a pixel box: a
- *           container survives layout changes, a coordinate rectangle does not.
- *           Omit for a full-viewport shot.
- *   pad   - pixels of breathing room around the clipped element.
- *   shoot - drives the app to the required state and adds annotations.
+ *   file     - path under docs/handleiding/imgs, so the mapping to the manual is explicit
+ *   clip     - CSS selector to crop to. Element-based rather than a pixel box: a
+ *              container survives layout changes, a coordinate rectangle does not.
+ *              Omit for a full-viewport shot.
+ *   pad      - pixels of breathing room around the clipped element.
+ *   fullPage - capture the entire scrollable page instead of clipping.
+ *   shoot    - drives the app to the required state and adds annotations.
+ *
+ * When in doubt, clip wider. A figure with some extra chrome around it still
+ * reads fine in the manual; one that has cropped away the table the surrounding
+ * paragraph refers to is simply wrong, and the error is easy to miss because the
+ * image still looks plausible on its own.
  */
 const FIGURES = [
   {
@@ -171,7 +176,20 @@ const FIGURES = [
     name: 'record-edit',
     file: '02_registers/02_avg-responsible-processing-records_edit.png',
     auth: true,
-    clip: '.fi-main',
+    // The manual points at the domain navigation on the right and the relation
+    // tables below the form ("de tabellen onderaan in het scherm"), and the
+    // original figure includes the sidebar for context - so clip to the whole
+    // layout, not .fi-main. Not fullPage either: every domain section renders
+    // expanded in the DOM, which makes the page ~28000px tall and the figure
+    // unreadable. maxHeight keeps the framing close to the original.
+    // The whole layout, not .fi-main: the manual points at the sidebar and the
+    // domain navigation beside the form. fullPage because the relation tables
+    // sit below the fold; maxHeight so a long record cannot stretch the figure
+    // to an unreadable sliver. Requires register_layout=steps (pinned by
+    // ScreenshotSeeder) - the one_page preference renders a ~28000px page.
+    clip: '.fi-layout',
+    fullPage: true,
+    maxHeight: 1800,
     async shoot(page) {
       await gotoSeededRecord(page);
     },
@@ -287,38 +305,70 @@ const FIGURES = [
     name: 'organisation-snapshots',
     file: '03_goedkeuringsproces/05_organisation-snapshots.png',
     auth: true,
-    clip: '.fi-main',
+    // The whole layout, not .fi-main: the text points at the overview "in het
+    // navigatiemenu links", so the sidebar has to be in frame for that arrow to
+    // land on anything.
+    clip: '.fi-layout',
     async shoot(page) {
       await page.goto(`${BASE}/${tenantOf(page)}/organisation-snapshot-approvals`, {
         waitUntil: 'networkidle',
       });
       await page.waitForSelector('table');
+
+      // Two arrows, matching the two things the paragraph describes: the
+      // overview's place in the sidebar, and the filter control above the table.
+      await page.evaluate(() => {
+        // Scope to the sidebar: the breadcrumb above the heading has the same
+        // text and would otherwise match first.
+        const sidebar = document.querySelector('.fi-sidebar, aside');
+        const navItem = [...(sidebar?.querySelectorAll('a') ?? [])].find((a) =>
+          /Alle Versies/i.test(a.textContent || ''),
+        );
+        if (!navItem) throw new Error('"Alle Versies" sidebar item not found');
+        // From the right: the item sits low in the sidebar, so an arrow above it
+        // runs off the top of the canvas.
+        // Short: a longer arrow reaches into the table and covers a row.
+        window.__annotate.arrow(navItem, { side: 'right', length: 55, gap: 8 });
+
+        // By accessible name rather than a class: Filament's table classes have
+        // been renamed across versions, the label has not.
+        const filter = [...document.querySelectorAll('button')].find((b) =>
+          /filter/i.test(b.getAttribute('aria-label') || b.title || ''),
+        );
+        if (!filter) throw new Error('table filter trigger not found');
+        window.__annotate.arrow(filter, { side: 'top', length: 90, gap: 10 });
+      });
     },
   },
   {
     name: 'personal-approvals',
     file: '03_goedkeuringsproces/07_personal-snapshot-approvals_akkoord_geven.png',
     auth: true,
-    // "Mijn Ondertekeningen" only lists approvals assigned to the current user,
-    // and ScreenshotSeeder assigns the pending one to the mandate holder.
+    // ScreenshotSeeder assigns the pending approval to the mandate holder, so
+    // only they see the Akkoord / Niet akkoord pair.
     as: 'mandateholder',
-    // The table section only; the page body below it is empty.
-    clip: '.fi-ta',
+    // The "Mijn ondertekeningen" panel at the foot of the version detail page.
+    // Not the personal-snapshot-approvals list: the manual describes approving
+    // "op de versie detailpagina onderaan", and the list's bulk action offers
+    // only Akkoord, while the text explicitly mentions Niet akkoord too.
+    // The section containing the approval buttons. Several .fi-section elements
+    // exist on the page, so it is resolved by content in shoot() and tagged.
+    clip: '[data-shot="approval-section"]',
     pad: 12,
     async shoot(page) {
-      await page.goto(`${BASE}/${tenantOf(page)}/personal-snapshot-approvals`, {
-        waitUntil: 'networkidle',
-      });
-      await page.waitForSelector('table');
-      // Selecting a row reveals the Akkoord / Niet akkoord bulk actions, which
-      // are what this figure is about.
-      await selectFirstRow(page);
-      await page.waitForTimeout(600);
+      await gotoSeededSnapshot(page);
+      // The panel sits at the foot of a long page.
+      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+      await page.waitForSelector('text=/Niet akkoord/i', { timeout: 30000 });
+      await page.waitForTimeout(400);
       await page.evaluate(() => {
         const btn = [...document.querySelectorAll('button')].find((b) =>
-          /^\s*Akkoord\s*$/i.test(b.textContent || ''),
+          /^\s*Niet akkoord\s*$/i.test(b.textContent || ''),
         );
-        if (!btn) throw new Error('Akkoord button not found');
+        if (!btn) throw new Error('"Niet akkoord" button not found');
+        const section = btn.closest('.fi-section');
+        if (!section) throw new Error('approval section not found');
+        section.setAttribute('data-shot', 'approval-section');
         window.__annotate.arrow(btn, { side: 'right', length: 130 });
       });
     },
@@ -327,11 +377,38 @@ const FIGURES = [
     name: 'users',
     file: '04_beheer/01_users_edit.png',
     auth: true,
-    clip: '.fi-main',
+    // The whole layout, matching the original: the surrounding text places user
+    // management "in het navigatiemenu onder Organisaties", so the sidebar is
+    // part of what the figure shows. fullPage with a bound so the role toggles
+    // below the fold are in frame without stretching to the page's full height.
+    clip: '.fi-layout',
+    fullPage: true,
+    maxHeight: 1500,
     async shoot(page) {
-      const tenant = tenantOf(page);
-      await page.goto(`${BASE}/${tenant}/users`, { waitUntil: 'networkidle' });
-      await page.waitForSelector('table');
+      // The edit page, not the list: the text describes what can be done once a
+      // user is opened - "Op deze pagina kunnen rollen worden aangepast" and the
+      // red delete button "rechtsbovenin". The list shows neither.
+      const id = tinker(`
+        echo App\\Models\\User::query()
+          ->where("name", "Marieke de Vries")
+          ->firstOrFail()->id;
+      `);
+      await page.goto(`${BASE}/${tenantOf(page)}/users/${id}/edit`, {
+        waitUntil: 'networkidle',
+      });
+      await page.waitForSelector('text=/Organisatie rollen/i', { timeout: 30000 });
+      // Filament restores the sidebar's scroll position, which leaves the figure
+      // showing the foot of the navigation rather than its start.
+      await page.evaluate(() => {
+        window.scrollTo(0, 0);
+        // Whatever is actually scrollable in the sidebar - the class has moved
+        // between Filament versions.
+        const aside = document.querySelector('aside, .fi-sidebar');
+        for (const el of [aside, ...(aside?.querySelectorAll('*') ?? [])]) {
+          if (el && el.scrollHeight > el.clientHeight + 10) el.scrollTop = 0;
+        }
+      });
+      await page.waitForTimeout(300);
     },
   },
 ];
@@ -464,19 +541,30 @@ async function login(page, as) {
 }
 
 /** Crop to an element's box plus padding, clamped to the page. */
-async function clipOf(page, selector, pad = 0) {
+async function clipOf(page, selector, pad = 0, maxHeight = null) {
   const el = page.locator(selector).first();
   if ((await el.count()) === 0) throw new Error(`clip selector not found: ${selector}`);
   const box = await el.boundingBox();
   if (!box) throw new Error(`clip selector has no box: ${selector}`);
-  const size = page.viewportSize();
+  // Clamp to the full scrollable page, not the viewport: an element taller than
+  // the viewport (an edit form with its relation tables below it, say) would
+  // otherwise be silently cut off at the fold - which is how the manual ended up
+  // with a figure whose text described a table that was not in the image.
+  const size = await page.evaluate(() => ({
+    width: Math.max(document.documentElement.scrollWidth, window.innerWidth),
+    height: Math.max(document.documentElement.scrollHeight, window.innerHeight),
+  }));
   const x = Math.max(0, box.x - pad);
   const y = Math.max(0, box.y - pad);
+  let height = Math.min(box.height + pad * 2, size.height - y);
+  if (maxHeight !== null) {
+    height = Math.min(height, maxHeight);
+  }
   return {
     x,
     y,
     width: Math.min(box.width + pad * 2, size.width - x),
-    height: Math.min(box.height + pad * 2, size.height - y),
+    height,
   };
 }
 
@@ -525,7 +613,10 @@ for (const fig of todo) {
     mkdirSync(dirname(outPath), { recursive: true });
     await page.screenshot({
       path: outPath,
-      ...(fig.clip ? { clip: await clipOf(page, fig.clip, fig.pad ?? 0) } : {}),
+      ...(fig.fullPage ? { fullPage: true } : {}),
+      ...(fig.clip
+        ? { clip: await clipOf(page, fig.clip, fig.pad ?? 0, fig.maxHeight ?? null) }
+        : {}),
     });
     await page.evaluate(() => window.__annotate?.clear());
     console.log(`✓ ${fig.name} -> ${fig.file}`);

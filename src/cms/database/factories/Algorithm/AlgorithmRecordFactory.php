@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Database\Factories\Algorithm;
 
 use App\Enums\EntityNumberType;
-use App\Models\Algorithm\AlgorithmMetaSchema;
 use App\Models\Algorithm\AlgorithmPublicationCategory;
 use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Algorithm\AlgorithmStatus;
@@ -34,7 +33,6 @@ class AlgorithmRecordFactory extends Factory
             'algorithm_theme_id' => AlgorithmTheme::factory(state: ['enabled' => true]),
             'algorithm_status_id' => AlgorithmStatus::factory(state: ['enabled' => true]),
             'algorithm_publication_category_id' => AlgorithmPublicationCategory::factory(state: ['enabled' => true]),
-            'algorithm_meta_schema_id' => AlgorithmMetaSchema::factory(state: ['enabled' => true]),
             'entity_number_id' => EntityNumber::factory(state: ['type' => EntityNumberType::DATABREACH]),
 
             'name' => $this->faker->word(),
@@ -65,7 +63,6 @@ class AlgorithmRecordFactory extends Factory
             'oper_supplier' => $this->faker->optional()->company(),
             'oper_source_code_link' => $this->faker->optional()->url(),
 
-            'meta_lang' => $this->faker->optional()->countryISOAlpha3(),
             'meta_national_id' => $this->faker->optional()->slug(1),
             'meta_source_id' => $this->faker->optional()->slug(1),
             'meta_tags' => $this->faker->optional()->sentence(),

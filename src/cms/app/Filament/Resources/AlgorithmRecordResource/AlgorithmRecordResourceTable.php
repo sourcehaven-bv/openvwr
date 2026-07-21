@@ -24,7 +24,7 @@ class AlgorithmRecordResourceTable
                 EntityNumber::make()
                     ->label(__('algorithm_record.number')),
                 TextColumn::make('name')
-                    ->label(__('processing_record.name'))
+                    ->label(__('general.name'))
                     ->searchable()
                     ->sortable(),
                 SnapshotStatusColumn::make(),

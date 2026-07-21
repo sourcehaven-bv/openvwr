@@ -5,16 +5,31 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Enums\Authorization\Role;
+use App\Enums\RegisterLayout;
 use App\Enums\Snapshot\SnapshotApprovalStatus;
+use App\Models\Algorithm\AlgorithmRecord;
+use App\Models\Avg\AvgGoal;
+use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
+use App\Models\Avg\AvgResponsibleProcessingRecordService;
 use App\Models\Organisation;
+use App\Models\Receiver;
 use App\Models\Snapshot;
 use App\Models\SnapshotApproval;
 use App\Models\States\Snapshot\Established;
 use App\Models\States\Snapshot\InReview;
+use App\Models\Tag;
 use App\Models\User;
+use App\Models\Wpg\WpgProcessingRecord;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
+
+use function count;
+use function intdiv;
+use function is_string;
+use function sprintf;
 
 /**
  * Deterministic data for the handleiding screenshots.
@@ -50,12 +65,61 @@ class ScreenshotSeeder extends Seeder
         'Zorgregistratie cliëntdossiers',
     ];
 
+    /** Plausible Dutch department names for the "AVG Verantwoordelijke Dienst" field. */
+    private const SERVICE_NAMES = [
+        'Directie Bedrijfsvoering',
+        'Directie Communicatie',
+        'Directie Informatievoorziening',
+        'Directie Juridische Zaken',
+        'Directie Personeel en Organisatie',
+        'Directie Publieke Gezondheid',
+    ];
+
+    /** Plausible Dutch labels, in place of faker words. */
+    private const TAG_NAMES = [
+        'Bijzondere persoonsgegevens',
+        'Cameratoezicht',
+        'Extern gedeeld',
+        'Financieel',
+        'Gezondheidsgegevens',
+        'Hoog risico',
+        'Medewerkers',
+        'Onderzoek',
+        'Publiek toegankelijk',
+        'Wettelijke verplichting',
+    ];
+
+    /** Plausible Dutch recipients of personal data. */
+    private const RECEIVER_NAMES = [
+        'Belastingdienst',
+        'Gemeentelijke gezondheidsdienst',
+        'Inspectie Gezondheidszorg en Jeugd',
+        'Nationale politie',
+        'Pensioenfonds ABP',
+        'Rijksdienst voor Identiteitsgegevens',
+        'UWV',
+        'Zorgverzekeraar',
+    ];
+
+    /** Plausible Dutch processing goals. */
+    private const GOAL_NAMES = [
+        'Beantwoorden van vragen en klachten van burgers',
+        'Beheer van toegangsrechten tot informatiesystemen',
+        'Beoordelen van subsidieaanvragen',
+        'Naleving van wettelijke bewaartermijnen',
+        'Onderzoek naar de effectiviteit van beleid',
+        'Uitvoeren van de salarisadministratie',
+        'Verantwoording afleggen aan de toezichthouder',
+        'Vaststellen van de identiteit van betrokkenen',
+    ];
+
     public function run(): void
     {
         $organisation = Organisation::query()->where('slug', 'nipg')->firstOrFail();
 
         $this->trimScreenshotUserRoles($organisation);
         $this->renameRecords($organisation);
+        $this->renameRelatedEntities($organisation);
         $this->createVersionHistory($organisation);
     }
 
@@ -76,6 +140,14 @@ class ScreenshotSeeder extends Seeder
             return;
         }
 
+        // The record detail page renders either as steps (a domain navigation
+        // beside the form) or as one long stacked page, per user preference.
+        // UserFactory picks one at random, so without pinning it the figure
+        // alternates between two entirely different layouts between runs - and
+        // the manual describes the steps layout.
+        $user->register_layout = RegisterLayout::STEPS;
+        $user->save();
+
         $user->organisationRoles()
             ->where('organisation_id', $organisation->id)
             ->where('role', Role::DATA_PROTECTION_OFFICIAL->value)
@@ -88,15 +160,115 @@ class ScreenshotSeeder extends Seeder
      */
     private function renameRecords(Organisation $organisation): void
     {
+        // Every record, not just the first dozen: the register overview sorts by
+        // number and paginates, so renaming a subset leaves the very figure the
+        // manual opens with showing faker words like "quidem" and "aspernatur".
+        // The list is cycled, with a counter appended past the first pass to
+        // keep names distinct.
         $records = AvgResponsibleProcessingRecord::query()
             ->where('organisation_id', $organisation->id)
             ->orderBy('id')
-            ->take(count(self::RECORD_NAMES))
             ->get();
 
+        $total = count(self::RECORD_NAMES);
+
         foreach ($records as $index => $record) {
-            $record->name = self::RECORD_NAMES[$index];
+            $name = self::RECORD_NAMES[$index % $total];
+            $round = intdiv($index, $total);
+            $record->name = $round === 0 ? $name : sprintf('%s (%d)', $name, $round + 1);
             $record->save();
+        }
+    }
+
+    /**
+     * The detail-page figure shows more than the record's own name: the
+     * "AVG Verantwoordelijke Dienst" dropdown and the Labels field render
+     * related entities, which TestDataSeeder fills with faker latin
+     * ("Quas ut laudantium id dignissimos temporibus et architecto.",
+     * labels reading "quidem", "est", "id"). Rename those too, or the figure
+     * still reads as noise however well the record itself is named.
+     */
+    private function renameRelatedEntities(Organisation $organisation): void
+    {
+        $this->renameByOrganisation(
+            AvgResponsibleProcessingRecordService::query()->where('organisation_id', $organisation->id),
+            self::SERVICE_NAMES,
+        );
+
+        $this->renameByOrganisation(
+            Tag::query()->where('organisation_id', $organisation->id),
+            self::TAG_NAMES,
+        );
+
+        // Receivers are described rather than named, so the column differs.
+        $this->renameByOrganisation(
+            Receiver::query()->where('organisation_id', $organisation->id),
+            self::RECEIVER_NAMES,
+            'description',
+        );
+
+        // Scrolling past the first domain reaches the goal descriptions and the
+        // responsibility free text, both faker latin out of the box.
+        $this->renameByOrganisation(AvgGoal::query(), self::GOAL_NAMES, 'goal');
+
+        // The "Alle Versies" overview lists snapshots of every record type, not
+        // just AVG responsible ones, so rename the other three too - otherwise
+        // that figure still shows faker words in the "Naam versie" column.
+        $this->renameByOrganisation(
+            AvgProcessorProcessingRecord::query()->where('organisation_id', $organisation->id),
+            self::RECORD_NAMES,
+        );
+        $this->renameByOrganisation(
+            WpgProcessingRecord::query()->where('organisation_id', $organisation->id),
+            self::RECORD_NAMES,
+        );
+        $this->renameByOrganisation(
+            AlgorithmRecord::query()->where('organisation_id', $organisation->id),
+            self::RECORD_NAMES,
+        );
+
+        // Snapshots carry their own name, shown in the "Alle Versies" overview.
+        // They are created by TestDataSeeder from faker words, so rename them to
+        // match the record they belong to.
+        foreach (Snapshot::query()->where('organisation_id', $organisation->id)->get() as $snapshot) {
+            $source = $snapshot->snapshotSource;
+
+            if ($source === null) {
+                continue;
+            }
+
+            $name = $source->getAttribute('name');
+
+            if (!is_string($name)) {
+                continue;
+            }
+
+            $snapshot->name = $name;
+            $snapshot->save();
+        }
+
+        AvgResponsibleProcessingRecord::query()
+            ->where('organisation_id', $organisation->id)
+            ->update([
+                'responsibility_distribution' => 'De verwerkingsverantwoordelijke bepaalt doel en middelen van de '
+                    . 'verwerking. De uitvoering is belegd bij de betrokken directie.',
+            ]);
+    }
+
+    /**
+     * @param Builder<covariant Model> $query
+     * @param list<string> $names
+     */
+    private function renameByOrganisation(Builder $query, array $names, string $column = 'name'): void
+    {
+        $models = $query->orderBy('id')->get();
+        $total = count($names);
+
+        foreach ($models as $index => $model) {
+            $name = $names[$index % $total];
+            $round = intdiv($index, $total);
+            $model->setAttribute($column, $round === 0 ? $name : sprintf('%s (%d)', $name, $round + 1));
+            $model->save();
         }
     }
 
@@ -153,6 +325,16 @@ class ScreenshotSeeder extends Seeder
 
         $mandateHolder->name = 'Marieke de Vries';
         $mandateHolder->save();
+
+        // The approval panel on the version detail page is gated on the
+        // SNAPSHOT_APPROVAL_UPDATE_PERSONAL permission, which is scoped per
+        // organisation. A mandate holder whose role sits in another organisation
+        // is assigned the approval but cannot see the Akkoord / Niet akkoord
+        // buttons at all, so make sure the role exists for this one.
+        $mandateHolder->organisationRoles()->firstOrCreate([
+            'organisation_id' => $organisation->id,
+            'role' => Role::MANDATE_HOLDER->value,
+        ]);
 
         SnapshotApproval::factory()->create([
             'snapshot_id' => $inReview->id,

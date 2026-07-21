@@ -4,10 +4,10 @@ De standaard setup draait op Laravel Sail (Docker). Op machines waar Docker
 traag of onbetrouwbaar is, kan de applicatie ook volledig native draaien. Dit is
 met name handig voor het genereren van screenshots voor de handleiding.
 
-De twee services die niet native beschikbaar zijn, hebben allebei een
-ingebouwde uitweg: de virusscanner en de OTP-verificatie kennen een `fake`
-driver, en de standaard filesystem-disk is `app` (lokale schijf) in plaats van
-S3/MinIO. Er is dus geen vervanging nodig voor clamav of minio.
+De services die niet native beschikbaar zijn, hebben allebei een ingebouwde
+uitweg: de virusscanner en de OTP-verificatie kennen een `fake` driver. Voor
+bestandsopslag is helemaal geen vervanging nodig — de uploads- en exports-disks
+zijn sinds het verwijderen van MinIO gewoon lokale schijven.
 
 ## Vereisten
 
@@ -73,7 +73,6 @@ De applicatie draait nu op <http://127.0.0.1:8000>.
 |--------------|-----------------------------|------------------------------------|
 | `pgsql`      | Lokale PostgreSQL           | `DB_HOST=127.0.0.1`                |
 | `clamav`     | Fake virusscanner           | `VIRUSSCANNER_DEFAULT=fake`        |
-| `minio`      | Lokale schijf (`app`-disk)  | standaardwaarde, geen override     |
 | `mailpit`    | Mail naar het logbestand    | `MAIL_MAILER=log`                  |
 | `web` (nginx)| `php artisan serve`         | `APP_URL=http://127.0.0.1:8000`    |
 

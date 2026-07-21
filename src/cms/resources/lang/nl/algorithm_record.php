@@ -44,8 +44,6 @@ return [
     'oper_technical_operation' => 'Technische werking',
     'oper_supplier' => 'Leverancier',
     'oper_source_code_link' => 'Link naar broncode',
-    'meta_lang' => 'Taal',
-    'meta_schema' => 'Schema',
     'meta_national_id' => 'Landelijk-ID',
     'meta_source_id' => 'Bron-ID',
     'meta_tags' => 'Zoektermen',
