@@ -161,7 +161,7 @@ class FilamentServiceProvider extends PanelProvider
                         return Profile::getUrl(panel: $panel->getId(), tenant: $tenant);
                     }),
                 'manual' => MenuItem::make()
-                    ->url(asset('pdf/verwerkingsregister_handleiding.pdf'), true)
+                    ->url(asset('pdf/openvwr_handleiding.pdf'), true)
                     ->icon('heroicon-o-document-check')
                     ->label(__('general.manual')),
             ])

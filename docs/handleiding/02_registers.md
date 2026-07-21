@@ -2,7 +2,7 @@
 
 ![Registers\label{fig:registers}](./imgs/02_registers/01_avg-responsible-processing-records.png)
 
-Na het inloggen komt u in het verwerkingsregister en ziet u links in het scherm het navigatiemenu. Bovenaan staan de registers.
+Na het inloggen komt u in OpenVWR en ziet u links in het scherm het navigatiemenu. Bovenaan staan de registers.
 
 ## AVG Verantwoordelijke Verwerkingen, AVG Verwerker Verwerkingen, WPG Verantoordelijke Verwerkingen
 
