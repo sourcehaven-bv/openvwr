@@ -7,7 +7,9 @@ namespace Database\Seeders;
 use App\Enums\Authorization\Role;
 use App\Enums\RegisterLayout;
 use App\Enums\Snapshot\SnapshotApprovalStatus;
+use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Avg\AvgGoal;
+use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecordService;
 use App\Models\Organisation;
@@ -18,6 +20,7 @@ use App\Models\States\Snapshot\Established;
 use App\Models\States\Snapshot\InReview;
 use App\Models\Tag;
 use App\Models\User;
+use App\Models\Wpg\WpgProcessingRecord;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -25,6 +28,7 @@ use Illuminate\Database\Seeder;
 
 use function count;
 use function intdiv;
+use function is_string;
 use function sprintf;
 
 /**
@@ -207,6 +211,42 @@ class ScreenshotSeeder extends Seeder
         // responsibility free text, both faker latin out of the box.
         $this->renameByOrganisation(AvgGoal::query(), self::GOAL_NAMES, 'goal');
 
+        // The "Alle Versies" overview lists snapshots of every record type, not
+        // just AVG responsible ones, so rename the other three too - otherwise
+        // that figure still shows faker words in the "Naam versie" column.
+        $this->renameByOrganisation(
+            AvgProcessorProcessingRecord::query()->where('organisation_id', $organisation->id),
+            self::RECORD_NAMES,
+        );
+        $this->renameByOrganisation(
+            WpgProcessingRecord::query()->where('organisation_id', $organisation->id),
+            self::RECORD_NAMES,
+        );
+        $this->renameByOrganisation(
+            AlgorithmRecord::query()->where('organisation_id', $organisation->id),
+            self::RECORD_NAMES,
+        );
+
+        // Snapshots carry their own name, shown in the "Alle Versies" overview.
+        // They are created by TestDataSeeder from faker words, so rename them to
+        // match the record they belong to.
+        foreach (Snapshot::query()->where('organisation_id', $organisation->id)->get() as $snapshot) {
+            $source = $snapshot->snapshotSource;
+
+            if ($source === null) {
+                continue;
+            }
+
+            $name = $source->getAttribute('name');
+
+            if (!is_string($name)) {
+                continue;
+            }
+
+            $snapshot->name = $name;
+            $snapshot->save();
+        }
+
         AvgResponsibleProcessingRecord::query()
             ->where('organisation_id', $organisation->id)
             ->update([
@@ -285,6 +325,16 @@ class ScreenshotSeeder extends Seeder
 
         $mandateHolder->name = 'Marieke de Vries';
         $mandateHolder->save();
+
+        // The approval panel on the version detail page is gated on the
+        // SNAPSHOT_APPROVAL_UPDATE_PERSONAL permission, which is scoped per
+        // organisation. A mandate holder whose role sits in another organisation
+        // is assigned the approval but cannot see the Akkoord / Niet akkoord
+        // buttons at all, so make sure the role exists for this one.
+        $mandateHolder->organisationRoles()->firstOrCreate([
+            'organisation_id' => $organisation->id,
+            'role' => Role::MANDATE_HOLDER->value,
+        ]);
 
         SnapshotApproval::factory()->create([
             'snapshot_id' => $inReview->id,

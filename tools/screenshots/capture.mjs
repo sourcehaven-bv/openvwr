@@ -306,38 +306,70 @@ const FIGURES = [
     name: 'organisation-snapshots',
     file: '03_goedkeuringsproces/05_organisation-snapshots.png',
     auth: true,
-    clip: '.fi-main',
+    // The whole layout, not .fi-main: the text points at the overview "in het
+    // navigatiemenu links", so the sidebar has to be in frame for that arrow to
+    // land on anything.
+    clip: '.fi-layout',
     async shoot(page) {
       await page.goto(`${BASE}/${tenantOf(page)}/organisation-snapshot-approvals`, {
         waitUntil: 'networkidle',
       });
       await page.waitForSelector('table');
+
+      // Two arrows, matching the two things the paragraph describes: the
+      // overview's place in the sidebar, and the filter control above the table.
+      await page.evaluate(() => {
+        // Scope to the sidebar: the breadcrumb above the heading has the same
+        // text and would otherwise match first.
+        const sidebar = document.querySelector('.fi-sidebar, aside');
+        const navItem = [...(sidebar?.querySelectorAll('a') ?? [])].find((a) =>
+          /Alle Versies/i.test(a.textContent || ''),
+        );
+        if (!navItem) throw new Error('"Alle Versies" sidebar item not found');
+        // From the right: the item sits low in the sidebar, so an arrow above it
+        // runs off the top of the canvas.
+        // Short: a longer arrow reaches into the table and covers a row.
+        window.__annotate.arrow(navItem, { side: 'right', length: 55, gap: 8 });
+
+        // By accessible name rather than a class: Filament's table classes have
+        // been renamed across versions, the label has not.
+        const filter = [...document.querySelectorAll('button')].find((b) =>
+          /filter/i.test(b.getAttribute('aria-label') || b.title || ''),
+        );
+        if (!filter) throw new Error('table filter trigger not found');
+        window.__annotate.arrow(filter, { side: 'top', length: 90, gap: 10 });
+      });
     },
   },
   {
     name: 'personal-approvals',
     file: '03_goedkeuringsproces/07_personal-snapshot-approvals_akkoord_geven.png',
     auth: true,
-    // "Mijn Ondertekeningen" only lists approvals assigned to the current user,
-    // and ScreenshotSeeder assigns the pending one to the mandate holder.
+    // ScreenshotSeeder assigns the pending approval to the mandate holder, so
+    // only they see the Akkoord / Niet akkoord pair.
     as: 'mandateholder',
-    // The table section only; the page body below it is empty.
-    clip: '.fi-ta',
+    // The "Mijn ondertekeningen" panel at the foot of the version detail page.
+    // Not the personal-snapshot-approvals list: the manual describes approving
+    // "op de versie detailpagina onderaan", and the list's bulk action offers
+    // only Akkoord, while the text explicitly mentions Niet akkoord too.
+    // The section containing the approval buttons. Several .fi-section elements
+    // exist on the page, so it is resolved by content in shoot() and tagged.
+    clip: '[data-shot="approval-section"]',
     pad: 12,
     async shoot(page) {
-      await page.goto(`${BASE}/${tenantOf(page)}/personal-snapshot-approvals`, {
-        waitUntil: 'networkidle',
-      });
-      await page.waitForSelector('table');
-      // Selecting a row reveals the Akkoord / Niet akkoord bulk actions, which
-      // are what this figure is about.
-      await selectFirstRow(page);
-      await page.waitForTimeout(600);
+      await gotoSeededSnapshot(page);
+      // The panel sits at the foot of a long page.
+      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+      await page.waitForSelector('text=/Niet akkoord/i', { timeout: 30000 });
+      await page.waitForTimeout(400);
       await page.evaluate(() => {
         const btn = [...document.querySelectorAll('button')].find((b) =>
-          /^\s*Akkoord\s*$/i.test(b.textContent || ''),
+          /^\s*Niet akkoord\s*$/i.test(b.textContent || ''),
         );
-        if (!btn) throw new Error('Akkoord button not found');
+        if (!btn) throw new Error('"Niet akkoord" button not found');
+        const section = btn.closest('.fi-section');
+        if (!section) throw new Error('approval section not found');
+        section.setAttribute('data-shot', 'approval-section');
         window.__annotate.arrow(btn, { side: 'right', length: 130 });
       });
     },
