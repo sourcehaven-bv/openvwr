@@ -1,0 +1,56 @@
+# a5c2f0f4\-1d1e\-4a4a\-9d5c\-1f6a1b2c3d4e
+
+## Naam algoritme
+
+- **Nummer**: ALG000001
+- **Korte omschrijving**: Beschrijving van het algoritme\.
+- **Thema**: Verkeer
+- **Status**: In gebruik
+- **Begindatum**: 01-01-2024
+- **Einddatum**: -
+- **Contactgegevens**: contact@example\.com
+- **Link naar publiekspagina**: https://example\.com/algoritme
+- **Publicatiecategorie**: Impactvolle algoritmes
+- **Link naar bronregistratie**: https://example\.com/bron
+
+## Verantwoord gebruik
+
+- **Doel en impact**: Doel en impact\.
+- **Afwegingen**: Afwegingen\.
+- **Menselijke tussenkomst**: Menselijke tussenkomst\.
+- **Risicobeheer**: Risicobeheer\.
+- **Titel van wettelijke basis**: Wegenverkeerswet 1994
+- **Wettelijke basis**: Wettelijke basis\.
+- **Link naar wettelijke basis**: https://example\.com/wet
+- **Link naar verwerkingsregister**: https://example\.com/verwerkingsregister
+- **Impacttoetsen**: DPIA
+- **Links naar impacttoetsen**: https://example\.com/dpia
+- **Toelichting op impacttoetsen**: Toelichting op impacttoetsen\.
+
+## Werking
+
+- **Titel van gegevensbron**: Titel van gegevensbron
+- **Gegevens**: Gegevens\.
+- **Links naar gegevensbronnen**: https://example\.com/gegevensbron
+- **Technische werking**: Technische werking\.
+- **Leverancier**: Intern ontwikkeld
+- **Link naar broncode**: https://example\.com/broncode
+
+## Metadata
+
+- **Datum van ontwikkeling**: 01-06-2023
+- **Eigenaar van het algoritme**: Afdelingshoofd
+- **Product owner van het algoritme**: Product owner
+- **Landelijk-ID**: REG\-001
+- **Bron-ID**: BRON\-001
+- **Zoektermen**: verkeer, sensoren
+
+## Impactvol algoritme
+
+- **Is er sprake van een proces met directe gevolgen voor burgers of organisaties?**: Ja
+- **Worden er in dit proces één of meerdere algoritmes toegepast?**: Nee
+- **Heeft het algoritme een significant effect op de uitkomst van het proces?**: -
+
+## Validatie
+
+- **Antwoorden op de toetsvragen gecontroleerd door product owner**: Ja
