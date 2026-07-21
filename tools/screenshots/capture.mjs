@@ -131,22 +131,18 @@ const FIGURES = [
     name: 'export-complete',
     file: '05_overige_functies/02_avg-responsible-processing-records_export_complete.png',
     auth: true,
+    // Requires QUEUE_CONNECTION=database and a running `php artisan queue:work`
+    // (see the README): on the sync queue the completion notice is a session
+    // flash that never reaches the notifications table.
+    // The notification card itself; the surrounding panel is full-viewport
+    // height and would leave most of the image empty.
     clip: '.fi-no-notification',
-    pad: 20,
-    // Not working yet - excluded from the default run, request it explicitly
-    // with --only export-complete to work on it.
-    //
-    // The export itself succeeds (41 rows, completed_at set) but the completion
-    // notification never becomes visible. On the sync queue Filament sends it
-    // as a persistent session notification rather than sendToDatabase(), so:
-    // the notifications table stays empty, and reloading consumes the flash.
-    // Polling the DOM for 48s after completion found nothing either.
-    // See vendor/filament/actions/src/Exports/Jobs/ExportCompletion.php:77-83.
-    skip: true,
+    pad: 0,
     async shoot(page) {
-      // Start from a clean slate so waitForExport tracks *this* run's export
-      // rather than returning immediately on a previous run's completed row.
-      tinker('DB::table("exports")->delete();');
+      // Start from a clean slate: waitForExport must track *this* run's export
+      // rather than a previous row, and stale notifications would otherwise
+      // stack up in the panel on every re-run.
+      tinker('DB::table("exports")->delete(); DB::table("notifications")->delete();');
       await gotoRegister(page);
       await page.getByRole('button', { name: /Exporteren/i }).first().click();
       // The action opens a modal; the export only starts on the confirm inside
@@ -157,13 +153,18 @@ const FIGURES = [
         .filter({ hasText: /^\s*Exporteren\s*$/ })
         .first()
         .click();
-      // On the sync queue Filament sends this as a persistent session
-      // notification (->send()), not sendToDatabase(): it arrives as a live
-      // toast in the same request. Do NOT reload here - that consumes the
-      // flash and the notification is gone for good.
-      // See vendor/filament/actions/src/Exports/Jobs/ExportCompletion.php.
-      await page.waitForSelector('.fi-no-notification', { timeout: 90000 });
-      await page.waitForTimeout(800); // let the toast finish animating in
+      // Two notifications appear: "Exporteren gestart" immediately, then
+      // "Exporteren afgerond" with the download links once the worker is done.
+      // The manual shows the second one, so wait for the download action
+      // rather than any toast - the start notice also contains "voltooid".
+      await waitForExport(page);
+      // With a real queue driver this is a database notification, so it needs a
+      // page load to render (on the sync queue it would be a session flash and
+      // reloading would destroy it - see ExportCompletion.php).
+      await page.reload({ waitUntil: 'networkidle' });
+      await page.getByRole('button', { name: /Meldingen openen/i }).first().click();
+      await page.waitForSelector('text=/downloaden/i', { timeout: 30000 });
+      await page.waitForTimeout(800);
     },
   },
   {

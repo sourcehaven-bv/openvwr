@@ -14,6 +14,10 @@ cd src/cms
 php artisan db:seed --class=TestDataSeeder
 php artisan db:seed --class=ScreenshotSeeder   # deterministische inhoud
 php artisan serve --host=127.0.0.1 --port=8000
+
+# In een tweede terminal: nodig voor de exportfiguren, die op een
+# achtergrondjob wachten.
+php artisan queue:work
 ```
 
 Daarna:
@@ -82,15 +86,14 @@ om een echte TOTP-code te laten berekenen uit het geseede secret.
 
 - Niet alle figuren uit de handleiding zijn geautomatiseerd. `FIGURES` bevat op
   dit moment een deel; de rest staat nog in de originele afbeeldingen.
-- De exportmelding (`05_overige_functies/02_..._export_complete.png`) staat op
-  `skip: true` en wordt overgeslagen in een normale run. De export zelf slaagt
-  (41 rijen), maar de meldingstoast is niet te pakken te krijgen: op de
-  `sync`-queue verstuurt Filament die als sessiemelding in plaats van
-  `sendToDatabase()`, waardoor de `notifications`-tabel leeg blijft en een
-  reload de melding juist wist. Zie
-  `vendor/filament/actions/src/Exports/Jobs/ExportCompletion.php`. Werk eraan
-  met `--only export-complete`.
 
-Voor exports is `FILAMENT_FILESYSTEM_DISK=app` nodig (staat in
-`.env.nodocker.example`): standaard schrijft Filament naar een S3-disk die naar
-MinIO wijst, en die draait niet in deze setup. MinIO zelf is niet nodig.
+Twee instellingen zijn nodig voor de exportfiguren, beide in
+`.env.nodocker.example`:
+
+- `FILAMENT_FILESYSTEM_DISK=app` — standaard schrijft Filament naar een S3-disk
+  die MinIO verwacht. Met de lokale disk is MinIO niet nodig.
+- `QUEUE_CONNECTION=database` plus een draaiende worker (zie boven). Op de
+  `sync`-queue verstuurt Filament de voltooiingsmelding als sessiemelding in
+  plaats van `sendToDatabase()`; de `notifications`-tabel blijft dan leeg en de
+  melding is niet vast te leggen. Zie
+  `vendor/filament/actions/src/Exports/Jobs/ExportCompletion.php`.
