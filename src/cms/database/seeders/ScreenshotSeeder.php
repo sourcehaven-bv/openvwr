@@ -54,8 +54,32 @@ class ScreenshotSeeder extends Seeder
     {
         $organisation = Organisation::query()->where('slug', 'nipg')->firstOrFail();
 
+        $this->trimScreenshotUserRoles($organisation);
         $this->renameRecords($organisation);
         $this->createVersionHistory($organisation);
+    }
+
+    /**
+     * TestDataSeeder gives the admin every organisation role, including
+     * Functionaris Gegevensbescherming. That role adds an "FG Opmerkingen"
+     * widget to entity pages which only FGs ever see, so leaving it on would
+     * put a field in the manual that is irrelevant to most readers.
+     *
+     * The screenshots are taken as a (Chief) Privacy Officer, which is the role
+     * the manual describes for these screens.
+     */
+    private function trimScreenshotUserRoles(Organisation $organisation): void
+    {
+        $user = User::query()->where('email', 'admin@example.com')->first();
+
+        if ($user === null) {
+            return;
+        }
+
+        $user->organisationRoles()
+            ->where('organisation_id', $organisation->id)
+            ->where('role', Role::DATA_PROTECTION_OFFICIAL->value)
+            ->delete();
     }
 
     /**
