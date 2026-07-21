@@ -8,6 +8,7 @@ use App\Http\Controllers\Authentication\PasswordlessLoginController;
 use App\Http\Controllers\Authentication\SnapshotSignLoginController;
 use App\Http\Controllers\PrivateMediaController;
 use App\Http\Controllers\RedirectToTenantController;
+use App\Http\Controllers\TransferExportDownloadController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', RedirectToTenantController::class)->name(RouteName::HOME);
@@ -19,6 +20,10 @@ Route::prefix('/login/consume')->middleware('signed')->group(static function ():
 
 Route::get('/media/{media}', PrivateMediaController::class)
     ->name(RouteName::MEDIA_PRIVATE);
+
+Route::get('/transfer-export/{filename}', TransferExportDownloadController::class)
+    ->middleware('signed')
+    ->name(RouteName::TRANSFER_EXPORT_DOWNLOAD);
 
 Route::prefix('/snapshot/sign')->middleware('signed')->group(static function (): void {
     Route::prefix('/batch')->group(static function (): void {

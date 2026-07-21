@@ -22,4 +22,7 @@ enum RouteName: string
 
     // media
     case MEDIA_PRIVATE = 'media.private';
+
+    // transfer
+    case TRANSFER_EXPORT_DOWNLOAD = 'transfer-export.download';
 }
