@@ -13,6 +13,8 @@ use function __;
 
 abstract class ListLookupListRecords extends ListRecords
 {
+    public const string TAB_ID_ALL = 'all';
+
     protected function getHeaderActions(): array
     {
         return [
@@ -23,7 +25,7 @@ abstract class ListLookupListRecords extends ListRecords
     public function getTabs(): array
     {
         return [
-            null => Tab::make('all')
+            self::TAB_ID_ALL => Tab::make()
                 ->label(__('general.all')),
             'enabled' => Tab::make()
                 ->label(__('general.enabled'))

@@ -37,8 +37,8 @@ class TimedOneTimePassword implements OneTimePassword
     {
         Assert::stringNotEmpty($label);
 
-        $otp = TOTP::createFromSecret($secret->toString());
-        $otp->setLabel($label);
+        $otp = TOTP::createFromSecret($secret->toString())
+            ->withLabel($label);
         $url = $otp->getProvisioningUri();
 
         $fill = Fill::uniformColor(new Rgb(255, 255, 255), new Rgb(0, 0, 0));
