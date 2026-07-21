@@ -11,6 +11,7 @@ use App\Filament\Forms\Components\Select\SelectSingleWithLookup;
 use App\Filament\Forms\Components\SelectMultipleWithLookup;
 use App\Filament\Forms\Components\Upload\AttachmentFileField;
 use App\Models\Algorithm\AlgorithmRecord;
+use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\DataBreachRecord;
 use App\Models\DocumentType;
@@ -141,7 +142,7 @@ class DocumentResourceForm
                 SelectMultipleWithLookup::makeForRelationship(
                     'avg_processor_processing_record_id',
                     'avgProcessorProcessingRecords',
-                    AvgResponsibleProcessingRecord::class,
+                    AvgProcessorProcessingRecord::class,
                     'name',
                 )
                     ->label(__('avg_processor_processing_record.model_plural'))

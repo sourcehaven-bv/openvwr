@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\NavigationGroups\NavigationGroup;
+use App\Filament\RelationManagers\AvgProcessorProcessingRecordRelationManager;
 use App\Filament\RelationManagers\AvgResponsibleProcessingRecordRelationManager;
+use App\Filament\RelationManagers\WpgProcessingRecordRelationManager;
 use App\Filament\Resources\TagResource\Pages;
 use App\Filament\Resources\TagResource\TagResourceForm;
 use App\Filament\Resources\TagResource\TagResourceInfolist;
@@ -47,6 +49,8 @@ class TagResource extends Resource
     {
         return [
             AvgResponsibleProcessingRecordRelationManager::class,
+            AvgProcessorProcessingRecordRelationManager::class,
+            WpgProcessingRecordRelationManager::class,
         ];
     }
 

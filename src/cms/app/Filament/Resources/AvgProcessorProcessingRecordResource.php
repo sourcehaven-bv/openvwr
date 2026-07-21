@@ -17,6 +17,7 @@ use App\Filament\RelationManagers\ReceiverRelationManager;
 use App\Filament\RelationManagers\ResponsibleRelationManager;
 use App\Filament\RelationManagers\SnapshotsRelationManager;
 use App\Filament\RelationManagers\SystemRelationManager;
+use App\Filament\RelationManagers\TagRelationManager;
 use App\Filament\Resources\AvgProcessorProcessingRecordResource\AvgProcessorProcessingRecordResourceForm;
 use App\Filament\Resources\AvgProcessorProcessingRecordResource\AvgProcessorProcessingRecordResourceInfolist;
 use App\Filament\Resources\AvgProcessorProcessingRecordResource\AvgProcessorProcessingRecordResourceTable;
@@ -84,6 +85,7 @@ class AvgProcessorProcessingRecordResource extends Resource
             SystemRelationManager::class,
             ProcessingRecordUsersRelationManager::class,
             ProcessingRecordContactPersonRelationManager::class,
+            TagRelationManager::class,
         ];
     }
 

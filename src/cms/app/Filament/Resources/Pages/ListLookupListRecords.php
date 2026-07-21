@@ -16,6 +16,8 @@ abstract class ListLookupListRecords extends ListRecords
 {
     use PersistsFiltersInSession;
 
+    public const string TAB_ID_ALL = 'all';
+
     protected function getHeaderActions(): array
     {
         return [
@@ -36,7 +38,7 @@ abstract class ListLookupListRecords extends ListRecords
                 ->query(static function (Builder $query) {
                     return $query->where('enabled', false);
                 }),
-            'all' => Tab::make('all')
+            self::TAB_ID_ALL => Tab::make()
                 ->label(__('general.all')),
         ];
     }

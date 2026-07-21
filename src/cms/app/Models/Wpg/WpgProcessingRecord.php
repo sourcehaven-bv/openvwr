@@ -27,6 +27,7 @@ use App\Models\Concerns\HasResponsibles;
 use App\Models\Concerns\HasSnapshots;
 use App\Models\Concerns\HasSoftDeletes;
 use App\Models\Concerns\HasSystems;
+use App\Models\Concerns\HasTags;
 use App\Models\Concerns\HasTimestamps;
 use App\Models\Concerns\HasUsers;
 use App\Models\Concerns\HasUuidAsId;
@@ -118,6 +119,7 @@ class WpgProcessingRecord extends Model implements Cloneable, EntityNumerable, R
     use HasSnapshots;
     use HasSoftDeletes;
     use HasSystems;
+    use HasTags;
     use HasTimestamps;
     use HasUuidAsId;
     use HasUsers;

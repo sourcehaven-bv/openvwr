@@ -45,10 +45,12 @@ class AvgResponsibleProcessingRecordResourceTable
             ->defaultSort('avg_responsible_processing_records.updated_at', 'desc')
             ->emptyStateHeading(__('avg_responsible_processing_record.table_empty_heading'))
             ->emptyStateDescription(null)
+            ->actionsColumnLabel(__('general.edit'))
             ->actions([
                 GoToStaticWebsiteAction::make(),
                 EditAction::make()
-                    ->label(''),
+                    ->hiddenLabel()
+                    ->tooltip(static fn (EditAction $action) => $action->getLabel()),
             ])
             ->filters([
                 TagFilter::make(),

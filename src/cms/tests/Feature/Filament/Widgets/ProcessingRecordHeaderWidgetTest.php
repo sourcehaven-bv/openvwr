@@ -36,7 +36,9 @@ it('cannot view without correct role', function (array $roles, bool $expectedRes
 ]);
 
 it('handles submit', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
         ->create();
 
     expect($avgResponsibleProcessingRecord->fgRemark)
@@ -44,7 +46,8 @@ it('handles submit', function (): void {
 
     $body = fake()->sentence();
 
-    $this->createLivewireTestable(FgRemarksWidget::class, ['record' => $avgResponsibleProcessingRecord])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(FgRemarksWidget::class, ['record' => $avgResponsibleProcessingRecord])
         ->set('data', ['body' => $body])
         ->call('submit');
 

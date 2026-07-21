@@ -1,1 +1,1 @@
-<img src="{{ $poster->getFullUrl() }}">
+<img src="{{ $poster->getFullUrl() }}" alt="{{ __('organisation.poster') }}">

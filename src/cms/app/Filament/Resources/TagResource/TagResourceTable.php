@@ -29,9 +29,11 @@ class TagResourceTable
             ->defaultSort('tags.updated_at', 'desc')
             ->emptyStateHeading(__('tag.table_empty_heading'))
             ->emptyStateDescription(null)
+            ->actionsColumnLabel(__('general.edit'))
             ->actions([
                 EditAction::make()
-                    ->label(''),
+                    ->hiddenLabel()
+                    ->tooltip(static fn (EditAction $action) => $action->getLabel()),
             ])
             ->bulkActions([
                 DeleteBulkAction::make(),

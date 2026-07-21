@@ -34,9 +34,11 @@ class OrganisationResourceTable
             ->defaultSort('organisations.updated_at', 'desc')
             ->emptyStateHeading(__('organisation.table_empty_heading'))
             ->emptyStateDescription(null)
+            ->actionsColumnLabel(__('general.edit'))
             ->actions([
                 EditAction::make()
-                    ->label(''),
+                    ->hiddenLabel()
+                    ->tooltip(static fn (EditAction $action) => $action->getLabel()),
             ]);
     }
 }

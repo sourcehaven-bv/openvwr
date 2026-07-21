@@ -29,6 +29,8 @@ Directory: `/src/static-website/`
 - See [docs/static_website_hugo.md](docs/static_website_hugo.md) for detailed information about the Hugo static website publishing system.
 
 ## Getting started
+> All `artisan` commands must be run via Sail (`sail artisan ...` or inside `sail shell`).
+> Running `php artisan` directly on your host will fail because `DB_HOST=pgsql` is only reachable inside Docker.
 
 ### Prerequisites
 
@@ -99,10 +101,11 @@ We now need the Public website script to build the static files within your cont
 1. Open the shell with `sail shell`
 2. Run `npm ci` (NPM clean install) to install the required dependencies. If you visit your local website (in your browser) you should see a warning that says something like `Vite manifest not found at: /var/www/html/public/build/manifest.json`.
 3. Run `npm run build` (within the shell) to build the static files. This will generate the static files in the `public` folder.
-4. It is now important to run (within the shell) `php artisan storage:link` to link the configured (default) /static-website to the actual static files of the website.
+4. Exit the shell (`exit`).
+5. Run `sail artisan storage:link` to link the configured (default) /static-website to the actual static files of the website.
+6. Run `sail artisan static-website:refresh` to generate the public website content from the CMS database.
 
 As a result of these steps, you have created the static files for the public website and in your browser you can see the Login page.
-- Navigate to http://localhost/static-website (or http://web.cms.orb.local/static-website for Orbstack users)
 
 ### Login to the CMS
 
@@ -124,7 +127,7 @@ A. Set ENV variable `ONE_TIME_PASSWORD_DRIVER` to `fake` in your `.env` file
 
 B. Disable 2FA for the added user
   1. `sail shell` to enter the Shell
-  2. `php artisan user:disable-otp`
+  2. `php artisan app:user-disable-otp`
   3. add the email again and press Enter
   4. Visit your local default project url again and you are now logged in
 

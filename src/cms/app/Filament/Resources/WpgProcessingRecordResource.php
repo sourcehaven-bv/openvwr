@@ -14,6 +14,7 @@ use App\Filament\RelationManagers\ProcessorRelationManager;
 use App\Filament\RelationManagers\ResponsibleRelationManager;
 use App\Filament\RelationManagers\SnapshotsRelationManager;
 use App\Filament\RelationManagers\SystemRelationManager;
+use App\Filament\RelationManagers\TagRelationManager;
 use App\Filament\RelationManagers\WpgProcessingRecordChildrenRelationManager;
 use App\Filament\RelationManagers\WpgProcessingRecordParentRelationManager;
 use App\Filament\Resources\WpgProcessingRecordResource\Pages;
@@ -72,6 +73,7 @@ class WpgProcessingRecordResource extends Resource
             SystemRelationManager::class,
             ProcessingRecordUsersRelationManager::class,
             ProcessingRecordContactPersonRelationManager::class,
+            TagRelationManager::class,
         ];
     }
 

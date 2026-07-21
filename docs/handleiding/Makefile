@@ -13,7 +13,7 @@ handleiding:
 		pandoc $(PANDOC_ARGS) --pdf-engine=xelatex; \
 	else \
 		echo "pandoc not found, falling back to Docker..."; \
-		docker run --rm --platform linux/amd64 --volume "`pwd`:/data" --user `id -u`:`id -g` pandoc/extra $(PANDOC_ARGS); \
+		docker run --rm --platform linux/amd64 --volume "`pwd`:/data" --user `id -u`:`id -g` pandoc/extra:latest-ubuntu $(PANDOC_ARGS); \
 	fi
 	mv $(PDF) $(DEST)
 

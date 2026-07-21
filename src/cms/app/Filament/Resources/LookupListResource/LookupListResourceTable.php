@@ -38,9 +38,11 @@ class LookupListResourceTable
             ->defaultSort(sprintf('%s.updated_at', $model::getModel()->getTable()), 'desc')
             ->emptyStateHeading($emptyStateHeading)
             ->emptyStateDescription(null)
+            ->actionsColumnLabel(__('general.edit'))
             ->actions([
                 EditAction::make()
-                    ->label(''),
+                    ->hiddenLabel()
+                    ->tooltip(static fn (EditAction $action) => $action->getLabel()),
             ])
             ->bulkActions([
                 DeleteBulkActionWithRelationChecks::make(),

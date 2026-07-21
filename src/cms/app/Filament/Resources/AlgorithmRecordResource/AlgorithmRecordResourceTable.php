@@ -34,9 +34,11 @@ class AlgorithmRecordResourceTable
             ->defaultSort('algorithm_records.updated_at', 'desc')
             ->emptyStateHeading(__('algorithm_record.table_empty_heading'))
             ->emptyStateDescription(null)
+            ->actionsColumnLabel(__('general.edit'))
             ->actions([
                 EditAction::make()
-                    ->label(''),
+                    ->hiddenLabel()
+                    ->tooltip(static fn (EditAction $action) => $action->getLabel()),
             ])
             ->filters([
                 DocumentFilter::make(),

@@ -83,7 +83,16 @@ class AvgProcessorProcessingRecordFactory extends Factory
     public function withValidState(): self
     {
         return $this
-            ->withResponsibles();
+            ->withResponsibles()
+            ->state(function (): array {
+                return [
+                    'has_processors' => false,
+                    'decision_making' => false,
+                    'has_systems' => false,
+                    'has_security' => false,
+                    'outside_eu' => false,
+                ];
+            });
     }
 
     public function withAllRelatedEntities(): self

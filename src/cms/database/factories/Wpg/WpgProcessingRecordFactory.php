@@ -91,6 +91,21 @@ class WpgProcessingRecordFactory extends Factory
         ];
     }
 
+    public function withValidState(): self
+    {
+        return $this
+            ->state(function (): array {
+                return [
+                    'has_processors' => false,
+                    'has_systems' => false,
+                    'decision_making' => false,
+                    'article_17_a' => false,
+                    'third_parties' => false,
+                    'has_security' => false,
+                ];
+            });
+    }
+
     public function withAllRelatedEntities(): self
     {
         return self::withContactPersons()
