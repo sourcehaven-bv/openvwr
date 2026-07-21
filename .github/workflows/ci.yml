@@ -15,11 +15,6 @@ jobs:
       DB_PASSWORD: postgres
       DB_USERNAME: postgres
       DB_DATABASE: postgres
-      AWS_ENDPOINT: http://localhost:9000
-      AWS_ACCESS_KEY_ID: minioadmin
-      AWS_SECRET_ACCESS_KEY: minioadmin
-      AWS_DEFAULT_REGION: eu-central-1
-      AWS_USE_PATH_STYLE_ENDPOINT: true
     services:
       postgres:
         image: postgres:15
@@ -42,21 +37,6 @@ jobs:
 
       - name: Set env
         run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-
-      - name: Start MinIO
-        run: |
-          docker run -d \
-            --name minio \
-            -p 9000:9000 \
-            -p 9001:9001 \
-            -e "MINIO_ROOT_USER=minioadmin" \
-            -e "MINIO_ROOT_PASSWORD=minioadmin" \
-            minio/minio:RELEASE.2025-02-28T09-55-16Z \
-            server /data --console-address ":9001"
-
-          echo "Waiting for MinIO to be ready..."
-          timeout 60s bash -c 'until curl -sf http://localhost:9000/minio/health/live >/dev/null 2>&1; do sleep 2; done'
-          echo "MinIO is ready!"
 
       - name: Install Node.js
         uses: actions/setup-node@v6
@@ -107,9 +87,6 @@ jobs:
         run: |
           mv static-website/ cms/
 
-      - name: Setup MinIO buckets
-        run: php artisan minio:setup
-
       - name: Run Migration
         run: php artisan migrate:fresh
 
@@ -128,7 +105,3 @@ jobs:
         run: vendor/bin/pest --coverage --coverage-text --min=100 --log-junit=reports/report-phpunit.xml --coverage-clover=reports/coverage-phpunit.xml
         env:
           DB_PORT: ${{ job.services.postgres.ports[5432] }}
-
-      - name: Stop MinIO
-        if: always()
-        run: docker stop minio && docker rm minio || true

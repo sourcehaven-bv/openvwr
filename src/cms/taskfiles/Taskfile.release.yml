@@ -192,8 +192,6 @@ tasks:
         echo "VITE_PORT=15173" >> "$WORKTREE/.env"
         echo "FORWARD_MAILPIT_PORT=11025" >> "$WORKTREE/.env"
         echo "FORWARD_MAILPIT_DASHBOARD_PORT=18025" >> "$WORKTREE/.env"
-        echo "MINIO_PORT=19000" >> "$WORKTREE/.env"
-        echo "MINIO_CONSOLE_PORT=19001" >> "$WORKTREE/.env"
         echo "WWWUSER=$(id -u)" >> "$WORKTREE/.env"
         echo "WWWGROUP=$(id -g)" >> "$WORKTREE/.env"
 
@@ -311,8 +309,6 @@ tasks:
         echo "VITE_PORT=15174" >> "$WORKTREE/.env"
         echo "FORWARD_MAILPIT_PORT=11026" >> "$WORKTREE/.env"
         echo "FORWARD_MAILPIT_DASHBOARD_PORT=18026" >> "$WORKTREE/.env"
-        echo "MINIO_PORT=19002" >> "$WORKTREE/.env"
-        echo "MINIO_CONSOLE_PORT=19003" >> "$WORKTREE/.env"
         echo "WWWUSER=$(id -u)" >> "$WORKTREE/.env"
         echo "WWWGROUP=$(id -g)" >> "$WORKTREE/.env"
 

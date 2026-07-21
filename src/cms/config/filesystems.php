@@ -47,27 +47,10 @@ return [
             'throw' => false,
         ],
 
-        'minio' => [
-            'driver' => 's3',
-            'key' => env('MINIO_ACCESS_KEY_ID'),
-            'secret' => env('MINIO_SECRET_ACCESS_KEY'),
-            'region' => env('MINIO_DEFAULT_REGION', 'eu-central-1'),
-            'bucket' => env('MINIO_BUCKET'),
-            'url' => env('MINIO_URL'),
-            'endpoint' => env('MINIO_ENDPOINT'),
-            'use_path_style_endpoint' => env('MINIO_USE_PATH_STYLE_ENDPOINT', true),
-            'throw' => false,
-        ],
-
         // used by filament, .e.g export
         'filament' => [
-            'driver' => 's3',
-            'bucket' => env('EXPORTS_BUCKET', 'exports'),
-            'endpoint' => env('AWS_ENDPOINT'),
-            'key' => env('AWS_ACCESS_KEY_ID'),
-            'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'region' => env('AWS_DEFAULT_REGION', 'eu-central-1'),
-            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true),
+            'driver' => 'local',
+            'root' => $sharedStoragePath . '/exports',
             'throw' => false,
             'allowed_mimetypes' => ['xlsx'],
             'max_file_size' => '20mb',
@@ -83,13 +66,8 @@ return [
 
         // used for uploading images (see config/media-library.php)
         'media-library' => [
-            'driver' => 's3',
-            'bucket' => env('UPLOADS_BUCKET', 'uploads'),
-            'endpoint' => env('AWS_ENDPOINT'),
-            'key' => env('AWS_ACCESS_KEY_ID'),
-            'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'region' => env('AWS_DEFAULT_REGION', 'eu-central-1'),
-            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true),
+            'driver' => 'local',
+            'root' => $sharedStoragePath . '/uploads',
             'throw' => false,
             'allowed_extensions' => ['pdf', 'png', 'jpg', 'jpeg', 'webp', 'docx', 'odt', 'md', 'txt', 'eml', 'msg'],
             'max_file_size' => '20mb',
