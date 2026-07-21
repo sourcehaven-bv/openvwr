@@ -168,6 +168,43 @@ const FIGURES = [
     },
   },
   {
+    name: 'organisation-snapshots',
+    file: '03_goedkeuringsproces/05_organisation-snapshots.png',
+    auth: true,
+    clip: '.fi-main',
+    async shoot(page) {
+      await page.goto(`${BASE}/${tenantOf(page)}/organisation-snapshot-approvals`, {
+        waitUntil: 'networkidle',
+      });
+      await page.waitForSelector('table');
+    },
+  },
+  {
+    name: 'personal-approvals',
+    file: '03_goedkeuringsproces/07_personal-snapshot-approvals_akkoord_geven.png',
+    auth: true,
+    // The table section only; the page body below it is empty.
+    clip: '.fi-ta',
+    pad: 12,
+    async shoot(page) {
+      await page.goto(`${BASE}/${tenantOf(page)}/personal-snapshot-approvals`, {
+        waitUntil: 'networkidle',
+      });
+      await page.waitForSelector('table');
+      // Selecting a row reveals the Akkoord / Niet akkoord bulk actions, which
+      // are what this figure is about.
+      await page.locator('table tbody input[type=checkbox]').first().check();
+      await page.waitForTimeout(600);
+      await page.evaluate(() => {
+        const btn = [...document.querySelectorAll('button')].find((b) =>
+          /^\s*Akkoord\s*$/i.test(b.textContent || ''),
+        );
+        if (!btn) throw new Error('Akkoord button not found');
+        window.__annotate.arrow(btn, { side: 'right', length: 130 });
+      });
+    },
+  },
+  {
     name: 'users',
     file: '04_beheer/01_users_edit.png',
     auth: true,
