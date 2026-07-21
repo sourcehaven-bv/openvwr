@@ -378,11 +378,38 @@ const FIGURES = [
     name: 'users',
     file: '04_beheer/01_users_edit.png',
     auth: true,
-    clip: '.fi-main',
+    // The whole layout, matching the original: the surrounding text places user
+    // management "in het navigatiemenu onder Organisaties", so the sidebar is
+    // part of what the figure shows. fullPage with a bound so the role toggles
+    // below the fold are in frame without stretching to the page's full height.
+    clip: '.fi-layout',
+    fullPage: true,
+    maxHeight: 1500,
     async shoot(page) {
-      const tenant = tenantOf(page);
-      await page.goto(`${BASE}/${tenant}/users`, { waitUntil: 'networkidle' });
-      await page.waitForSelector('table');
+      // The edit page, not the list: the text describes what can be done once a
+      // user is opened - "Op deze pagina kunnen rollen worden aangepast" and the
+      // red delete button "rechtsbovenin". The list shows neither.
+      const id = tinker(`
+        echo App\\Models\\User::query()
+          ->where("name", "Marieke de Vries")
+          ->firstOrFail()->id;
+      `);
+      await page.goto(`${BASE}/${tenantOf(page)}/users/${id}/edit`, {
+        waitUntil: 'networkidle',
+      });
+      await page.waitForSelector('text=/Organisatie rollen/i', { timeout: 30000 });
+      // Filament restores the sidebar's scroll position, which leaves the figure
+      // showing the foot of the navigation rather than its start.
+      await page.evaluate(() => {
+        window.scrollTo(0, 0);
+        // Whatever is actually scrollable in the sidebar - the class has moved
+        // between Filament versions.
+        const aside = document.querySelector('aside, .fi-sidebar');
+        for (const el of [aside, ...(aside?.querySelectorAll('*') ?? [])]) {
+          if (el && el.scrollHeight > el.clientHeight + 10) el.scrollTop = 0;
+        }
+      });
+      await page.waitForTimeout(300);
     },
   },
 ];
