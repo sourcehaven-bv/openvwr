@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Models\Algorithm\AlgorithmMetaSchema;
 use App\Models\Algorithm\AlgorithmPublicationCategory;
 use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Algorithm\AlgorithmStatus;
@@ -28,19 +27,6 @@ use App\Models\Tag;
 use App\Models\Wpg\WpgGoal;
 use App\Models\Wpg\WpgProcessingRecord;
 use App\Models\Wpg\WpgProcessingRecordService;
-
-it('has algorithmMetaSchemas', function (): void {
-    $organisation = Organisation::factory()->create();
-    expect($organisation->algorithmMetaSchemas()->count())
-        ->toBe(0);
-
-    AlgorithmMetaSchema::factory()
-        ->for($organisation)
-        ->create();
-
-    expect($organisation->algorithmMetaSchemas()->count())
-        ->toBe(1);
-});
 
 it('has algorithmPublicationCategories', function (): void {
     $organisation = Organisation::factory()->create();

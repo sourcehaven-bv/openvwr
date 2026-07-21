@@ -7,7 +7,6 @@ namespace App\Filament\Resources;
 use App\Enums\RegisterLayout;
 use App\Facades\Authentication;
 use App\Filament\NavigationGroups\NavigationGroup;
-use App\Filament\RelationManagers\AlgorithmMetaSchemaRelationManager;
 use App\Filament\RelationManagers\AlgorithmPublicationCategoryRelationManager;
 use App\Filament\RelationManagers\AlgorithmStatusRelationManager;
 use App\Filament\RelationManagers\AlgorithmThemeRelationManager;
@@ -65,7 +64,6 @@ class AlgorithmRecordResource extends Resource
             AlgorithmThemeRelationManager::class,
             AlgorithmStatusRelationManager::class,
             AlgorithmPublicationCategoryRelationManager::class,
-            AlgorithmMetaSchemaRelationManager::class,
         ];
     }
 

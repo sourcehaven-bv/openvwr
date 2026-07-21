@@ -46,8 +46,6 @@ class AlgorithmRecordExporter extends Exporter
                 ->label(__('general.name')),
             ExportColumn::make('description')
                 ->label(__('algorithm_record.description')),
-            ExportColumn::make('algorithmMetaSchema.name')
-                ->label(__('algorithm_meta_schema.model_singular')),
             ExportColumn::make('algorithmPublicationCategory.name')
                 ->label(__('algorithm_publication_category.model_singular')),
             ExportColumn::make('algorithmStatus.name')
@@ -125,8 +123,6 @@ class AlgorithmRecordExporter extends Exporter
     private static function getMetadataColumns(): array
     {
         return [
-            ExportColumn::make('meta_lang')
-                ->label(__('algorithm_record.meta_lang')),
             ExportColumn::make('meta_national_id')
                 ->label(__('algorithm_record.meta_national_id')),
             ExportColumn::make('meta_source_id')

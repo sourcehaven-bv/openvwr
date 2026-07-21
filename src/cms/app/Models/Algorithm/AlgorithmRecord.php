@@ -31,7 +31,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property ?UuidInterface $algorithm_theme_id
  * @property ?UuidInterface $algorithm_status_id
  * @property ?UuidInterface $algorithm_publication_category_id
- * @property ?UuidInterface $algorithm_meta_schema_id
  * @property string|null $import_id
  * @property string $name
  * @property string|null $description
@@ -70,7 +69,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property bool|null $validation_answers_checked_by_product_owner
  * @property CarbonImmutable|null $public_from
  *
- * @property-read AlgorithmMetaSchema|null $algorithmMetaSchema
  * @property-read AlgorithmPublicationCategory|null $algorithmPublicationCategory
  * @property-read AlgorithmStatus|null $algorithmStatus
  * @property-read AlgorithmTheme|null $algorithmTheme
@@ -95,7 +93,6 @@ class AlgorithmRecord extends Model implements Cloneable, EntityNumerable, Snaps
         'algorithm_theme_id',
         'algorithm_status_id',
         'algorithm_publication_category_id',
-        'algorithm_meta_schema_id',
         'public_from',
 
         'name',
@@ -145,7 +142,6 @@ class AlgorithmRecord extends Model implements Cloneable, EntityNumerable, Snaps
             'algorithm_theme_id' => UuidCast::class,
             'algorithm_status_id' => UuidCast::class,
             'algorithm_publication_category_id' => UuidCast::class,
-            'algorithm_meta_schema_id' => UuidCast::class,
             'public_from' => 'datetime',
             'meta_date_of_development' => 'date',
             'impact_with_consequences' => 'boolean',
@@ -177,13 +173,5 @@ class AlgorithmRecord extends Model implements Cloneable, EntityNumerable, Snaps
     public function algorithmPublicationCategory(): BelongsTo
     {
         return $this->belongsTo(AlgorithmPublicationCategory::class, 'algorithm_publication_category_id');
-    }
-
-    /**
-     * @return BelongsTo<AlgorithmMetaSchema, $this>
-     */
-    public function algorithmMetaSchema(): BelongsTo
-    {
-        return $this->belongsTo(AlgorithmMetaSchema::class, 'algorithm_meta_schema_id');
     }
 }
