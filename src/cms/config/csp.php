@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Http\CspPolicy;
 use Spatie\Csp\Nonce\RandomString;
-use Spatie\Csp\Presets\BunnyFonts;
 
 return [
 
@@ -13,7 +12,6 @@ return [
      * any class that extends `Spatie\Csp\Preset`
      */
     'presets' => [
-        BunnyFonts::class,
         CspPolicy::class,
     ],
 
