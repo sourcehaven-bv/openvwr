@@ -180,9 +180,10 @@ const FIGURES = [
     name: 'record-version',
     file: '03_goedkeuringsproces/01_avg-responsible-processing-records_edit_versie.png',
     auth: true,
-    // Top of the edit page: heading plus the "Versie aanmaken" action.
+    // Top of the edit page: heading plus the "Versie aanmaken" action. Extra
+    // padding leaves room for the arrow above the button.
     clip: '.fi-header',
-    pad: 24,
+    pad: 90,
     async shoot(page) {
       await gotoSeededRecord(page);
       await page.evaluate(() => {
@@ -190,7 +191,95 @@ const FIGURES = [
           /Versie aanmaken/i.test(b.textContent || ''),
         );
         if (!btn) throw new Error('"Versie aanmaken" button not found');
+        // From above: pointing from the left would cross the "Dupliceren"
+        // button that sits immediately beside it.
+        window.__annotate.arrow(btn, { side: 'top', length: 70, gap: 10 });
+      });
+    },
+  },
+  {
+    name: 'version-select',
+    file: '03_goedkeuringsproces/02_avg-responsible-processing-records_edit_versie_select.png',
+    auth: true,
+    clip: '.fi-ta',
+    pad: 12,
+    async shoot(page) {
+      await gotoSeededRecord(page);
+      await openVersionsTab(page);
+      await page.evaluate(() => {
+        // Point at the in-review version (2), the one awaiting approval.
+        const cell = [...document.querySelectorAll('table tbody tr')]
+          .find((tr) => /In review/i.test(tr.textContent || ''))
+          ?.querySelector('td:first-child');
+        if (!cell) throw new Error('in-review version row not found');
+        // From the left: the table spans the full width, so a right-side arrow
+        // would land past the page edge.
+        window.__annotate.arrow(cell, { side: 'left', length: 110 });
+      });
+    },
+  },
+  {
+    name: 'snapshot-signatures',
+    file: '03_goedkeuringsproces/03_snapshots_ondertekeningen.png',
+    auth: true,
+    clip: '.fi-page',
+    pad: 12,
+    async shoot(page) {
+      await gotoSeededSnapshot(page);
+      await page.evaluate(() => {
+        const tab = [...document.querySelectorAll('a, button')].find((t) =>
+          /Ondertekeningen/i.test(t.textContent || ''),
+        );
+        if (!tab) throw new Error('Ondertekeningen tab not found');
+        window.__annotate.arrow(tab, { side: 'bottom', length: 70, gap: 10 });
+      });
+    },
+  },
+  {
+    name: 'snapshot-mandateholder',
+    file: '03_goedkeuringsproces/04_snapshots_mandaathouder.png',
+    auth: true,
+    // .fi-page, not .fi-main: the latter is full viewport height and leaves
+    // most of the image empty below the short approvals table.
+    clip: '.fi-page',
+    pad: 12,
+    async shoot(page) {
+      await gotoSeededSnapshot(page, 'Ondertekeningen');
+      await page.evaluate(() => {
+        const btn = [...document.querySelectorAll('button, a')].find((b) =>
+          /Mandaathouders toevoegen/i.test(b.textContent || ''),
+        );
+        if (!btn) throw new Error('"Mandaathouders toevoegen" button not found');
         window.__annotate.arrow(btn, { side: 'left', length: 150 });
+      });
+    },
+  },
+  {
+    name: 'snapshot-notify',
+    file: '03_goedkeuringsproces/06_snapshots_mandaathouders_uitnodigen.png',
+    auth: true,
+    clip: '.fi-main',
+    // CANNOT BE REPRODUCED - the feature no longer exists.
+    //
+    // The original figure shows a "Notificatie versturen" bulk action on the
+    // Ondertekeningen tab. app/Livewire/Snapshot/Approvals.php now defines only
+    // one bulk action ("delete"); the snapshot_approval.notify translation
+    // string is still present but unused. Selecting a row does reveal a bulk
+    // action bar, but it only offers Verwijderen.
+    //
+    // This figure - and the manual text describing it - needs a product
+    // decision rather than a capture fix.
+    skip: true,
+    async shoot(page) {
+      await gotoSeededSnapshot(page, 'Ondertekeningen');
+      await page.locator('input[type=checkbox][x-on\\:click]').first().click();
+      await page.waitForSelector('text=/Notificatie versturen/i', { timeout: 15000 });
+      await page.evaluate(() => {
+        const btn = [...document.querySelectorAll('button')].find((b) =>
+          /Notificatie versturen/i.test(b.textContent || ''),
+        );
+        if (!btn) throw new Error('"Notificatie versturen" button not found');
+        window.__annotate.arrow(btn, { side: 'left', length: 130 });
       });
     },
   },
@@ -210,6 +299,9 @@ const FIGURES = [
     name: 'personal-approvals',
     file: '03_goedkeuringsproces/07_personal-snapshot-approvals_akkoord_geven.png',
     auth: true,
+    // "Mijn Ondertekeningen" only lists approvals assigned to the current user,
+    // and ScreenshotSeeder assigns the pending one to the mandate holder.
+    as: 'mandateholder',
     // The table section only; the page body below it is empty.
     clip: '.fi-ta',
     pad: 12,
@@ -287,6 +379,32 @@ async function gotoSeededRecord(page) {
   await page.waitForSelector('text=/Afhandelen burgervragen/i', { timeout: 30000 });
 }
 
+/** Switch the record edit page to its "Versies" tab. */
+async function openVersionsTab(page) {
+  await page.getByRole('tab', { name: /Versies/i }).first().click();
+  await page.waitForSelector('table tbody tr');
+  await page.waitForTimeout(500);
+}
+
+/**
+ * Open the in-review snapshot (version 2) that ScreenshotSeeder creates,
+ * optionally on one of its tabs.
+ */
+async function gotoSeededSnapshot(page, tab) {
+  const id = tinker(`
+    echo App\\Models\\Snapshot::query()
+      ->where("name", "Afhandelen burgervragen en klachten")
+      ->where("version", 2)
+      ->firstOrFail()->id;
+  `);
+  await page.goto(`${BASE}/${tenantOf(page)}/snapshots/${id}`, { waitUntil: 'networkidle' });
+  await page.waitForSelector('text=/Versie bekijken/i', { timeout: 30000 });
+  if (tab) {
+    await page.getByRole('tab', { name: new RegExp(tab, 'i') }).first().click();
+    await page.waitForTimeout(800);
+  }
+}
+
 async function gotoRegister(page) {
   await page.goto(`${BASE}/${tenantOf(page)}/avg-responsible-processing-records`, {
     waitUntil: 'networkidle',
@@ -294,8 +412,19 @@ async function gotoRegister(page) {
   await page.waitForSelector('table', { timeout: 15000 });
 }
 
-async function login(page) {
-  await page.goto(loginUrl(EMAIL), { waitUntil: 'networkidle' });
+/** Email of the seeded user a figure runs as. */
+function emailFor(as) {
+  if (as !== 'mandateholder') return EMAIL;
+  return tinker(`
+    echo App\\Models\\User::query()
+      ->where("name", "Marieke de Vries")
+      ->firstOrFail()->email;
+  `);
+}
+
+async function login(page, as) {
+  const email = emailFor(as);
+  await page.goto(loginUrl(email), { waitUntil: 'networkidle' });
   await page.getByRole('button', { name: /^Inloggen$/i }).first().click();
   await page.waitForLoadState('networkidle');
   if (page.url().includes('/login/consume')) {
@@ -307,7 +436,7 @@ async function login(page) {
   if (page.url().includes('two-factor-authentication')) {
     const code =
       process.env.OTP_FAKE === '0'
-        ? totp(tinker(`echo App\\Models\\User::where("email", "${EMAIL}")->firstOrFail()->otp_secret;`))
+        ? totp(tinker(`echo App\\Models\\User::where("email", "${email}")->firstOrFail()->otp_secret;`))
         : '000000';
     await page.locator('#code').fill(code);
     // Livewire form (action=null): clicking the button does not reliably submit.
@@ -348,16 +477,33 @@ const context = await browser.newContext({
 await context.addInitScript(annotate);
 
 const page = await context.newPage();
-let authed = false;
+// Which seeded user the current session belongs to; figures may need a
+// different one (`as: 'mandateholder'`), which forces a re-login.
+let authedAs = null;
 // Skipped figures are excluded from a full run but still selectable by name.
-const todo = FIGURES.filter((f) => (ONLY.length ? ONLY.includes(f.name) : !f.skip));
+// Group by user so each session is established once: logging in repeatedly
+// trips the OTP rate limit (3 attempts per 60s).
+const todo = FIGURES.filter((f) => (ONLY.length ? ONLY.includes(f.name) : !f.skip)).sort(
+  (a, b) => (a.as ?? '').localeCompare(b.as ?? ''),
+);
 const failures = [];
 
 for (const fig of todo) {
   try {
-    if (fig.auth && !authed) {
-      await login(page);
-      authed = true;
+    const wantedUser = fig.as ?? 'admin';
+    if (fig.auth && authedAs !== wantedUser) {
+      if (authedAs !== null) await context.clearCookies(); // drop the old session
+      try {
+        await login(page, fig.as);
+      } catch (e) {
+        // The OTP form allows 3 attempts per 60s; a second login within that
+        // window is rejected. Wait the window out and try once more.
+        if (!/OTP step did not pass/.test(e.message)) throw e;
+        console.log(`  (OTP rate limit hit, waiting 60s before retrying login)`);
+        await page.waitForTimeout(61000);
+        await login(page, fig.as);
+      }
+      authedAs = wantedUser;
     }
     await fig.shoot(page);
 

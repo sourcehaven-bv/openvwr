@@ -56,7 +56,20 @@
    *   top   -> points down     bottom -> points up
    * All four occur in the existing handleiding.
    */
-  function arrow(target, { side = 'left', length = 190, thickness = 18, gap = 14, color = ACCENT } = {}) {
+  function arrow(
+    target,
+    {
+      side = 'left',
+      length = 190,
+      thickness = 18,
+      gap = 14,
+      // Black with a white outline: readable on light backgrounds and on the
+      // primary buttons, which are themselves the accent colour.
+      color = '#111827',
+      outlineColor = '#fff',
+      outlineWidth = 3,
+    } = {},
+  ) {
     const t = resolve(target);
     const head = thickness * 2.1;
     const horizontal = side === 'left' || side === 'right';
@@ -105,11 +118,8 @@
     const base = forward ? span - head * 0.62 : head * 0.62;
     const tail = forward ? 0 : span;
 
-    // One continuous polygon rather than a rect plus a triangle: a single
-    // outline can then carry a white halo, which keeps the arrow readable when
-    // it overlaps something in the same colour (the accent is also the primary
-    // button colour). Two overlapping shapes would each stroke their own edge
-    // and leave a seam through the middle.
+    // One continuous polygon rather than a rect plus a triangle, so the outline
+    // below traces a single outer edge.
     const h = thickness / 2;
     const hh = head / 2;
     const pts = horizontal
@@ -135,9 +145,14 @@
     const arrowEl = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
     arrowEl.setAttribute('points', pts.map((p) => p.join(',')).join(' '));
     arrowEl.setAttribute('fill', color);
-    // NOTE: on a target the same colour as the accent (primary buttons are also
-    // #F84F39) the arrow tip has little contrast. Prefer pointing at such a
-    // button from a neutral background, or pass a different `color`.
+    // White outline around the whole shape. Because this is one polygon rather
+    // than a rect plus a triangle, the stroke traces the outer edge only - two
+    // overlapping shapes would each stroke their shared edge and leave a seam.
+    // paint-order puts the stroke behind the fill so it reads as a border.
+    arrowEl.setAttribute('stroke', outlineColor);
+    arrowEl.setAttribute('stroke-width', String(outlineWidth));
+    arrowEl.setAttribute('stroke-linejoin', 'round');
+    arrowEl.setAttribute('paint-order', 'stroke');
 
     svg.append(arrowEl);
     layer().appendChild(svg);

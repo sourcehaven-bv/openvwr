@@ -113,16 +113,22 @@ class ScreenshotSeeder extends Seeder
             'replaced_at' => null,
         ]);
 
+        // Prefer a dedicated mandate holder over the admin account, so the
+        // "Toegewezen aan" column shows a realistic name rather than "Admin".
         $mandateHolder = User::query()
             ->whereHas('organisationRoles', static function ($query) use ($organisation): void {
                 $query->where('organisation_id', $organisation->id)
                     ->where('role', Role::MANDATE_HOLDER->value);
             })
+            ->where('email', '!=', 'admin@example.com')
             ->first();
 
         if ($mandateHolder === null) {
             return;
         }
+
+        $mandateHolder->name = 'Marieke de Vries';
+        $mandateHolder->save();
 
         SnapshotApproval::factory()->create([
             'snapshot_id' => $inReview->id,
