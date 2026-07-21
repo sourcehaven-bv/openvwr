@@ -6,8 +6,7 @@ regenereer je de figuren in plaats van ze met de hand opnieuw te maken.
 
 ## Draaien
 
-Vereist een draaiende, geseede applicatie (zie
-[`docs/local_development_without_docker.md`](../../docs/local_development_without_docker.md)):
+Vereist een draaiende, geseede applicatie, met Sail of lokaal:
 
 ```bash
 cd src/cms
@@ -105,8 +104,7 @@ om een echte TOTP-code te laten berekenen uit het geseede secret.
 - Niet alle figuren uit de handleiding zijn geautomatiseerd. `FIGURES` bevat op
   dit moment een deel; de rest staat nog in de originele afbeeldingen.
 
-Twee instellingen zijn nodig voor de exportfiguren, beide in
-`.env.nodocker.example`:
+Twee `.env`-instellingen zijn nodig voor de exportfiguren:
 
 - `FILAMENT_FILESYSTEM_DISK=app` — standaard schrijft Filament naar een S3-disk
   die MinIO verwacht. Met de lokale disk is MinIO niet nodig.

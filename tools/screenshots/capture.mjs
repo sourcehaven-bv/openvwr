@@ -9,9 +9,8 @@
  * The app is passwordless: login is email -> signed magic link. Rather than
  * scrape mail, we mint a signed URL through artisan.
  *
- * Prerequisites: the app running locally (see
- * docs/local_development_without_docker.md), seeded with TestDataSeeder and
- * ScreenshotSeeder.
+ * Prerequisites: the app running locally, seeded with TestDataSeeder and
+ * ScreenshotSeeder. See tools/screenshots/README.md.
  *
  * Usage:
  *   node capture.mjs                     # all figures, into docs/handleiding/imgs
