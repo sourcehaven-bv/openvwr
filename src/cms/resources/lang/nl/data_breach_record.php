@@ -18,6 +18,7 @@ return [
 
     'number' => 'Nummer',
     'name' => 'Naam',
+    'state' => 'Status',
     'reported_at' => 'Datum melding',
     'type' => 'Type',
     'ap_reported' => 'Gemeld aan de autoriteit persoonsgegevens (AP)',

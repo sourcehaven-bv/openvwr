@@ -13,6 +13,8 @@ use App\Models\EntityNumber;
 use App\Models\FgRemark;
 use App\Models\Organisation;
 use App\Models\Responsible;
+use App\Models\States\DataBreachRecord\Reported;
+use App\Models\States\DataBreachRecordState;
 use App\Models\Wpg\WpgProcessingRecord;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -36,6 +38,7 @@ class DataBreachRecordFactory extends Factory
 
             'name' => $this->faker->word(),
             'type' => $this->faker->randomElement(__('data_breach_record.type_options')),
+            'state' => Reported::class,
             'reported_at' => $this->faker->optional()->date(),
             'ap_reported' => $this->faker->boolean(),
 
@@ -53,6 +56,16 @@ class DataBreachRecordFactory extends Factory
 
             'fg_reported' => $this->faker->boolean(),
         ];
+    }
+
+    /**
+     * @param class-string<DataBreachRecordState> $state
+     */
+    public function inState(string $state): self
+    {
+        return $this->state(function () use ($state): array {
+            return ['state' => $state];
+        });
     }
 
     /**
