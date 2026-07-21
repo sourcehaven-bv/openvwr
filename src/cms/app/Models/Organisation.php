@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Collections\Algorithm\AlgorithmMetaSchemaCollection;
 use App\Collections\Algorithm\AlgorithmPublicationCategoryCollection;
 use App\Collections\Algorithm\AlgorithmRecordCollection;
 use App\Collections\Algorithm\AlgorithmStatusCollection;
@@ -34,7 +33,6 @@ use App\Collections\Wpg\WpgProcessingRecordCollection;
 use App\Collections\Wpg\WpgProcessingRecordServiceCollection;
 use App\Components\Uuid\UuidInterface;
 use App\Enums\Media\MediaGroup;
-use App\Models\Algorithm\AlgorithmMetaSchema;
 use App\Models\Algorithm\AlgorithmPublicationCategory;
 use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Algorithm\AlgorithmStatus;
@@ -76,7 +74,6 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property int $review_at_default_in_months
  * @property string $slug
  *
- * @property-read AlgorithmMetaSchemaCollection $algorithmMetaSchemas
  * @property-read AlgorithmPublicationCategoryCollection $algorithmPublicationCategories
  * @property-read AlgorithmRecordCollection $algorithmRecords
  * @property-read AlgorithmStatusCollection $algorithmStatuses
@@ -149,14 +146,6 @@ class Organisation extends Model implements HasMedia
     public function avgGoals(): HasMany
     {
         return $this->hasMany(AvgGoal::class);
-    }
-
-    /**
-     * @return HasMany<AlgorithmMetaSchema, $this>
-     */
-    public function algorithmMetaSchemas(): HasMany
-    {
-        return $this->hasMany(AlgorithmMetaSchema::class);
     }
 
     /**

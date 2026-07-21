@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Models\Avg;
 
-use App\Models\Algorithm\AlgorithmMetaSchema;
 use App\Models\Algorithm\AlgorithmPublicationCategory;
 use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Algorithm\AlgorithmStatus;
@@ -18,6 +17,5 @@ it('can have algorithm themes', function (): void {
 
     expect($algorithmRecord->algorithmTheme)->toBeInstanceOf(AlgorithmTheme::class)
         ->and($algorithmRecord->algorithmStatus)->toBeInstanceOf(AlgorithmStatus::class)
-        ->and($algorithmRecord->algorithmPublicationCategory)->toBeInstanceOf(AlgorithmPublicationCategory::class)
-        ->and($algorithmRecord->algorithmMetaSchema)->toBeInstanceOf(AlgorithmMetaSchema::class);
+        ->and($algorithmRecord->algorithmPublicationCategory)->toBeInstanceOf(AlgorithmPublicationCategory::class);
 });
