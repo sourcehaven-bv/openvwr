@@ -34,8 +34,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $import_id
  * @property string $name
  * @property string|null $description
- * @property string|null $start_date
- * @property string|null $end_date
+ * @property CarbonImmutable|null $start_date
+ * @property CarbonImmutable|null $end_date
  * @property string|null $contact_data
  * @property string|null $source_link
  * @property string|null $public_page_link
@@ -56,7 +56,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $oper_data_title
  * @property string|null $oper_supplier
  * @property string|null $oper_source_code_link
- * @property string|null $meta_lang
  * @property string|null $meta_national_id
  * @property string|null $meta_source_id
  * @property string|null $meta_tags
@@ -122,7 +121,6 @@ class AlgorithmRecord extends Model implements Cloneable, EntityNumerable, Snaps
         'oper_supplier',
         'oper_source_code_link',
 
-        'meta_lang',
         'meta_national_id',
         'meta_source_id',
         'meta_tags',
@@ -143,6 +141,8 @@ class AlgorithmRecord extends Model implements Cloneable, EntityNumerable, Snaps
             'algorithm_status_id' => UuidCast::class,
             'algorithm_publication_category_id' => UuidCast::class,
             'public_from' => 'datetime',
+            'start_date' => 'date',
+            'end_date' => 'date',
             'meta_date_of_development' => 'date',
             'impact_with_consequences' => 'boolean',
             'impact_more_algorithms_applied' => 'boolean',

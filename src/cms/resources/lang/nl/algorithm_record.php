@@ -45,7 +45,7 @@ return [
     'oper_technical_operation' => 'Technische werking',
     'oper_supplier' => 'Leverancier',
     'oper_source_code_link' => 'Link naar broncode',
-    'meta_national_id' => 'Landelijk-ID',
+    'meta_national_id' => 'Extern registratienummer',
     'meta_source_id' => 'Bron-ID',
     'meta_tags' => 'Zoektermen',
     'meta_date_of_development' => 'Datum van ontwikkeling',
@@ -54,7 +54,7 @@ return [
     'impact_with_consequences' => 'Is er sprake van een proces met directe gevolgen voor burgers of organisaties?',
     'impact_more_algorithms_applied' => 'Worden er in dit proces één of meerdere algoritmes toegepast?',
     'impact_effect_on_outcome' => 'Heeft het algoritme een significant effect op de uitkomst van het proces?',
-    'impact_algorithm_message' => 'Alle drie de vragen zijn met "Ja" beantwoord, dit algoritme wordt aangemerkt als impactvol en opgenomen in het (rijksbrede) algoritmeregister.',
+    'impact_algorithm_message' => 'Alle drie de vragen zijn met "Ja" beantwoord, dit algoritme wordt aangemerkt als impactvol en opgenomen in het algoritmeregister.',
 
     'help_description' => 'Eén alinea in begrijpelijke taal voor een burger; maximaal 400 tekens.',
     'help_theme' => 'Het beleidsterrein waarop het algoritme wordt ingezet, bijvoorbeeld Openbare orde en veiligheid.',
