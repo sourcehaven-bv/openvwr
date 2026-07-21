@@ -49,6 +49,8 @@ return [
     'number_create_failed' => 'Het genereren van een (uniek) nummer is mislukt, probeer het opnieuw',
 
     'manual' => 'Handleiding',
+    'go_to_public_page' => 'Bekijk op de publieke website',
+    'edit' => 'Bewerken',
 
     'country' => 'Landen',
     'country_other' => 'Anders, namelijk:',

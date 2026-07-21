@@ -15,6 +15,7 @@ use App\Filament\Forms\Components\Select\ParentSelect;
 use App\Filament\Forms\Components\Select\SelectSingleWithLookup;
 use App\Filament\Forms\Components\SelectMultipleWithLookup;
 use App\Filament\Forms\Components\StakeholdersRepeater;
+use App\Filament\Forms\Components\TagsInput;
 use App\Filament\Forms\Components\TextInput\EntityNumber;
 use App\Filament\Forms\Components\TextInput\ImportNumber;
 use App\Filament\Forms\FormHelper;
@@ -65,6 +66,7 @@ class AvgProcessorProcessingRecordResourceFormSchemas
                 'name',
             )
                 ->label(__('avg_processor_processing_record_service.model_singular')),
+            TagsInput::make(),
             PeriodicReviewField::make(),
             ParentSelect::make()
                 ->hintIcon('heroicon-o-information-circle', __('general.parent_hint_icon_text')),

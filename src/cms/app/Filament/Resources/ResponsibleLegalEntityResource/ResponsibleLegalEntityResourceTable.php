@@ -26,9 +26,11 @@ class ResponsibleLegalEntityResourceTable
                 UpdatedAtColumn::make(),
             ])
             ->defaultSort('responsible_legal_entity.updated_at', 'desc')
+            ->actionsColumnLabel(__('general.edit'))
             ->actions([
                 EditAction::make()
-                    ->label(''),
+                    ->hiddenLabel()
+                    ->tooltip(static fn (EditAction $action) => $action->getLabel()),
             ])
             ->emptyStateHeading(__('responsible_legal_entity.table_empty_heading'))
             ->emptyStateDescription(null);

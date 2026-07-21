@@ -30,6 +30,7 @@ use App\Models\Concerns\HasSnapshots;
 use App\Models\Concerns\HasSoftDeletes;
 use App\Models\Concerns\HasStakeholders;
 use App\Models\Concerns\HasSystems;
+use App\Models\Concerns\HasTags;
 use App\Models\Concerns\HasTimestamps;
 use App\Models\Concerns\HasUsers;
 use App\Models\Concerns\HasUuidAsId;
@@ -111,6 +112,7 @@ class AvgProcessorProcessingRecord extends Model implements Cloneable, EntityNum
     use HasStakeholders;
     use HasSoftDeletes;
     use HasSystems;
+    use HasTags;
     use HasTimestamps;
     use HasUsers;
     use HasUuidAsId;

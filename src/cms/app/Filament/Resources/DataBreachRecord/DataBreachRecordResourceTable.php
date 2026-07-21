@@ -43,9 +43,11 @@ class DataBreachRecordResourceTable
             ->defaultSort('data_breach_records.updated_at', 'desc')
             ->emptyStateHeading(__('data_breach_record.table_empty_heading'))
             ->emptyStateDescription(null)
+            ->actionsColumnLabel(__('general.edit'))
             ->actions([
                 EditAction::make()
-                    ->label(''),
+                    ->hiddenLabel()
+                    ->tooltip(static fn (EditAction $action) => $action->getLabel()),
             ])
             ->filters([
                 TernaryFilter::make('ap_reported')

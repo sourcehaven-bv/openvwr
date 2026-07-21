@@ -1,4 +1,4 @@
-# Beheer
+# Beheer\label{Beheer}
 
 Het beheren van de applicatie bestaat uit het beheren van gebruikers binnen de organisatie.
 

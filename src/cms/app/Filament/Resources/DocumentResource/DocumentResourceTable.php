@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Filament\Resources\DocumentResource;
 
 use App\Facades\Authentication;
+use App\Filament\Resources\DocumentResource;
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\ExpiringDateColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
+use App\Models\Document;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
@@ -46,11 +48,16 @@ class DocumentResourceTable
                     ->multiple(),
             ])
             ->defaultSort('documents.updated_at', 'desc')
+            ->recordUrl(static function (Document $record): string {
+                return DocumentResource::getUrl('view', ['record' => $record]);
+            })
             ->emptyStateHeading(__('document.table_empty_heading'))
             ->emptyStateDescription(null)
+            ->actionsColumnLabel(__('general.edit'))
             ->actions([
                 EditAction::make()
-                    ->label(''),
+                    ->hiddenLabel()
+                    ->tooltip(static fn (EditAction $action) => $action->getLabel()),
             ])
             ->bulkActions([
                 DeleteBulkAction::make(),

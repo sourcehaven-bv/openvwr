@@ -7,6 +7,8 @@
             icon="heroicon-o-globe-alt"
             class="h-8 w-8 text-gray-500"
             alias="link"
+            role="img"
+            aria-label="{{ __('general.published_at') }}"
         />
     </a>
 </span>

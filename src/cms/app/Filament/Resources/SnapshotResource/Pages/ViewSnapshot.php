@@ -54,6 +54,10 @@ class ViewSnapshot extends ViewRecord
         $resource = Filament::getModelResource($snapshoutSource);
         $resourceUrl = $resource::getGlobalSearchResultUrl($snapshoutSource);
 
+        if ($resourceUrl === null) {
+            return [];
+        }
+
         return [
             $resourceUrl => __('snapshot.back_to', ['resource' => $resource::getModelLabel()]),
         ];

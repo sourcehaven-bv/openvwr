@@ -14,8 +14,7 @@ class UserDeleteWithoutOrganisation extends Command
 
     public function handle(): int
     {
-        $users = User::withoutGlobalScopes()
-            ->doesntHave('organisations')
+        $users = User::doesntHave('organisations')
             ->limit(100)
             ->get();
 
