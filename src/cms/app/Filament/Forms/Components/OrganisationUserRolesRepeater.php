@@ -10,7 +10,6 @@ use App\Models\User;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Toggle;
 use Webmozart\Assert\Assert;
 
 use function __;
@@ -63,20 +62,12 @@ class OrganisationUserRolesRepeater extends Repeater
      */
     private static function getOrganisationRoleToggles(string $name): array
     {
-        $organisationRoleToggleSections = [];
-
-        foreach (Role::organisationRoleGroups(true) as $organisationRoleGroup) {
-            $organisationRoleToggles = [];
-
-            foreach ($organisationRoleGroup as $organisationRole) {
-                $organisationRoleToggles[] = Toggle::make(sprintf('%s.%s', $name, $organisationRole->value))
-                    ->label(__(sprintf('role.%s', $organisationRole->value)));
-            }
-
-            $organisationRoleToggleSections[] = Section::make($organisationRoleToggles)->columns();
-        }
-
-        return $organisationRoleToggleSections;
+        return RoleToggle::organisationRoleSections(
+            true,
+            static function (Role $organisationRole) use ($name): string {
+                return sprintf('%s.%s', $name, $organisationRole->value);
+            },
+        );
     }
 
     /**

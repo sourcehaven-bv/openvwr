@@ -8,15 +8,13 @@ use App\Enums\Authorization\Role;
 use App\Models\User;
 use Filament\Forms\Components\Toggle;
 
-use function __;
 use function sprintf;
 
-class UserGlobalRoleToggle extends Toggle
+class UserGlobalRoleToggle extends RoleToggle
 {
     public static function makeForUser(string $name, User $user, Role $role): static
     {
-        return parent::make(sprintf('%s.%s', $name, $role->value))
-            ->label(__(sprintf('role.%s', $role->value)))
+        return parent::makeForRole(sprintf('%s.%s', $name, $role->value), $role)
             ->afterStateHydrated(static function (Toggle $component) use ($user, $role): void {
                 $hasRole = $user->globalRoles
                     ->pluck('role')

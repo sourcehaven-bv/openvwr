@@ -7,6 +7,7 @@ namespace App\Filament\Resources\OrganisationUserResource;
 use App\Enums\Authorization\Permission;
 use App\Enums\Authorization\Role;
 use App\Facades\Authorization;
+use App\Filament\Forms\Components\RoleToggle;
 use App\Models\OrganisationUserRole;
 use App\Models\User;
 use Filament\Forms\Components\Section;
@@ -15,7 +16,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 
 use function __;
-use function sprintf;
 
 class OrganisationUserResourceForm
 {
@@ -46,28 +46,23 @@ class OrganisationUserResourceForm
      */
     private static function getOrganisationRoleToggles(): array
     {
-        $organisationRoleToggleSections = [];
         $includeCpoRoles = Authorization::hasPermission(Permission::USER_ROLE_ORGANISATION_CPO_MANAGE);
 
-        foreach (Role::organisationRoleGroups($includeCpoRoles) as $organisationRoleGroup) {
-            $organisationRoleToggles = [];
+        return RoleToggle::organisationRoleSections(
+            $includeCpoRoles,
+            static function (Role $organisationRole): string {
+                return $organisationRole->value;
+            },
+            static function (RoleToggle $toggle, Role $organisationRole): Toggle {
+                return $toggle->formatStateUsing(static function (User $record) use ($organisationRole): bool {
+                    $organisationRoles = $record->organisationRoles
+                        ->map(static function (OrganisationUserRole $organisationUserRole): Role {
+                            return $organisationUserRole->role;
+                        });
 
-            foreach ($organisationRoleGroup as $organisationRole) {
-                $organisationRoleToggles[] = Toggle::make($organisationRole->value)
-                    ->label(__(sprintf('role.%s', $organisationRole->value)))
-                    ->formatStateUsing(static function (User $record) use ($organisationRole): bool {
-                        $organisationRoles = $record->organisationRoles
-                            ->map(static function (OrganisationUserRole $organisationUserRole): Role {
-                                return $organisationUserRole->role;
-                            });
-
-                        return $organisationRoles->contains($organisationRole);
-                    });
-            }
-
-            $organisationRoleToggleSections[] = Section::make($organisationRoleToggles)->columns();
-        }
-
-        return $organisationRoleToggleSections;
+                    return $organisationRoles->contains($organisationRole);
+                });
+            },
+        );
     }
 }

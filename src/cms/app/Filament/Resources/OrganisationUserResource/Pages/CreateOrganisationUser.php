@@ -8,6 +8,7 @@ use App\Enums\Authorization\Permission;
 use App\Enums\Authorization\Role;
 use App\Facades\Authentication;
 use App\Facades\Authorization;
+use App\Filament\Forms\Components\RoleToggle;
 use App\Filament\Pages\CreateRecord;
 use App\Filament\Resources\OrganisationUserResource;
 use App\Models\OrganisationUserRole;
@@ -15,7 +16,6 @@ use App\Models\User;
 use Closure;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
@@ -25,7 +25,6 @@ use Webmozart\Assert\Assert;
 
 use function __;
 use function in_array;
-use function sprintf;
 
 class CreateOrganisationUser extends CreateRecord
 {
@@ -91,21 +90,14 @@ class CreateOrganisationUser extends CreateRecord
      */
     private static function getOrganisationRoleToggles(): array
     {
-        $organisationRoleToggleSections = [];
         $includeCpoRoles = Authorization::hasPermission(Permission::USER_ROLE_ORGANISATION_CPO_MANAGE);
 
-        foreach (Role::organisationRoleGroups($includeCpoRoles) as $organisationRoleGroup) {
-            $organisationRoleToggles = [];
-
-            foreach ($organisationRoleGroup as $organisationRole) {
-                $organisationRoleToggles[] = Toggle::make($organisationRole->value)
-                    ->label(__(sprintf('role.%s', $organisationRole->value)));
-            }
-
-            $organisationRoleToggleSections[] = Section::make($organisationRoleToggles)->columns();
-        }
-
-        return $organisationRoleToggleSections;
+        return RoleToggle::organisationRoleSections(
+            $includeCpoRoles,
+            static function (Role $organisationRole): string {
+                return $organisationRole->value;
+            },
+        );
     }
 
     /**
