@@ -28,7 +28,8 @@ class ProcessingRecordContactPersons extends Group
                 })
                 ->rules([CurrentOrganisation::forModel(OrganisationUser::class, 'user_id')])
                 ->default([Authentication::user()->id->toString()])
-                ->label(__('contact_person.form_title_users')),
+                ->label(__('contact_person.form_title_users'))
+                ->helperText(__('contact_person.help_form_title_users')),
             SelectMultipleWithLookup::makeForRelationshipWithCreate(
                 'contactPersons',
                 'contactPersons',
@@ -36,7 +37,8 @@ class ProcessingRecordContactPersons extends Group
                 LookupListResourceForm::getSchema(),
                 'name',
             )
-                ->label(__('contact_person.form_title_contact_persons')),
+                ->label(__('contact_person.form_title_contact_persons'))
+                ->helperText(__('contact_person.help_form_title_contact_persons')),
         ]);
     }
 }

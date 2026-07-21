@@ -19,6 +19,11 @@ class ListWpgProcessingRecords extends ListRecords
 
     protected static string $resource = WpgProcessingRecordResource::class;
 
+    public function getSubheading(): string
+    {
+        return __('wpg_processing_record.register_description');
+    }
+
     protected function getHeaderActions(): array
     {
         return [

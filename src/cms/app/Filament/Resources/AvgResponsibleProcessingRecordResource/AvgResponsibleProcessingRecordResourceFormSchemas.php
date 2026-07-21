@@ -68,7 +68,8 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
                 AvgResponsibleProcessingRecordService::class,
                 'name',
             )
-                ->label(__('avg_responsible_processing_record_service.model_singular')),
+                ->label(__('avg_responsible_processing_record_service.model_singular'))
+                ->helperText(__('avg_responsible_processing_record.help_service')),
             TagsInput::make(),
             PeriodicReviewField::make(),
             ParentSelect::make()
@@ -97,7 +98,8 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
                 ->label(__('responsible.model_plural'))
                 ->required(),
             Textarea::make('responsibility_distribution')
-                ->label(__('avg_responsible_processing_record.responsibility_distribution')),
+                ->label(__('avg_responsible_processing_record.responsibility_distribution'))
+                ->helperText(__('avg_responsible_processing_record.help_responsibility_distribution')),
             InformationBlockSection::makeCollapsible(
                 __('information_blocks.avg_responsible_processing_record.step_responsible_title'),
                 __('information_blocks.avg_responsible_processing_record.step_responsible_info'),
@@ -201,10 +203,12 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
                 ->schema([
                     Textarea::make('logic')
                         ->label(__('avg_responsible_processing_record.logic'))
+                        ->helperText(__('avg_responsible_processing_record.help_logic'))
                         ->required(FormHelper::isFieldEnabled('decision_making')),
 
                     Textarea::make('importance_consequences')
                         ->label(__('avg_responsible_processing_record.importance_consequences'))
+                        ->helperText(__('avg_responsible_processing_record.help_importance_consequences'))
                         ->required(FormHelper::isFieldEnabled('decision_making')),
                 ]),
             InformationBlockSection::makeCollapsible(
@@ -263,11 +267,14 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
                     Section::make(__('processor.measures'))
                         ->schema([
                             Checkbox::make('measures_implemented')
-                                ->label(__('processor.measures_implemented')),
+                                ->label(__('processor.measures_implemented'))
+                                ->helperText(__('avg_responsible_processing_record.help_measures_implemented')),
                             Checkbox::make('other_measures')
-                                ->label(__('processor.other_measures')),
+                                ->label(__('processor.other_measures'))
+                                ->helperText(__('avg_responsible_processing_record.help_other_measures')),
                             Textarea::make('measures_description')
-                                ->label(__('processor.measures_description')),
+                                ->label(__('processor.measures_description'))
+                                ->helperText(__('avg_responsible_processing_record.help_measures_description')),
                         ]),
 
                     Section::make()
@@ -278,6 +285,7 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
                                 ->live(),
                             Textarea::make('pseudonymization')
                                 ->label(__('avg_responsible_processing_record.pseudonymization'))
+                                ->helperText(__('avg_responsible_processing_record.help_pseudonymization'))
                                 ->visible(FormHelper::isFieldEnabled('has_pseudonymization')),
                         ]),
                 ]),
@@ -318,7 +326,8 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
                                 ->visible(FormHelper::isFieldDisabled('outside_eu_protection_level')),
 
                             Textarea::make('outside_eu_description')
-                                ->label(__('avg_responsible_processing_record.outside_eu_description')),
+                                ->label(__('avg_responsible_processing_record.outside_eu_description'))
+                                ->helperText(__('avg_responsible_processing_record.help_outside_eu_description')),
                         ]),
                 ]),
             InformationBlockSection::makeCollapsible(
@@ -337,6 +346,7 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
         return [
             Toggle::make('geb_dpia_executed')
                 ->label(__('avg_responsible_processing_record.geb_dpia_executed'))
+                ->helperText(__('avg_responsible_processing_record.help_geb_dpia_executed'))
                 ->live(),
             Toggle::make('geb_dpia_automated')
                 ->label(__('avg_responsible_processing_record.geb_dpia_automated'))

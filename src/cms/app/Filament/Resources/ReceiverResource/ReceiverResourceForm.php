@@ -26,6 +26,7 @@ class ReceiverResourceForm
         return [
             Textarea::make('description')
                 ->label(__('receiver.description'))
+                ->helperText(__('receiver.help_description'))
                 ->required()
                 ->maxLength(255),
         ];

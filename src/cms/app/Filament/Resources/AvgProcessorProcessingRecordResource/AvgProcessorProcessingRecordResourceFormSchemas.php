@@ -65,7 +65,8 @@ class AvgProcessorProcessingRecordResourceFormSchemas
                 AvgProcessorProcessingRecordService::class,
                 'name',
             )
-                ->label(__('avg_processor_processing_record_service.model_singular')),
+                ->label(__('avg_processor_processing_record_service.model_singular'))
+                ->helperText(__('avg_processor_processing_record.help_service')),
             TagsInput::make(),
             PeriodicReviewField::make(),
             ParentSelect::make()
@@ -109,6 +110,7 @@ class AvgProcessorProcessingRecordResourceFormSchemas
         return [
             Toggle::make('has_processors')
                 ->label(__('avg_processor_processing_record.has_subprocessors'))
+                ->helperText(__('avg_processor_processing_record.help_has_subprocessors'))
                 ->default(false)
                 ->live(),
 
@@ -210,11 +212,13 @@ class AvgProcessorProcessingRecordResourceFormSchemas
                 ->schema([
                     Textarea::make('logic')
                         ->required(FormHelper::isFieldEnabled('decision_making'))
-                        ->label(__('avg_processor_processing_record.logic')),
+                        ->label(__('avg_processor_processing_record.logic'))
+                        ->helperText(__('avg_processor_processing_record.help_logic')),
 
                     Textarea::make('importance_consequences')
                         ->required(FormHelper::isFieldEnabled('decision_making'))
-                        ->label(__('avg_processor_processing_record.importance_consequences')),
+                        ->label(__('avg_processor_processing_record.importance_consequences'))
+                        ->helperText(__('avg_processor_processing_record.help_importance_consequences')),
                 ]),
             InformationBlockSection::makeCollapsible(
                 __('information_blocks.avg_processor_processing_record.step_decision_making_title'),
@@ -272,11 +276,14 @@ class AvgProcessorProcessingRecordResourceFormSchemas
                     Section::make(__('processor.measures'))
                         ->schema([
                             Checkbox::make('measures_implemented')
-                                ->label(__('processor.measures_implemented')),
+                                ->label(__('processor.measures_implemented'))
+                                ->helperText(__('avg_processor_processing_record.help_measures_implemented')),
                             Checkbox::make('other_measures')
-                                ->label(__('processor.other_measures')),
+                                ->label(__('processor.other_measures'))
+                                ->helperText(__('avg_processor_processing_record.help_other_measures')),
                             Textarea::make('measures_description')
-                                ->label(__('processor.measures_description')),
+                                ->label(__('processor.measures_description'))
+                                ->helperText(__('avg_processor_processing_record.help_measures_description')),
                         ]),
 
                     Section::make(__('avg_processor_processing_record.section_pseudonymization'))
@@ -287,6 +294,7 @@ class AvgProcessorProcessingRecordResourceFormSchemas
                                 ->live(),
                             Textarea::make('pseudonymization')
                                 ->label(__('avg_processor_processing_record.pseudonymization'))
+                                ->helperText(__('avg_processor_processing_record.help_pseudonymization'))
                                 ->default('')
                                 ->required(FormHelper::isFieldEnabled('has_pseudonymization'))
                                 ->visible(FormHelper::isFieldEnabled('has_pseudonymization')),
@@ -328,7 +336,8 @@ class AvgProcessorProcessingRecordResourceFormSchemas
                         ->visible(FormHelper::isFieldDisabled('outside_eu_protection_level')),
 
                     Textarea::make('outside_eu_description')
-                        ->label(__('avg_processor_processing_record.outside_eu_description')),
+                        ->label(__('avg_processor_processing_record.outside_eu_description'))
+                        ->helperText(__('avg_processor_processing_record.help_outside_eu_description')),
                 ]),
             InformationBlockSection::makeCollapsible(
                 __('information_blocks.avg_processor_processing_record.step_passthrough_title'),

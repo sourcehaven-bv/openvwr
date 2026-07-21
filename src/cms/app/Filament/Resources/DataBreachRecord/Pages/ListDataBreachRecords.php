@@ -19,6 +19,11 @@ class ListDataBreachRecords extends ListRecords
 
     protected static string $resource = DataBreachRecordResource::class;
 
+    public function getSubheading(): string
+    {
+        return __('data_breach_record.register_description');
+    }
+
     protected function getHeaderActions(): array
     {
         return [

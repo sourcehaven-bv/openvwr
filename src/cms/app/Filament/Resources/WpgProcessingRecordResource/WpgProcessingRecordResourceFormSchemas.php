@@ -62,7 +62,8 @@ class WpgProcessingRecordResourceFormSchemas
                 WpgProcessingRecordService::class,
                 'name',
             )
-                ->label(__('wpg_processing_record_service.model_singular')),
+                ->label(__('wpg_processing_record_service.model_singular'))
+                ->helperText(__('wpg_processing_record.help_service')),
             TagsInput::make(),
             PeriodicReviewField::make(),
             ParentSelect::make()
@@ -140,7 +141,8 @@ class WpgProcessingRecordResourceFormSchemas
                     Toggle::make('article_15_a')
                         ->label(__('wpg_processing_record.article_15_a')),
                     Textarea::make('explanation_available')
-                        ->label(__('wpg_processing_record.explanation_available')),
+                        ->label(__('wpg_processing_record.explanation_available'))
+                        ->helperText(__('wpg_processing_record.help_explanation_available')),
                 ]),
             Section::make(__('wpg_processing_record.help_receiver_third_party'))
                 ->schema([
@@ -151,17 +153,21 @@ class WpgProcessingRecordResourceFormSchemas
                     Toggle::make('article_18')
                         ->label(__('wpg_processing_record.article_18')),
                     Toggle::make('article_19')
-                        ->label(__('wpg_processing_record.article_19')),
+                        ->label(__('wpg_processing_record.article_19'))
+                        ->helperText(__('wpg_processing_record.help_article_19')),
                     Toggle::make('article_20')
                         ->label(__('wpg_processing_record.article_20')),
                     Toggle::make('article_22')
                         ->label(__('wpg_processing_record.article_22')),
                     Toggle::make('article_23')
-                        ->label(__('wpg_processing_record.article_23')),
+                        ->label(__('wpg_processing_record.article_23'))
+                        ->helperText(__('wpg_processing_record.help_article_23')),
                     Toggle::make('article_24')
-                        ->label(__('wpg_processing_record.article_24')),
+                        ->label(__('wpg_processing_record.article_24'))
+                        ->helperText(__('wpg_processing_record.help_article_24')),
                     Textarea::make('explanation_provisioning')
-                        ->label(__('wpg_processing_record.explanation_provisioning')),
+                        ->label(__('wpg_processing_record.explanation_provisioning'))
+                        ->helperText(__('wpg_processing_record.help_explanation_provisioning')),
                 ]),
             Section::make(__('wpg_processing_record.help_receiver_transfer'))
                 ->schema([
@@ -170,6 +176,7 @@ class WpgProcessingRecordResourceFormSchemas
                         ->live(),
                     Textarea::make('explanation_transfer')
                         ->label(__('wpg_processing_record.explanation_transfer'))
+                        ->helperText(__('wpg_processing_record.help_explanation_transfer'))
                         ->required()
                         ->visible(FormHelper::isFieldEnabled('article_17_a')),
                 ]),
@@ -250,6 +257,7 @@ class WpgProcessingRecordResourceFormSchemas
                             Textarea::make('consequences')
                                 ->maxLength(255)
                                 ->label(__('wpg_processing_record.consequences'))
+                                ->helperText(__('wpg_processing_record.help_consequences'))
                                 ->required(),
                         ]),
                     InformationBlockSection::makeCollapsible(
@@ -309,11 +317,14 @@ class WpgProcessingRecordResourceFormSchemas
                     Section::make(__('processor.measures'))
                         ->schema([
                             Checkbox::make('measures_implemented')
-                                ->label(__('processor.measures_implemented')),
+                                ->label(__('processor.measures_implemented'))
+                                ->helperText(__('wpg_processing_record.help_measures_implemented')),
                             Checkbox::make('other_measures')
-                                ->label(__('processor.other_measures')),
+                                ->label(__('processor.other_measures'))
+                                ->helperText(__('wpg_processing_record.help_other_measures')),
                             Textarea::make('measures_description')
-                                ->label(__('processor.measures_description')),
+                                ->label(__('processor.measures_description'))
+                                ->helperText(__('wpg_processing_record.help_measures_description')),
                         ]),
 
                     Section::make()
@@ -324,6 +335,7 @@ class WpgProcessingRecordResourceFormSchemas
                                 ->live(),
                             Textarea::make('pseudonymization')
                                 ->label(__('wpg_processing_record.pseudonymization'))
+                                ->helperText(__('wpg_processing_record.help_pseudonymization'))
                                 ->visible(FormHelper::isFieldEnabled('has_pseudonymization')),
                         ]),
                 ]),
@@ -419,15 +431,18 @@ class WpgProcessingRecordResourceFormSchemas
                     Toggle::make('convicts')
                         ->label(__('wpg_processing_record.convicts')),
                     Toggle::make('police_justice')
-                        ->label(__('wpg_processing_record.police_justice')),
+                        ->label(__('wpg_processing_record.police_justice'))
+                        ->helperText(__('wpg_processing_record.help_police_justice')),
                     Toggle::make('third_parties')
                         ->label(__('wpg_processing_record.third_parties'))
+                        ->helperText(__('wpg_processing_record.help_third_parties'))
                         ->live(),
 
                     Textarea::make('third_party_explanation')
                         ->required()
                         ->placeholder(__('wpg_processing_record.third_party_explanation'))
                         ->label(__('wpg_processing_record.third_party_explanation'))
+                        ->helperText(__('wpg_processing_record.help_third_party_explanation'))
                         ->visible(FormHelper::isFieldEnabled('third_parties')),
                 ]),
             InformationBlockSection::makeCollapsible(

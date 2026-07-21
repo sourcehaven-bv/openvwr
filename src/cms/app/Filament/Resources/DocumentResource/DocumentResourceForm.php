@@ -57,13 +57,16 @@ class DocumentResourceForm
                     ->required()
                     ->maxLength(255),
                 SelectSingleWithLookup::makeWithDisabledOptions('document_type_id', 'documentType', DocumentType::class, 'name')
-                    ->label(__('document.type')),
+                    ->label(__('document.type'))
+                    ->helperText(__('document.help_type')),
                 DatePicker::make('expires_at')
                     ->label(__('document.expires_at'))
+                    ->helperText(__('document.help_expires_at'))
                     ->live()
                     ->validationMessages(['required_unless' => __('document.expires_at_required_unless')]),
                 DatePicker::make('notify_at')
                     ->label(__('document.notify_at'))
+                    ->helperText(__('document.help_notify_at'))
                     ->hintAction(
                         Action::make('notify_at_expires_at')
                             ->label(__('document.notification_options.expires_at'))
@@ -126,7 +129,6 @@ class DocumentResourceForm
     private static function getAttachProcessingRecordsSection(): Section
     {
         return Section::make(__('document.attach_processing_records'))
-            ->label('foo')
             ->collapsible()
             ->collapsed()
             ->schema([

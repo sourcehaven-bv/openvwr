@@ -6,6 +6,7 @@ return [
     'model_singular' => 'Verwerking AVG Verwerker',
     'model_plural' => 'Verwerkingen AVG Verwerker',
     'table_empty_heading' => 'Geen Verwerkingen AVG Verwerkers',
+    'register_description' => 'Verwerkingen van persoonsgegevens die uw organisatie in opdracht van een andere verantwoordelijke uitvoert.',
 
     'step_processing_name' => 'Naam verwerking',
     'step_responsible' => 'Verwerkingsverantwoordelijke',
@@ -36,6 +37,18 @@ return [
     'help_has_involved' => 'Is er sprake van een (of meerdere) categorieën van betrokkenen?',
     'help_decision_making' => 'Is er sprake van geautomatiseerde besluitvorming?',
     'help_geb_pia' => 'Is er een GEB (DPIA) door de verantwoordelijke uitgevoerd?',
+
+    'help_service' => 'De dienst of afdeling die deze verwerking voor de verantwoordelijke uitvoert.',
+    'help_has_subprocessors' => 'Is er sprake van (een of meerdere) subverwerkers?',
+    'help_logic' => 'Welke gegevens tot welk besluit leiden, begrijpelijk beschreven en zonder technische details.',
+    'help_importance_consequences' => 'Wat het besluit concreet voor de betrokkene betekent, bijvoorbeeld toekenning of afwijzing.',
+    'help_measures_implemented' => 'Alleen aanvinken als het beleid formeel is vastgesteld én in de praktijk wordt toegepast.',
+    'help_other_measures' => 'Aanvinken als er maatregelen zijn buiten het vastgestelde beveiligingsbeleid.',
+    'help_measures_description' => 'De concrete maatregelen, bijvoorbeeld versleuteling, autorisatiematrix of toegangscontrole.',
+    'help_pseudonymization' => 'Hoe gegevens zijn vervangen door kenmerken die niet direct naar een persoon herleidbaar zijn.',
+    'help_outside_eu_description' => 'Welke gegevens worden doorgegeven en met welk doel.',
+    'help_users' => 'Wie als eerste benaderd wordt bij vragen over deze verwerking.',
+    'help_contact_persons' => 'Aanvullende contactpersonen, bijvoorbeeld de beheerder van het systeem.',
 
     'responsibility_distribution' => '',
     'pseudonymization' => 'Toelichting',

@@ -30,6 +30,8 @@ return [
     'save' => 'Opslaan',
     'saved' => 'Opgeslagen',
 
+    'help_country' => 'De landen buiten de EER waarnaar persoonsgegevens worden doorgegeven.',
+
     'parent' => 'Hoofdverwerking',
     'parent_hint_icon_text' => 'Indien deze verwerking een subverwerking is van een hoofdverwerking kunt u de hoofdverwerking hier aangeven. Bij de hoofdverwerking zijn alle subverwerkingen te vinden in de tabel "Subverwerkingen" onderaan deze pagina.',
     'child' => 'Subverwerking',

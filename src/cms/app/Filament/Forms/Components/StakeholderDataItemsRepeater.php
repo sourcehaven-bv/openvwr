@@ -54,18 +54,21 @@ class StakeholderDataItemsRepeater extends Repeater
                 ->maxLength(512),
             Textarea::make('collection_purpose')
                 ->label(__('stakeholder_data_item.collection_purpose'))
+                ->helperText(__('stakeholder_data_item.help_collection_purpose'))
                 ->required()
                 ->rows(3)
                 ->columnSpanFull()
                 ->maxLength(512),
             Textarea::make('retention_period')
                 ->label(__('stakeholder_data_item.retention_period'))
+                ->helperText(__('stakeholder_data_item.help_retention_period'))
                 ->required()
                 ->rows(3)
                 ->columnSpanFull()
                 ->maxLength(512),
             Textarea::make('source_description')
                 ->label(__('stakeholder_data_item.source_description'))
+                ->helperText(__('stakeholder_data_item.help_source_description'))
                 ->required()
                 ->rows(3)
                 ->columnSpanFull()
@@ -75,6 +78,7 @@ class StakeholderDataItemsRepeater extends Repeater
                 ->live(),
             Textarea::make('stakeholder_consequences')
                 ->label(__('stakeholder_data_item.stakeholder_consequences'))
+                ->helperText(__('stakeholder_data_item.help_stakeholder_consequences'))
                 ->required(FormHelper::isFieldEnabled('is_stakeholder_mandatory'))
                 ->rows(3)
                 ->columnSpanFull()

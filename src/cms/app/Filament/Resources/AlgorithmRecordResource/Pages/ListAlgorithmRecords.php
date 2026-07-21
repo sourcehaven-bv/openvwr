@@ -19,6 +19,11 @@ class ListAlgorithmRecords extends ListRecords
 
     protected static string $resource = AlgorithmRecordResource::class;
 
+    public function getSubheading(): string
+    {
+        return __('algorithm_record.register_description');
+    }
+
     protected function getHeaderActions(): array
     {
         return [

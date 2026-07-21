@@ -37,7 +37,8 @@ class ContactPersonResourceForm
                 ContactPersonPosition::class,
                 'name',
             )
-                ->label(__('contact_person_position.model_singular')),
+                ->label(__('contact_person_position.model_singular'))
+                ->helperText(__('contact_person.help_position')),
             TextInput::make('email')
                 ->label(__('contact_person.email'))
                 ->email()

@@ -23,6 +23,13 @@ return [
     'allowed_ips' => 'Toegestane IP-adressen',
     'review_at_default_in_months' => 'Standaard periode voor periodieke review (in maanden)',
     'public_website_content' => 'Tekst publieke website',
+
+    'help_slug' => 'Bepaalt het webadres van het portaal; gebruik alleen kleine letters en koppeltekens.',
+    'help_allowed_ips' => 'Eén IP-adres, reeks of CIDR-notatie per regel; geldt niet voor de inlogpagina zelf.',
+    'help_review_at_default_in_months' => 'Wordt toegepast zodra een versie wordt vastgesteld en de reviewdatum nog leeg is.',
+    'help_responsible_legal_entity' => 'De rechtspersoon waaronder deze organisatie valt.',
+    'help_public_website_content' => 'Introductietekst boven de registers op de publieke website.',
+    'help_poster' => 'Afbeelding bovenaan de publieke website; een liggende afbeelding werkt het beste.',
     'entity_number_prefix' => 'Prefix',
     'register_entity_number_prefix' => 'Verwerking prefix',
     'databreach_entity_number_prefix' => 'Datalek prefix',

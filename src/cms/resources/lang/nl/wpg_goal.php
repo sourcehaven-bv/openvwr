@@ -20,4 +20,13 @@ return [
     'article_13_3' => 'Art. 13, lid 3: Geautomatiseerde vergelijking',
     'article_required_message' => 'Ten minste 1 artikel is verplicht',
     'explanation' => 'Uitleg',
+
+    'help_description' => 'Welke politiegegevens voor welk doel worden verwerkt.',
+    'help_article_8' => 'De dagelijkse politietaak: binnenkomende signalen en meldingen die worden afgehandeld.',
+    'help_article_9' => 'Een specifiek onderzoek naar een concreet strafbaar feit, met een afgebakende onderzoeksvraag.',
+    'help_article_10_1b' => 'Verwerking rond een maatschappelijk verschijnsel in plaats van één concreet strafbaar feit.',
+    'help_article_10_1c' => 'Verwerking door de Regionale Inlichtingendienst ten behoeve van de openbare orde.',
+    'help_article_13_2' => 'Gegevens over een specialistisch onderwerp, bijvoorbeeld verkeer of milieu.',
+    'help_article_13_3' => 'Het geautomatiseerd vergelijken van gegevensbestanden met elkaar.',
+    'help_explanation' => 'Waarom de aangevinkte artikelen op deze verwerking van toepassing zijn.',
 ];

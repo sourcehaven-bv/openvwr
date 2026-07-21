@@ -48,14 +48,17 @@ class DataBreachRecordResourceFormSchemas
                 ->required()
                 ->maxLength(255),
             DatePicker::make('reported_at')
-                ->label(__('data_breach_record.reported_at')),
+                ->label(__('data_breach_record.reported_at'))
+                ->helperText(__('data_breach_record.help_reported_at')),
             Radio::make('type')
                 ->label(__('data_breach_record.type'))
+                ->helperText(__('data_breach_record.help_type'))
                 ->options(FormHelper::setValueAsKey($typeOptions))
                 ->default(Arr::first($typeOptions))
                 ->required(),
             Toggle::make('ap_reported')
-                ->label(__('data_breach_record.ap_reported')),
+                ->label(__('data_breach_record.ap_reported'))
+                ->helperText(__('data_breach_record.help_ap_reported')),
             InformationBlockSection::makeCollapsible(
                 __('information_blocks.data_breach_record.step_name_title'),
                 __('information_blocks.data_breach_record.step_name_info'),
@@ -93,15 +96,19 @@ class DataBreachRecordResourceFormSchemas
         return [
             DatePicker::make('discovered_at')
                 ->label(__('data_breach_record.discovered_at'))
+                ->helperText(__('data_breach_record.help_discovered_at'))
                 ->required(),
             DatePicker::make('started_at')
-                ->label(__('data_breach_record.started_at')),
+                ->label(__('data_breach_record.started_at'))
+                ->helperText(__('data_breach_record.help_started_at')),
             DatePicker::make('ended_at')
-                ->label(__('data_breach_record.ended_at')),
+                ->label(__('data_breach_record.ended_at'))
+                ->helperText(__('data_breach_record.help_ended_at')),
             DatePicker::make('ap_reported_at')
                 ->label(__('data_breach_record.ap_reported_at')),
             DatePicker::make('completed_at')
-                ->label(__('data_breach_record.completed_at')),
+                ->label(__('data_breach_record.completed_at'))
+                ->helperText(__('data_breach_record.help_completed_at')),
             InformationBlockSection::makeCollapsible(
                 __('information_blocks.data_breach_record.step_dates_title'),
                 __('information_blocks.data_breach_record.step_dates_info'),
@@ -129,6 +136,7 @@ class DataBreachRecordResourceFormSchemas
         return [
             Radio::make('nature_of_incident')
                 ->label(__('data_breach_record.nature_of_incident'))
+                ->helperText(__('data_breach_record.help_nature_of_incident'))
                 ->options(FormHelper::setValueAsKey($natureOfIncidentOptions))
                 ->live(),
             Textarea::make('nature_of_incident_other')
@@ -136,9 +144,11 @@ class DataBreachRecordResourceFormSchemas
                 ->visible(FormHelper::fieldValueEquals(['nature_of_incident' => 'Overig'])),
             Textarea::make('summary')
                 ->label(__('data_breach_record.summary'))
+                ->helperText(__('data_breach_record.help_summary'))
                 ->required(),
             Textarea::make('involved_people')
                 ->label(__('data_breach_record.involved_people'))
+                ->helperText(__('data_breach_record.help_involved_people'))
                 ->required(),
             CheckboxList::makeWithValidatedOptions('personal_data_categories', FormHelper::setValueAsKey($personalDataCategoriesOptions))
                 ->label(__('data_breach_record.personal_data_categories'))
@@ -151,15 +161,19 @@ class DataBreachRecordResourceFormSchemas
                 FormHelper::setValueAsKey($personalDataSpecialCategoriesOptions),
             )
                 ->label(__('data_breach_record.personal_data_special_categories'))
+                ->helperText(__('data_breach_record.help_personal_data_special_categories'))
                 ->live(),
             Textarea::make('estimated_risk')
                 ->label(__('data_breach_record.estimated_risk'))
+                ->helperText(__('data_breach_record.help_estimated_risk'))
                 ->required(),
             Textarea::make('measures')
                 ->label(__('data_breach_record.measures'))
+                ->helperText(__('data_breach_record.help_measures'))
                 ->required(),
             Toggle::make('reported_to_involved')
                 ->label(__('data_breach_record.reported_to_involved'))
+                ->helperText(__('data_breach_record.help_reported_to_involved'))
                 ->live(),
             CheckboxList::makeWithValidatedOptions(
                 'reported_to_involved_communication',
@@ -172,7 +186,8 @@ class DataBreachRecordResourceFormSchemas
                 ->label(__('data_breach_record.reported_to_involved_communication_other'))
                 ->visible(FormHelper::fieldValuesContainValue('reported_to_involved_communication', 'Anders')),
             Toggle::make('fg_reported')
-                ->label(__('data_breach_record.fg_reported')),
+                ->label(__('data_breach_record.fg_reported'))
+                ->helperText(__('data_breach_record.help_fg_reported')),
             InformationBlockSection::makeCollapsible(
                 __('information_blocks.data_breach_record.step_incident_title'),
                 __('information_blocks.data_breach_record.step_incident_info'),

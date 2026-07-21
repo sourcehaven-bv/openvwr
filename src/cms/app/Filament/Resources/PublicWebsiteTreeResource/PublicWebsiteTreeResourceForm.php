@@ -31,6 +31,7 @@ class PublicWebsiteTreeResourceForm
                     ->maxLength(255),
                 TextInput::make('slug')
                     ->label(__('public_website_tree.slug'))
+                    ->helperText(__('public_website_tree.help_slug'))
                     ->afterStateUpdated(static function (Set $set, string $state): void {
                         $set('slug', Str::slug($state));
                     })
@@ -39,6 +40,7 @@ class PublicWebsiteTreeResourceForm
                     ->unique(ignoreRecord: true),
                 TextInput::make('public_url')
                     ->label(__('public_website_tree.public_url'))
+                    ->helperText(__('public_website_tree.help_public_url'))
                     ->url()
                     ->maxLength(255),
                 PublicFromField::makeForModel(PublicWebsiteTree::class)

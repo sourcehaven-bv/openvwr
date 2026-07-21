@@ -6,6 +6,7 @@ return [
     'model_singular' => 'Datalek',
     'model_plural' => 'Datalekken',
     'table_empty_heading' => 'Geen datalekken',
+    'register_description' => 'Inbreuken op de beveiliging van persoonsgegevens, inclusief de melding aan de Autoriteit Persoonsgegevens.',
 
     'step_name' => 'Naam datalek',
     'step_responsible' => 'Verantwoordelijke',
@@ -20,6 +21,24 @@ return [
     'reported_at' => 'Datum melding',
     'type' => 'Type',
     'ap_reported' => 'Gemeld aan de autoriteit persoonsgegevens (AP)',
+
+    'help_reported_at' => 'De datum waarop het datalek intern is gemeld.',
+    'help_type' => 'Kies Voorlopig zolang het onderzoek loopt en Definitief zodra alle gegevens bekend zijn.',
+    'help_ap_reported' => 'Bij het opslaan ontvangen de Chief Privacy Officers en Functionarissen Gegevensbescherming hierover automatisch een e-mail.',
+    'help_responsible' => 'De partij die het doel en de middelen van de getroffen verwerking bepaalt.',
+    'help_discovered_at' => 'Het moment waarop het datalek intern is ontdekt; dit is het startpunt voor de meldtermijn.',
+    'help_started_at' => 'Een schatting volstaat als de exacte datum niet bekend is.',
+    'help_ended_at' => 'De datum waarop het lek is gedicht.',
+    'help_completed_at' => 'De datum waarop het onderzoek en de maatregelen zijn afgerond.',
+    'help_nature_of_incident' => 'Wat er feitelijk is gebeurd, bijvoorbeeld verkeerd verzonden of kwijtgeraakte gegevens.',
+    'help_summary' => 'Wat er is gebeurd, wanneer het speelde en hoe het is ontdekt.',
+    'help_involved_people' => 'Om welke groep het gaat en om hoeveel personen ongeveer.',
+    'help_personal_data_special_categories' => 'Bijzondere gegevens verhogen het risico en daarmee de kans op een meldplicht.',
+    'help_estimated_risk' => 'De gevolgen voor de betrokkenen; bij een hoog risico moeten zij zelf geïnformeerd worden.',
+    'help_measures' => 'Zowel de directe maatregelen als de maatregelen om herhaling te voorkomen.',
+    'help_reported_to_involved' => 'Verplicht wanneer het datalek waarschijnlijk een hoog risico voor de betrokkenen oplevert.',
+    'help_fg_reported' => 'De Functionaris Gegevensbescherming moet bij ieder datalek betrokken worden.',
+    'help_processing_records' => 'De verwerkingen waarvan gegevens bij dit datalek betrokken zijn.',
 
     'type_options' => [
         'Voorlopig',

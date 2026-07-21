@@ -28,6 +28,7 @@ class OutsideEuCountryInputGroup extends Group
             ->schema([
                 Select::make('country')
                     ->label(__('general.country'))
+                    ->helperText(__('general.help_country'))
                     ->live()
                     ->options(FormHelper::setValueAsKey($countryOptions))
                     ->in($countryOptions),

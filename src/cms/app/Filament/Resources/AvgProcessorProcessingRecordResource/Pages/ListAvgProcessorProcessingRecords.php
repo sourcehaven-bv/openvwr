@@ -19,6 +19,11 @@ class ListAvgProcessorProcessingRecords extends ListRecords
 
     protected static string $resource = AvgProcessorProcessingRecordResource::class;
 
+    public function getSubheading(): string
+    {
+        return __('avg_processor_processing_record.register_description');
+    }
+
     protected function getHeaderActions(): array
     {
         return [
