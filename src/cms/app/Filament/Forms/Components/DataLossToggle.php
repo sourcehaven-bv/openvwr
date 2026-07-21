@@ -93,9 +93,13 @@ class DataLossToggle extends Toggle
      */
     private static function mountConfirmation(Component $livewire, string $statePath, string $actionName): void
     {
+        // Every Filament page that renders a form has this trait, so this guard is
+        // unreachable in practice; it only keeps the call type-safe.
+        // @codeCoverageIgnoreStart
         if (!method_exists($livewire, 'mountFormComponentAction')) {
             return;
         }
+        // @codeCoverageIgnoreEnd
 
         $livewire->mountFormComponentAction($statePath, $actionName);
     }
@@ -116,9 +120,13 @@ class DataLossToggle extends Toggle
                 continue;
             }
 
+            // Only relationship fields (always arrays) are wired up today; this branch
+            // keeps scalar dependent fields working when one is added.
+            // @codeCoverageIgnoreStart
             if (filled($value)) {
                 return true;
             }
+            // @codeCoverageIgnoreEnd
         }
 
         return false;

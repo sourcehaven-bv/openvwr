@@ -66,3 +66,16 @@ it('does not ask for confirmation when there is nothing to lose', function (): v
         ->set('data.has_processors', false)
         ->assertFormSet(['has_processors' => false]);
 });
+
+it('turns the toggle off once the confirmation is accepted', function (): void {
+    [$user, $avgResponsibleProcessingRecord] = editPageForRecordWithProcessors(true);
+
+    $this->asFilamentUser($user);
+
+    livewire(EditAvgResponsibleProcessingRecord::class, [
+        'record' => $avgResponsibleProcessingRecord->getRouteKey(),
+    ])
+        ->set('data.has_processors', false)
+        ->call('callMountedFormComponentAction')
+        ->assertFormSet(['has_processors' => false]);
+});
