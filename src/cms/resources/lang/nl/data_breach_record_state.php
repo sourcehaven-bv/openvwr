@@ -24,4 +24,10 @@ return [
         'closed' => 'Afsluiten',
         'no_breach' => 'Markeren als geen datalek',
     ],
+    'transition_back' => [
+        'reported' => 'Terug naar gemeld',
+        'verified' => 'Terug naar geverifieerd',
+        'in_response' => 'Heropenen',
+        'closed' => 'Terug naar afgesloten',
+    ],
 ];

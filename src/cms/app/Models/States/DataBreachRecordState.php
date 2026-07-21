@@ -32,6 +32,12 @@ abstract class DataBreachRecordState extends State
     public static string $name = 'none';
 
     /**
+     * Position in the handling workflow, used to tell a step forward from a
+     * correction. States outside the linear flow (no breach) share position 0.
+     */
+    public static int $position = 0;
+
+    /**
      * @return class-string<DataBreachRecordTransitionAction>
      */
     abstract public static function getAction(): string;

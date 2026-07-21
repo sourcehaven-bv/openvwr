@@ -12,6 +12,7 @@ class InResponse extends DataBreachRecordState
 {
     public static string $name = 'in_response';
     public static StateColor $color = StateColor::PRIMARY;
+    public static int $position = 3;
 
     public static function getAction(): string
     {

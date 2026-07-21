@@ -12,6 +12,7 @@ class Verified extends DataBreachRecordState
 {
     public static string $name = 'verified';
     public static StateColor $color = StateColor::WARNING;
+    public static int $position = 2;
 
     public static function getAction(): string
     {

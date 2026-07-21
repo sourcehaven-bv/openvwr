@@ -12,6 +12,7 @@ class Closed extends DataBreachRecordState
 {
     public static string $name = 'closed';
     public static StateColor $color = StateColor::SUCCESS;
+    public static int $position = 4;
 
     public static function getAction(): string
     {

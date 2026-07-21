@@ -12,6 +12,7 @@ class Reported extends DataBreachRecordState
 {
     public static string $name = 'reported';
     public static StateColor $color = StateColor::INFO;
+    public static int $position = 1;
 
     public static function getAction(): string
     {
