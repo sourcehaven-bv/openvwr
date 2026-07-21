@@ -50,6 +50,24 @@ optioneel op welk element wordt bijgesneden.
 }
 ```
 
+### Selectors
+
+Gebruik bij voorkeur `getByRole(...)` met de zichtbare of toegankelijke naam.
+Dat is niet alleen robuuster dan een CSS-pad, het test ook wat een gebruiker
+(en een screenreader) daadwerkelijk waarneemt: wordt een knop hernoemd, dan
+faalt de capture — precies het moment waarop de figuur opnieuw gemaakt moet
+worden.
+
+Filament levert hiervoor meer aanknopingspunten dan je op het eerste gezicht
+ziet. De selectievakjes in tabellen hebben bijvoorbeeld geen `aria-label`, maar
+wel een `sr-only`-label met een unieke naam per rij ("Item &lt;key&gt;
+selecteren...") tegenover de kop ("Alle items..."). Daarmee is een rij te
+selecteren zonder op DOM-volgorde of op Alpine's `x-on:click` te leunen.
+
+Er zijn daarom geen extra `data-*`-attributen aan de applicatie toegevoegd:
+rollen en toegankelijke namen dekken de gevallen die ertoe doen, en die zijn
+sowieso nuttig voor toegankelijkheid.
+
 Twee keuzes zijn bewust gemaakt:
 
 - **Bijsnijden op elementen, niet op pixels.** Een container als `.fi-main`

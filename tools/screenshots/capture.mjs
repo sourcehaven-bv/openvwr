@@ -272,7 +272,7 @@ const FIGURES = [
     skip: true,
     async shoot(page) {
       await gotoSeededSnapshot(page, 'Ondertekeningen');
-      await page.locator('input[type=checkbox][x-on\\:click]').first().click();
+      await selectFirstRow(page);
       await page.waitForSelector('text=/Notificatie versturen/i', { timeout: 15000 });
       await page.evaluate(() => {
         const btn = [...document.querySelectorAll('button')].find((b) =>
@@ -312,7 +312,7 @@ const FIGURES = [
       await page.waitForSelector('table');
       // Selecting a row reveals the Akkoord / Niet akkoord bulk actions, which
       // are what this figure is about.
-      await page.locator('table tbody input[type=checkbox]').first().check();
+      await selectFirstRow(page);
       await page.waitForTimeout(600);
       await page.evaluate(() => {
         const btn = [...document.querySelectorAll('button')].find((b) =>
@@ -377,6 +377,20 @@ async function gotoSeededRecord(page) {
   // Wait for the record heading rather than a bare `form`: the page renders
   // several forms and the first can be present before the record has loaded.
   await page.waitForSelector('text=/Afhandelen burgervragen/i', { timeout: 30000 });
+}
+
+/**
+ * Tick the first table row's selection checkbox, revealing the bulk actions.
+ *
+ * Filament gives these checkboxes distinct accessible names via an sr-only
+ * label ("Item <key> selecteren..." for rows, "Alle items..." for the header),
+ * so match on that rather than on DOM position or Alpine's x-on:click binding.
+ */
+async function selectFirstRow(page) {
+  await page
+    .getByRole('checkbox', { name: /^Item .*selecteren/i })
+    .first()
+    .click();
 }
 
 /** Switch the record edit page to its "Versies" tab. */
