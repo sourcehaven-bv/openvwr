@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 
+use App\Filament\Forms\Components\DataLossToggle;
 use App\Filament\Forms\Components\Group\ProcessingRecordContactPersons;
 use App\Filament\Forms\Components\OutsideEuCountryInputGroup;
 use App\Filament\Forms\Components\PeriodicReviewField;
@@ -112,11 +113,14 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
     public static function getProcessor(): array
     {
         return [
-            Toggle::make('has_processors')
+            DataLossToggle::makeWithConfirmation(
+                'has_processors',
+                ['processors'],
+                __('avg_responsible_processing_record.warn_has_processors_data_loss'),
+            )
                 ->helperText(__('avg_responsible_processing_record.help_has_processors'))
                 ->label(__('avg_responsible_processing_record.has_processors'))
-                ->default(false)
-                ->live(),
+                ->default(false),
             SelectMultipleWithLookup::makeForRelationshipWithCreate(
                 'processors',
                 'processors',
