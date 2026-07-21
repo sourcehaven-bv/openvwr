@@ -27,6 +27,11 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          # Build the requested version, not the triggering ref. On a
+          # dispatched run the triggering ref is the branch, which would
+          # otherwise package current main under the tag's name.
+          ref: ${{ inputs.version }}
 
       - name: Install just
         uses: extractions/setup-just@v2
