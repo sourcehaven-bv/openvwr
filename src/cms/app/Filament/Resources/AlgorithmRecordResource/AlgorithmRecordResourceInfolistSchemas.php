@@ -114,10 +114,6 @@ class AlgorithmRecordResourceInfolistSchemas
     public static function getMeta(): array
     {
         return [
-            TextEntry::make('meta_lang')
-                ->label(__('algorithm_record.meta_lang')),
-            TextEntry::make('algorithmMetaSchema.name')
-                ->label(__('algorithm_record.meta_schema')),
             TextEntry::make('meta_national_id')
                 ->label(__('algorithm_record.meta_national_id')),
             TextEntry::make('meta_source_id')
