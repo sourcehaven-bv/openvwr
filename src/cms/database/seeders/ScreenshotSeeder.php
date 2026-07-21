@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Enums\Authorization\Role;
+use App\Enums\RegisterLayout;
 use App\Enums\Snapshot\SnapshotApprovalStatus;
+use App\Models\Avg\AvgGoal;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecordService;
 use App\Models\Organisation;
+use App\Models\Receiver;
 use App\Models\Snapshot;
 use App\Models\SnapshotApproval;
 use App\Models\States\Snapshot\Established;
@@ -19,6 +22,10 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
+
+use function count;
+use function intdiv;
+use function sprintf;
 
 /**
  * Deterministic data for the handleiding screenshots.
@@ -78,6 +85,30 @@ class ScreenshotSeeder extends Seeder
         'Wettelijke verplichting',
     ];
 
+    /** Plausible Dutch recipients of personal data. */
+    private const RECEIVER_NAMES = [
+        'Belastingdienst',
+        'Gemeentelijke gezondheidsdienst',
+        'Inspectie Gezondheidszorg en Jeugd',
+        'Nationale politie',
+        'Pensioenfonds ABP',
+        'Rijksdienst voor Identiteitsgegevens',
+        'UWV',
+        'Zorgverzekeraar',
+    ];
+
+    /** Plausible Dutch processing goals. */
+    private const GOAL_NAMES = [
+        'Beantwoorden van vragen en klachten van burgers',
+        'Beheer van toegangsrechten tot informatiesystemen',
+        'Beoordelen van subsidieaanvragen',
+        'Naleving van wettelijke bewaartermijnen',
+        'Onderzoek naar de effectiviteit van beleid',
+        'Uitvoeren van de salarisadministratie',
+        'Verantwoording afleggen aan de toezichthouder',
+        'Vaststellen van de identiteit van betrokkenen',
+    ];
+
     public function run(): void
     {
         $organisation = Organisation::query()->where('slug', 'nipg')->firstOrFail();
@@ -105,6 +136,14 @@ class ScreenshotSeeder extends Seeder
             return;
         }
 
+        // The record detail page renders either as steps (a domain navigation
+        // beside the form) or as one long stacked page, per user preference.
+        // UserFactory picks one at random, so without pinning it the figure
+        // alternates between two entirely different layouts between runs - and
+        // the manual describes the steps layout.
+        $user->register_layout = RegisterLayout::STEPS;
+        $user->save();
+
         $user->organisationRoles()
             ->where('organisation_id', $organisation->id)
             ->where('role', Role::DATA_PROTECTION_OFFICIAL->value)
@@ -117,14 +156,22 @@ class ScreenshotSeeder extends Seeder
      */
     private function renameRecords(Organisation $organisation): void
     {
+        // Every record, not just the first dozen: the register overview sorts by
+        // number and paginates, so renaming a subset leaves the very figure the
+        // manual opens with showing faker words like "quidem" and "aspernatur".
+        // The list is cycled, with a counter appended past the first pass to
+        // keep names distinct.
         $records = AvgResponsibleProcessingRecord::query()
             ->where('organisation_id', $organisation->id)
             ->orderBy('id')
-            ->take(\count(self::RECORD_NAMES))
             ->get();
 
+        $total = count(self::RECORD_NAMES);
+
         foreach ($records as $index => $record) {
-            $record->name = self::RECORD_NAMES[$index];
+            $name = self::RECORD_NAMES[$index % $total];
+            $round = intdiv($index, $total);
+            $record->name = $round === 0 ? $name : sprintf('%s (%d)', $name, $round + 1);
             $record->save();
         }
     }
@@ -148,18 +195,39 @@ class ScreenshotSeeder extends Seeder
             Tag::query()->where('organisation_id', $organisation->id),
             self::TAG_NAMES,
         );
+
+        // Receivers are described rather than named, so the column differs.
+        $this->renameByOrganisation(
+            Receiver::query()->where('organisation_id', $organisation->id),
+            self::RECEIVER_NAMES,
+            'description',
+        );
+
+        // Scrolling past the first domain reaches the goal descriptions and the
+        // responsibility free text, both faker latin out of the box.
+        $this->renameByOrganisation(AvgGoal::query(), self::GOAL_NAMES, 'goal');
+
+        AvgResponsibleProcessingRecord::query()
+            ->where('organisation_id', $organisation->id)
+            ->update([
+                'responsibility_distribution' => 'De verwerkingsverantwoordelijke bepaalt doel en middelen van de '
+                    . 'verwerking. De uitvoering is belegd bij de betrokken directie.',
+            ]);
     }
 
     /**
      * @param Builder<covariant Model> $query
      * @param list<string> $names
      */
-    private function renameByOrganisation(Builder $query, array $names): void
+    private function renameByOrganisation(Builder $query, array $names, string $column = 'name'): void
     {
-        $models = $query->orderBy('id')->take(\count($names))->get();
+        $models = $query->orderBy('id')->get();
+        $total = count($names);
 
         foreach ($models as $index => $model) {
-            $model->setAttribute('name', $names[$index]);
+            $name = $names[$index % $total];
+            $round = intdiv($index, $total);
+            $model->setAttribute($column, $round === 0 ? $name : sprintf('%s (%d)', $name, $round + 1));
             $model->save();
         }
     }

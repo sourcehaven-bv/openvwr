@@ -83,7 +83,11 @@ return [
 
         // used for uploading images (see config/media-library.php)
         'media-library' => [
-            'driver' => 's3',
+            // Local development without Docker has no MinIO to talk to; setting
+            // MEDIA_LIBRARY_DRIVER=local keeps uploads on disk instead. The
+            // default is unchanged, so Sail and production still use S3.
+            'driver' => env('MEDIA_LIBRARY_DRIVER', 's3'),
+            'root' => storage_path('app/media-library'),
             'bucket' => env('UPLOADS_BUCKET', 'uploads'),
             'endpoint' => env('AWS_ENDPOINT'),
             'key' => env('AWS_ACCESS_KEY_ID'),

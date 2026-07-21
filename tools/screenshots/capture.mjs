@@ -177,11 +177,20 @@ const FIGURES = [
     name: 'record-edit',
     file: '02_registers/02_avg-responsible-processing-records_edit.png',
     auth: true,
-    // No clip: the manual's text points at both the domain navigation on the
-    // right and the relation tables below the form ("de tabellen onderaan in
-    // het scherm"), and the original figure shows the sidebar for context.
-    // Clipping to .fi-main dropped all three.
+    // The manual points at the domain navigation on the right and the relation
+    // tables below the form ("de tabellen onderaan in het scherm"), and the
+    // original figure includes the sidebar for context - so clip to the whole
+    // layout, not .fi-main. Not fullPage either: every domain section renders
+    // expanded in the DOM, which makes the page ~28000px tall and the figure
+    // unreadable. maxHeight keeps the framing close to the original.
+    // The whole layout, not .fi-main: the manual points at the sidebar and the
+    // domain navigation beside the form. fullPage because the relation tables
+    // sit below the fold; maxHeight so a long record cannot stretch the figure
+    // to an unreadable sliver. Requires register_layout=steps (pinned by
+    // ScreenshotSeeder) - the one_page preference renders a ~28000px page.
+    clip: '.fi-layout',
     fullPage: true,
+    maxHeight: 1800,
     async shoot(page) {
       await gotoSeededRecord(page);
     },
@@ -474,7 +483,7 @@ async function login(page, as) {
 }
 
 /** Crop to an element's box plus padding, clamped to the page. */
-async function clipOf(page, selector, pad = 0) {
+async function clipOf(page, selector, pad = 0, maxHeight = null) {
   const el = page.locator(selector).first();
   if ((await el.count()) === 0) throw new Error(`clip selector not found: ${selector}`);
   const box = await el.boundingBox();
@@ -489,11 +498,15 @@ async function clipOf(page, selector, pad = 0) {
   }));
   const x = Math.max(0, box.x - pad);
   const y = Math.max(0, box.y - pad);
+  let height = Math.min(box.height + pad * 2, size.height - y);
+  if (maxHeight !== null) {
+    height = Math.min(height, maxHeight);
+  }
   return {
     x,
     y,
     width: Math.min(box.width + pad * 2, size.width - x),
-    height: Math.min(box.height + pad * 2, size.height - y),
+    height,
   };
 }
 
@@ -543,7 +556,9 @@ for (const fig of todo) {
     await page.screenshot({
       path: outPath,
       ...(fig.fullPage ? { fullPage: true } : {}),
-      ...(fig.clip ? { clip: await clipOf(page, fig.clip, fig.pad ?? 0) } : {}),
+      ...(fig.clip
+        ? { clip: await clipOf(page, fig.clip, fig.pad ?? 0, fig.maxHeight ?? null) }
+        : {}),
     });
     await page.evaluate(() => window.__annotate?.clear());
     console.log(`✓ ${fig.name} -> ${fig.file}`);
