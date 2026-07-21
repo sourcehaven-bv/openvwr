@@ -12,6 +12,7 @@ use App\Filament\Forms\Components\Section\InformationBlockSection;
 use App\Filament\Forms\Components\Select\ParentSelect;
 use App\Filament\Forms\Components\Select\SelectSingleWithLookup;
 use App\Filament\Forms\Components\SelectMultipleWithLookup;
+use App\Filament\Forms\Components\TagsInput;
 use App\Filament\Forms\Components\TextInput\EntityNumber;
 use App\Filament\Forms\Components\TextInput\ImportNumber;
 use App\Filament\Forms\Components\WpgGoalsRepeater;
@@ -62,6 +63,7 @@ class WpgProcessingRecordResourceFormSchemas
                 'name',
             )
                 ->label(__('wpg_processing_record_service.model_singular')),
+            TagsInput::make(),
             PeriodicReviewField::make(),
             ParentSelect::make()
                 ->hintIcon('heroicon-o-information-circle', __('general.parent_hint_icon_text')),

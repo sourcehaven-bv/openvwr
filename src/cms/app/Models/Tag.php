@@ -6,12 +6,14 @@ namespace App\Models;
 
 use App\Collections\Avg\AvgResponsibleProcessingRecordCollection;
 use App\Collections\TagCollection;
+use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Concerns\HasOrganisation;
 use App\Models\Concerns\HasSoftDeletes;
 use App\Models\Concerns\HasTimestamps;
 use App\Models\Concerns\HasUuidAsId;
 use App\Models\Contracts\TenantAware;
+use App\Models\Wpg\WpgProcessingRecord;
 use Database\Factories\TagFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -42,5 +44,21 @@ class Tag extends Model implements TenantAware
     public function avgResponsibleProcessingRecords(): MorphToMany
     {
         return $this->morphedByMany(AvgResponsibleProcessingRecord::class, 'taggable');
+    }
+
+    /**
+     * @return MorphToMany<AvgProcessorProcessingRecord, $this>
+     */
+    public function avgProcessorProcessingRecords(): MorphToMany
+    {
+        return $this->morphedByMany(AvgProcessorProcessingRecord::class, 'taggable');
+    }
+
+    /**
+     * @return MorphToMany<WpgProcessingRecord, $this>
+     */
+    public function wpgProcessingRecords(): MorphToMany
+    {
+        return $this->morphedByMany(WpgProcessingRecord::class, 'taggable');
     }
 }

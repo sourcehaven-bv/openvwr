@@ -1,4 +1,4 @@
-# Overige Functies
+# Overige Functies\label{OverigeFuncties}
 
 Het portaal biedt een aantal overige functies zoals het kunnen importeren vanuit het [AVG Register Rijksoverheid](https://www.avgregisterrijksoverheid.nl/) systeem of het exporteren naar sheets voor het maken van overzichten.
 
@@ -10,7 +10,7 @@ Het [AVG Register Rijksoverheid](https://www.avgregisterrijksoverheid.nl/) biedt
 
 ## Export
 
-**Beschikbaar voor**: (Chief) Privacy Officer
+**Beschikbaar voor**: (Chief) Privacy Officer, Functionaris Gegevensbescherming
 
 Het Verwerkingsregister biedt de mogelijkheid om registers te exporteren naar een `.csv` of `.xlsx` bestand. De knop voor het exporteren zit boven de overzichtstabel van ieder register (Figuur \ref{fig:export}).
 

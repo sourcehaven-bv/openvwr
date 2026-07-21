@@ -16,3 +16,18 @@ it('loads the edit page', function (): void {
         ->get(TagResource::getUrl('edit', ['record' => $tag]))
         ->assertSuccessful();
 });
+
+it('shows all processing type relations on the edit page', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $tag = Tag::factory()
+        ->recycle($organisation)
+        ->create();
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->get(TagResource::getUrl('edit', ['record' => $tag]))
+        ->assertSuccessful()
+        ->assertSeeHtml('fi-resource-relation-managers')
+        ->assertSeeText('AVG Verantwoordelijke')
+        ->assertSeeText('AVG Verwerker')
+        ->assertSeeText('Verwerkingen WPG');
+});

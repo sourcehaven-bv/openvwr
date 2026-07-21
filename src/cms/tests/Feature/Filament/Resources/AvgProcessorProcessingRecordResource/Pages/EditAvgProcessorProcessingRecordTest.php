@@ -7,6 +7,7 @@ use App\Filament\Resources\AvgProcessorProcessingRecordResource;
 use App\Filament\Resources\AvgProcessorProcessingRecordResource\Pages\EditAvgProcessorProcessingRecord;
 use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\EntityNumber;
+use App\Models\Tag;
 use App\Services\EntityNumberService;
 use Tests\Helpers\Model\OrganisationTestHelper;
 use Tests\Helpers\Model\UserTestHelper;
@@ -31,9 +32,7 @@ it('can be saved', function (): void {
     $avgProcessorProcessingRecord = AvgProcessorProcessingRecord::factory()
         ->recycle($organisation)
         ->withValidState()
-        ->create([
-            'has_systems' => false,
-        ]);
+        ->create();
     $name = fake()->uuid();
 
     $this->asFilamentOrganisationUser($organisation)
@@ -112,4 +111,34 @@ it('can be cloned', function (): void {
 
     expect($avgProcessorProcessingRecordClone->systems->pluck('id')->toArray())
         ->toEqual($avgProcessorProcessingRecord->systems->pluck('id')->toArray());
+});
+
+
+it('can be attached to a tag', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgProcessorProcessingRecord = AvgProcessorProcessingRecord::factory()
+        ->recycle($organisation)
+        ->withValidState()
+        ->create();
+
+    $tag = Tag::factory()
+        ->recycle($organisation)
+        ->create();
+
+    expect($avgProcessorProcessingRecord->tags->count())
+        ->toBe(0);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgProcessorProcessingRecord::class, [
+            'record' => $avgProcessorProcessingRecord->getRouteKey(),
+        ])
+        ->fillForm([
+            'tags' => [$tag->id->toString()],
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $avgProcessorProcessingRecord->refresh();
+    expect($avgProcessorProcessingRecord->tags->count())
+        ->toBe(1);
 });

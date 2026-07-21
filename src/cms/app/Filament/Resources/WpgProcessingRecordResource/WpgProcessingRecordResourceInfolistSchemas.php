@@ -43,6 +43,8 @@ class WpgProcessingRecordResourceInfolistSchemas
                 ->label(__('general.data_collection_source')),
             TextEntry::make('wpgProcessingRecordService.name')
                 ->label(__('wpg_processing_record_service.model_singular')),
+            SelectMultipleEntry::make('tags.name')
+                ->label(__('tag.model_plural')),
             DateEntry::make('review_at')
                 ->label(__('general.review_at')),
             ParentSelectEntry::make(),

@@ -16,6 +16,7 @@ use App\Filament\Tables\ProcessorFilter;
 use App\Filament\Tables\ReceiverFilter;
 use App\Filament\Tables\ResponsibleFilter;
 use App\Filament\Tables\SystemFilter;
+use App\Filament\Tables\TagFilter;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -43,14 +44,17 @@ class AvgProcessorProcessingRecordResourceTable
             ->defaultSort('avg_processor_processing_records.updated_at', 'desc')
             ->emptyStateHeading(__('avg_processor_processing_record.table_empty_heading'))
             ->emptyStateDescription(null)
+            ->actionsColumnLabel(__('general.edit'))
             ->actions([
                 EditAction::make()
-                    ->label(''),
+                    ->hiddenLabel()
+                    ->tooltip(static fn (EditAction $action) => $action->getLabel()),
             ])
             ->filters([
                 ResponsibleFilter::make(),
                 ProcessorFilter::make(),
                 ReceiverFilter::make(),
+                TagFilter::make(),
                 SystemFilter::make(),
                 ContactPersonFilter::make(),
                 DocumentFilter::make(),

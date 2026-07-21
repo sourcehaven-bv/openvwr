@@ -39,9 +39,11 @@ class UserResourceTable
             ->defaultSort('users.name')
             ->emptyStateHeading(__('user.table_empty_heading'))
             ->emptyStateDescription(null)
+            ->actionsColumnLabel(__('general.edit'))
             ->actions([
                 EditAction::make()
-                    ->label(''),
+                    ->hiddenLabel()
+                    ->tooltip(static fn (EditAction $action) => $action->getLabel()),
             ])
             ->bulkActions([
                 DetachBulkAction::make(),
