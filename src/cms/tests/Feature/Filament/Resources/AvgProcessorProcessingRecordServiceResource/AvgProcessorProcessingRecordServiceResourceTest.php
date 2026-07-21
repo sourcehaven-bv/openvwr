@@ -32,6 +32,7 @@ it('loads the list page', function (): void {
 
     $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(ListAvgProcessorProcessingRecordServices::class)
+        ->set('activeTab', 'all')
         ->assertCanSeeTableRecords([$avgProcessorProcessingRecordService]);
 });
 

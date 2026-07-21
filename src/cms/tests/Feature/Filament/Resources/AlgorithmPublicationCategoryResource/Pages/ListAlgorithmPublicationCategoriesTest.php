@@ -15,5 +15,6 @@ it('can load the list resource page', function (): void {
 
     $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(ListAlgorithmPublicationCategories::class)
+        ->set('activeTab', 'all')
         ->assertCanSeeTableRecords($records);
 });

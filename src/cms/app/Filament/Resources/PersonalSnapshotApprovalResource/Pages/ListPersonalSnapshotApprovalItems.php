@@ -27,15 +27,6 @@ class ListPersonalSnapshotApprovalItems extends ListRecords
     public function getTabs(): array
     {
         return [
-            self::TAB_ID_ALL => Tab::make()
-                ->label(__('general.all')),
-            self::TAB_ID_REVIEWED => Tab::make()
-                ->label(__('snapshot_approval.reviewed'))
-                ->modifyQueryUsing(static function (SnapshotBuilder $query): void {
-                    $query->whereHas('snapshotApprovals', static function (SnapshotApprovalBuilder $query): void {
-                        $query->signed()->assignedTo(Authentication::user());
-                    });
-                }),
             self::TAB_ID_UNREVIEWED => Tab::make()
                 ->label(__('snapshot_approval.unreviewed'))
                 ->modifyQueryUsing(static function (SnapshotBuilder $query): void {
@@ -43,6 +34,15 @@ class ListPersonalSnapshotApprovalItems extends ListRecords
                         $query->unsigned()->assignedTo(Authentication::user());
                     });
                 }),
+            self::TAB_ID_REVIEWED => Tab::make()
+                ->label(__('snapshot_approval.reviewed'))
+                ->modifyQueryUsing(static function (SnapshotBuilder $query): void {
+                    $query->whereHas('snapshotApprovals', static function (SnapshotApprovalBuilder $query): void {
+                        $query->signed()->assignedTo(Authentication::user());
+                    });
+                }),
+            self::TAB_ID_ALL => Tab::make()
+                ->label(__('general.all')),
         ];
     }
 }
