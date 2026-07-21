@@ -65,10 +65,20 @@ services:
             - sail
 
     clamav:
-        image: 'clamav/clamav'
+        build:
+            context: ./docker/clamav
+        volumes:
+            - 'sail-clamav:/var/lib/clamav'
         networks:
             - sail
-        platform: 'linux/amd64'
+        healthcheck:
+            # The Debian package ships no clamdcheck.sh, so PING clamd over the
+            # same TCP port the app uses and expect the literal "PONG".
+            test: ["CMD-SHELL", "printf 'PING\\n' | nc -w 5 localhost 3310 | grep -q PONG"]
+            interval: 30s
+            timeout: 10s
+            retries: 5
+            start_period: 300s
 
     static-website:
         image: 'nginx:alpine'
@@ -124,4 +134,6 @@ volumes:
     sail-pgsql:
         driver: local
     sail-minio:
+        driver: local
+    sail-clamav:
         driver: local
