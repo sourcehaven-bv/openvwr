@@ -26,12 +26,16 @@ class AttachmentFileField extends SpatieMediaLibraryFileUpload
         $types = Config::array('media-library.permitted_file_types.attachment');
         Assert::allString($types);
 
+        $allowedExtensions = Config::array('media-library.permitted_file_extensions.attachment');
+        /** @var array<string, list<string>> $allowedExtensions */
+
         return parent::make($name)
             ->label(__('general.attachments'))
             ->collection(MediaGroup::ATTACHMENTS->value)
             ->downloadable()
             ->multiple()
             ->acceptedFileTypes($types)
+            ->mimeTypeMap(self::buildMimeTypeMap($allowedExtensions))
             ->maxSize(self::MEGABYTE * 20)
             ->preserveFilenames()
             ->properties([
@@ -46,5 +50,22 @@ class AttachmentFileField extends SpatieMediaLibraryFileUpload
                 },
             ])
             ->columnSpanFull();
+    }
+
+    /**
+     * @param array<string, list<string>> $allowedExtensions
+     *
+     * @return array<string, string>
+     */
+    private static function buildMimeTypeMap(array $allowedExtensions): array
+    {
+        $map = [];
+        foreach ($allowedExtensions as $mimeType => $extensions) {
+            foreach ($extensions as $extension) {
+                $map[$extension] = $mimeType;
+            }
+        }
+
+        return $map;
     }
 }

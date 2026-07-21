@@ -106,6 +106,7 @@ We now need the Public website script to build the static files within your cont
 6. Run `sail artisan static-website:refresh` to generate the public website content from the CMS database.
 
 As a result of these steps, you have created the static files for the public website and in your browser you can see the Login page.
+- Navigate to http://localhost/static-website (or http://web.cms.orb.local/static-website for Orbstack users)
 
 ### Login to the CMS
 

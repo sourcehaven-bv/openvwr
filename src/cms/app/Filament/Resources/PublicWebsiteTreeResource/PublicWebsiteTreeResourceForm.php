@@ -8,10 +8,10 @@ use App\Components\Uuid\UuidInterface;
 use App\Enums\Media\MediaGroup;
 use App\Filament\Forms\Components\MarkdownEditor\MarkdownEditor;
 use App\Filament\Forms\Components\PublicFromField;
+use App\Filament\Forms\Components\Upload\PosterFileField;
 use App\Models\Organisation;
 use App\Models\PublicWebsiteTree;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Forms\Set;
@@ -37,24 +37,17 @@ class PublicWebsiteTreeResourceForm
                     ->required()
                     ->maxLength(255)
                     ->unique(ignoreRecord: true),
+                TextInput::make('public_url')
+                    ->label(__('public_website_tree.public_url'))
+                    ->url()
+                    ->maxLength(255),
                 PublicFromField::makeForModel(PublicWebsiteTree::class)
                     ->hintIcon('heroicon-o-information-circle', __('organisation.public_from_hint_icon_text')),
                 MarkdownEditor::make('public_website_content')
                     ->label(__('organisation.public_website_content')),
-                SpatieMediaLibraryFileUpload::make('poster')
+                PosterFileField::make('poster')
                     ->label(__('public_website_tree.poster'))
-                    ->imageEditor()
-                    ->acceptedFileTypes(['image/jpeg'])
-                    ->imagePreviewHeight('295')
-                    ->imageResizeMode('cover')
-                    ->imageCropAspectRatio('33:8')
-                    ->imageResizeTargetWidth('1920')
-                    ->imageResizeTargetHeight('480')
-                    ->panelAspectRatio('33:8')
-                    ->panelLayout('integrated')
-                    ->columnSpanFull()
-                    ->collection(MediaGroup::PUBLIC_WEBSITE_TREE->value)
-                    ->image(),
+                    ->collection(MediaGroup::PUBLIC_WEBSITE_TREE->value),
                 Select::make('organisation_id')
                     ->relationship('organisation', 'name')
                     ->label(__('public_website_tree.organisation'))

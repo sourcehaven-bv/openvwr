@@ -69,6 +69,14 @@ class AlgorithmRecordFactory extends Factory
             'meta_national_id' => $this->faker->optional()->slug(1),
             'meta_source_id' => $this->faker->optional()->slug(1),
             'meta_tags' => $this->faker->optional()->sentence(),
+            'meta_date_of_development' => $this->faker->optional()->dateTime(),
+            'meta_owner_algorithm' => $this->faker->optional()->name(),
+            'meta_product_owner_algorithm' => $this->faker->optional()->name(),
+
+            'impact_with_consequences' => $this->faker->optional()->boolean(),
+            'impact_more_algorithms_applied' => $this->faker->optional()->boolean(),
+            'impact_effect_on_outcome' => $this->faker->optional()->boolean(),
+            'validation_answers_checked_by_product_owner' => $this->faker->optional()->boolean(),
         ];
     }
 

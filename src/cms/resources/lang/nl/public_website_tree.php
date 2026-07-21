@@ -9,6 +9,7 @@ return [
 
     'title' => 'Titel',
     'slug' => 'URL-segment',
+    'public_url' => 'Publieke URL',
     'public_website_content' => 'Tekst publieke website',
     'poster' => 'Poster',
     'organisation' => 'Organisatie',

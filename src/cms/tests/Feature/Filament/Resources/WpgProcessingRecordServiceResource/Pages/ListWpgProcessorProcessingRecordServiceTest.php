@@ -15,6 +15,7 @@ it('loads the list page', function (): void {
 
     $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(ListWpgProcessingRecordServices::class)
+        ->set('activeTab', 'all')
         ->assertCanSeeTableRecords($wpgProcessingRecordService);
 });
 

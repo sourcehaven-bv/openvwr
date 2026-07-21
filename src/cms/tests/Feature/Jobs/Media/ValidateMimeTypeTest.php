@@ -5,32 +5,19 @@ declare(strict_types=1);
 namespace Tests\Feature\Jobs\Media;
 
 use App\Jobs\Media\ValidateMimeType;
-use App\Services\Media\MimeTypeService;
 use App\Vendor\MediaLibrary\Media;
-use Illuminate\Support\Facades\Storage;
 use Tests\Helpers\ConfigTestHelper;
 use Throwable;
 
-use function base_path;
 use function dispatch_sync;
 use function it;
-use function sprintf;
 
 it('throws a Exception when the mime type of a media is not in the permitted list', function (): void {
-    $disk = ConfigTestHelper::get('media-library.filesystem_disk');
-    Storage::fake($disk);
-
-    $media = Media::factory()
-        ->create([
-            'file_name' => 'test.png',
-            'mime_type' => 'image/png',
-        ]);
-
-    copyFileToDisk(
-        base_path('tests/Fixtures/Images/test.png'),
-        sprintf('%s/%s/%s/test.png', $media->organisation->id, $media->collection_name, $media->uuid),
-        $disk,
-    );
+    $media = Media::factory()->create([
+        'file_name' => 'test.png',
+        'mime_type' => 'image/png',
+        'collection_name' => 'attachments',
+    ]);
 
     ConfigTestHelper::set('media-library.permitted_file_types.attachment', ['image/jpg']);
 
@@ -42,28 +29,92 @@ it('throws a Exception when the mime type of a media is not in the permitted lis
 });
 
 it('does not throw an RunTimeException when the mime type of a media is in the permitted list', function (): void {
-    $disk = ConfigTestHelper::get('media-library.filesystem_disk');
-    Storage::fake($disk);
     $media = Media::factory()->create([
         'file_name' => 'test.png',
         'mime_type' => 'image/png',
     ]);
 
-    copyFileToDisk(
-        base_path('tests/Fixtures/Images/test.png'),
-        sprintf('%s/%s/%s/test.png', $media->organisation->id, $media->collection_name, $media->uuid),
-        $disk,
-    );
+    $job = new ValidateMimeType($media);
+    dispatch_sync($job);
+})->throwsNoExceptions();
+
+it('uses collection-specific permitted mime types when configured', function (): void {
+    $media = Media::factory()->create([
+        'file_name' => 'test.pdf',
+        'mime_type' => 'application/pdf',
+        'collection_name' => 'organisation_posters',
+    ]);
+
+    // PDF is in attachment types but not in organisation_posters types
+    $job = new ValidateMimeType($media);
+    $this->expectException(Throwable::class);
+    $this->expectExceptionMessage('Mime type is not permitted');
+
+    dispatch_sync($job);
+});
+
+it('allows image mime types for organisation_posters collection', function (): void {
+    $media = Media::factory()->create([
+        'file_name' => 'poster.jpeg',
+        'mime_type' => 'image/jpeg',
+        'collection_name' => 'organisation_posters',
+    ]);
+
+    $job = new ValidateMimeType($media);
+    dispatch_sync($job);
+})->throwsNoExceptions();
+
+it('falls back to attachment permitted types for unknown collections', function (): void {
+    $media = Media::factory()->create([
+        'file_name' => 'test.pdf',
+        'mime_type' => 'application/pdf',
+        'collection_name' => 'attachments',
+    ]);
+
+    $job = new ValidateMimeType($media);
+    dispatch_sync($job);
+})->throwsNoExceptions();
+
+it('throws when file extension is not in the permitted list for its mime type', function (): void {
+    $media = Media::factory()->create([
+        'file_name' => 'malware.bat',
+        'mime_type' => 'text/plain',
+        'collection_name' => 'attachments',
+    ]);
+
+    $job = new ValidateMimeType($media);
+    $this->expectException(Throwable::class);
+    $this->expectExceptionMessage('File extension is not permitted for this mime type');
+
+    dispatch_sync($job);
+});
+
+it('allows a plain text file with a permitted .txt extension', function (): void {
+    $media = Media::factory()->create([
+        'file_name' => 'readme.txt',
+        'mime_type' => 'text/plain',
+        'collection_name' => 'attachments',
+    ]);
+
+    $job = new ValidateMimeType($media);
+    dispatch_sync($job);
+})->throwsNoExceptions();
+
+it('allows a file when no extensions are configured for its mime type', function (): void {
+    $media = Media::factory()->create([
+        'file_name' => 'test.unknown',
+        'mime_type' => 'application/x-custom',
+        'collection_name' => 'attachments',
+    ]);
+
+    ConfigTestHelper::set('media-library.permitted_file_types.attachment', ['application/x-custom']);
+    ConfigTestHelper::set('media-library.permitted_file_extensions.attachment', []);
 
     $job = new ValidateMimeType($media);
     dispatch_sync($job);
 })->throwsNoExceptions();
 
 it('does not validate mime type if the batch is cancelled', function (): void {
-    $this->mock(MimeTypeService::class)
-        ->shouldReceive('getMimeType')
-        ->never();
-
     $validateMimeType = (new ValidateMimeType(Media::factory()->create()))->withFakeBatch();
     $job = $validateMimeType[0];
     $batch = $validateMimeType[1];

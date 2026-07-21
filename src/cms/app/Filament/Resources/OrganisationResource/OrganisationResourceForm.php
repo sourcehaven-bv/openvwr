@@ -12,13 +12,13 @@ use App\Facades\Authorization;
 use App\Filament\Forms\Components\MarkdownEditor\MarkdownEditor;
 use App\Filament\Forms\Components\PublicFromField;
 use App\Filament\Forms\Components\TextInput\EntityNumberPrefix;
+use App\Filament\Forms\Components\Upload\PosterFileField;
 use App\Models\Organisation;
 use App\Models\ResponsibleLegalEntity;
 use App\Rules\IPRanges;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -103,23 +103,12 @@ class OrganisationResourceForm
                         MarkdownEditor::make('public_website_content')
                             ->label(__('organisation.public_website_content'))
                             ->columnSpan(2),
-                        SpatieMediaLibraryFileUpload::make('poster')
+                        PosterFileField::make('poster')
                             ->label(__('organisation.poster'))
-                            ->imageEditor()
-                            ->acceptedFileTypes(['image/jpeg'])
-                            ->imagePreviewHeight('295')
-                            ->imageResizeMode('cover')
-                            ->imageCropAspectRatio('33:8')
-                            ->imageResizeTargetWidth('1920')
-                            ->imageResizeTargetHeight('480')
-                            ->panelAspectRatio('33:8')
-                            ->panelLayout('integrated')
-                            ->columnSpanFull()
                             ->properties([
                                 'organisation_id' => Authentication::organisation()->id->toString(),
                             ])
-                            ->collection(MediaGroup::ORGANISATION_POSTERS->value)
-                            ->image(),
+                            ->collection(MediaGroup::ORGANISATION_POSTERS->value),
                     ]),
             ]);
     }

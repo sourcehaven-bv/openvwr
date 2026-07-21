@@ -38,6 +38,7 @@ it('loads the list items', function (): void {
 
     $this->asFilamentUser($user)
         ->createLivewireTestable(ListPersonalSnapshotApprovalItems::class)
+        ->set('activeTab', ListPersonalSnapshotApprovalItems::TAB_ID_ALL)
         ->assertCanSeeTableRecords($snapshots);
 });
 
@@ -103,6 +104,7 @@ it('can bulk approve', function (): void {
 
     $this->asFilamentUser($user)
         ->createLivewireTestable(ListPersonalSnapshotApprovalItems::class)
+        ->set('activeTab', ListPersonalSnapshotApprovalItems::TAB_ID_ALL)
         ->assertCountTableRecords(3)
         ->assertCanSeeTableRecords([
             $snapshotApprovalApproved->snapshot,

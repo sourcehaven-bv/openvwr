@@ -12,7 +12,7 @@ Het [AVG Register Rijksoverheid](https://www.avgregisterrijksoverheid.nl/) biedt
 
 **Beschikbaar voor**: (Chief) Privacy Officer, Functionaris Gegevensbescherming
 
-Het Verwerkingsregister biedt de mogelijkheid om registers te exporteren naar een `.csv` of `.xlsx` bestand. De knop voor het exporteren zit boven de overzichtstabel van ieder register (Figuur \ref{fig:export}).
+OpenVWR biedt de mogelijkheid om registers te exporteren naar een `.csv` of `.xlsx` bestand. De knop voor het exporteren zit boven de overzichtstabel van ieder register (Figuur \ref{fig:export}).
 
 ![Exporteren\label{fig:export}](./imgs/05_overige_functies/01_avg-responsible-processing-records_export.png)
 

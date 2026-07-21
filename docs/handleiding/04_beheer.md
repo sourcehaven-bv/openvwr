@@ -10,7 +10,7 @@ Binnen de Organisatie zijn Gebruikers te beheren: nieuwe gebruikers kunnen uitge
 
 ### Gebruikers toevoegen
 
-Rechtsboven de gebruikerstabel is de knop om gebruikers toe te voegen. Als een gebruiker is toegevoegd zal deze een welkomst email toegestuurd krijgen met de link naar het verwerkingsregister.
+Rechtsboven de gebruikerstabel is de knop om gebruikers toe te voegen. Als een gebruiker is toegevoegd zal deze een welkomst email toegestuurd krijgen met de link naar OpenVWR.
 
 ### Gebruikers aanpassen / verwijderen
 

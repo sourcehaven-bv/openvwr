@@ -101,3 +101,12 @@ it('is not a string or null', function (): void {
     $this->expectException(InvalidArgumentException::class);
     Config::stringOrNull($configKey);
 });
+
+it('checks whether a config key exists', function (): void {
+    $configKey = fake()->word();
+
+    config()->set($configKey, fake()->word());
+
+    $this->assertTrue(Config::has($configKey));
+    $this->assertFalse(Config::has($configKey . '_missing'));
+});

@@ -7,6 +7,7 @@ namespace App\Filament\Resources\AlgorithmRecordResource\Pages;
 use App\Filament\Actions\ExportAction;
 use App\Filament\Exports\AlgorithmRecordExporter;
 use App\Filament\Resources\AlgorithmRecordResource;
+use App\Filament\Resources\Pages\Concerns\PersistsFiltersInSession;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -14,6 +15,8 @@ use function __;
 
 class ListAlgorithmRecords extends ListRecords
 {
+    use PersistsFiltersInSession;
+
     protected static string $resource = AlgorithmRecordResource::class;
 
     protected function getHeaderActions(): array

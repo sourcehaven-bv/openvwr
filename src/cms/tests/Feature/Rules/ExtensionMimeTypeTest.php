@@ -32,7 +32,7 @@ it('validates with a real file', function (): void {
         ]);
 
     $fileName = sprintf('/tmp/%s.%s', fake()->uuid(), $fileExtension);
-    File::put($fileName, fake()->word());
+    File::put($fileName, fake()->sentence());
     $uploadedFile = new UploadedFile($fileName, $fileName);
 
     $extensionMimeType = new ExtensionMimeType(new NullLogger(), $mimeTypes);
@@ -56,10 +56,68 @@ it('fails when extension and mime-type do not match', function (): void {
         ]);
 
     $fileName = sprintf('/tmp/%s.%s', fake()->uuid(), fake()->unique()->fileExtension());
-    File::put($fileName, fake()->word());
+    File::put($fileName, fake()->sentence());
     $uploadedFile = new UploadedFile($fileName, $fileName);
 
     $extensionMimeType = new ExtensionMimeType(new NullLogger(), $mimeTypes);
+    $extensionMimeType->validate(fake()->word(), $uploadedFile, function () use (&$validated): void {
+        $validated = false;
+    });
+
+    expect($validated)->toBeFalse();
+});
+
+it('passes when extension is in the explicit allowlist for detected mime-type', function (): void {
+    $validated = true;
+
+    $fileName = sprintf('/tmp/%s.txt', fake()->uuid());
+    File::put($fileName, fake()->sentence());
+    $uploadedFile = new UploadedFile($fileName, $fileName);
+
+    $allowedExtensions = ['text/plain' => ['txt']];
+    $mimeTypes = $this->mock(MimeTypesInterface::class);
+    $mimeTypes->expects('getExtensions')->never();
+
+    $extensionMimeType = new ExtensionMimeType(new NullLogger(), $mimeTypes, $allowedExtensions);
+    $extensionMimeType->validate(fake()->word(), $uploadedFile, function () use (&$validated): void {
+        $validated = false;
+    });
+
+    expect($validated)->toBeTrue();
+});
+
+it('blocks a dangerous extension even though content is text/plain', function (): void {
+    $validated = true;
+
+    $fileName = sprintf('/tmp/%s.bat', fake()->uuid());
+    File::put($fileName, '@echo off');
+    $uploadedFile = new UploadedFile($fileName, $fileName);
+
+    $allowedExtensions = ['text/plain' => ['txt']];
+    $mimeTypes = $this->mock(MimeTypesInterface::class);
+    $mimeTypes->expects('getExtensions')->never();
+
+    $extensionMimeType = new ExtensionMimeType(new NullLogger(), $mimeTypes, $allowedExtensions);
+    $extensionMimeType->validate(fake()->word(), $uploadedFile, function () use (&$validated): void {
+        $validated = false;
+    });
+
+    expect($validated)->toBeFalse();
+});
+
+it('fails when detected mime-type has no entry in the allowlist', function (): void {
+    $validated = true;
+
+    $fileName = sprintf('/tmp/%s.txt', fake()->uuid());
+    File::put($fileName, fake()->sentence());
+    $uploadedFile = new UploadedFile($fileName, $fileName);
+
+    // allowlist does not contain text/plain at all
+    $allowedExtensions = ['image/png' => ['png']];
+    $mimeTypes = $this->mock(MimeTypesInterface::class);
+    $mimeTypes->expects('getExtensions')->never();
+
+    $extensionMimeType = new ExtensionMimeType(new NullLogger(), $mimeTypes, $allowedExtensions);
     $extensionMimeType->validate(fake()->word(), $uploadedFile, function () use (&$validated): void {
         $validated = false;
     });

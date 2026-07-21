@@ -44,6 +44,7 @@ class PublicWebsiteTreeNodeGenerator extends Generator
                 'title' => $publicWebsiteTree->title,
                 'type' => 'organisation',
                 'depth' => count($parentSlugs),
+                'public_url' => $publicWebsiteTree->public_url,
             ]),
             'content' => $this->convertMarkdownToHtml($publicWebsiteTree->public_website_content),
             'publicWebsiteTree' => $publicWebsiteTree,
