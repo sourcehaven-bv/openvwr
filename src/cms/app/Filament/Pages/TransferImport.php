@@ -70,7 +70,7 @@ class TransferImport extends Page implements HasForms
 
     public static function canAccess(): bool
     {
-        return Authorization::hasPermission(Permission::CORE_ENTITY_IMPORT);
+        return Authorization::hasPermission(Permission::TRANSFER_IMPORT);
     }
 
     public static function getNavigationGroup(): ?string

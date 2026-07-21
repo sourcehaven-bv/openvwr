@@ -35,7 +35,7 @@ class TransferExportBulkAction extends BulkAction
             ->label(__('transfer.export_action'))
             ->icon('heroicon-o-archive-box-arrow-down')
             ->color('gray')
-            ->visible(static fn (): bool => Authorization::hasPermission(Permission::EXPORT))
+            ->visible(static fn (): bool => Authorization::hasPermission(Permission::TRANSFER_EXPORT))
             ->modalHeading(__('transfer.export_modal_heading'))
             ->modalDescription(__('transfer.export_modal_description'))
             ->modalSubmitActionLabel(__('transfer.export_submit'))
