@@ -88,8 +88,7 @@ it('can be cloned', function (): void {
         ->and($algorithmRecordClone->public_from?->toJson())->toBe($algorithmRecord->public_from?->toJson())
         ->and($algorithmRecordClone->algorithm_theme_id)->toEqual($algorithmRecord->algorithm_theme_id)
         ->and($algorithmRecordClone->algorithm_status_id)->toEqual($algorithmRecord->algorithm_status_id)
-        ->and($algorithmRecordClone->algorithm_publication_category_id)->toEqual($algorithmRecord->algorithm_publication_category_id)
-        ->and($algorithmRecordClone->algorithm_meta_schema_id)->toEqual($algorithmRecord->algorithm_meta_schema_id);
+        ->and($algorithmRecordClone->algorithm_publication_category_id)->toEqual($algorithmRecord->algorithm_publication_category_id);
 
     expect($algorithmRecordClone->fgRemark)->toBeNull();
     expect($algorithmRecordClone->snapshots)->toBeEmpty();

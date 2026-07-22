@@ -599,11 +599,11 @@ return [
 
         'step_meta_title' => 'Informatie over Metadata',
         'step_meta_info' => '
-            <p class="text-sm text-gray-500">Geef bij "Datum van ontwikkeling" aan wanneer een algoritme ontwikkeld is, helpt AI compliance officers bij overzicht recent of nog te ontwikkelen algoritmes. Geef bij "Eigenaar van het algoritme" aan wie de eindverantwoordelijk is (bijv. proceseigenaar). Geef bij "Product owner van het algoritme" aan wie operationeel verantwoordelijk is voor beheer en doorontwikkeling. Vermeld bij "Landelijk-ID" het identificatienummer dat het Algoritmeregister aan deze registratie heeft toegekend. Noteer bij "Bron-ID" de unieke identificatie voor deze registratie zoals die binnen de eigen organisatie wordt gehanteerd. Voeg bij "Zoektermen" relevante trefwoorden toe die het algoritme beschrijven, gescheiden door komma\'s. Deze zoektermen zijn niet zichtbaar op de website, maar verbeteren wel de vindbaarheid.</p>',
+            <p class="text-sm text-gray-500">Geef bij "Datum van ontwikkeling" aan wanneer een algoritme ontwikkeld is, helpt AI compliance officers bij overzicht recent of nog te ontwikkelen algoritmes. Geef bij "Eigenaar van het algoritme" aan wie de eindverantwoordelijk is (bijv. proceseigenaar). Geef bij "Product owner van het algoritme" aan wie operationeel verantwoordelijk is voor beheer en doorontwikkeling. Vermeld bij "Extern registratienummer" het identificatienummer dat een extern register aan deze registratie heeft toegekend, bijvoorbeeld het landelijke Algoritmeregister. Noteer bij "Bron-ID" de unieke identificatie voor deze registratie zoals die binnen de eigen organisatie wordt gehanteerd. Voeg bij "Zoektermen" relevante trefwoorden toe die het algoritme beschrijven, gescheiden door komma\'s. Deze zoektermen zijn niet zichtbaar op de website, maar verbeteren wel de vindbaarheid.</p>',
 
         'step_impact_title' => 'Informatie over Impactvol algoritme',
         'step_impact_info' => '
-            <p class="text-sm text-gray-500">Beantwoord de toetsvragen met een "Ja" of "Nee", <span class="font-bold">Let op:</span> als alle drie de vragen met "Ja" zijn beantwoord, moet het algoritme als impactvol worden aangemerkt en opgenomen worden in het (rijksbrede) algoritmeregister.</p>',
+            <p class="text-sm text-gray-500">Beantwoord de toetsvragen met een "Ja" of "Nee", <span class="font-bold">Let op:</span> als alle drie de vragen met "Ja" zijn beantwoord, moet het algoritme als impactvol worden aangemerkt en opgenomen worden in het algoritmeregister.</p>',
 
         'step_validation_title' => 'Informatie over Validatie',
         'step_validation_info' => '
