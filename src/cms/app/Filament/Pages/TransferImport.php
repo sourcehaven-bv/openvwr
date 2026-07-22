@@ -160,11 +160,9 @@ class TransferImport extends Page implements HasForms
         $items = [];
 
         foreach ($bundle->entities as $id => $entity) {
+            // BundleReader::read() has already validated every entity's type as a known enum value.
             $typeValue = $entity['type'] ?? null;
-
-            if (!is_string($typeValue)) {
-                continue;
-            }
+            Assert::string($typeValue);
 
             $type = TransferEntityType::from($typeValue);
 

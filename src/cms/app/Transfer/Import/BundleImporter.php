@@ -317,16 +317,13 @@ class BundleImporter
         $attributes = $this->attributeRemapper->attributes($entity);
         $body = $attributes['body'] ?? '';
 
+        // importOwned only runs for owned types (see TransferEntityType::isOwned()),
+        // so every case maps to a relation name.
         $relationName = match ($type) {
-            TransferEntityType::ADDRESS => 'address',
             TransferEntityType::FG_REMARK => 'fgRemark',
             TransferEntityType::REMARK => 'remarks',
-            default => null,
+            default => 'address',
         };
-
-        if ($relationName === null) {
-            return;
-        }
 
         $relation = ModelGraph::relation($ownerModel, $relationName);
 

@@ -62,37 +62,11 @@ class TransferExportBulkAction extends BulkAction
             ->action(static function (Collection $records, array $data): void {
                 $first = $records->first();
                 Assert::isInstanceOf($first, Model::class);
-                $recordType = TransferEntityType::fromModel($first);
-
-                $recordIds = [];
-                foreach ($records as $record) {
-                    Assert::isInstanceOf($record, Model::class);
-                    $recordIds[] = ModelGraph::id($record);
-                }
-
-                $related = $data['related'] ?? [];
-                Assert::isArray($related);
-
-                $selectedRelated = [];
-                foreach ($related as $relationName => $ids) {
-                    if (!is_string($relationName) || !is_array($ids)) {
-                        continue;
-                    }
-
-                    $selectedIds = [];
-                    foreach ($ids as $id) {
-                        if (is_string($id) && $id !== '') {
-                            $selectedIds[] = $id;
-                        }
-                    }
-
-                    $selectedRelated[$relationName] = $selectedIds;
-                }
 
                 TransferExportJob::dispatch(
-                    $recordType,
-                    $recordIds,
-                    $selectedRelated,
+                    TransferEntityType::fromModel($first),
+                    self::recordIds($records),
+                    self::selectedRelated($data['related'] ?? []),
                     Authentication::organisation()->id,
                     Authentication::user()->id,
                 );
@@ -105,5 +79,53 @@ class TransferExportBulkAction extends BulkAction
                     ->send();
             })
             ->deselectRecordsAfterCompletion();
+    }
+
+    /**
+     * @param Collection<int|string, Model> $records
+     *
+     * @return list<string>
+     */
+    public static function recordIds(Collection $records): array
+    {
+        $recordIds = [];
+
+        foreach ($records as $record) {
+            $recordIds[] = ModelGraph::id($record);
+        }
+
+        return $recordIds;
+    }
+
+    /**
+     * Normalise the form's `related` payload into selected ids keyed by relation name,
+     * discarding any malformed entries.
+     *
+     * @return array<string, list<string>>
+     */
+    public static function selectedRelated(mixed $related): array
+    {
+        if (!is_array($related)) {
+            return [];
+        }
+
+        $selectedRelated = [];
+
+        foreach ($related as $relationName => $ids) {
+            if (!is_string($relationName) || !is_array($ids)) {
+                continue;
+            }
+
+            $selectedIds = [];
+            foreach ($ids as $id) {
+                if (is_string($id) && $id !== '') {
+                    $selectedIds[] = $id;
+                }
+            }
+
+            $selectedRelated[$relationName] = $selectedIds;
+        }
+
+        return $selectedRelated;
     }
 }
