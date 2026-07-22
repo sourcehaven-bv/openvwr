@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DataBreachRecord;
 
+use App\Filament\Actions\TransferExportBulkAction;
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\EntityNumber;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
@@ -48,6 +49,9 @@ class DataBreachRecordResourceTable
                 EditAction::make()
                     ->hiddenLabel()
                     ->tooltip(static fn (EditAction $action) => $action->getLabel()),
+            ])
+            ->bulkActions([
+                TransferExportBulkAction::make(),
             ])
             ->filters([
                 TernaryFilter::make('ap_reported')

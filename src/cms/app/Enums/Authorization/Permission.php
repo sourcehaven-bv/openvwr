@@ -60,6 +60,8 @@ enum Permission: string
     case TAG_DELETE = 'tag.delete';
     case TAG_UPDATE = 'tag.update';
     case TAG_VIEW = 'tag.view';
+    case TRANSFER_EXPORT = 'transfer.export';
+    case TRANSFER_IMPORT = 'transfer.import';
     case USER_CREATE = 'user.create';
     case USER_DELETE = 'user.delete';
     case USER_IMPORT = 'user.import';

@@ -27,6 +27,7 @@ Directory: `/src/static-website/`
 - See [docs/environment_variables.md](docs/environment_variables.md) for an overview of all environment variables that can be set in the `.env` file.
 - See [docs/roles_and_permissions.md](docs/roles_and_permissions.md) for an overview of all roles and permissions and the location where they are configured.
 - See [docs/static_website_hugo.md](docs/static_website_hugo.md) for detailed information about the Hugo static website publishing system.
+- See [docs/import_export.md](docs/import_export.md) for the zip-based import/export of register content between organisations.
 
 ## Getting started
 > All `artisan` commands must be run via Sail (`sail artisan ...` or inside `sail shell`).

@@ -143,6 +143,11 @@ The following environment variables are used to configure the application in `sr
 - `SESSION_DOMAIN`
 - `SESSION_SECURE_COOKIE` (default: `true`)
 
+**TRANSFER (import/export between organisations):**
+
+- `TRANSFER_MAX_ZIPPED_NUMBER_OF_FILES` (default: `5000`)
+- `TRANSFER_MAX_ZIPPED_FILESIZE` (default: `50`, in MB per file in the zip)
+
 **VIRUSSCANNER:**
 
 - `VIRUSSCANNER_DEFAULT` (default: `clamav`)
