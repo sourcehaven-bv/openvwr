@@ -60,8 +60,10 @@ class TransferImport extends Page implements HasForms
     // another organisation's export zip or traversing to arbitrary files on the disk.
     #[Locked]
     public ?string $bundlePath = null;
+
     #[Locked]
     public ?string $sourceOrganisation = null;
+
     #[Locked]
     public ?string $exportedAt = null;
 
