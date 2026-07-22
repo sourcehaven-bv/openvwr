@@ -9,9 +9,14 @@ on:
         type: boolean
         default: false
 
+permissions:
+  contents: write
+
 jobs:
   tag:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.VERSION }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -31,17 +36,47 @@ jobs:
           echo "Generated version: ${VERSION}"
 
       - name: Create and push tag
+        env:
+          VERSION: ${{ steps.version.outputs.VERSION }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a ${{ steps.version.outputs.VERSION }} -m "Release ${{ steps.version.outputs.VERSION }}"
-          git push origin ${{ steps.version.outputs.VERSION }}
+          git tag -a "$VERSION" -m "Release $VERSION"
+          git push origin "$VERSION"
 
       - name: Summary
+        env:
+          VERSION: ${{ steps.version.outputs.VERSION }}
         run: |
           echo "### Release Tagged :rocket:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Version:** \`${{ steps.version.outputs.VERSION }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** \`$VERSION\`" >> $GITHUB_STEP_SUMMARY
           echo "**Alpha:** ${{ inputs.alpha }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "The release workflow will now build and publish this version." >> $GITHUB_STEP_SUMMARY
+          echo "The build and publish jobs will now package and release this version." >> $GITHUB_STEP_SUMMARY
+
+  # Build and publish inline rather than relying on the tag push to trigger
+  # release.yml: tags pushed with GITHUB_TOKEN do not fire `on: push` events,
+  # so a chained trigger would never run.
+  build:
+    needs: tag
+    uses: ./.github/workflows/build-release.yml
+    with:
+      version: ${{ needs.tag.outputs.version }}
+
+  publish:
+    needs: [tag, build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          pattern: openvwr-*
+          merge-multiple: true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ needs.tag.outputs.version }}
+          files: "*.tar.gz"
+          generate_release_notes: true
