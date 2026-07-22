@@ -37,6 +37,10 @@ return [
     'child' => 'Subverwerking',
     'children' => 'Subverwerkingen',
 
+    'data_loss_confirm_title' => 'Weet u het zeker?',
+    'data_loss_confirm_submit' => 'Ja, gegevens verwijderen',
+    'data_loss_confirm_cancel' => 'Annuleren',
+
     'name' => 'Naam',
     'description' => 'Beschrijving',
     'import_id' => 'Import ID',

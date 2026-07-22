@@ -26,6 +26,7 @@ return [
     'step_publish' => 'Publiceren',
 
     'help_has_processors' => 'Is er sprake van (een of meerdere) verwerkers?',
+    'warn_has_processors_data_loss' => 'De verwerkers die aan deze verwerking gekoppeld zijn, worden verwijderd zodra u opslaat. Deze actie kan niet ongedaan worden gemaakt.',
     'help_has_systems' => 'Is er sprake van (een of meerdere) applicaties / systemen?',
     'help_has_security' => 'Beveiligt u de persoonsgegevens?',
     'help_outside_eu' => 'Geeft u bij uw gegevensverwerking persoonsgegevens door aan een of meer landen buiten de Europese Unie of aan een internationale organisatie?',
