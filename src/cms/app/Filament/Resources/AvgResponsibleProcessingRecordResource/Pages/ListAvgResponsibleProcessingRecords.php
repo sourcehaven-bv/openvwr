@@ -19,6 +19,11 @@ class ListAvgResponsibleProcessingRecords extends ListRecords
 
     protected static string $resource = AvgResponsibleProcessingRecordResource::class;
 
+    public function getSubheading(): string
+    {
+        return __('avg_responsible_processing_record.register_description');
+    }
+
     protected function getHeaderActions(): array
     {
         return [

@@ -17,6 +17,7 @@ use Webmozart\Assert\Assert;
 
 use function __;
 use function array_map;
+use function is_string;
 use function sprintf;
 
 class WpgGoalsRepeater extends Repeater
@@ -50,11 +51,13 @@ class WpgGoalsRepeater extends Repeater
         return [
             Textarea::make('description')
                 ->label(__('wpg_goal.description'))
+                ->helperText(__('wpg_goal.help_description'))
                 ->required()
                 ->columnSpanFull(),
             ...self::getArticleToggles(),
             Textarea::make('explanation')
                 ->label(__('wpg_goal.explanation'))
+                ->helperText(__('wpg_goal.help_explanation'))
                 ->columnSpanFull()
                 ->required(),
             Hidden::make('organisation_id')
@@ -82,6 +85,7 @@ class WpgGoalsRepeater extends Repeater
         return array_map(static function (string $name) use ($fields) {
             return Toggle::make($name)
                 ->label(__(sprintf('wpg_goal.%s', $name)))
+                ->helperText(self::getArticleHelperText($name))
                 ->accepted(static function (Get $get) use ($fields): bool {
                     foreach ($fields as $field) {
                         if ($get($field) === true) {
@@ -96,5 +100,21 @@ class WpgGoalsRepeater extends Repeater
                 ])
                 ->live();
         }, $fields);
+    }
+
+    /**
+     * Only the articles whose label does not already explain their scope get helper text;
+     * the others would merely repeat their own label.
+     */
+    private static function getArticleHelperText(string $name): ?string
+    {
+        $key = sprintf('wpg_goal.help_%s', $name);
+        $helperText = __($key);
+
+        if (!is_string($helperText) || $helperText === $key) {
+            return null;
+        }
+
+        return $helperText;
     }
 }

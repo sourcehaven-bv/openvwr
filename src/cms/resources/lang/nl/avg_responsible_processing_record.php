@@ -6,6 +6,7 @@ return [
     'model_singular' => 'Verwerking AVG Verantwoordelijke',
     'model_plural' => 'Verwerkingen AVG Verantwoordelijke',
     'table_empty_heading' => 'Geen Verwerkingen AVG Verantwoordelijke',
+    'register_description' => 'Verwerkingen van persoonsgegevens waarbij uw organisatie zelf het doel en de middelen bepaalt.',
 
     'step_processing_name' => 'Naam verwerking',
     'step_responsible' => 'Verwerkingsverantwoordelijke',
@@ -28,6 +29,19 @@ return [
     'help_has_systems' => 'Is er sprake van (een of meerdere) applicaties / systemen?',
     'help_has_security' => 'Beveiligt u de persoonsgegevens?',
     'help_outside_eu' => 'Geeft u bij uw gegevensverwerking persoonsgegevens door aan een of meer landen buiten de Europese Unie of aan een internationale organisatie?',
+
+    'help_service' => 'De dienst of afdeling die verantwoordelijk is voor deze verwerking.',
+    'help_responsibility_distribution' => 'Alleen invullen bij meerdere verantwoordelijken: wie is waarvoor verantwoordelijk?',
+    'help_logic' => 'Welke gegevens tot welk besluit leiden, begrijpelijk beschreven en zonder technische details.',
+    'help_importance_consequences' => 'Wat het besluit concreet voor de betrokkene betekent, bijvoorbeeld toekenning of afwijzing.',
+    'help_measures_implemented' => 'Alleen aanvinken als het beleid formeel is vastgesteld én in de praktijk wordt toegepast.',
+    'help_other_measures' => 'Aanvinken als er maatregelen zijn buiten het vastgestelde beveiligingsbeleid.',
+    'help_measures_description' => 'De concrete maatregelen, bijvoorbeeld versleuteling, autorisatiematrix of toegangscontrole.',
+    'help_pseudonymization' => 'Hoe gegevens zijn vervangen door kenmerken die niet direct naar een persoon herleidbaar zijn.',
+    'help_outside_eu_description' => 'Welke gegevens worden doorgegeven en met welk doel.',
+    'help_geb_dpia_executed' => 'Zet aan als er daadwerkelijk een GEB is uitgevoerd; de vragen hieronder bepalen of dat verplicht is.',
+    'help_users' => 'Wie als eerste benaderd wordt bij vragen over deze verwerking.',
+    'help_contact_persons' => 'Aanvullende contactpersonen, bijvoorbeeld de beheerder van het systeem.',
 
     'remarks' => 'Opmerkingen',
     'outside_eu' => 'Doorgifte buiten EER',

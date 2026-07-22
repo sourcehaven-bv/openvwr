@@ -27,6 +27,7 @@ class ResponsibleResourceForm
         return [
             TextInput::make('name')
                 ->label(__('responsible.name'))
+                ->helperText(__('responsible.help_name'))
                 ->required()
                 ->maxLength(255),
             AddressRepeater::make()

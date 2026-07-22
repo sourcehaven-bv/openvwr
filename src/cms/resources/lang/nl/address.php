@@ -19,4 +19,6 @@ return [
     'postbox_postal_code' => 'Postbus postcode',
     'postbox_city' => 'Postbus plaats',
     'postbox_country' => 'Postbus land',
+
+    'help_address' => 'Alleen invullen als het adres afwijkt van dat van de organisatie.',
 ];

@@ -8,4 +8,6 @@ return [
     'table_empty_heading' => 'Geen ontvangers',
 
     'description' => 'Omschrijving',
+
+    'help_description' => 'Aan wie de gegevens worden verstrekt, bijvoorbeeld "Belastingdienst".',
 ];

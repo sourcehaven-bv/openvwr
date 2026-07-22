@@ -28,6 +28,7 @@ class SystemResourceForm
         return [
             TextInput::make('description')
                 ->label(__('system.description'))
+                ->helperText(__('system.help_description'))
                 ->unique(ignoreRecord: true, modifyRuleUsing: static function (Unique $rule): void {
                     $rule->where('organisation_id', Authentication::organisation()->id->toString());
                 })

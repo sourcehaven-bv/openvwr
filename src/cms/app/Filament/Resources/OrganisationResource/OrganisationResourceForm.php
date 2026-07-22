@@ -44,11 +44,13 @@ class OrganisationResourceForm
                             ->maxLength(255),
                         TextInput::make('review_at_default_in_months')
                             ->label(__('organisation.review_at_default_in_months'))
+                            ->helperText(__('organisation.help_review_at_default_in_months'))
                             ->required()
                             ->default(36)
                             ->integer(),
                         Select::make('responsible_legal_entity_id')
                             ->label(__('responsible_legal_entity.model_singular'))
+                            ->helperText(__('organisation.help_responsible_legal_entity'))
                             ->relationship('responsibleLegalEntity', 'name')
                             ->searchable(['name'])
                             ->required()
@@ -74,6 +76,7 @@ class OrganisationResourceForm
                     ->schema([
                         TextInput::make('slug')
                             ->label(__('organisation.slug'))
+                            ->helperText(__('organisation.help_slug'))
                             ->unique(ignoreRecord: true, modifyRuleUsing: static function (Unique $rule): void {
                                 $rule->withoutTrashed();
                             })
@@ -86,6 +89,7 @@ class OrganisationResourceForm
                             ->hintIcon('heroicon-o-information-circle', __('organisation.public_from_hint_icon_text')),
                         Textarea::make('allowed_ips')
                             ->label(__('organisation.allowed_ips'))
+                            ->helperText(__('organisation.help_allowed_ips'))
                             ->required()
                             ->default('*.*.*.*')
                             ->rules([new IPRanges()])
@@ -102,9 +106,11 @@ class OrganisationResourceForm
                             ),
                         MarkdownEditor::make('public_website_content')
                             ->label(__('organisation.public_website_content'))
+                            ->helperText(__('organisation.help_public_website_content'))
                             ->columnSpan(2),
                         PosterFileField::make('poster')
                             ->label(__('organisation.poster'))
+                            ->helperText(__('organisation.help_poster'))
                             ->properties([
                                 'organisation_id' => Authentication::organisation()->id->toString(),
                             ])

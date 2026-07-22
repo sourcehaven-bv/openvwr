@@ -40,20 +40,27 @@ class AlgorithmRecordResourceFormSchemas
                 ->maxLength(100),
             Textarea::make('description')
                 ->label(__('algorithm_record.description'))
+                ->helperText(__('algorithm_record.help_description'))
                 ->maxLength(400),
             SelectSingleWithLookup::makeWithDisabledOptions('algorithm_theme_id', 'algorithmTheme', AlgorithmTheme::class, 'name')
-                ->label(__('algorithm_record.theme')),
+                ->label(__('algorithm_record.theme'))
+                ->helperText(__('algorithm_record.help_theme')),
             SelectSingleWithLookup::makeWithDisabledOptions('algorithm_status_id', 'algorithmStatus', AlgorithmStatus::class, 'name')
-                ->label(__('algorithm_record.status')),
+                ->label(__('algorithm_record.status'))
+                ->helperText(__('algorithm_record.help_status')),
             DatePicker::make('start_date')
-                ->label(__('algorithm_record.start_date')),
+                ->label(__('algorithm_record.start_date'))
+                ->helperText(__('algorithm_record.help_start_date')),
             DatePicker::make('end_date')
-                ->label(__('algorithm_record.end_date')),
+                ->label(__('algorithm_record.end_date'))
+                ->helperText(__('algorithm_record.help_end_date')),
             TextInput::make('contact_data')
                 ->label(__('algorithm_record.contact_data'))
+                ->helperText(__('algorithm_record.help_contact_data'))
                 ->maxLength(500),
             TextInput::make('public_page_link')
                 ->label(__('algorithm_record.public_page_link'))
+                ->helperText(__('algorithm_record.help_public_page_link'))
                 ->url()
                 ->maxLength(500),
             SelectSingleWithLookup::makeWithDisabledOptions(
@@ -65,6 +72,7 @@ class AlgorithmRecordResourceFormSchemas
                 ->label(__('algorithm_record.publication_category')),
             TextInput::make('source_link')
                 ->label(__('algorithm_record.source_link'))
+                ->helperText(__('algorithm_record.help_source_link'))
                 ->columns(1)
                 ->url()
                 ->maxLength(500),
@@ -143,6 +151,7 @@ class AlgorithmRecordResourceFormSchemas
                 ->maxLength(5000),
             Textarea::make('oper_supplier')
                 ->label(__('algorithm_record.oper_supplier'))
+                ->helperText(__('algorithm_record.help_oper_supplier'))
                 ->maxLength(200),
             TextInput::make('oper_source_code_link')
                 ->label(__('algorithm_record.oper_source_code_link'))
@@ -165,20 +174,25 @@ class AlgorithmRecordResourceFormSchemas
             // legt deze vast op respectievelijk 'nld' en de versie van de standaard zelf. De
             // aanlever-API van het Algoritmeregister vult ze server-side in.
             DatePicker::make('meta_date_of_development')
-                ->label(__('algorithm_record.meta_date_of_development')),
+                ->label(__('algorithm_record.meta_date_of_development'))
+                ->helperText(__('algorithm_record.help_meta_date_of_development')),
             TextInput::make('meta_owner_algorithm')
                 ->label(__('algorithm_record.meta_owner_algorithm'))
+                ->helperText(__('algorithm_record.help_meta_owner_algorithm'))
                 ->required(),
             TextInput::make('meta_product_owner_algorithm')
                 ->label(__('algorithm_record.meta_product_owner_algorithm'))
+                ->helperText(__('algorithm_record.help_meta_product_owner_algorithm'))
                 ->required(),
             TextInput::make('meta_national_id')
                 ->label(__('algorithm_record.meta_national_id')),
             TextInput::make('meta_source_id')
                 ->label(__('algorithm_record.meta_source_id'))
+                ->helperText(__('algorithm_record.help_meta_source_id'))
                 ->maxLength(100),
             Textarea::make('meta_tags')
                 ->label(__('algorithm_record.meta_tags'))
+                ->helperText(__('algorithm_record.help_meta_tags'))
                 ->maxLength(2500),
             InformationBlockSection::makeCollapsible(
                 __('information_blocks.algorithm_record.step_meta_title'),
@@ -255,6 +269,7 @@ class AlgorithmRecordResourceFormSchemas
     {
         return Radio::make($name)
             ->label(__('algorithm_record.' . $name))
+            ->helperText(__('algorithm_record.help_' . $name))
             ->options([
                 '1' => __('general.yes'),
                 '0' => __('general.no'),
