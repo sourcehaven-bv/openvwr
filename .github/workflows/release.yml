@@ -1,12 +1,11 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - 'v*'
-  # Tags pushed by tag-release.yml use GITHUB_TOKEN, and GitHub does not
-  # fire workflows for token-created events. Without this, tagging never
-  # builds a release. Dispatch also lets a failed build be re-run.
+  # tag-release.yml builds and publishes inline when it creates a tag, so the
+  # normal path does not rely on this workflow. This manual dispatch stays as an
+  # escape hatch to (re)build and publish an existing tag — e.g. after a failed
+  # build, or a tag pushed by hand. There is no `push: tags` trigger because
+  # tags pushed with GITHUB_TOKEN do not fire workflow events anyway.
   workflow_dispatch:
     inputs:
       tag:
@@ -21,7 +20,7 @@ jobs:
   build:
     uses: ./.github/workflows/build-release.yml
     with:
-      version: ${{ inputs.tag || github.ref_name }}
+      version: ${{ inputs.tag }}
 
   publish:
     needs: build
@@ -36,8 +35,6 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          # On dispatch github.ref_name is the branch, not the tag, so the
-          # release must be pinned to the requested tag explicitly.
-          tag_name: ${{ inputs.tag || github.ref_name }}
+          tag_name: ${{ inputs.tag }}
           files: "*.tar.gz"
           generate_release_notes: true
