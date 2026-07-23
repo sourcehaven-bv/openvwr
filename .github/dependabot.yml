@@ -51,6 +51,8 @@ updates:
       day: "monday"
       time: "06:00"
       timezone: "Europe/Amsterdam"
+    # Majors are proposed too, but ungrouped: one breaking major in a
+    # grouped PR would otherwise block every other update in it.
     groups:
       minor-and-patch:
         patterns:
