@@ -119,6 +119,7 @@ class Snapshot extends Model implements HasStatesContract, TenantAware
     public function snapshotTransitions(): HasMany
     {
         return $this->hasMany(SnapshotTransition::class)
+            ->with('creator')
             ->oldest();
     }
 }

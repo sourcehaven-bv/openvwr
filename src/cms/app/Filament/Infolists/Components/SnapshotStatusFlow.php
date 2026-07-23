@@ -46,7 +46,7 @@ class SnapshotStatusFlow extends ViewEntry
     /**
      * @return array{stations: list<array<string, mixed>>, obsolete: array<string, mixed>|null}
      */
-    private static function buildFlow(Snapshot $snapshot): array
+    public static function buildFlow(Snapshot $snapshot): array
     {
         // The first time each state was reached, keyed by state name.
         /** @var array<string, SnapshotTransition> $reachedAt */
@@ -64,11 +64,14 @@ class SnapshotStatusFlow extends ViewEntry
         foreach (self::MAIN_LINE as $index => $stateClass) {
             $stateName = $stateClass::$name;
             $transition = $reachedAt[$stateName] ?? null;
+            $isCurrent = $currentState === $stateName;
             // A snapshot always starts in review even before any transition is
-            // recorded, so the first station counts as reached by default.
-            $reached = $transition !== null || $index === 0;
+            // recorded, so the first station counts as reached by default. The
+            // current station is always reached too: a state can be set directly
+            // (e.g. seeded data) without a recorded transition.
+            $reached = $transition !== null || $index === 0 || $isCurrent;
 
-            $stations[] = self::station($stateClass, $reached, $currentState === $stateName, $transition);
+            $stations[] = self::station($stateClass, $reached, $isCurrent, $transition);
         }
 
         $obsolete = null;
