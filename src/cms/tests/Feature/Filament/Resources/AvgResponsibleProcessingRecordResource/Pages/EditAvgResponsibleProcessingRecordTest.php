@@ -135,7 +135,9 @@ it('can see the dpia field', function (): void {
         ->assertSee(__('avg_responsible_processing_record.geb_dpia_automated'));
 });
 
-it('can not see the dpia field', function (): void {
+it('hides the mandatory-GEB questionnaire when a GEB was executed', function (): void {
+    // The pre-screen determines whether a GEB is required; once one has been
+    // carried out the questionnaire is moot and the criteria are hidden.
     $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
         ->recycle($organisation)
@@ -176,6 +178,8 @@ it('can save a dpia subfield', function (): void {
         ->assertHasNoFormErrors();
 
     $avgResponsibleProcessingRecord->refresh();
+    // wp248 comes before high_risk in the questionnaire, so answering it "ja"
+    // makes it the first "ja" and resets the later high_risk answer.
     expect($avgResponsibleProcessingRecord->geb_dpia_executed)->toBeFalse()
         ->and($avgResponsibleProcessingRecord->geb_dpia_criteria_wp248)->toBeTrue()
         ->and($avgResponsibleProcessingRecord->geb_dpia_high_risk_freedoms)->toBeFalse();

@@ -31,6 +31,14 @@ it('can generate private markdown', function (): void {
             'importance_consequences' => null,
             'outside_eu' => false,
             'geb_dpia_executed' => 'yes',
+            // The criteria print unconditionally now, so pin them for a stable
+            // snapshot instead of letting the factory randomise them.
+            'geb_dpia_automated' => true,
+            'geb_dpia_large_scale_processing' => false,
+            'geb_dpia_large_scale_monitoring' => false,
+            'geb_dpia_list_required' => true,
+            'geb_dpia_criteria_wp248' => false,
+            'geb_dpia_high_risk_freedoms' => false,
             'public_from' => '2012-05-24',
             'avg_responsible_processing_record_service_id' => AvgResponsibleProcessingRecordService::factory()->state([
                 'name' => 'In modi dolore aspernatur nobis ullam magni minus ipsum.',

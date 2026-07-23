@@ -14,7 +14,7 @@ return [
     'step_meta' => 'Metadata',
     'step_impact' => 'Impactvol algoritme',
     'step_validation' => 'Validatie',
-    'step_attachments' => 'Documenten & Bijlagen',
+    'step_attachments' => 'Documenten & bijlagen',
     'step_publish' => 'Publiceren',
     'step_remarks' => 'Opmerkingen',
 
@@ -56,7 +56,9 @@ return [
     'impact_effect_on_outcome' => 'Heeft het algoritme een significant effect op de uitkomst van het proces?',
     'impact_algorithm_message' => 'Alle drie de vragen zijn met "Ja" beantwoord, dit algoritme wordt aangemerkt als impactvol en opgenomen in het algoritmeregister.',
 
+    'help_name' => 'Een korte, herkenbare naam voor het algoritme, zoals een burger het zou herkennen.',
     'help_description' => 'Eén alinea in begrijpelijke taal voor een burger; maximaal 400 tekens.',
+    'help_publication_category' => 'Bepaalt hoe uitgebreid het algoritme op de publieke website wordt gepubliceerd.',
     'help_theme' => 'Het beleidsterrein waarop het algoritme wordt ingezet, bijvoorbeeld Openbare orde en veiligheid.',
     'help_status' => 'De fase waarin het algoritme zich bevindt: in ontwikkeling, in gebruik of uitgefaseerd.',
     'help_start_date' => 'De datum waarop het algoritme in gebruik is genomen.',

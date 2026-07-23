@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 return [
-    'model_singular' => 'AVG Rechtsgrond',
-    'model_plural' => 'AVG Rechtsgronden',
+    'model_singular' => 'AVG rechtsgrond',
+    'model_plural' => 'AVG rechtsgronden',
 
     'options' => [
         'Toestemming betrokkene',

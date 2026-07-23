@@ -49,6 +49,11 @@ class AvgProcessorProcessingRecordResourceFormSchemas
     public static function getProcessingName(): array
     {
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.avg_processor_processing_record.step_processing_name_title'),
+                __('information_blocks.avg_processor_processing_record.step_processing_name_info'),
+                __('information_blocks.avg_processor_processing_record.step_processing_name_extra_info'),
+            ),
             Grid::make()
                 ->schema([
                     EntityNumber::make(),
@@ -56,6 +61,7 @@ class AvgProcessorProcessingRecordResourceFormSchemas
                 ]),
             TextInput::make('name')
                 ->label(__('processing_record.name'))
+                ->helperText(__('processing_record.name_help'))
                 ->required()
                 ->maxLength(255),
             CoreEntityDataCollectionSource::make(),
@@ -70,12 +76,7 @@ class AvgProcessorProcessingRecordResourceFormSchemas
             TagsInput::make(),
             PeriodicReviewField::make(),
             ParentSelect::make()
-                ->hintIcon('heroicon-o-information-circle', __('general.parent_hint_icon_text')),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.avg_processor_processing_record.step_processing_name_title'),
-                __('information_blocks.avg_processor_processing_record.step_processing_name_info'),
-                __('information_blocks.avg_processor_processing_record.step_processing_name_extra_info'),
-            ),
+                ->helperText(__('general.parent_help')),
         ];
     }
 
@@ -85,6 +86,11 @@ class AvgProcessorProcessingRecordResourceFormSchemas
     public static function getResponsible(): array
     {
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.avg_processor_processing_record.step_responsible_title'),
+                __('information_blocks.avg_processor_processing_record.step_responsible_info'),
+                __('information_blocks.avg_processor_processing_record.step_responsible_extra_info'),
+            ),
             SelectMultipleWithLookup::makeForRelationshipWithCreate(
                 'responsible_id',
                 'responsibles',
@@ -93,12 +99,8 @@ class AvgProcessorProcessingRecordResourceFormSchemas
                 'name',
             )
                 ->label(__('responsible.model_plural'))
+                ->helperText(__('avg_processor_processing_record.help_responsible'))
                 ->required(),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.avg_processor_processing_record.step_responsible_title'),
-                __('information_blocks.avg_processor_processing_record.step_responsible_info'),
-                __('information_blocks.avg_processor_processing_record.step_responsible_extra_info'),
-            ),
         ];
     }
 
@@ -108,6 +110,11 @@ class AvgProcessorProcessingRecordResourceFormSchemas
     public static function getProcessors(): array
     {
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.avg_processor_processing_record.step_processor_title'),
+                __('information_blocks.avg_processor_processing_record.step_processor_info'),
+                __('information_blocks.avg_processor_processing_record.step_processor_extra_info'),
+            ),
             Toggle::make('has_processors')
                 ->label(__('avg_processor_processing_record.has_subprocessors'))
                 ->helperText(__('avg_processor_processing_record.help_has_subprocessors'))
@@ -123,11 +130,6 @@ class AvgProcessorProcessingRecordResourceFormSchemas
             )
                 ->label(__('avg_processor_processing_record.subprocessors'))
                 ->visible(FormHelper::isFieldEnabled('has_processors')),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.avg_processor_processing_record.step_processor_title'),
-                __('information_blocks.avg_processor_processing_record.step_processor_info'),
-                __('information_blocks.avg_processor_processing_record.step_processor_extra_info'),
-            ),
         ];
     }
 
@@ -137,6 +139,11 @@ class AvgProcessorProcessingRecordResourceFormSchemas
     public static function getReceiver(): array
     {
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.avg_processor_processing_record.step_receiver_title'),
+                __('information_blocks.avg_processor_processing_record.step_receiver_info'),
+                __('information_blocks.avg_processor_processing_record.step_receiver_extra_info'),
+            ),
             SelectMultipleWithLookup::makeForRelationshipWithCreate(
                 'receivers',
                 'receivers',
@@ -144,12 +151,8 @@ class AvgProcessorProcessingRecordResourceFormSchemas
                 ReceiverResourceForm::getSchema(),
                 'description',
             )
-                ->label(__('receiver.model_plural')),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.avg_processor_processing_record.step_receiver_title'),
-                __('information_blocks.avg_processor_processing_record.step_receiver_info'),
-                __('information_blocks.avg_processor_processing_record.step_receiver_extra_info'),
-            ),
+                ->label(__('receiver.model_plural'))
+                ->helperText(__('avg_processor_processing_record.help_receivers')),
         ];
     }
 
@@ -159,17 +162,18 @@ class AvgProcessorProcessingRecordResourceFormSchemas
     public static function getProcessingGoal(): array
     {
         return [
-            Toggle::make('has_goal')
-                ->label(__('avg_processor_processing_record.has_goal'))
-                ->default(false)
-                ->live(),
-            AvgGoalsRepeater::make()
-                ->visible(FormHelper::isFieldEnabled('has_goal')),
             InformationBlockSection::makeCollapsible(
                 __('information_blocks.avg_processor_processing_record.step_processing_goal_title'),
                 __('information_blocks.avg_processor_processing_record.step_processing_goal_info'),
                 __('information_blocks.avg_processor_processing_record.step_processing_goal_extra_info'),
             ),
+            Toggle::make('has_goal')
+                ->label(__('avg_processor_processing_record.has_goal'))
+                ->helperText(__('avg_processor_processing_record.help_has_goal'))
+                ->default(false)
+                ->live(),
+            AvgGoalsRepeater::make()
+                ->visible(FormHelper::isFieldEnabled('has_goal')),
         ];
     }
 
@@ -179,6 +183,11 @@ class AvgProcessorProcessingRecordResourceFormSchemas
     public static function getInvolvedData(): array
     {
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.avg_processor_processing_record.step_stakeholder_data_title'),
+                __('information_blocks.avg_processor_processing_record.step_stakeholder_data_info'),
+                __('information_blocks.avg_processor_processing_record.step_stakeholder_data_extra_info'),
+            ),
             Toggle::make('has_involved')
                 ->label(__('avg_processor_processing_record.has_involved'))
                 ->default(false)
@@ -187,11 +196,6 @@ class AvgProcessorProcessingRecordResourceFormSchemas
 
             StakeholdersRepeater::make()
                 ->visible(FormHelper::isFieldEnabled('has_involved')),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.avg_processor_processing_record.step_stakeholder_data_title'),
-                __('information_blocks.avg_processor_processing_record.step_stakeholder_data_info'),
-                __('information_blocks.avg_processor_processing_record.step_stakeholder_data_extra_info'),
-            ),
         ];
     }
 
@@ -201,6 +205,11 @@ class AvgProcessorProcessingRecordResourceFormSchemas
     public static function getDecisionMaking(): array
     {
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.avg_processor_processing_record.step_decision_making_title'),
+                __('information_blocks.avg_processor_processing_record.step_decision_making_info'),
+                __('information_blocks.avg_processor_processing_record.step_decision_making_extra_info'),
+            ),
             Toggle::make('decision_making')
                 ->label(__('avg_processor_processing_record.decision_making'))
                 ->default(false)
@@ -220,11 +229,6 @@ class AvgProcessorProcessingRecordResourceFormSchemas
                         ->label(__('avg_processor_processing_record.importance_consequences'))
                         ->helperText(__('avg_processor_processing_record.help_importance_consequences')),
                 ]),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.avg_processor_processing_record.step_decision_making_title'),
-                __('information_blocks.avg_processor_processing_record.step_decision_making_info'),
-                __('information_blocks.avg_processor_processing_record.step_decision_making_extra_info'),
-            ),
         ];
     }
 
@@ -234,6 +238,11 @@ class AvgProcessorProcessingRecordResourceFormSchemas
     public static function getSystem(): array
     {
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.avg_processor_processing_record.step_system_title'),
+                __('information_blocks.avg_processor_processing_record.step_system_info'),
+                __('information_blocks.avg_processor_processing_record.step_system_extra_info'),
+            ),
             Toggle::make('has_systems')
                 ->helperText(__('avg_processor_processing_record.help_has_systems'))
                 ->label(__('avg_processor_processing_record.has_systems'))
@@ -250,11 +259,6 @@ class AvgProcessorProcessingRecordResourceFormSchemas
                 ->label(__('system.model_plural'))
                 ->required()
                 ->visible(FormHelper::isFieldEnabled('has_systems')),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.avg_processor_processing_record.step_system_title'),
-                __('information_blocks.avg_processor_processing_record.step_system_info'),
-                __('information_blocks.avg_processor_processing_record.step_system_extra_info'),
-            ),
         ];
     }
 
@@ -264,6 +268,11 @@ class AvgProcessorProcessingRecordResourceFormSchemas
     public static function getSecurity(): array
     {
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.avg_processor_processing_record.step_security_title'),
+                __('information_blocks.avg_processor_processing_record.step_security_info'),
+                __('information_blocks.avg_processor_processing_record.step_security_extra_info'),
+            ),
             Toggle::make('has_security')
                 ->helperText(__('avg_processor_processing_record.help_has_security'))
                 ->label(__('avg_processor_processing_record.has_security'))
@@ -290,6 +299,7 @@ class AvgProcessorProcessingRecordResourceFormSchemas
                         ->schema([
                             Toggle::make('has_pseudonymization')
                                 ->label(__('avg_processor_processing_record.has_pseudonymization'))
+                                ->helperText(__('avg_processor_processing_record.help_has_pseudonymization'))
                                 ->default(false)
                                 ->live(),
                             Textarea::make('pseudonymization')
@@ -300,11 +310,6 @@ class AvgProcessorProcessingRecordResourceFormSchemas
                                 ->visible(FormHelper::isFieldEnabled('has_pseudonymization')),
                         ]),
                 ]),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.avg_processor_processing_record.step_security_title'),
-                __('information_blocks.avg_processor_processing_record.step_security_info'),
-                __('information_blocks.avg_processor_processing_record.step_security_extra_info'),
-            ),
         ];
     }
 
@@ -314,6 +319,11 @@ class AvgProcessorProcessingRecordResourceFormSchemas
     public static function getPassthrough(): array
     {
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.avg_processor_processing_record.step_passthrough_title'),
+                __('information_blocks.avg_processor_processing_record.step_passthrough_info'),
+                __('information_blocks.avg_processor_processing_record.step_passthrough_extra_info'),
+            ),
             Toggle::make('outside_eu')
                 ->helperText(__('avg_processor_processing_record.help_outside_eu'))
                 ->label(__('avg_processor_processing_record.outside_eu'))
@@ -327,6 +337,7 @@ class AvgProcessorProcessingRecordResourceFormSchemas
 
                     Toggle::make('outside_eu_protection_level')
                         ->label(__('avg_processor_processing_record.outside_eu_protection_level'))
+                        ->helperText(__('avg_processor_processing_record.help_outside_eu_protection_level'))
                         ->live(),
 
                     Textarea::make('outside_eu_protection_level_description')
@@ -339,11 +350,6 @@ class AvgProcessorProcessingRecordResourceFormSchemas
                         ->label(__('avg_processor_processing_record.outside_eu_description'))
                         ->helperText(__('avg_processor_processing_record.help_outside_eu_description')),
                 ]),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.avg_processor_processing_record.step_passthrough_title'),
-                __('information_blocks.avg_processor_processing_record.step_passthrough_info'),
-                __('information_blocks.avg_processor_processing_record.step_passthrough_extra_info'),
-            ),
         ];
     }
 
@@ -353,14 +359,14 @@ class AvgProcessorProcessingRecordResourceFormSchemas
     public static function getGebPia(): array
     {
         return [
-            Toggle::make('geb_pia')
-                ->label(__('avg_processor_processing_record.geb_pia'))
-                ->helperText(__('avg_processor_processing_record.help_geb_pia')),
             InformationBlockSection::makeCollapsible(
                 __('information_blocks.avg_processor_processing_record.step_geb_dpia_title'),
                 __('information_blocks.avg_processor_processing_record.step_geb_dpia_info'),
                 __('information_blocks.avg_processor_processing_record.step_geb_dpia_extra_info'),
             ),
+            Toggle::make('geb_pia')
+                ->label(__('avg_processor_processing_record.geb_pia'))
+                ->helperText(__('avg_processor_processing_record.help_geb_pia')),
         ];
     }
 
@@ -370,11 +376,11 @@ class AvgProcessorProcessingRecordResourceFormSchemas
     public static function getContactPerson(): array
     {
         return [
-            ProcessingRecordContactPersons::makeGroup(),
             InformationBlockSection::makeCollapsible(
                 __('information_blocks.avg_processor_processing_record.step_contact_person_title'),
                 __('information_blocks.avg_processor_processing_record.step_contact_person_info'),
             ),
+            ProcessingRecordContactPersons::makeGroup(),
         ];
     }
 
@@ -384,6 +390,10 @@ class AvgProcessorProcessingRecordResourceFormSchemas
     public static function getAttachments(): array
     {
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.avg_processor_processing_record.step_attachments_title'),
+                __('information_blocks.avg_processor_processing_record.step_attachments_info'),
+            ),
             SelectMultipleWithLookup::makeForRelationshipWithCreate(
                 'document_id',
                 'documents',
@@ -392,10 +402,6 @@ class AvgProcessorProcessingRecordResourceFormSchemas
                 'name',
             )
                 ->label(__('document.model_plural')),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.avg_processor_processing_record.step_attachments_title'),
-                __('information_blocks.avg_processor_processing_record.step_attachments_info'),
-            ),
         ];
     }
 
@@ -405,14 +411,14 @@ class AvgProcessorProcessingRecordResourceFormSchemas
     public static function getRemarks(): array
     {
         return [
-            RemarksField::make()
-                ->mutateRelationshipDataBeforeCreateUsing(FormHelper::addAuthFields())
-                ->mutateRelationshipDataBeforeSaveUsing(FormHelper::addAuthFields()),
             InformationBlockSection::makeCollapsible(
                 __('information_blocks.avg_processor_processing_record.step_remarks_title'),
                 __('information_blocks.avg_processor_processing_record.step_remarks_info'),
                 __('information_blocks.avg_processor_processing_record.step_remarks_extra_info'),
             ),
+            RemarksField::make()
+                ->mutateRelationshipDataBeforeCreateUsing(FormHelper::addAuthFields())
+                ->mutateRelationshipDataBeforeSaveUsing(FormHelper::addAuthFields()),
         ];
     }
 }

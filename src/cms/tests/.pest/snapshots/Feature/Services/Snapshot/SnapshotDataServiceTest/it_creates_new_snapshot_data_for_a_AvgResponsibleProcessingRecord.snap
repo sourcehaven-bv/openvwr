@@ -23,10 +23,10 @@
 
 <!--- #App\Models\Receiver# --->
 
-## Doel &amp; Grondslag
+## Doel &amp; grondslag
 
 - **Doel**: Quos non maiores non\.
-  - **AVG Rechtsgronden**: Toestemming betrokkene
+  - **AVG rechtsgronden**: Toestemming betrokkene
   - **Toelichting bij gekozen rechtsgrond**: -
 
 ## Betrokkenen en gegevens
@@ -57,7 +57,7 @@
 
 - **Doorgifte buiten EER**: ja
 - **Landen**: - 
-- **Adequate bescherming buiten de EER**: nee
+- **Vallen alle doorgiftes onder een adequaatheidsbesluit?**: nee
 - **Toelichting adequate bescherming**: Quaerat consectetur repellat iure aut\.
 - **Toelichting doorgifte**: -
 
@@ -65,13 +65,19 @@
 
 - **GEB (DPIA) uitgevoerd**: nee
 - **Systematische en uitgebreide beoordeling van persoonlijke aspecten**: ja
+- **Grootschalige verwerking van bijzondere categorieen**: nee
+- **Grootschalige monitoring**: nee
+- **Autoriteit Persoonsgegevens gepubliceerde lijst**: nee
+- **De negen criteria van WP248**: nee
+- **Hoog risico voor rechten en vrijheden**: nee
+- **Uitkomst**: Op basis van uw antwoorden is een GEB (DPIA) verplicht.
 
 ## Contactpersoon
 
 
 <!--- #App\Models\ContactPerson# --->
 
-## Documenten &amp; Bijlagen
+## Documenten &amp; bijlagen
 
 - Geen
 

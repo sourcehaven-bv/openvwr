@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 
+use App\Filament\Forms\GebDpiaQuestionnaire;
 use App\Filament\Infolists\Components\AvgGoalsRepeatableEntry;
 use App\Filament\Infolists\Components\CheckboxEntry;
 use App\Filament\Infolists\Components\DateEntry;
@@ -20,6 +21,7 @@ use App\Filament\Infolists\Components\TextareaEntry;
 use App\Filament\Infolists\Components\ToggleEntry;
 use App\Filament\Infolists\Group\ProcessingRecordContactPersons;
 use App\Filament\Infolists\InfolistHelper;
+use App\Models\Avg\AvgResponsibleProcessingRecord;
 use Filament\Infolists\Components\Component;
 use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\Group;
@@ -27,6 +29,7 @@ use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 
 use function __;
+use function array_map;
 
 class AvgResponsibleProcessingRecordResourceInfolistSchemas
 {
@@ -243,8 +246,8 @@ class AvgResponsibleProcessingRecordResourceInfolistSchemas
                     ToggleEntry::make('outside_eu_protection_level')
                         ->label(__('avg_responsible_processing_record.outside_eu_protection_level')),
                     TextareaEntry::make('outside_eu_protection_level_description')
-                        ->label(__('processor.outside_eu_protection_level_description'))
-                        ->visible(InfolistHelper::isFieldEnabled('outside_eu_protection_level')),
+                        ->label(__('avg_responsible_processing_record.outside_eu_protection_level_description'))
+                        ->visible(InfolistHelper::isFieldDisabled('outside_eu_protection_level')),
                     TextareaEntry::make('outside_eu_description')
                         ->label(__('avg_responsible_processing_record.outside_eu_description')),
                 ]),
@@ -261,52 +264,30 @@ class AvgResponsibleProcessingRecordResourceInfolistSchemas
      */
     public static function getGebDpia(): array
     {
+        // Mirrors the form's questionnaire: the executed flag, the criteria
+        // answers (already normalised on save so only reached questions can be
+        // "ja"), and the computed outcome.
+        $criteria = GebDpiaQuestionnaire::CRITERIA;
+
         return [
             ToggleEntry::make('geb_dpia_executed')
                 ->label(__('avg_responsible_processing_record.geb_dpia_executed')),
-            ToggleEntry::make('geb_dpia_automated')
-                ->label(__('avg_responsible_processing_record.geb_dpia_automated'))
-                ->visible(InfolistHelper::isFieldDisabled('geb_dpia_executed')),
-            ToggleEntry::make('geb_dpia_large_scale_processing')
-                ->label(__('avg_responsible_processing_record.geb_dpia_large_scale_processing'))
-                ->visible(InfolistHelper::fieldValueEquals([
-                    'geb_dpia_executed' => false,
-                    'geb_dpia_automated' => false,
-                ])),
-            ToggleEntry::make('geb_dpia_large_scale_monitoring')
-                ->label(__('avg_responsible_processing_record.geb_dpia_large_scale_monitoring'))
-                ->visible(InfolistHelper::fieldValueEquals([
-                    'geb_dpia_executed' => false,
-                    'geb_dpia_automated' => false,
-                    'geb_dpia_large_scale_processing' => false,
-                ])),
-            ToggleEntry::make('geb_dpia_list_required')
-                ->label(__('avg_responsible_processing_record.geb_dpia_list_required'))
-                ->visible(InfolistHelper::fieldValueEquals([
-                    'geb_dpia_executed' => false,
-                    'geb_dpia_automated' => false,
-                    'geb_dpia_large_scale_processing' => false,
-                    'geb_dpia_large_scale_monitoring' => false,
-                ])),
-            ToggleEntry::make('geb_dpia_criteria_wp248')
-                ->label(__('avg_responsible_processing_record.geb_dpia_criteria_wp248'))
-                ->visible(InfolistHelper::fieldValueEquals([
-                    'geb_dpia_executed' => false,
-                    'geb_dpia_automated' => false,
-                    'geb_dpia_large_scale_processing' => false,
-                    'geb_dpia_large_scale_monitoring' => false,
-                    'geb_dpia_list_required' => false,
-                ])),
-            ToggleEntry::make('geb_dpia_high_risk_freedoms')
-                ->label(__('avg_responsible_processing_record.geb_dpia_high_risk_freedoms'))
-                ->visible(InfolistHelper::fieldValueEquals([
-                    'geb_dpia_executed' => false,
-                    'geb_dpia_automated' => false,
-                    'geb_dpia_large_scale_processing' => false,
-                    'geb_dpia_large_scale_monitoring' => false,
-                    'geb_dpia_list_required' => false,
-                    'geb_dpia_criteria_wp248' => false,
-                ])),
+            Section::make(__('avg_responsible_processing_record.geb_dpia_criteria_heading'))
+                ->visible(InfolistHelper::isFieldDisabled('geb_dpia_executed'))
+                ->schema(array_map(static fn (string $field): ToggleEntry => ToggleEntry::make($field)
+                    ->label(__('avg_responsible_processing_record.' . $field)), $criteria)),
+            TextEntry::make('geb_dpia_outcome')
+                ->label(__('avg_responsible_processing_record.geb_dpia_outcome_label'))
+                ->state(static function (AvgResponsibleProcessingRecord $record) use ($criteria): string {
+                    $answers = [];
+                    foreach ($criteria as $criterion) {
+                        $answers[$criterion] = $record->getAttribute($criterion) === true;
+                    }
+
+                    $outcome = GebDpiaQuestionnaire::outcomeFor($record->geb_dpia_executed === true, $answers);
+
+                    return __('avg_responsible_processing_record.geb_dpia_outcome_' . $outcome);
+                }),
             InformationBlockSection::makeCollapsible(
                 __('information_blocks.avg_responsible_processing_record.step_geb_dpia_title'),
                 __('information_blocks.avg_responsible_processing_record.step_geb_dpia_info'),

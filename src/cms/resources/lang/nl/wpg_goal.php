@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 return [
-    'model_singular' => 'WPG Doel',
-    'model_plural' => 'WPG Doelen',
+    'model_singular' => 'WPG doel',
+    'model_plural' => 'WPG doelen',
     'table_empty_heading' => 'Geen WPG doelen',
     'add_action_label' => 'Doel toevoegen',
 

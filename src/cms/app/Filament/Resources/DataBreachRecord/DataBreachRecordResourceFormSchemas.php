@@ -41,10 +41,15 @@ class DataBreachRecordResourceFormSchemas
         Assert::allString($typeOptions);
 
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.data_breach_record.step_name_title'),
+                __('information_blocks.data_breach_record.step_name_info'),
+            ),
             EntityNumber::make()
                 ->label(__('data_breach_record.number')),
             TextInput::make('name')
                 ->label(__('data_breach_record.name'))
+                ->helperText(__('data_breach_record.help_name'))
                 ->required()
                 ->maxLength(255),
             DatePicker::make('reported_at')
@@ -59,10 +64,6 @@ class DataBreachRecordResourceFormSchemas
             Toggle::make('ap_reported')
                 ->label(__('data_breach_record.ap_reported'))
                 ->helperText(__('data_breach_record.help_ap_reported')),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.data_breach_record.step_name_title'),
-                __('information_blocks.data_breach_record.step_name_info'),
-            ),
         ];
     }
 
@@ -72,6 +73,11 @@ class DataBreachRecordResourceFormSchemas
     public static function getResponsible(): array
     {
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.data_breach_record.step_responsible_title'),
+                __('information_blocks.data_breach_record.step_responsible_info'),
+                __('information_blocks.data_breach_record.step_responsible_extra_info'),
+            ),
             SelectMultipleWithLookup::makeForRelationshipWithCreate(
                 'responsible_id',
                 'responsibles',
@@ -80,11 +86,6 @@ class DataBreachRecordResourceFormSchemas
                 'name',
             )
                 ->label(__('responsible.model_plural')),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.data_breach_record.step_responsible_title'),
-                __('information_blocks.data_breach_record.step_responsible_info'),
-                __('information_blocks.data_breach_record.step_responsible_extra_info'),
-            ),
         ];
     }
 
@@ -94,6 +95,10 @@ class DataBreachRecordResourceFormSchemas
     public static function getDates(): array
     {
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.data_breach_record.step_dates_title'),
+                __('information_blocks.data_breach_record.step_dates_info'),
+            ),
             DatePicker::make('discovered_at')
                 ->label(__('data_breach_record.discovered_at'))
                 ->helperText(__('data_breach_record.help_discovered_at'))
@@ -105,14 +110,11 @@ class DataBreachRecordResourceFormSchemas
                 ->label(__('data_breach_record.ended_at'))
                 ->helperText(__('data_breach_record.help_ended_at')),
             DatePicker::make('ap_reported_at')
-                ->label(__('data_breach_record.ap_reported_at')),
+                ->label(__('data_breach_record.ap_reported_at'))
+                ->helperText(__('data_breach_record.help_ap_reported_at')),
             DatePicker::make('completed_at')
                 ->label(__('data_breach_record.completed_at'))
                 ->helperText(__('data_breach_record.help_completed_at')),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.data_breach_record.step_dates_title'),
-                __('information_blocks.data_breach_record.step_dates_info'),
-            ),
         ];
     }
 
@@ -134,6 +136,10 @@ class DataBreachRecordResourceFormSchemas
         Assert::allString($reportedToInvolvedCommunicationOptions);
 
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.data_breach_record.step_incident_title'),
+                __('information_blocks.data_breach_record.step_incident_info'),
+            ),
             Radio::make('nature_of_incident')
                 ->label(__('data_breach_record.nature_of_incident'))
                 ->helperText(__('data_breach_record.help_nature_of_incident'))
@@ -152,6 +158,7 @@ class DataBreachRecordResourceFormSchemas
                 ->required(),
             CheckboxList::makeWithValidatedOptions('personal_data_categories', FormHelper::setValueAsKey($personalDataCategoriesOptions))
                 ->label(__('data_breach_record.personal_data_categories'))
+                ->helperText(__('data_breach_record.help_personal_data_categories'))
                 ->live(),
             Textarea::make('personal_data_categories_other')
                 ->label(__('data_breach_record.personal_data_categories_other'))
@@ -188,10 +195,6 @@ class DataBreachRecordResourceFormSchemas
             Toggle::make('fg_reported')
                 ->label(__('data_breach_record.fg_reported'))
                 ->helperText(__('data_breach_record.help_fg_reported')),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.data_breach_record.step_incident_title'),
-                __('information_blocks.data_breach_record.step_incident_info'),
-            ),
         ];
     }
 
@@ -201,8 +204,13 @@ class DataBreachRecordResourceFormSchemas
     public static function getProcessingRecords(): array
     {
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.data_breach_record.step_processing_records_title'),
+                __('information_blocks.data_breach_record.step_processing_records_info'),
+            ),
             Select::make('avgResponsibleProcessingRecords')
                 ->label(__('avg_responsible_processing_record.model_plural'))
+                ->helperText(__('data_breach_record.help_linked_processing_records'))
                 ->relationship('avgResponsibleProcessingRecords', 'name', TenantScoped::getAsClosure())
                 ->rules([CurrentOrganisation::forModel(AvgResponsibleProcessingRecord::class)])
                 ->multiple(),
@@ -216,10 +224,6 @@ class DataBreachRecordResourceFormSchemas
                 ->relationship('wpgProcessingRecords', 'name', TenantScoped::getAsClosure())
                 ->rules([CurrentOrganisation::forModel(WpgProcessingRecord::class)])
                 ->multiple(),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.data_breach_record.step_processing_records_title'),
-                __('information_blocks.data_breach_record.step_processing_records_info'),
-            ),
         ];
     }
 
@@ -229,6 +233,10 @@ class DataBreachRecordResourceFormSchemas
     public static function getAttachments(): array
     {
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.data_breach_record.step_attachments_title'),
+                __('information_blocks.data_breach_record.step_attachments_info'),
+            ),
             SelectMultipleWithLookup::makeForRelationshipWithCreate(
                 'document_id',
                 'documents',
@@ -237,10 +245,6 @@ class DataBreachRecordResourceFormSchemas
                 'name',
             )
                 ->label(__('document.model_plural')),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.data_breach_record.step_attachments_title'),
-                __('information_blocks.data_breach_record.step_attachments_info'),
-            ),
         ];
     }
 }

@@ -12,7 +12,12 @@ class InformationBlockSection extends Section
 {
     public static function makeCollapsible(string $heading, string $info, ?string $extraInfo = null): static
     {
-        $informationBlockSection = parent::make($heading);
+        $informationBlockSection = parent::make($heading)
+            // A real, consistent toggle that starts closed: a saved record
+            // should open with its information blocks collapsed rather than
+            // everything expanded at once.
+            ->collapsible()
+            ->collapsed();
 
         if ($extraInfo === null) {
             return $informationBlockSection
@@ -25,8 +30,7 @@ class InformationBlockSection extends Section
             ->description(self::makeHtmlString($info))
             ->schema([
                 self::makePlaceholderWithHtmlString($extraInfo),
-            ])
-            ->collapsed();
+            ]);
     }
 
     private static function makePlaceholderWithHtmlString(string $info): Placeholder
