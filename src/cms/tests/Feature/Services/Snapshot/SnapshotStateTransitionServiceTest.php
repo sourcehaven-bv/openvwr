@@ -125,6 +125,36 @@ it('sets replaced at attribute when snapshot is obsoleted', function (): void {
 });
 
 
+it('sets established at attribute when snapshot is established', function (): void {
+    Event::fake();
+
+    $organisation = Organisation::factory()->create();
+    $user = User::factory()
+        ->hasOrganisationRole(Role::PRIVACY_OFFICER, $organisation)
+        ->create();
+    $this->be($user);
+
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create();
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->for($avgResponsibleProcessingRecord, 'snapshotSource')
+        ->create([
+            'state' => Approved::class,
+            'established_at' => null,
+        ]);
+
+    /** @var SnapshotState $snapshotState */
+    $snapshotState = SnapshotState::make(Established::class, $snapshot);
+
+    $snapshotStateTransitionService = $this->app->get(SnapshotStateTransitionService::class);
+    $snapshotStateTransitionService->transitionToSnapshotState($snapshot, $snapshotState);
+    expect($snapshot->refresh()->established_at)
+        ->not()->toBeNull();
+});
+
+
 it('can transition even if snapshotSource is deleted', function (): void {
     Event::fake();
 

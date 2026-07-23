@@ -11,9 +11,12 @@ use App\Filament\Tables\Columns\SnapshotStateColumn;
 use App\Models\Scopes\OrderByCreatedAtAscScope;
 use App\Models\Snapshot;
 use App\Models\States\SnapshotState;
+use App\Services\DateFormatService;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 
 use function __;
@@ -44,6 +47,10 @@ class OrganisationSnapshotApprovalResourceTable
                     ->formatStateUsing(static function (Snapshot $snapshot): string {
                         return sprintf('%s / %s', SnapshotFacade::countApproved($snapshot), SnapshotFacade::countTotal($snapshot));
                     }),
+                TextColumn::make('established_at')
+                    ->label(__('snapshot.established_at'))
+                    ->dateTime(DateFormatService::FORMAT_DATE_TIME, DateFormatService::getDisplayTimezone())
+                    ->sortable(),
                 CreatedAtColumn::make(),
             ])
             ->defaultSort('created_at', 'desc')
@@ -72,6 +79,15 @@ class OrganisationSnapshotApprovalResourceTable
                             })
                             ->toArray();
                     }),
+                TernaryFilter::make('established_at')
+                    ->label(__('snapshot.established_filter'))
+                    ->placeholder(__('snapshot.established_filter_all'))
+                    ->trueLabel(__('snapshot.established_filter_established'))
+                    ->falseLabel(__('snapshot.established_filter_never'))
+                    ->queries(
+                        true: static fn (Builder $query): Builder => $query->whereNotNull('established_at'),
+                        false: static fn (Builder $query): Builder => $query->whereNull('established_at'),
+                    ),
             ]);
     }
 }
