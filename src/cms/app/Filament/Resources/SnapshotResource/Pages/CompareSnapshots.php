@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SnapshotResource\Pages;
 
+use App\Enums\Authorization\Permission;
 use App\Enums\Snapshot\SnapshotDataSection;
+use App\Facades\Authorization;
 use App\Facades\DateFormat;
 use App\Filament\Resources\SnapshotResource;
 use App\Models\Contracts\SnapshotSource;
@@ -49,6 +51,11 @@ class CompareSnapshots extends Page
     {
         $this->record = $this->resolveRecord($record);
 
+        // Page (unlike ViewRecord) does not authorize access on mount, so the
+        // SNAPSHOT_VIEW policy would never run. Enforce the same check
+        // ViewSnapshot gets automatically before rendering any diff.
+        $this->authorizeAccess();
+
         abort_unless($this->getSnapshot()->snapshotSource !== null, 404);
 
         $snapshots = $this->getSnapshots();
@@ -63,6 +70,13 @@ class CompareSnapshots extends Page
         if ($this->toId === null || !$snapshots->has($this->toId)) {
             $this->toId = $this->getSnapshot()->id->toString();
         }
+    }
+
+    protected function authorizeAccess(): void
+    {
+        // Mirror SnapshotPolicy::view(), which ViewSnapshot enforces via
+        // ViewRecord::mount() but a plain Page does not.
+        abort_unless(Authorization::hasPermission(Permission::SNAPSHOT_VIEW), 403);
     }
 
     public function getTitle(): string|Htmlable

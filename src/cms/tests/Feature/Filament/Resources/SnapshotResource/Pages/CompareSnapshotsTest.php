@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\Authorization\Permission;
 use App\Filament\RelationManagers\SnapshotsRelationManager;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\EditAvgResponsibleProcessingRecord;
 use App\Filament\Resources\SnapshotResource;
@@ -11,6 +12,7 @@ use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Snapshot;
 use App\Models\SnapshotData;
 use Tests\Helpers\Model\OrganisationTestHelper;
+use Tests\Helpers\Model\UserTestHelper;
 
 /**
  * @return array{0: Snapshot, 1: Snapshot}
@@ -61,6 +63,46 @@ it('renders the compare page for a source with two versions', function (): void 
         ->assertOk()
         ->assertSee('oudewaarde')
         ->assertSee('nieuwewaarde');
+});
+
+it('forbids access without the snapshot view permission', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $source = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create();
+    [, $to] = createComparableSnapshots($source, 'oud-fragment', 'nieuw-fragment');
+
+    // A user who can see the source entity but lacks SNAPSHOT_VIEW must not be
+    // able to read the diff of every snapshot in the tenant.
+    $user = UserTestHelper::createForOrganisationWithPermissions(
+        $organisation,
+        [Permission::CORE_ENTITY_VIEW],
+    );
+
+    $this->withFilamentSession($user, $organisation)
+        ->createLivewireTestable(CompareSnapshots::class, [
+            'record' => $to->getRouteKey(),
+        ])
+        ->assertForbidden();
+});
+
+it('allows access with the snapshot view permission', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $source = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create();
+    [, $to] = createComparableSnapshots($source, 'oud-fragment', 'nieuw-fragment');
+
+    $user = UserTestHelper::createForOrganisationWithPermissions(
+        $organisation,
+        [Permission::CORE_ENTITY_VIEW, Permission::SNAPSHOT_VIEW],
+    );
+
+    $this->withFilamentSession($user, $organisation)
+        ->createLivewireTestable(CompareSnapshots::class, [
+            'record' => $to->getRouteKey(),
+        ])
+        ->assertOk();
 });
 
 it('defaults the pickers to the previous and anchor versions', function (): void {
