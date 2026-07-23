@@ -23,6 +23,7 @@ return [
     'url' => 'Url',
 
     'back_to' => 'Terug naar :resource',
+    'status_flow' => 'Statusverloop',
     'properties' => 'Gegevens',
     'public_data' => 'Publieke gegevens',
     'private_data' => 'Private gegevens',
