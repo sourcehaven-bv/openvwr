@@ -10,13 +10,14 @@ use App\Filament\Forms\Components\OutsideEuCountryInputGroup;
 use App\Filament\Forms\Components\PeriodicReviewField;
 use App\Filament\Forms\Components\PublicFromField;
 use App\Filament\Forms\Components\Radio\CoreEntityDataCollectionSource;
+use App\Filament\Forms\Components\RelationTable;
+use App\Filament\Forms\Components\RelationTableColumns;
 use App\Filament\Forms\Components\RemarksField;
 use App\Filament\Forms\Components\Repeater\AvgGoalsRepeater;
 use App\Filament\Forms\Components\Section\InformationBlockSection;
 use App\Filament\Forms\Components\Section\StaticWebsiteCheckSection;
 use App\Filament\Forms\Components\Select\ParentSelect;
 use App\Filament\Forms\Components\Select\SelectSingleWithLookup;
-use App\Filament\Forms\Components\SelectMultipleWithLookup;
 use App\Filament\Forms\Components\StakeholdersRepeater;
 use App\Filament\Forms\Components\TagsInput;
 use App\Filament\Forms\Components\TextInput\EntityNumber;
@@ -89,12 +90,13 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
     public static function getResponsible(): array
     {
         return [
-            SelectMultipleWithLookup::makeForRelationshipWithCreate(
+            RelationTable::makeForRelationship(
                 'responsible_id',
                 'responsibles',
                 Responsible::class,
-                ResponsibleResourceForm::getSchema(),
                 'name',
+                RelationTableColumns::for(Responsible::class),
+                ResponsibleResourceForm::getSchema(),
             )
                 ->label(__('responsible.model_plural'))
                 ->required(),
@@ -123,12 +125,13 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
                 ->helperText(__('avg_responsible_processing_record.help_has_processors'))
                 ->label(__('avg_responsible_processing_record.has_processors'))
                 ->default(false),
-            SelectMultipleWithLookup::makeForRelationshipWithCreate(
+            RelationTable::makeForRelationship(
                 'processors',
                 'processors',
                 Processor::class,
-                ProcessorResourceForm::getSchema(),
                 'name',
+                RelationTableColumns::for(Processor::class),
+                ProcessorResourceForm::getSchema(),
             )
                 ->label(__('processor.model_plural'))
                 ->required()
@@ -146,12 +149,13 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
     public static function getReceiver(): array
     {
         return [
-            SelectMultipleWithLookup::makeForRelationshipWithCreate(
+            RelationTable::makeForRelationship(
                 'receivers',
                 'receivers',
                 Receiver::class,
-                ReceiverResourceForm::getSchema(),
                 'description',
+                RelationTableColumns::for(Receiver::class),
+                ReceiverResourceForm::getSchema(),
             )
                 ->label(__('receiver.model_plural')),
             InformationBlockSection::makeCollapsible(
@@ -235,12 +239,13 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
                 ->default(false)
                 ->live(),
 
-            SelectMultipleWithLookup::makeForRelationshipWithCreate(
+            RelationTable::makeForRelationship(
                 'systems',
                 'systems',
                 System::class,
-                SystemResourceForm::getSchema(),
                 'description',
+                RelationTableColumns::for(System::class),
+                SystemResourceForm::getSchema(),
             )
                 ->label(__('system.model_plural'))
                 ->required()
@@ -429,12 +434,13 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
     public static function getAttachments(): array
     {
         return [
-            SelectMultipleWithLookup::makeForRelationshipWithCreate(
+            RelationTable::makeForRelationship(
                 'document_id',
                 'documents',
                 Document::class,
-                DocumentResourceForm::getSchema(),
                 'name',
+                RelationTableColumns::for(Document::class),
+                DocumentResourceForm::getSchema(),
             )
                 ->label(__('document.model_plural')),
             InformationBlockSection::makeCollapsible(

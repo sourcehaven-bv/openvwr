@@ -6,8 +6,9 @@ namespace App\Filament\Resources\DataBreachRecord;
 
 use App\Filament\Forms\Components\CheckboxList;
 use App\Filament\Forms\Components\DatePicker\DatePicker;
+use App\Filament\Forms\Components\RelationTable;
+use App\Filament\Forms\Components\RelationTableColumns;
 use App\Filament\Forms\Components\Section\InformationBlockSection;
-use App\Filament\Forms\Components\SelectMultipleWithLookup;
 use App\Filament\Forms\Components\TextInput\EntityNumber;
 use App\Filament\Forms\FormHelper;
 use App\Filament\Resources\DocumentResource\DocumentResourceForm;
@@ -72,12 +73,13 @@ class DataBreachRecordResourceFormSchemas
     public static function getResponsible(): array
     {
         return [
-            SelectMultipleWithLookup::makeForRelationshipWithCreate(
+            RelationTable::makeForRelationship(
                 'responsible_id',
                 'responsibles',
                 Responsible::class,
-                ResponsibleResourceForm::getSchema(),
                 'name',
+                RelationTableColumns::for(Responsible::class),
+                ResponsibleResourceForm::getSchema(),
             )
                 ->label(__('responsible.model_plural')),
             InformationBlockSection::makeCollapsible(
@@ -229,12 +231,13 @@ class DataBreachRecordResourceFormSchemas
     public static function getAttachments(): array
     {
         return [
-            SelectMultipleWithLookup::makeForRelationshipWithCreate(
+            RelationTable::makeForRelationship(
                 'document_id',
                 'documents',
                 Document::class,
-                DocumentResourceForm::getSchema(),
                 'name',
+                RelationTableColumns::for(Document::class),
+                DocumentResourceForm::getSchema(),
             )
                 ->label(__('document.model_plural')),
             InformationBlockSection::makeCollapsible(

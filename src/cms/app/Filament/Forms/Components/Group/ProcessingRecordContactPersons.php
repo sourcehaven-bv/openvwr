@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Forms\Components\Group;
 
 use App\Facades\Authentication;
-use App\Filament\Forms\Components\SelectMultipleWithLookup;
+use App\Filament\Forms\Components\RelationTable;
+use App\Filament\Forms\Components\RelationTableColumns;
 use App\Filament\Resources\LookupListResource\LookupListResourceForm;
 use App\Models\ContactPerson;
 use App\Models\OrganisationUser;
@@ -30,12 +31,13 @@ class ProcessingRecordContactPersons extends Group
                 ->default([Authentication::user()->id->toString()])
                 ->label(__('contact_person.form_title_users'))
                 ->helperText(__('contact_person.help_form_title_users')),
-            SelectMultipleWithLookup::makeForRelationshipWithCreate(
+            RelationTable::makeForRelationship(
                 'contactPersons',
                 'contactPersons',
                 ContactPerson::class,
-                LookupListResourceForm::getSchema(),
                 'name',
+                RelationTableColumns::for(ContactPerson::class),
+                LookupListResourceForm::getSchema(),
             )
                 ->label(__('contact_person.form_title_contact_persons'))
                 ->helperText(__('contact_person.help_form_title_contact_persons')),

@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\Filament\Resources\AlgorithmRecordResource;
 
 use App\Filament\Forms\Components\DatePicker\DatePicker;
+use App\Filament\Forms\Components\RelationTable;
+use App\Filament\Forms\Components\RelationTableColumns;
 use App\Filament\Forms\Components\Section\InformationBlockSection;
 use App\Filament\Forms\Components\Select\SelectSingleWithLookup;
-use App\Filament\Forms\Components\SelectMultipleWithLookup;
 use App\Filament\Forms\Components\TextInput\EntityNumber;
 use App\Filament\Resources\DocumentResource\DocumentResourceForm;
 use App\Models\Algorithm\AlgorithmPublicationCategory;
@@ -250,12 +251,13 @@ class AlgorithmRecordResourceFormSchemas
     public static function getAttachments(): array
     {
         return [
-            SelectMultipleWithLookup::makeForRelationshipWithCreate(
+            RelationTable::makeForRelationship(
                 'document_id',
                 'documents',
                 Document::class,
-                DocumentResourceForm::getSchema(),
                 'name',
+                RelationTableColumns::for(Document::class),
+                DocumentResourceForm::getSchema(),
             )
                 ->label(__('document.model_plural')),
             InformationBlockSection::makeCollapsible(

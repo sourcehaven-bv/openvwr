@@ -7,8 +7,9 @@ namespace App\Filament\Resources\DocumentResource;
 use App\Enums\Authorization\Permission;
 use App\Facades\Authorization;
 use App\Filament\Forms\Components\DatePicker\DatePicker;
+use App\Filament\Forms\Components\RelationTable;
+use App\Filament\Forms\Components\RelationTableColumns;
 use App\Filament\Forms\Components\Select\SelectSingleWithLookup;
-use App\Filament\Forms\Components\SelectMultipleWithLookup;
 use App\Filament\Forms\Components\Upload\AttachmentFileField;
 use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Avg\AvgProcessorProcessingRecord;
@@ -132,47 +133,52 @@ class DocumentResourceForm
             ->collapsible()
             ->collapsed()
             ->schema([
-                SelectMultipleWithLookup::makeForRelationship(
+                RelationTable::makeForRelationship(
                     'avg_responsible_processing_record_id',
                     'avgResponsibleProcessingRecords',
                     AvgResponsibleProcessingRecord::class,
                     'name',
+                    RelationTableColumns::for(AvgResponsibleProcessingRecord::class),
                 )
                     ->label(__('avg_responsible_processing_record.model_plural'))
                     ->visible(Authorization::hasPermission(Permission::CORE_ENTITY_VIEW))
                     ->columnSpan(2),
-                SelectMultipleWithLookup::makeForRelationship(
+                RelationTable::makeForRelationship(
                     'avg_processor_processing_record_id',
                     'avgProcessorProcessingRecords',
                     AvgProcessorProcessingRecord::class,
                     'name',
+                    RelationTableColumns::for(AvgProcessorProcessingRecord::class),
                 )
                     ->label(__('avg_processor_processing_record.model_plural'))
                     ->visible(Authorization::hasPermission(Permission::CORE_ENTITY_VIEW))
                     ->columnSpan(2),
-                SelectMultipleWithLookup::makeForRelationship(
+                RelationTable::makeForRelationship(
                     'wpg_processing_record_id',
                     'WpgProcessingRecords',
                     WpgProcessingRecord::class,
                     'name',
+                    RelationTableColumns::for(WpgProcessingRecord::class),
                 )
                     ->label(__('wpg_processing_record.model_plural'))
                     ->visible(Authorization::hasPermission(Permission::CORE_ENTITY_VIEW))
                     ->columnSpan(2),
-                SelectMultipleWithLookup::makeForRelationship(
+                RelationTable::makeForRelationship(
                     'algorithm_record_id',
                     'AlgorithmRecords',
                     AlgorithmRecord::class,
                     'name',
+                    RelationTableColumns::for(AlgorithmRecord::class),
                 )
                     ->label(__('algorithm_record.model_plural'))
                     ->visible(Authorization::hasPermission(Permission::CORE_ENTITY_VIEW))
                     ->columnSpan(2),
-                SelectMultipleWithLookup::makeForRelationship(
+                RelationTable::makeForRelationship(
                     'data_breach_record_id',
                     'DataBreachRecords',
                     DataBreachRecord::class,
                     'name',
+                    RelationTableColumns::for(DataBreachRecord::class),
                 )
                     ->label(__('data_breach_record.model_plural'))
                     ->visible(Authorization::hasPermission(Permission::DATA_BREACH_RECORD_VIEW))

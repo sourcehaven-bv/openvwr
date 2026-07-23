@@ -7,11 +7,12 @@ namespace App\Filament\Resources\WpgProcessingRecordResource;
 use App\Filament\Forms\Components\Group\ProcessingRecordContactPersons;
 use App\Filament\Forms\Components\PeriodicReviewField;
 use App\Filament\Forms\Components\Radio\CoreEntityDataCollectionSource;
+use App\Filament\Forms\Components\RelationTable;
+use App\Filament\Forms\Components\RelationTableColumns;
 use App\Filament\Forms\Components\RemarksField;
 use App\Filament\Forms\Components\Section\InformationBlockSection;
 use App\Filament\Forms\Components\Select\ParentSelect;
 use App\Filament\Forms\Components\Select\SelectSingleWithLookup;
-use App\Filament\Forms\Components\SelectMultipleWithLookup;
 use App\Filament\Forms\Components\TagsInput;
 use App\Filament\Forms\Components\TextInput\EntityNumber;
 use App\Filament\Forms\Components\TextInput\ImportNumber;
@@ -82,12 +83,13 @@ class WpgProcessingRecordResourceFormSchemas
     public static function getResponsible(): array
     {
         return [
-            SelectMultipleWithLookup::makeForRelationshipWithCreate(
+            RelationTable::makeForRelationship(
                 'responsible_id',
                 'responsibles',
                 Responsible::class,
-                ResponsibleResourceForm::getSchema(),
                 'name',
+                RelationTableColumns::for(Responsible::class),
+                ResponsibleResourceForm::getSchema(),
             )
                 ->label(__('responsible.model_plural')),
             InformationBlockSection::makeCollapsible(
@@ -110,12 +112,13 @@ class WpgProcessingRecordResourceFormSchemas
                 ->default(false)
                 ->live(),
 
-            SelectMultipleWithLookup::makeForRelationshipWithCreate(
+            RelationTable::makeForRelationship(
                 'processors',
                 'processors',
                 Processor::class,
-                ProcessorResourceForm::getSchema(),
                 'name',
+                RelationTableColumns::for(Processor::class),
+                ProcessorResourceForm::getSchema(),
             )
                 ->label(__('processor.model_plural'))
                 ->required()
@@ -281,12 +284,13 @@ class WpgProcessingRecordResourceFormSchemas
                 ->default(false)
                 ->live(),
 
-            SelectMultipleWithLookup::makeForRelationshipWithCreate(
+            RelationTable::makeForRelationship(
                 'systems',
                 'systems',
                 System::class,
-                SystemResourceForm::getSchema(),
                 'description',
+                RelationTableColumns::for(System::class),
+                SystemResourceForm::getSchema(),
             )
                 ->label(__('system.model_plural'))
                 ->required()
@@ -384,12 +388,13 @@ class WpgProcessingRecordResourceFormSchemas
     public static function getAttachments(): array
     {
         return [
-            SelectMultipleWithLookup::makeForRelationshipWithCreate(
+            RelationTable::makeForRelationship(
                 'document_id',
                 'documents',
                 Document::class,
-                DocumentResourceForm::getSchema(),
                 'name',
+                RelationTableColumns::for(Document::class),
+                DocumentResourceForm::getSchema(),
             )
                 ->label(__('document.model_plural')),
             InformationBlockSection::makeCollapsible(
