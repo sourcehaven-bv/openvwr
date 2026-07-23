@@ -13,10 +13,12 @@ use App\Models\Snapshot;
 use App\Models\SnapshotApproval;
 use App\Models\SnapshotApprovalLog;
 use App\Models\SnapshotData;
+use App\Models\SnapshotTransition;
 use App\Models\States\Snapshot\Approved;
 use App\Models\States\Snapshot\Established;
 use App\Models\States\Snapshot\InReview;
 use App\Models\States\Snapshot\Obsolete;
+use App\Models\User;
 use App\Models\Wpg\WpgProcessingRecord;
 use Tests\Helpers\Model\OrganisationTestHelper;
 use Tests\Helpers\Model\UserTestHelper;
@@ -639,4 +641,50 @@ it('does not show button to view all snapshot approvales if no permission', func
             'record' => $snapshot->getRouteKey(),
         ])
         ->assertActionDisabled('approve_view_all');
+});
+
+it('shows the status flow with the reached states and who reached them', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = User::factory()->create(['name' => 'Statuswijziger']);
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create([
+            'state' => Established::class,
+        ]);
+
+    // A recorded happy-path history: reached In review, Goedgekeurd and
+    // Vastgesteld, the last of which is the current state.
+    foreach ([InReview::class, Approved::class, Established::class] as $state) {
+        SnapshotTransition::factory()
+            ->recycle($snapshot)
+            ->recycle($user)
+            ->create(['state' => $state]);
+    }
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshot->getRouteKey(),
+        ])
+        ->assertSee(__('snapshot.status_flow'))
+        ->assertSeeInOrder([
+            __('snapshot_state.label.in_review'),
+            __('snapshot_state.label.approved'),
+            __('snapshot_state.label.established'),
+        ])
+        ->assertSee('Statuswijziger');
+});
+
+it('shows the obsolete branch in the status flow when a snapshot is obsolete', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create([
+            'state' => Obsolete::class,
+        ]);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshot->getRouteKey(),
+        ])
+        ->assertSee(__('snapshot_state.label.obsolete'));
 });
