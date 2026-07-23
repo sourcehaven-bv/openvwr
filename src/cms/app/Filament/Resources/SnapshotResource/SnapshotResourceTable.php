@@ -31,7 +31,8 @@ class SnapshotResourceTable
                 SnapshotStateColumn::make(),
                 TextColumn::make('established_at')
                     ->label(__('snapshot.established_at'))
-                    ->dateTime(DateFormatService::FORMAT_DATE_TIME, DateFormatService::getDisplayTimezone()),
+                    ->dateTime(DateFormatService::FORMAT_DATE_TIME, DateFormatService::getDisplayTimezone())
+                    ->sortable(),
                 TextColumn::make('replaced_at')
                     ->label(__('snapshot.replaced_at'))
                     ->dateTime(DateFormatService::FORMAT_DATE_TIME, DateFormatService::getDisplayTimezone()),

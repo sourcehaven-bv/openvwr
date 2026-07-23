@@ -11,7 +11,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('snapshots', static function (Blueprint $table): void {
-            $table->dateTime('established_at')->nullable()->after('replaced_at');
+            $table->dateTime('established_at')->nullable();
         });
     }
 

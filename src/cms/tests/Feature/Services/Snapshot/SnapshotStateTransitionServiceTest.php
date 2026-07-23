@@ -13,6 +13,7 @@ use App\Models\States\Snapshot\Obsolete;
 use App\Models\States\SnapshotState;
 use App\Models\User;
 use App\Services\Snapshot\SnapshotStateTransitionService;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Event;
 
 it('makes previous snapshots (only of the same state) obsolete', function (): void {
@@ -127,6 +128,7 @@ it('sets replaced at attribute when snapshot is obsoleted', function (): void {
 
 it('sets established at attribute when snapshot is established', function (): void {
     Event::fake();
+    CarbonImmutable::setTestNow('2026-07-23 12:00:00');
 
     $organisation = Organisation::factory()->create();
     $user = User::factory()
@@ -150,8 +152,10 @@ it('sets established at attribute when snapshot is established', function (): vo
 
     $snapshotStateTransitionService = $this->app->get(SnapshotStateTransitionService::class);
     $snapshotStateTransitionService->transitionToSnapshotState($snapshot, $snapshotState);
-    expect($snapshot->refresh()->established_at)
-        ->not()->toBeNull();
+    expect($snapshot->refresh()->established_at?->toDateTimeString())
+        ->toBe('2026-07-23 12:00:00');
+
+    CarbonImmutable::setTestNow();
 });
 
 
