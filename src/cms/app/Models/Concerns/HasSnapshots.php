@@ -64,6 +64,11 @@ trait HasSnapshots
         return $this->morphMany(Snapshot::class, 'snapshot_source');
     }
 
+    final public function hasComparableSnapshots(): bool
+    {
+        return $this->snapshots()->get()->count() >= 2;
+    }
+
     /**
      * @param class-string<SnapshotState> $state
      */

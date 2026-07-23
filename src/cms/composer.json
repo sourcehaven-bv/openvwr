@@ -22,6 +22,7 @@
         "filament/filament": "^3.3.52",
         "filament/spatie-laravel-media-library-plugin": "^3.0-stable",
         "guzzlehttp/guzzle": "^7.2",
+        "jfcherng/php-diff": "^6.0",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^3.0",
         "livewire/livewire": "^3.4",

@@ -19,6 +19,8 @@ interface SnapshotSource
      */
     public function snapshots(): MorphMany;
 
+    public function hasComparableSnapshots(): bool;
+
     /**
      * @param class-string<SnapshotState> $state
      */

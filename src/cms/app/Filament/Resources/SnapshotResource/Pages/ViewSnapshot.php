@@ -89,6 +89,16 @@ class ViewSnapshot extends ViewRecord
                 ->url(PersonalSnapshotApprovalResource::getUrl(parameters: [
                     'activeTab' => ListPersonalSnapshotApprovalItems::TAB_ID_UNREVIEWED,
                 ])),
+            Action::make('compare')
+                ->label(__('snapshot.compare'))
+                ->icon('heroicon-o-arrows-right-left')
+                ->color('gray')
+                ->visible(static function (Snapshot $record): bool {
+                    return $record->snapshotSource?->hasComparableSnapshots() === true;
+                })
+                ->url(static function (Snapshot $record): string {
+                    return SnapshotResource::getUrl('compare', ['record' => $record]);
+                }),
             ExportToPdfAction::make(),
             ...$this->getSnapshotWorkflowActions(),
         ];

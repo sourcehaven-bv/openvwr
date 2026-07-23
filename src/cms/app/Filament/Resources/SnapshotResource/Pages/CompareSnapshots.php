@@ -1,0 +1,201 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Filament\Resources\SnapshotResource\Pages;
+
+use App\Enums\Snapshot\SnapshotDataSection;
+use App\Facades\DateFormat;
+use App\Filament\Resources\SnapshotResource;
+use App\Models\Contracts\SnapshotSource;
+use App\Models\Snapshot;
+use App\ValueObjects\Markdown;
+use Filament\Resources\Pages\Concerns\InteractsWithRecord;
+use Filament\Resources\Pages\Page;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Collection;
+use Illuminate\Support\HtmlString;
+use Jfcherng\Diff\DiffHelper;
+use Livewire\Attributes\Url;
+use Webmozart\Assert\Assert;
+
+use function __;
+use function abort_unless;
+use function sprintf;
+
+class CompareSnapshots extends Page
+{
+    use InteractsWithRecord;
+
+    protected static string $resource = SnapshotResource::class;
+    protected static string $view = 'filament.resources.snapshot-resource.pages.compare-snapshots';
+
+    #[Url]
+    public ?string $fromId = null;
+
+    #[Url]
+    public ?string $toId = null;
+
+    public function mount(int|string $record): void
+    {
+        $this->record = $this->resolveRecord($record);
+
+        abort_unless($this->getSnapshot()->snapshotSource !== null, 404);
+
+        $snapshots = $this->getSnapshots();
+        abort_unless($snapshots->count() >= 2, 404, __('snapshot.compare_not_enough_versions'));
+
+        if ($this->fromId === null || !$snapshots->has($this->fromId)) {
+            // Default the "from" side to the version right before the anchor,
+            // falling back to the oldest snapshot.
+            $this->fromId = $this->defaultFromId($snapshots);
+        }
+
+        if ($this->toId === null || !$snapshots->has($this->toId)) {
+            $this->toId = $this->getSnapshot()->id->toString();
+        }
+    }
+
+    public function getTitle(): string|Htmlable
+    {
+        $snapshot = $this->getSnapshot();
+
+        return __('snapshot.compare_title', [
+            'name' => $snapshot->snapshotSource?->getDisplayName() ?? $snapshot->name,
+        ]);
+    }
+
+    /**
+     * @return array<int|string, string>
+     */
+    public function getBreadcrumbs(): array
+    {
+        $breadcrumbs = [
+            SnapshotResource::getUrl('view', ['record' => $this->getSnapshot()]) => __('snapshot.model_singular'),
+        ];
+        $breadcrumbs[] = __('snapshot.compare');
+
+        return $breadcrumbs;
+    }
+
+    /**
+     * Snapshots of the same source, keyed by id, newest version first.
+     *
+     * @return Collection<string, Snapshot>
+     */
+    public function getSnapshots(): Collection
+    {
+        return $this->getSource()->snapshots()
+            ->get()
+            ->sortByDesc('version')
+            ->keyBy(static fn (Snapshot $snapshot): string => $snapshot->id->toString());
+    }
+
+    /**
+     * Options for the version pickers: id => human label.
+     *
+     * @return array<string, string>
+     */
+    public function getVersionOptions(): array
+    {
+        return $this->getSnapshots()
+            ->map(static function (Snapshot $snapshot): string {
+                return sprintf(
+                    '%s %d — %s',
+                    __('snapshot.version'),
+                    $snapshot->version,
+                    DateFormat::toDateTime($snapshot->created_at),
+                );
+            })
+            ->all();
+    }
+
+    /**
+     * Side-by-side HTML diffs for each snapshot-data section.
+     *
+     * @return array<string, HtmlString>
+     */
+    public function getDiffs(): array
+    {
+        $snapshots = $this->getSnapshots();
+
+        $from = $this->fromId !== null ? $snapshots->get($this->fromId) : null;
+        $to = $this->toId !== null ? $snapshots->get($this->toId) : null;
+
+        if ($from === null || $to === null) {
+            return [];
+        }
+
+        return [
+            SnapshotDataSection::PUBLIC->value => $this->diffSection(
+                $from->snapshotData?->public_markdown,
+                $to->snapshotData?->public_markdown,
+            ),
+            SnapshotDataSection::PRIVATE->value => $this->diffSection(
+                $from->snapshotData?->private_markdown,
+                $to->snapshotData?->private_markdown,
+            ),
+        ];
+    }
+
+    private function diffSection(?Markdown $from, ?Markdown $to): HtmlString
+    {
+        // We diff the stored snapshot markdown rather than the rendered output:
+        // SnapshotDataMarkdownRenderer injects the currently-established related
+        // snapshots at render time, so its output is not a stable function of the
+        // version and would produce phantom differences.
+        $html = DiffHelper::calculate(
+            (string) $from?->toString(),
+            (string) $to?->toString(),
+            'SideBySide',
+            [
+                'context' => 3,
+                'ignoreWhitespace' => false,
+            ],
+            [
+                'detailLevel' => 'word',
+                'lineNumbers' => false,
+                'showHeader' => false,
+                'separateBlock' => true,
+                'resultForIdenticals' => sprintf(
+                    '<div class="snapshot-diff-empty">%s</div>',
+                    __('snapshot.compare_no_changes'),
+                ),
+            ],
+        );
+
+        return new HtmlString($html);
+    }
+
+    private function getSnapshot(): Snapshot
+    {
+        $snapshot = $this->getRecord();
+        Assert::isInstanceOf($snapshot, Snapshot::class);
+
+        return $snapshot;
+    }
+
+    private function getSource(): SnapshotSource
+    {
+        $source = $this->getSnapshot()->snapshotSource;
+        Assert::isInstanceOf($source, SnapshotSource::class);
+
+        return $source;
+    }
+
+    /**
+     * @param Collection<string, Snapshot> $snapshots
+     */
+    private function defaultFromId(Collection $snapshots): string
+    {
+        $version = $this->getSnapshot()->version;
+
+        $previous = $snapshots
+            ->first(static fn (Snapshot $snapshot): bool => $snapshot->version < $version);
+
+        $fallback = $snapshots->last();
+        Assert::isInstanceOf($fallback, Snapshot::class);
+
+        return ($previous ?? $fallback)->id->toString();
+    }
+}
