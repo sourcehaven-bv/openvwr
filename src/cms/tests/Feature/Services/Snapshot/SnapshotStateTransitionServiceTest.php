@@ -13,6 +13,7 @@ use App\Models\States\Snapshot\Obsolete;
 use App\Models\States\SnapshotState;
 use App\Models\User;
 use App\Services\Snapshot\SnapshotStateTransitionService;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Event;
 
 it('makes previous snapshots (only of the same state) obsolete', function (): void {
@@ -122,6 +123,39 @@ it('sets replaced at attribute when snapshot is obsoleted', function (): void {
     $snapshotStateTransitionService->transitionToSnapshotState($snapshot, $snapshotState);
     expect($snapshot->refresh()->replaced_at)
         ->not()->toBeNull();
+});
+
+
+it('sets established at attribute when snapshot is established', function (): void {
+    Event::fake();
+    CarbonImmutable::setTestNow('2026-07-23 12:00:00');
+
+    $organisation = Organisation::factory()->create();
+    $user = User::factory()
+        ->hasOrganisationRole(Role::PRIVACY_OFFICER, $organisation)
+        ->create();
+    $this->be($user);
+
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create();
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->for($avgResponsibleProcessingRecord, 'snapshotSource')
+        ->create([
+            'state' => Approved::class,
+            'established_at' => null,
+        ]);
+
+    /** @var SnapshotState $snapshotState */
+    $snapshotState = SnapshotState::make(Established::class, $snapshot);
+
+    $snapshotStateTransitionService = $this->app->get(SnapshotStateTransitionService::class);
+    $snapshotStateTransitionService->transitionToSnapshotState($snapshot, $snapshotState);
+    expect($snapshot->refresh()->established_at?->toDateTimeString())
+        ->toBe('2026-07-23 12:00:00');
+
+    CarbonImmutable::setTestNow();
 });
 
 

@@ -14,6 +14,7 @@ use App\Models\Scopes\OrderByCreatedAtAscScope;
 use App\Models\Snapshot;
 use App\Models\SnapshotApproval;
 use App\Models\States\SnapshotState;
+use App\Services\DateFormatService;
 use App\Services\Snapshot\SnapshotApprovalService;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
@@ -56,6 +57,10 @@ class PersonalSnapshotApprovalResourceTable
 
                         return __(sprintf('snapshot_approval_status.%s', $snapshotApproval->status->value));
                     }),
+                TextColumn::make('established_at')
+                    ->label(__('snapshot.established_at'))
+                    ->dateTime(DateFormatService::FORMAT_DATE_TIME, DateFormatService::getDisplayTimezone())
+                    ->sortable(),
                 CreatedAtColumn::make(),
             ])
             ->defaultSort('created_at', 'desc')

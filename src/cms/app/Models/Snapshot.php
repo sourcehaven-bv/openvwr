@@ -35,6 +35,7 @@ use Spatie\ModelStates\HasStatesContract;
  * @property int $version
  * @property SnapshotState $state
  * @property CarbonImmutable|null $replaced_at
+ * @property CarbonImmutable|null $established_at
  * @property string $snapshot_source_type
  * @property UuidInterface $snapshot_source_id
  *
@@ -67,6 +68,7 @@ class Snapshot extends Model implements HasStatesContract, TenantAware
         return [
             'snapshot_source_id' => UuidCast::class,
             'replaced_at' => 'datetime',
+            'established_at' => 'datetime',
             'state' => SnapshotState::class,
         ];
     }

@@ -55,3 +55,36 @@ it('loads correct list of items in all tabs', function (string $activeTab, int $
     [ListOrganisationSnapshotApprovalItems::TAB_ID_ESTABLISHED_OBSOLETE, 3],
     [ListOrganisationSnapshotApprovalItems::TAB_ID_INREVIEW_APPROVED, 2],
 ]);
+
+it('filters on whether a snapshot was ever established', function (): void {
+    $organisation = OrganisationTestHelper::create();
+
+    $established = Snapshot::factory()
+        ->recycle($organisation)
+        ->count(2)
+        ->create([
+            'state' => Established::$name,
+            'established_at' => now(),
+        ]);
+
+    $neverEstablished = Snapshot::factory()
+        ->recycle($organisation)
+        ->count(3)
+        ->create([
+            'state' => Obsolete::$name,
+            'established_at' => null,
+        ]);
+
+    $page = $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ListOrganisationSnapshotApprovalItems::class, [
+            'activeTab' => ListOrganisationSnapshotApprovalItems::TAB_ID_ALL,
+        ]);
+
+    $page->filterTable('established_at', true)
+        ->assertCanSeeTableRecords($established)
+        ->assertCanNotSeeTableRecords($neverEstablished);
+
+    $page->filterTable('established_at', false)
+        ->assertCanSeeTableRecords($neverEstablished)
+        ->assertCanNotSeeTableRecords($established);
+});
