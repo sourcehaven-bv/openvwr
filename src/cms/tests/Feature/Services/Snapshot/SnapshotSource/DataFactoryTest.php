@@ -6,7 +6,8 @@ use App\Models\Snapshot;
 use App\Services\Snapshot\SnapshotSource\DataFactory;
 
 it('returns empty defaults for a source that generates no data', function (): void {
-    $factory = new class extends DataFactory {};
+    $factory = new class extends DataFactory {
+    };
 
     $snapshot = Snapshot::factory()->create();
 
