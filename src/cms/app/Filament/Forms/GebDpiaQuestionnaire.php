@@ -117,7 +117,9 @@ final class GebDpiaQuestionnaire
                 }
             }
 
-            return true;
+            // Unreachable for a known criterion: the loop always matches $field
+            // above. Guards against an unlisted field name.
+            return true; // @codeCoverageIgnore
         };
     }
 

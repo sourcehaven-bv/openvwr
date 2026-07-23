@@ -76,12 +76,7 @@ class DocumentResourceForm
                             ->color('gray')
                             ->visible(static fn (Get $get): bool => filled($get('expires_at')))
                             ->action(static function (Get $get, Set $set): void {
-                                $expiresAt = self::readExpiresAt($get);
-                                if ($expiresAt === null) {
-                                    return;
-                                }
-
-                                $set('notify_at', $expiresAt);
+                                $set('notify_at', self::readExpiresAt($get));
                             }),
                     )
                     ->hintAction(
@@ -91,12 +86,7 @@ class DocumentResourceForm
                             ->color('gray')
                             ->visible(static fn (Get $get): bool => filled($get('expires_at')))
                             ->action(static function (Get $get, Set $set): void {
-                                $expiresAt = self::readExpiresAt($get);
-                                if ($expiresAt === null) {
-                                    return;
-                                }
-
-                                $set('notify_at', $expiresAt->subMonth());
+                                $set('notify_at', self::readExpiresAt($get)->subMonth());
                             }),
                     )
                     ->hintAction(
@@ -106,12 +96,7 @@ class DocumentResourceForm
                             ->color('gray')
                             ->visible(static fn (Get $get): bool => filled($get('expires_at')))
                             ->action(static function (Get $get, Set $set): void {
-                                $expiresAt = self::readExpiresAt($get);
-                                if ($expiresAt === null) {
-                                    return;
-                                }
-
-                                $set('notify_at', $expiresAt->subMonths(3));
+                                $set('notify_at', self::readExpiresAt($get)->subMonths(3));
                             }),
                     ),
                 Textarea::make('location')
@@ -123,16 +108,13 @@ class DocumentResourceForm
     /**
      * Read the expires_at field state as a date. A DatePicker stores its value
      * as a plain "Y-m-d" string, so parse leniently rather than with a fixed
-     * date-time format.
+     * date-time format. Only called from actions that are visible when
+     * expires_at is filled, so the value is guaranteed to be a non-empty string.
      */
-    private static function readExpiresAt(Get $get): ?CarbonImmutable
+    private static function readExpiresAt(Get $get): CarbonImmutable
     {
         $expiresAt = $get('expires_at');
-        Assert::nullOrString($expiresAt);
-
-        if ($expiresAt === null || $expiresAt === '') {
-            return null;
-        }
+        Assert::stringNotEmpty($expiresAt);
 
         return CarbonImmutable::parse($expiresAt);
     }
