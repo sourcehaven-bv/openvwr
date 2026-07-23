@@ -78,6 +78,39 @@ it('defaults the pickers to the previous and anchor versions', function (): void
         ->assertSet('toId', $to->id->toString());
 });
 
+it('defaults the from-side to the oldest version when anchored on the oldest', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $source = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create();
+    [$oldest] = createComparableSnapshots($source, 'oud-fragment', 'nieuw-fragment');
+
+    // Anchoring on the oldest version leaves no earlier version, so the
+    // "from" side falls back to the oldest snapshot itself.
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(CompareSnapshots::class, [
+            'record' => $oldest->getRouteKey(),
+        ])
+        ->assertSet('fromId', $oldest->id->toString())
+        ->assertSet('toId', $oldest->id->toString());
+});
+
+it('renders no diff sections when a selected version is unknown', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $source = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create();
+    [, $to] = createComparableSnapshots($source, 'oud-fragment', 'nieuw-fragment');
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(CompareSnapshots::class, [
+            'record' => $to->getRouteKey(),
+        ])
+        ->set('toId', 'unknown-id')
+        ->assertDontSee(__('snapshot.public_data'))
+        ->assertDontSee(__('snapshot.private_data'));
+});
+
 it('shows a no-changes message when both versions are identical', function (): void {
     $organisation = OrganisationTestHelper::create();
     $source = AvgResponsibleProcessingRecord::factory()

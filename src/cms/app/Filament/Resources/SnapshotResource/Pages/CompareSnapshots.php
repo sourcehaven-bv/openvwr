@@ -67,10 +67,9 @@ class CompareSnapshots extends Page
 
     public function getTitle(): string|Htmlable
     {
-        $snapshot = $this->getSnapshot();
-
+        // The source is guaranteed non-null: mount() aborts otherwise.
         return __('snapshot.compare_title', [
-            'name' => $snapshot->snapshotSource?->getDisplayName() ?? $snapshot->name,
+            'name' => $this->getSource()->getDisplayName(),
         ]);
     }
 
