@@ -69,6 +69,14 @@ trait HasSnapshots
         return $this->snapshots()->get()->count() >= 2;
     }
 
+    final public function getLatestSnapshot(): ?Snapshot
+    {
+        return $this->snapshots()
+            ->get()
+            ->sortByDesc('version')
+            ->first();
+    }
+
     /**
      * @param class-string<SnapshotState> $state
      */

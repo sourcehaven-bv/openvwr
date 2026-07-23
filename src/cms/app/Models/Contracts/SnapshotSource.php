@@ -21,6 +21,8 @@ interface SnapshotSource
 
     public function hasComparableSnapshots(): bool;
 
+    public function getLatestSnapshot(): ?Snapshot;
+
     /**
      * @param class-string<SnapshotState> $state
      */

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SnapshotResource;
 
-use App\Filament\Resources\SnapshotResource\Pages\CompareSnapshots;
 use App\Filament\Resources\SnapshotResource\Pages\ViewSnapshot;
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\SnapshotStateColumn;
@@ -12,7 +11,6 @@ use App\Models\Builders\SnapshotBuilder;
 use App\Models\Snapshot;
 use App\Services\DateFormatService;
 use Filament\Facades\Filament;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -44,18 +42,6 @@ class SnapshotResourceTable
                 ViewAction::make()
                     ->url(static function (Snapshot $snapshot): string {
                         return route(ViewSnapshot::getRouteName(), [
-                            'tenant' => Filament::getTenant(),
-                            'record' => $snapshot,
-                        ]);
-                    }),
-                Action::make('compare')
-                    ->label(__('snapshot.compare'))
-                    ->icon('heroicon-o-arrows-right-left')
-                    ->visible(static function (Snapshot $snapshot): bool {
-                        return $snapshot->snapshotSource?->hasComparableSnapshots() === true;
-                    })
-                    ->url(static function (Snapshot $snapshot): string {
-                        return route(CompareSnapshots::getRouteName(), [
                             'tenant' => Filament::getTenant(),
                             'record' => $snapshot,
                         ]);

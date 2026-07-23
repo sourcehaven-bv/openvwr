@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Filament\RelationManagers\SnapshotsRelationManager;
+use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\EditAvgResponsibleProcessingRecord;
 use App\Filament\Resources\SnapshotResource;
 use App\Filament\Resources\SnapshotResource\Pages\CompareSnapshots;
 use App\Filament\Resources\SnapshotResource\Pages\ViewSnapshot;
@@ -146,4 +148,52 @@ it('hides the compare action when only one version exists', function (): void {
             'record' => $snapshot->getRouteKey(),
         ])
         ->assertActionHidden('compare');
+});
+
+it('shows a compare header action in the versions table for comparable versions', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $source = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create();
+    createComparableSnapshots($source, 'oud', 'nieuw');
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(SnapshotsRelationManager::class, [
+            'ownerRecord' => $source,
+            'pageClass' => EditAvgResponsibleProcessingRecord::class,
+        ])
+        ->assertTableActionVisible('compare');
+});
+
+it('the compare header action targets the latest version', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $source = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create();
+    [, $latest] = createComparableSnapshots($source, 'oud', 'nieuw');
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(SnapshotsRelationManager::class, [
+            'ownerRecord' => $source,
+            'pageClass' => EditAvgResponsibleProcessingRecord::class,
+        ])
+        ->assertTableActionHasUrl('compare', SnapshotResource::getUrl('compare', ['record' => $latest]));
+});
+
+it('hides the compare header action when only one version exists', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $source = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create();
+    Snapshot::factory()
+        ->recycle($organisation)
+        ->for($source, 'snapshotSource')
+        ->create(['version' => 1]);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(SnapshotsRelationManager::class, [
+            'ownerRecord' => $source,
+            'pageClass' => EditAvgResponsibleProcessingRecord::class,
+        ])
+        ->assertTableActionHidden('compare');
 });

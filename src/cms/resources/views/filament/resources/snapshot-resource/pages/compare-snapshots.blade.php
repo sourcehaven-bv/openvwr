@@ -4,33 +4,42 @@
         $diffs = $this->getDiffs();
     @endphp
 
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div>
-            <label for="compare-from" class="fi-fo-field-wrp-label inline-flex items-center gap-x-3 mb-1 text-sm font-medium text-gray-950 dark:text-white">
-                {{ __('snapshot.compare_from') }}
-            </label>
-            <x-filament::input.wrapper>
-                <x-filament::input.select wire:model.live="fromId" id="compare-from">
-                    @foreach ($options as $id => $label)
-                        <option value="{{ $id }}">{{ $label }}</option>
-                    @endforeach
-                </x-filament::input.select>
-            </x-filament::input.wrapper>
+    <x-filament::section>
+        <div class="snapshot-diff">
+            <table class="snapshot-diff-pickers">
+                <colgroup>
+                    <col style="width: 50%;">
+                    <col style="width: 50%;">
+                </colgroup>
+                <tr>
+                    <th>
+                        <label for="compare-from" class="snapshot-diff-picker-label">
+                            {{ __('snapshot.compare_from') }}
+                        </label>
+                        <x-filament::input.wrapper>
+                            <x-filament::input.select wire:model.live="fromId" id="compare-from">
+                                @foreach ($options as $id => $label)
+                                    <option value="{{ $id }}">{{ $label }}</option>
+                                @endforeach
+                            </x-filament::input.select>
+                        </x-filament::input.wrapper>
+                    </th>
+                    <th>
+                        <label for="compare-to" class="snapshot-diff-picker-label">
+                            {{ __('snapshot.compare_to') }}
+                        </label>
+                        <x-filament::input.wrapper>
+                            <x-filament::input.select wire:model.live="toId" id="compare-to">
+                                @foreach ($options as $id => $label)
+                                    <option value="{{ $id }}">{{ $label }}</option>
+                                @endforeach
+                            </x-filament::input.select>
+                        </x-filament::input.wrapper>
+                    </th>
+                </tr>
+            </table>
         </div>
-
-        <div>
-            <label for="compare-to" class="fi-fo-field-wrp-label inline-flex items-center gap-x-3 mb-1 text-sm font-medium text-gray-950 dark:text-white">
-                {{ __('snapshot.compare_to') }}
-            </label>
-            <x-filament::input.wrapper>
-                <x-filament::input.select wire:model.live="toId" id="compare-to">
-                    @foreach ($options as $id => $label)
-                        <option value="{{ $id }}">{{ $label }}</option>
-                    @endforeach
-                </x-filament::input.select>
-            </x-filament::input.wrapper>
-        </div>
-    </div>
+    </x-filament::section>
 
     @foreach ($diffs as $section => $diff)
         <x-filament::section>
@@ -46,6 +55,30 @@
 
     @push('styles')
         <style>
+            /* Picker row mirrors the diff table geometry: two flush 50% columns,
+               so "Oude versie" caps the old column and "Nieuwe versie" the new. */
+            .snapshot-diff-pickers {
+                width: 100%;
+                table-layout: fixed;
+                border-collapse: collapse;
+            }
+            .snapshot-diff-pickers th {
+                padding: 0 0.5rem;
+                text-align: left;
+                vertical-align: bottom;
+                font-weight: inherit;
+            }
+            .snapshot-diff-pickers th:first-child { padding-left: 0; }
+            .snapshot-diff-pickers th:last-child { padding-right: 0; }
+            .snapshot-diff-picker-label {
+                display: block;
+                margin-bottom: 0.25rem;
+                font-size: 0.875rem;
+                font-weight: 500;
+                color: rgb(3 7 18); /* gray-950 */
+            }
+            .dark .snapshot-diff-picker-label { color: rgb(255 255 255); }
+
             .snapshot-diff { overflow-x: auto; }
             .snapshot-diff table.diff {
                 width: 100%;
