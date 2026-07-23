@@ -153,7 +153,9 @@ it('resets passthrough country_other if not other on save', function (): void {
         ->toBeNull();
 });
 
-it('resets gebDpia-fields for geb_dpia_executed', function (): void {
+it('clears every GEB criterion when a GEB was already executed', function (): void {
+    // The pre-screen questionnaire is skipped entirely once a GEB is executed,
+    // so no criterion was actually reached: all are reset to false on save.
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
         ->create([
             'geb_dpia_executed' => false,
@@ -178,7 +180,9 @@ it('resets gebDpia-fields for geb_dpia_executed', function (): void {
         ->and($avgResponsibleProcessingRecord->geb_dpia_high_risk_freedoms)->toBeFalse();
 });
 
-it('resets gebDpia-fields for geb_dpia_automated', function (): void {
+it('resets the GEB criteria after the first "ja", keeping earlier answers', function (): void {
+    // Progressive OR-questionnaire: once a criterion is "ja" the later questions
+    // are never asked, so their stored answers are reset to false on save.
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
         ->create([
             'geb_dpia_executed' => false,
@@ -190,32 +194,6 @@ it('resets gebDpia-fields for geb_dpia_automated', function (): void {
             'geb_dpia_high_risk_freedoms' => true,
         ]);
 
-    $avgResponsibleProcessingRecord->geb_dpia_automated = true;
-    $avgResponsibleProcessingRecord->save();
-    $avgResponsibleProcessingRecord->refresh();
-
-    expect($avgResponsibleProcessingRecord->geb_dpia_executed)->toBeFalse()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_automated)->toBeTrue()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_large_scale_processing)->toBeFalse()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_large_scale_monitoring)->toBeFalse()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_list_required)->toBeFalse()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_criteria_wp248)->toBeFalse()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_high_risk_freedoms)->toBeFalse();
-});
-
-it('resets gebDpia-fields for geb_dpia_large_scale_processing', function (): void {
-    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->create([
-            'geb_dpia_executed' => false,
-            'geb_dpia_automated' => false,
-            'geb_dpia_large_scale_processing' => false,
-            'geb_dpia_large_scale_monitoring' => true,
-            'geb_dpia_list_required' => true,
-            'geb_dpia_criteria_wp248' => true,
-            'geb_dpia_high_risk_freedoms' => true,
-        ]);
-
-    $avgResponsibleProcessingRecord->geb_dpia_large_scale_processing = true;
     $avgResponsibleProcessingRecord->save();
     $avgResponsibleProcessingRecord->refresh();
 
@@ -228,82 +206,8 @@ it('resets gebDpia-fields for geb_dpia_large_scale_processing', function (): voi
         ->and($avgResponsibleProcessingRecord->geb_dpia_high_risk_freedoms)->toBeFalse();
 });
 
-it('resets gebDpia-fields for geb_dpia_large_scale_monitoring', function (): void {
-    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->create([
-            'geb_dpia_executed' => false,
-            'geb_dpia_automated' => false,
-            'geb_dpia_large_scale_processing' => false,
-            'geb_dpia_large_scale_monitoring' => false,
-            'geb_dpia_list_required' => true,
-            'geb_dpia_criteria_wp248' => true,
-            'geb_dpia_high_risk_freedoms' => true,
-        ]);
-
-    $avgResponsibleProcessingRecord->geb_dpia_large_scale_monitoring = true;
-    $avgResponsibleProcessingRecord->save();
-    $avgResponsibleProcessingRecord->refresh();
-
-    expect($avgResponsibleProcessingRecord->geb_dpia_executed)->toBeFalse()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_automated)->toBeFalse()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_large_scale_processing)->toBeFalse()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_large_scale_monitoring)->toBeTrue()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_list_required)->toBeFalse()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_criteria_wp248)->toBeFalse()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_high_risk_freedoms)->toBeFalse();
-});
-
-it('resets gebDpia-fields for geb_dpia_list_required', function (): void {
-    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->create([
-            'geb_dpia_executed' => false,
-            'geb_dpia_automated' => false,
-            'geb_dpia_large_scale_processing' => false,
-            'geb_dpia_large_scale_monitoring' => false,
-            'geb_dpia_list_required' => false,
-            'geb_dpia_criteria_wp248' => true,
-            'geb_dpia_high_risk_freedoms' => true,
-        ]);
-
-    $avgResponsibleProcessingRecord->geb_dpia_list_required = true;
-    $avgResponsibleProcessingRecord->save();
-    $avgResponsibleProcessingRecord->refresh();
-
-    expect($avgResponsibleProcessingRecord->geb_dpia_executed)->toBeFalse()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_automated)->toBeFalse()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_large_scale_processing)->toBeFalse()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_large_scale_monitoring)->toBeFalse()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_list_required)->toBeTrue()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_criteria_wp248)->toBeFalse()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_high_risk_freedoms)->toBeFalse();
-});
-
-it('resets gebDpia-fields for geb_dpia_criteria_wp248', function (): void {
-    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->create([
-            'geb_dpia_executed' => false,
-            'geb_dpia_automated' => false,
-            'geb_dpia_large_scale_processing' => false,
-            'geb_dpia_large_scale_monitoring' => false,
-            'geb_dpia_list_required' => false,
-            'geb_dpia_criteria_wp248' => false,
-            'geb_dpia_high_risk_freedoms' => true,
-        ]);
-
-    $avgResponsibleProcessingRecord->geb_dpia_criteria_wp248 = true;
-    $avgResponsibleProcessingRecord->save();
-    $avgResponsibleProcessingRecord->refresh();
-
-    expect($avgResponsibleProcessingRecord->geb_dpia_executed)->toBeFalse()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_automated)->toBeFalse()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_large_scale_processing)->toBeFalse()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_large_scale_monitoring)->toBeFalse()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_list_required)->toBeFalse()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_criteria_wp248)->toBeTrue()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_high_risk_freedoms)->toBeFalse();
-});
-
-it('resets gebDpia-fields for geb_dpia_high_risk_freedoms', function (): void {
+it('keeps all GEB criteria when every answer is "nee"', function (): void {
+    // No "ja" means every question was reached and answered; nothing is reset.
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
         ->create([
             'geb_dpia_executed' => false,
@@ -315,15 +219,9 @@ it('resets gebDpia-fields for geb_dpia_high_risk_freedoms', function (): void {
             'geb_dpia_high_risk_freedoms' => false,
         ]);
 
-    $avgResponsibleProcessingRecord->geb_dpia_high_risk_freedoms = true;
     $avgResponsibleProcessingRecord->save();
     $avgResponsibleProcessingRecord->refresh();
 
     expect($avgResponsibleProcessingRecord->geb_dpia_executed)->toBeFalse()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_automated)->toBeFalse()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_large_scale_processing)->toBeFalse()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_large_scale_monitoring)->toBeFalse()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_list_required)->toBeFalse()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_criteria_wp248)->toBeFalse()
-        ->and($avgResponsibleProcessingRecord->geb_dpia_high_risk_freedoms)->toBeTrue();
+        ->and($avgResponsibleProcessingRecord->geb_dpia_high_risk_freedoms)->toBeFalse();
 });

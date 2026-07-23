@@ -133,3 +133,31 @@ it('ignores the remove action when no id is given', function (): void {
         ->callFormComponentAction('document_id', RelationTable::REMOVE_ACTION, arguments: [])
         ->assertFormSet(['document_id' => [$document->getKey()->toString()]]);
 });
+
+it('does not render records from another organisation injected into the state', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $ownDocument = Document::factory()->recycle($organisation)->create();
+
+    // A record belonging to a different tenant. Its id is only ever reachable
+    // by tampering with the (client-influenced) live form state.
+    $otherOrganisation = OrganisationTestHelper::create();
+    $foreignDocument = Document::factory()
+        ->recycle($otherOrganisation)
+        ->create(['name' => 'geheime-andere-organisatie']);
+
+    $algorithmRecord = AlgorithmRecord::factory()->recycle($organisation)->create();
+    $algorithmRecord->documents()->attach($ownDocument);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAlgorithmRecord::class, [
+            'record' => $algorithmRecord->getRouteKey(),
+        ])
+        ->fillForm([
+            'document_id' => [
+                $ownDocument->getKey()->toString(),
+                $foreignDocument->getKey()->toString(),
+            ],
+        ])
+        ->assertSee($ownDocument->name)
+        ->assertDontSee($foreignDocument->name);
+});

@@ -15,6 +15,7 @@ class CoreEntityDataCollectionSource extends Radio
     {
         return parent::make($name)
             ->label(__('general.data_collection_source'))
+            ->helperText(__('general.data_collection_source_help_short'))
             ->hintIcon('heroicon-o-information-circle', __('general.data_collection_source_help'))
             ->options(CoreEntityDataCollectionSourceEnum::class)
             ->enum(CoreEntityDataCollectionSourceEnum::class)

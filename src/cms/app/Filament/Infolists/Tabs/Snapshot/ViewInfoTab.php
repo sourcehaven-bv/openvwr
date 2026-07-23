@@ -10,7 +10,9 @@ use App\Enums\Snapshot\SnapshotDataSection;
 use App\Facades\Authentication;
 use App\Facades\Authorization;
 use App\Facades\DateFormat;
+use App\Filament\Infolists\Components\DateTimeEntry;
 use App\Filament\Infolists\Components\SnapshotStateEntry;
+use App\Filament\Infolists\Components\SnapshotStatusFlow;
 use App\Filament\Infolists\Components\SnapshotUrlEntry;
 use App\Filament\Resources\SnapshotResource\Pages\ViewSnapshot;
 use App\Models\Snapshot;
@@ -43,11 +45,20 @@ class ViewInfoTab extends Tab
         return parent::make($label)
             ->icon('heroicon-o-information-circle')
             ->schema([
+                self::getStatusFlowSection(),
                 self::getPropertiesSection(),
                 self::getPublicDataSection(),
                 self::getPrivateDataSection(),
                 self::getRelatedSnapshotSourcesSection(),
                 self::getApprovalSection(),
+            ]);
+    }
+
+    private static function getStatusFlowSection(): Section
+    {
+        return Section::make(__('snapshot.status_flow'))
+            ->schema([
+                SnapshotStatusFlow::make(),
             ]);
     }
 
@@ -71,6 +82,10 @@ class ViewInfoTab extends Tab
                     ->label(__('snapshot.name')),
                 SnapshotStateEntry::make(),
                 SnapshotUrlEntry::make(),
+                DateTimeEntry::make('established_at')
+                    ->label(__('snapshot.established_at')),
+                DateTimeEntry::make('replaced_at')
+                    ->label(__('snapshot.replaced_at')),
             ])
             ->columns(2);
     }

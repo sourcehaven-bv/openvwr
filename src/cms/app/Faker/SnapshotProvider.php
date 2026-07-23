@@ -11,7 +11,6 @@ use Closure;
 use Faker\Provider\Miscellaneous;
 use Webmozart\Assert\Assert;
 
-use function array_key_exists;
 use function in_array;
 use function sprintf;
 
@@ -26,21 +25,6 @@ class SnapshotProvider extends Miscellaneous
     public function snapshotState(array $excluded = []): Closure
     {
         return function (array $attributes) use ($excluded): string {
-            /** @var class-string<SnapshotState> $state */
-            $state = SnapshotState::all()
-                ->reject(static function (string $state) use ($excluded) {
-                    if ($state === Obsolete::class) {
-                        return false;
-                    }
-
-                    return in_array($state, $excluded, true);
-                })
-                ->random();
-
-            if ($state === SnapshotState::OBSOLETE_STATE) {
-                return $state;
-            }
-
             $snapshotSourceId = $attributes['snapshot_source_id'];
             $snapshotSourceType = $attributes['snapshot_source_type'];
 
@@ -48,7 +32,20 @@ class SnapshotProvider extends Miscellaneous
             Assert::isInstanceOf($snapshotSourceId, UuidInterface::class);
 
             $group = sprintf('%s-%s', $snapshotSourceType, $snapshotSourceId->toString());
-            if (array_key_exists($group, $this->groups) && in_array($state, $this->groups[$group], true)) {
+            $used = $this->groups[$group] ?? [];
+
+            /** @var class-string<SnapshotState>|null $state */
+            $state = SnapshotState::all()
+                ->reject(static function (string $state) use ($excluded, $used) {
+                    if ($state === Obsolete::class) {
+                        return true;
+                    }
+
+                    return in_array($state, $excluded, true) || in_array($state, $used, true);
+                })
+                ->first();
+
+            if ($state === null) {
                 return SnapshotState::OBSOLETE_STATE;
             }
 

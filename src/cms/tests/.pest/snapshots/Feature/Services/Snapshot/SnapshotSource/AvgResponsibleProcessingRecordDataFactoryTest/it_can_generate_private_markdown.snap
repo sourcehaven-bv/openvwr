@@ -23,7 +23,7 @@
 
 <!--- #App\Models\Receiver# --->
 
-## Doel &amp; Grondslag
+## Doel &amp; grondslag
 
 - Geen
 
@@ -55,20 +55,27 @@
 
 - **Doorgifte buiten EER**: nee
 - **Landen**: - 
-- **Adequate bescherming buiten de EER**: nee
+- **Vallen alle doorgiftes onder een adequaatheidsbesluit?**: nee
 - **Toelichting adequate bescherming**: -
 - **Toelichting doorgifte**: -
 
 ## GEB (DPIA)
 
 - **GEB (DPIA) uitgevoerd**: ja
+- **Systematische en uitgebreide beoordeling van persoonlijke aspecten**: nee
+- **Grootschalige verwerking van bijzondere categorieen**: nee
+- **Grootschalige monitoring**: nee
+- **Autoriteit Persoonsgegevens gepubliceerde lijst**: nee
+- **De negen criteria van WP248**: nee
+- **Hoog risico voor rechten en vrijheden**: nee
+- **Uitkomst**: Er is al een GEB (DPIA) uitgevoerd; de vragen zijn niet nodig.
 
 ## Contactpersoon
 
 
 <!--- #App\Models\ContactPerson# --->
 
-## Documenten &amp; Bijlagen
+## Documenten &amp; bijlagen
 
 - Geen
 

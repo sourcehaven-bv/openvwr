@@ -18,6 +18,9 @@ class ParentSelect extends Select
         return parent::make($name)
             ->label(__('general.parent'))
             ->relationship('parent', 'name', TenantScoped::getAsClosure(), true)
+            // Show the available hoofdverwerkingen immediately instead of an
+            // empty dropdown that only populates once the user types.
+            ->preload()
             ->in(static function (ParentSelect $select): array {
                 return array_keys($select->getOptions());
             })

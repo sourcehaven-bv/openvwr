@@ -14,6 +14,6 @@ class PeriodicReviewField
     {
         return DatePicker::make('review_at')
             ->label(__('general.review_at'))
-            ->hintIcon('heroicon-o-information-circle', __('general.review_at_hint'));
+            ->helperText(__('general.review_at_help'));
     }
 }

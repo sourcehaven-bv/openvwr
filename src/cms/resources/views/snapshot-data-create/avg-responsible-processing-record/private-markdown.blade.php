@@ -99,24 +99,23 @@
 ## {{ __('avg_responsible_processing_record.step_geb_dpia') }}
 
 - **{{ __('avg_responsible_processing_record.geb_dpia_executed') }}**: {{ $record->geb_dpia_executed ? 'ja' : 'nee' }}
-@if(!$record->geb_dpia_executed)
 - **{{ __('avg_responsible_processing_record.geb_dpia_automated') }}**: {{ $record->geb_dpia_automated ? 'ja' : 'nee' }}
-@if(!$record->geb_dpia_automated)
 - **{{ __('avg_responsible_processing_record.geb_dpia_large_scale_processing') }}**: {{ $record->geb_dpia_large_scale_processing ? 'ja' : 'nee' }}
-@if(!$record->geb_dpia_large_scale_processing)
 - **{{ __('avg_responsible_processing_record.geb_dpia_large_scale_monitoring') }}**: {{ $record->geb_dpia_large_scale_monitoring ? 'ja' : 'nee' }}
-@if(!$record->geb_dpia_large_scale_monitoring)
 - **{{ __('avg_responsible_processing_record.geb_dpia_list_required') }}**: {{ $record->geb_dpia_list_required ? 'ja' : 'nee' }}
-@if(!$record->geb_dpia_list_required)
 - **{{ __('avg_responsible_processing_record.geb_dpia_criteria_wp248') }}**: {{ $record->geb_dpia_criteria_wp248 ? 'ja' : 'nee' }}
-@if(!$record->geb_dpia_criteria_wp248)
 - **{{ __('avg_responsible_processing_record.geb_dpia_high_risk_freedoms') }}**: {{ $record->geb_dpia_high_risk_freedoms ? 'ja' : 'nee' }}
-@endif
-@endif
-@endif
-@endif
-@endif
-@endif
+@php
+    $gebDpiaOutcome = \App\Filament\Forms\GebDpiaQuestionnaire::outcomeFor($record->geb_dpia_executed === true, [
+        'geb_dpia_automated' => $record->geb_dpia_automated === true,
+        'geb_dpia_large_scale_processing' => $record->geb_dpia_large_scale_processing === true,
+        'geb_dpia_large_scale_monitoring' => $record->geb_dpia_large_scale_monitoring === true,
+        'geb_dpia_list_required' => $record->geb_dpia_list_required === true,
+        'geb_dpia_criteria_wp248' => $record->geb_dpia_criteria_wp248 === true,
+        'geb_dpia_high_risk_freedoms' => $record->geb_dpia_high_risk_freedoms === true,
+    ]);
+@endphp
+- **{{ __('avg_responsible_processing_record.geb_dpia_outcome_label') }}**: {{ __('avg_responsible_processing_record.geb_dpia_outcome_' . $gebDpiaOutcome) }}
 
 ## {{ __('avg_responsible_processing_record.step_contact_person') }}
 

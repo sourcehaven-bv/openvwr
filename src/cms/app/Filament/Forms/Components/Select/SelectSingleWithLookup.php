@@ -39,6 +39,9 @@ class SelectSingleWithLookup extends Select
         return parent::make($name)
             ->required()
             ->relationship($relationshipName, $relatedField, TenantScoped::getAsClosure())
+            // These are bounded lookup lists, so load the options up front:
+            // otherwise the dropdown stays empty until the user starts typing.
+            ->preload()
             ->in(static function (SelectSingleWithLookup $select): array {
                 return array_keys($select->getEnabledOptions());
             })

@@ -46,6 +46,11 @@ class WpgProcessingRecordResourceFormSchemas
     public static function getProcessingName(): array
     {
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.wpg_processing_record.step_processing_name_title'),
+                __('information_blocks.wpg_processing_record.step_processing_name_info'),
+                __('information_blocks.wpg_processing_record.step_processing_name_extra_info'),
+            ),
             Grid::make()
                 ->schema([
                     EntityNumber::make(),
@@ -55,7 +60,8 @@ class WpgProcessingRecordResourceFormSchemas
                 ->autofocus()
                 ->required()
                 ->maxLength(255)
-                ->label(__('processing_record.name')),
+                ->label(__('processing_record.name'))
+                ->helperText(__('processing_record.name_help')),
             CoreEntityDataCollectionSource::make(),
             SelectSingleWithLookup::makeWithDisabledOptions(
                 'wpg_processing_record_service_id',
@@ -68,12 +74,7 @@ class WpgProcessingRecordResourceFormSchemas
             TagsInput::make(),
             PeriodicReviewField::make(),
             ParentSelect::make()
-                ->hintIcon('heroicon-o-information-circle', __('general.parent_hint_icon_text')),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.wpg_processing_record.step_processing_name_title'),
-                __('information_blocks.wpg_processing_record.step_processing_name_info'),
-                __('information_blocks.wpg_processing_record.step_processing_name_extra_info'),
-            ),
+                ->helperText(__('general.parent_help')),
         ];
     }
 
@@ -83,6 +84,11 @@ class WpgProcessingRecordResourceFormSchemas
     public static function getResponsible(): array
     {
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.wpg_processing_record.step_responsible_title'),
+                __('information_blocks.wpg_processing_record.step_responsible_info'),
+                __('information_blocks.wpg_processing_record.step_responsible_extra_info'),
+            ),
             RelationTable::makeForRelationship(
                 'responsible_id',
                 'responsibles',
@@ -91,12 +97,8 @@ class WpgProcessingRecordResourceFormSchemas
                 RelationTableColumns::for(Responsible::class),
                 ResponsibleResourceForm::getSchema(),
             )
-                ->label(__('responsible.model_plural')),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.wpg_processing_record.step_responsible_title'),
-                __('information_blocks.wpg_processing_record.step_responsible_info'),
-                __('information_blocks.wpg_processing_record.step_responsible_extra_info'),
-            ),
+                ->label(__('responsible.model_plural'))
+                ->helperText(__('wpg_processing_record.help_responsible')),
         ];
     }
 
@@ -106,6 +108,11 @@ class WpgProcessingRecordResourceFormSchemas
     public static function getProcessor(): array
     {
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.wpg_processing_record.step_processor_title'),
+                __('information_blocks.wpg_processing_record.step_processor_info'),
+                __('information_blocks.wpg_processing_record.step_processor_extra_info'),
+            ),
             Toggle::make('has_processors')
                 ->helperText(__('wpg_processing_record.help_has_processors'))
                 ->label(__('wpg_processing_record.has_processors'))
@@ -123,11 +130,6 @@ class WpgProcessingRecordResourceFormSchemas
                 ->label(__('processor.model_plural'))
                 ->required()
                 ->visible(FormHelper::isFieldEnabled('has_processors')),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.wpg_processing_record.step_processor_title'),
-                __('information_blocks.wpg_processing_record.step_processor_info'),
-                __('information_blocks.wpg_processing_record.step_processor_extra_info'),
-            ),
         ];
     }
 
@@ -137,6 +139,11 @@ class WpgProcessingRecordResourceFormSchemas
     public static function getReceiver(): array
     {
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.wpg_processing_record.step_receiver_title'),
+                __('information_blocks.wpg_processing_record.step_receiver_info'),
+                __('information_blocks.wpg_processing_record.step_receiver_extra_info'),
+            ),
             Section::make(__('wpg_processing_record.help_receiver_provisioning'))
                 ->schema([
                     Toggle::make('article_15')
@@ -183,11 +190,6 @@ class WpgProcessingRecordResourceFormSchemas
                         ->required()
                         ->visible(FormHelper::isFieldEnabled('article_17_a')),
                 ]),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.wpg_processing_record.step_receiver_title'),
-                __('information_blocks.wpg_processing_record.step_receiver_info'),
-                __('information_blocks.wpg_processing_record.step_receiver_extra_info'),
-            ),
         ];
     }
 
@@ -197,11 +199,11 @@ class WpgProcessingRecordResourceFormSchemas
     public static function getProcessingGoal(): array
     {
         return [
-            WpgGoalsRepeater::make(),
             InformationBlockSection::makeCollapsible(
                 __('information_blocks.wpg_processing_record.step_wpg_goal_title'),
                 __('information_blocks.wpg_processing_record.step_wpg_goal_info'),
             ),
+            WpgGoalsRepeater::make(),
         ];
     }
 
@@ -211,6 +213,10 @@ class WpgProcessingRecordResourceFormSchemas
     public static function getSpecialPoliceData(): array
     {
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.wpg_processing_record.step_special_police_data_title'),
+                __('information_blocks.wpg_processing_record.step_special_police_data_info'),
+            ),
             Section::make(__('wpg_processing_record.step_special_police_data'))
                 ->schema([
                     Toggle::make('police_race_or_ethnicity')
@@ -230,10 +236,6 @@ class WpgProcessingRecordResourceFormSchemas
                     Toggle::make('police_sexual_life')
                         ->label(__('wpg_processing_record.police_sexual_life')),
                 ]),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.wpg_processing_record.step_special_police_data_title'),
-                __('information_blocks.wpg_processing_record.step_special_police_data_info'),
-            ),
         ];
     }
 
@@ -247,6 +249,7 @@ class WpgProcessingRecordResourceFormSchemas
                 ->schema([
                     Toggle::make('decision_making')
                         ->label(__('wpg_processing_record.decision_making'))
+                        ->helperText(__('wpg_processing_record.help_decision_making'))
                         ->live(),
 
                     Group::make()
@@ -278,6 +281,11 @@ class WpgProcessingRecordResourceFormSchemas
     public static function getSystems(): array
     {
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.wpg_processing_record.step_system_application_title'),
+                __('information_blocks.wpg_processing_record.step_system_application_info'),
+                __('information_blocks.wpg_processing_record.step_system_application_extra_info'),
+            ),
             Toggle::make('has_systems')
                 ->helperText(__('wpg_processing_record.help_has_systems'))
                 ->label(__('wpg_processing_record.has_systems'))
@@ -295,11 +303,6 @@ class WpgProcessingRecordResourceFormSchemas
                 ->label(__('system.model_plural'))
                 ->required()
                 ->visible(FormHelper::isFieldEnabled('has_systems')),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.wpg_processing_record.step_system_application_title'),
-                __('information_blocks.wpg_processing_record.step_system_application_info'),
-                __('information_blocks.wpg_processing_record.step_system_application_extra_info'),
-            ),
         ];
     }
 
@@ -309,6 +312,11 @@ class WpgProcessingRecordResourceFormSchemas
     public static function getSecurity(): array
     {
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.wpg_processing_record.step_security_title'),
+                __('information_blocks.wpg_processing_record.step_security_info'),
+                __('information_blocks.wpg_processing_record.step_security_extra_info'),
+            ),
             Toggle::make('has_security')
                 ->label(__('wpg_processing_record.has_security'))
                 ->helperText(__('wpg_processing_record.help_has_security'))
@@ -335,6 +343,7 @@ class WpgProcessingRecordResourceFormSchemas
                         ->schema([
                             Toggle::make('has_pseudonymization')
                                 ->label(__('wpg_processing_record.has_pseudonymization'))
+                                ->helperText(__('wpg_processing_record.help_has_pseudonymization'))
                                 ->default(false)
                                 ->live(),
                             Textarea::make('pseudonymization')
@@ -343,11 +352,6 @@ class WpgProcessingRecordResourceFormSchemas
                                 ->visible(FormHelper::isFieldEnabled('has_pseudonymization')),
                         ]),
                 ]),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.wpg_processing_record.step_security_title'),
-                __('information_blocks.wpg_processing_record.step_security_info'),
-                __('information_blocks.wpg_processing_record.step_security_extra_info'),
-            ),
         ];
     }
 
@@ -357,14 +361,14 @@ class WpgProcessingRecordResourceFormSchemas
     public static function getGebDpia(): array
     {
         return [
-            Toggle::make('geb_pia')
-                ->label(__('wpg_processing_record.geb_pia'))
-                ->helperText(__('wpg_processing_record.help_geb_pia')),
             InformationBlockSection::makeCollapsible(
                 __('information_blocks.wpg_processing_record.step_geb_dpia_title'),
                 __('information_blocks.wpg_processing_record.step_geb_dpia_info'),
                 __('information_blocks.wpg_processing_record.step_geb_dpia_extra_info'),
             ),
+            Toggle::make('geb_pia')
+                ->label(__('wpg_processing_record.geb_pia'))
+                ->helperText(__('wpg_processing_record.help_geb_pia')),
         ];
     }
 
@@ -374,11 +378,11 @@ class WpgProcessingRecordResourceFormSchemas
     public static function getContactPersons(): array
     {
         return [
-            ProcessingRecordContactPersons::makeGroup(),
             InformationBlockSection::makeCollapsible(
                 __('information_blocks.wpg_processing_record.step_contact_person_title'),
                 __('information_blocks.wpg_processing_record.step_contact_person_info'),
             ),
+            ProcessingRecordContactPersons::makeGroup(),
         ];
     }
 
@@ -388,6 +392,10 @@ class WpgProcessingRecordResourceFormSchemas
     public static function getAttachments(): array
     {
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.wpg_processing_record.step_attachments_title'),
+                __('information_blocks.wpg_processing_record.step_attachments_info'),
+            ),
             RelationTable::makeForRelationship(
                 'document_id',
                 'documents',
@@ -397,10 +405,6 @@ class WpgProcessingRecordResourceFormSchemas
                 DocumentResourceForm::getSchema(),
             )
                 ->label(__('document.model_plural')),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.wpg_processing_record.step_attachments_title'),
-                __('information_blocks.wpg_processing_record.step_attachments_info'),
-            ),
         ];
     }
 
@@ -410,14 +414,14 @@ class WpgProcessingRecordResourceFormSchemas
     public static function getRemarks(): array
     {
         return [
-            RemarksField::make()
-                ->mutateRelationshipDataBeforeCreateUsing(FormHelper::addAuthFields())
-                ->mutateRelationshipDataBeforeSaveUsing(FormHelper::addAuthFields()),
             InformationBlockSection::makeCollapsible(
                 __('information_blocks.wpg_processing_record.step_remarks_title'),
                 __('information_blocks.wpg_processing_record.step_remarks_info'),
                 __('information_blocks.wpg_processing_record.step_remarks_extra_info'),
             ),
+            RemarksField::make()
+                ->mutateRelationshipDataBeforeCreateUsing(FormHelper::addAuthFields())
+                ->mutateRelationshipDataBeforeSaveUsing(FormHelper::addAuthFields()),
         ];
     }
 
@@ -427,14 +431,21 @@ class WpgProcessingRecordResourceFormSchemas
     public static function getCategoriesInvolved(): array
     {
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.wpg_processing_record.step_categories_involved_title'),
+                __('information_blocks.wpg_processing_record.step_categories_involved_info'),
+            ),
             Section::make(__('wpg_processing_record.step_categories_involved'))
                 ->schema([
                     Toggle::make('suspects')
-                        ->label(__('wpg_processing_record.suspects')),
+                        ->label(__('wpg_processing_record.suspects'))
+                        ->helperText(__('wpg_processing_record.help_suspects')),
                     Toggle::make('victims')
-                        ->label(__('wpg_processing_record.victims')),
+                        ->label(__('wpg_processing_record.victims'))
+                        ->helperText(__('wpg_processing_record.help_victims')),
                     Toggle::make('convicts')
-                        ->label(__('wpg_processing_record.convicts')),
+                        ->label(__('wpg_processing_record.convicts'))
+                        ->helperText(__('wpg_processing_record.help_convicts')),
                     Toggle::make('police_justice')
                         ->label(__('wpg_processing_record.police_justice'))
                         ->helperText(__('wpg_processing_record.help_police_justice')),
@@ -450,10 +461,6 @@ class WpgProcessingRecordResourceFormSchemas
                         ->helperText(__('wpg_processing_record.help_third_party_explanation'))
                         ->visible(FormHelper::isFieldEnabled('third_parties')),
                 ]),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.wpg_processing_record.step_categories_involved_title'),
-                __('information_blocks.wpg_processing_record.step_categories_involved_info'),
-            ),
         ];
     }
 }

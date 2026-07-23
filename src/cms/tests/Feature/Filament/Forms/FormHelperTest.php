@@ -134,6 +134,26 @@ it('returns the correct auth-fields', function (): void {
         ->toBe($user->id);
 });
 
+it('returns true only when every field matches its expected value', function (bool $fieldB, bool $expectedResult): void {
+    $getterMock = $this->mock(Get::class)
+        ->shouldReceive('__invoke')
+        ->once()
+        ->with('a')
+        ->andReturn(true)
+        ->shouldReceive('__invoke')
+        ->with('b')
+        ->andReturn($fieldB)
+        ->getMock();
+
+    $matches = FormHelper::fieldValueEquals(['a' => true, 'b' => true]);
+
+    expect($matches($getterMock))
+        ->toBe($expectedResult);
+})->with([
+    [true, true],
+    [false, false],
+]);
+
 it('returns correct value if any field is enabled', function (bool $fieldA, bool $fieldB, bool $expectedResult): void {
     $getterMock = $this->mock(Get::class)
         ->shouldReceive('__invoke')

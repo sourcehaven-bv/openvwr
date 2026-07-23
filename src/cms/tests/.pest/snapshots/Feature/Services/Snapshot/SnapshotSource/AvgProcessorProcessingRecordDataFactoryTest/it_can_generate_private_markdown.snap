@@ -20,7 +20,7 @@
 
 <!--- #App\Models\Receiver# --->
 
-## Doel &amp; Grondslag
+## Doel &amp; grondslag
 
 - Geen
 
@@ -52,7 +52,7 @@
 
 - **Doorgifte buiten EER**: nee
 - **Landen**: - 
-- **Adequate bescherming buiten de EER**: nee
+- **Vallen alle doorgiftes onder een adequaatheidsbesluit?**: nee
 - **Toelichting**: -
 - **Toelichting**: -
 
@@ -65,7 +65,7 @@
 
 <!--- #App\Models\ContactPerson# --->
 
-## Documenten &amp; Bijlagen
+## Documenten &amp; bijlagen
 
 - Geen
 

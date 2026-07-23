@@ -13,7 +13,7 @@ return [
     'step_dates' => 'Data',
     'step_incident' => 'Incident',
     'step_processing_records' => 'Verwerkingen',
-    'step_attachments' => 'Documenten & Bijlagen',
+    'step_attachments' => 'Documenten & bijlagen',
     'step_remarks' => 'Opmerkingen',
 
     'number' => 'Nummer',
@@ -22,6 +22,10 @@ return [
     'type' => 'Type',
     'ap_reported' => 'Gemeld aan de autoriteit persoonsgegevens (AP)',
 
+    'help_name' => 'Een korte, herkenbare omschrijving van het datalek.',
+    'help_ap_reported_at' => 'De datum waarop het datalek bij de Autoriteit Persoonsgegevens is gemeld.',
+    'help_personal_data_categories' => 'Kruis aan welke soorten persoonsgegevens bij het lek betrokken waren.',
+    'help_linked_processing_records' => 'Koppel de verwerkingen waarop dit datalek betrekking heeft, zodat het lek vindbaar is vanuit die registraties.',
     'help_reported_at' => 'De datum waarop het datalek intern is gemeld.',
     'help_type' => 'Kies Voorlopig zolang het onderzoek loopt en Definitief zodra alle gegevens bekend zijn.',
     'help_ap_reported' => 'Bij het opslaan ontvangen de Chief Privacy Officers en Functionarissen Gegevensbescherming hierover automatisch een e-mail.',

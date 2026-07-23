@@ -186,8 +186,12 @@ class RelationTable extends Select
             return $empty;
         }
 
+        // The ids come from live, client-influenced form state, so this render
+        // path must be tenant-scoped just like the search query above:
+        // without it a crafted id would render another organisation's record.
         /** @var Collection<int, Model> $records */
         $records = $model->newQuery()
+            ->tap(TenantScoped::getAsClosure())
             ->whereIn($model->getKeyName(), $ids)
             ->get();
 
