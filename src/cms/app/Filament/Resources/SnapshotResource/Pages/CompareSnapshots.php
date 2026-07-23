@@ -36,6 +36,15 @@ class CompareSnapshots extends Page
     #[Url]
     public ?string $toId = null;
 
+    /**
+     * Request-scoped cache: getSnapshots() is read several times per render
+     * (title, options, diffs). Livewire re-instantiates the component per
+     * request, so caching here stays correct while avoiding repeat queries.
+     *
+     * @var Collection<string, Snapshot>|null
+     */
+    private ?Collection $snapshots = null;
+
     public function mount(int|string $record): void
     {
         $this->record = $this->resolveRecord($record);
@@ -43,7 +52,7 @@ class CompareSnapshots extends Page
         abort_unless($this->getSnapshot()->snapshotSource !== null, 404);
 
         $snapshots = $this->getSnapshots();
-        abort_unless($snapshots->count() >= 2, 404, __('snapshot.compare_not_enough_versions'));
+        abort_unless($snapshots->count() >= 2, 404);
 
         if ($this->fromId === null || !$snapshots->has($this->fromId)) {
             // Default the "from" side to the version right before the anchor,
@@ -81,11 +90,17 @@ class CompareSnapshots extends Page
     /**
      * Snapshots of the same source, keyed by id, newest version first.
      *
+     * `version` is a unique, monotonically increasing integer per source, so
+     * "newest" here means the highest version number. The picker labels show
+     * `created_at`; the two only diverge if snapshots are ever persisted out of
+     * chronological version order (e.g. a cross-organisation import).
+     *
      * @return Collection<string, Snapshot>
      */
     public function getSnapshots(): Collection
     {
-        return $this->getSource()->snapshots()
+        return $this->snapshots ??= $this->getSource()->snapshots()
+            ->with('snapshotData')
             ->get()
             ->sortByDesc('version')
             ->keyBy(static fn (Snapshot $snapshot): string => $snapshot->id->toString());

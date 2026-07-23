@@ -18,7 +18,6 @@ return [
     'compare_from' => 'Oude versie',
     'compare_to' => 'Nieuwe versie',
     'compare_no_changes' => 'Geen wijzigingen',
-    'compare_not_enough_versions' => 'Er zijn minimaal twee versies nodig om te vergelijken',
 
     'number' => 'Nummer verwerking',
     'name' => 'Naam versie',

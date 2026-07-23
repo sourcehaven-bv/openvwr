@@ -2,6 +2,8 @@
     @php
         $options = $this->getVersionOptions();
         $diffs = $this->getDiffs();
+        $fromId = $this->fromId;
+        $toId = $this->toId;
     @endphp
 
     <x-filament::section>
@@ -19,7 +21,7 @@
                         <x-filament::input.wrapper>
                             <x-filament::input.select wire:model.live="fromId" id="compare-from">
                                 @foreach ($options as $id => $label)
-                                    <option value="{{ $id }}">{{ $label }}</option>
+                                    <option value="{{ $id }}" @selected($id === $fromId)>{{ $label }}</option>
                                 @endforeach
                             </x-filament::input.select>
                         </x-filament::input.wrapper>
@@ -31,7 +33,7 @@
                         <x-filament::input.wrapper>
                             <x-filament::input.select wire:model.live="toId" id="compare-to">
                                 @foreach ($options as $id => $label)
-                                    <option value="{{ $id }}">{{ $label }}</option>
+                                    <option value="{{ $id }}" @selected($id === $toId)>{{ $label }}</option>
                                 @endforeach
                             </x-filament::input.select>
                         </x-filament::input.wrapper>

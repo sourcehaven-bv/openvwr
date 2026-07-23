@@ -66,14 +66,13 @@ trait HasSnapshots
 
     final public function hasComparableSnapshots(): bool
     {
-        return $this->snapshots()->get()->count() >= 2;
+        return $this->snapshots()->count() >= 2;
     }
 
     final public function getLatestSnapshot(): ?Snapshot
     {
         return $this->snapshots()
-            ->get()
-            ->sortByDesc('version')
+            ->orderByDesc('version')
             ->first();
     }
 
