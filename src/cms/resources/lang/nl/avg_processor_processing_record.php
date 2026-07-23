@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 return [
-    'model_singular' => 'Verwerking AVG Verwerker',
-    'model_plural' => 'Verwerkingen AVG Verwerker',
-    'table_empty_heading' => 'Geen Verwerkingen AVG Verwerkers',
+    'model_singular' => 'Verwerking AVG verwerker',
+    'model_plural' => 'Verwerkingen AVG verwerker',
+    'table_empty_heading' => 'Geen verwerkingen AVG verwerkers',
     'register_description' => 'Verwerkingen van persoonsgegevens die uw organisatie in opdracht van een andere verantwoordelijke uitvoert.',
 
     'step_processing_name' => 'Naam verwerking',
@@ -16,8 +16,8 @@ return [
     'step_security' => 'Beveiliging',
     'step_contact_person' => 'Contactpersoon',
     'step_remarks' => 'Opmerkingen',
-    'step_attachments' => 'Documenten & Bijlagen',
-    'step_processing_goal' => 'Doel & Grondslag',
+    'step_attachments' => 'Documenten & bijlagen',
+    'step_processing_goal' => 'Doel & grondslag',
     'step_involved_data' => 'Betrokkenen en gegevens',
     'step_decision_making' => 'Besluitvorming',
     'step_receiver' => 'Ontvanger',
@@ -39,6 +39,10 @@ return [
     'help_geb_pia' => 'Is er een GEB (DPIA) door de verantwoordelijke uitgevoerd?',
 
     'help_service' => 'De dienst of afdeling die deze verwerking voor de verantwoordelijke uitvoert.',
+    'help_responsible' => 'De verantwoordelijke(n) in wiens opdracht u deze gegevens verwerkt.',
+    'help_receivers' => 'Aan wie de persoonsgegevens worden verstrekt, buiten uw eigen organisatie. Laat leeg als er geen ontvangers zijn.',
+    'help_has_goal' => 'Is er een specifiek doel voor deze verwerking vastgelegd?',
+    'help_has_pseudonymization' => 'Zet aan als de gegevens zijn vervangen door kenmerken die niet direct naar een persoon herleidbaar zijn.',
     'help_has_subprocessors' => 'Is er sprake van (een of meerdere) subverwerkers?',
     'help_logic' => 'Welke gegevens tot welk besluit leiden, begrijpelijk beschreven en zonder technische details.',
     'help_importance_consequences' => 'Wat het besluit concreet voor de betrokkene betekent, bijvoorbeeld toekenning of afwijzing.',
@@ -53,7 +57,7 @@ return [
     'responsibility_distribution' => '',
     'pseudonymization' => 'Toelichting',
     'outside_eu' => 'Doorgifte buiten EER',
-    'outside_eu_protection_level' => 'Adequate bescherming buiten de EER',
+    'outside_eu_protection_level' => 'Vallen alle doorgiftes onder een adequaatheidsbesluit?',
     'outside_eu_protection_level_description' => 'Toelichting',
     'outside_eu_description' => 'Toelichting',
     'decision_making' => 'Geautomatiseerde besluitvorming',

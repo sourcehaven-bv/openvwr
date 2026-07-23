@@ -3,13 +3,13 @@
 declare(strict_types=1);
 
 return [
-    'model_singular' => 'Verwerking WPG Verantwoordelijke',
-    'model_plural' => 'Verwerkingen WPG Verantwoordelijke',
-    'table_empty_heading' => 'Geen Verwerkingen WPG Verantwoordelijke',
+    'model_singular' => 'Verwerking WPG verantwoordelijke',
+    'model_plural' => 'Verwerkingen WPG verantwoordelijke',
+    'table_empty_heading' => 'Geen verwerkingen WPG verantwoordelijke',
     'register_description' => 'Verwerkingen van politiegegevens die onder de Wet politiegegevens vallen in plaats van onder de AVG.',
 
     'step_processing_name' => 'Naam verwerking',
-    'step_wpg_goal' => 'Doel & Grondslag',
+    'step_wpg_goal' => 'Doel & grondslag',
     'step_responsible' => 'Verwerkingsverantwoordelijke',
     'step_processor' => 'Verwerker',
     'step_receiver' => 'Ontvanger',
@@ -21,7 +21,7 @@ return [
     'step_geb_dpia' => 'GEB (DPIA)',
     'step_contact_person' => 'Contactpersoon',
     'step_remarks' => 'Opmerkingen',
-    'step_attachments' => 'Documenten & Bijlagen',
+    'step_attachments' => 'Documenten & bijlagen',
     'step_publish' => 'Publiceren',
 
     'help_has_processors' => 'Is er sprake van verwerkers',
@@ -38,6 +38,12 @@ return [
     'help_explanation_provisioning' => 'Per aangevinkt artikel: welke gegevens aan wie worden verstrekt.',
     'help_explanation_transfer' => 'Naar welk land of welke organisatie wordt doorgegeven en welke waarborgen daarvoor gelden.',
     'help_service' => 'De dienst of afdeling die verantwoordelijk is voor deze verwerking.',
+    'help_responsible' => 'De organisatie(s) die het doel en de middelen van deze verwerking bepalen.',
+    'help_decision_making' => 'Zet aan als besluiten (deels) automatisch worden genomen, zonder betekenisvolle menselijke tussenkomst. Vul dan de toelichting hieronder in.',
+    'help_has_pseudonymization' => 'Zet aan als de gegevens zijn vervangen door kenmerken die niet direct naar een persoon herleidbaar zijn.',
+    'help_suspects' => 'Zet aan als er politiegegevens van verdachten worden verwerkt.',
+    'help_victims' => 'Zet aan als er politiegegevens van slachtoffers worden verwerkt.',
+    'help_convicts' => 'Zet aan als er politiegegevens van veroordeelden worden verwerkt.',
     'help_special_police_data' => 'Vink alleen aan wat daadwerkelijk wordt verwerkt; dit vraagt om extra beveiliging en onderbouwing.',
     'help_police_justice' => 'Betrokkenen die werkzaam zijn bij politie of justitie.',
     'help_third_parties' => 'Overige betrokkenen, zoals getuigen, melders of contactpersonen.',

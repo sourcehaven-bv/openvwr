@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Observers;
 
+use App\Filament\Forms\GebDpiaQuestionnaire;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 
 use function __;
@@ -18,6 +19,26 @@ class AvgResponsibleProcessingRecordObserver
         $this->resetSecurity($avgResponsibleProcessingRecord);
         $this->resetPassthrough($avgResponsibleProcessingRecord);
         $this->resetGebDpia($avgResponsibleProcessingRecord);
+    }
+
+    /**
+     * The GEB (DPIA) pre-screen is a progressive OR-questionnaire: once a GEB
+     * was executed, or once an earlier criterion is answered "ja", the later
+     * questions are never asked. Reset those unreached answers so the stored
+     * data matches what the questionnaire actually presented.
+     */
+    private function resetGebDpia(AvgResponsibleProcessingRecord $avgResponsibleProcessingRecord): void
+    {
+        $answers = [];
+        foreach (GebDpiaQuestionnaire::CRITERIA as $criterion) {
+            $answers[$criterion] = $avgResponsibleProcessingRecord->getAttribute($criterion) === true;
+        }
+
+        $reset = GebDpiaQuestionnaire::resetUnreached($avgResponsibleProcessingRecord->geb_dpia_executed === true, $answers);
+
+        foreach ($reset as $criterion => $value) {
+            $avgResponsibleProcessingRecord->setAttribute($criterion, $value);
+        }
     }
 
     private function resetProcessors(AvgResponsibleProcessingRecord $avgResponsibleProcessingRecord): void
@@ -72,53 +93,6 @@ class AvgResponsibleProcessingRecordObserver
 
         if ($avgResponsibleProcessingRecord->outside_eu_protection_level === true) {
             $avgResponsibleProcessingRecord->outside_eu_protection_level_description = null;
-        }
-    }
-
-    private function resetGebDpia(AvgResponsibleProcessingRecord $avgResponsibleProcessingRecord): void
-    {
-        if ($avgResponsibleProcessingRecord->geb_dpia_executed === true) {
-            $avgResponsibleProcessingRecord->geb_dpia_automated = false;
-            $avgResponsibleProcessingRecord->geb_dpia_large_scale_processing = false;
-            $avgResponsibleProcessingRecord->geb_dpia_large_scale_monitoring = false;
-            $avgResponsibleProcessingRecord->geb_dpia_list_required = false;
-            $avgResponsibleProcessingRecord->geb_dpia_criteria_wp248 = false;
-            $avgResponsibleProcessingRecord->geb_dpia_high_risk_freedoms = false;
-            return;
-        }
-
-        if ($avgResponsibleProcessingRecord->geb_dpia_automated === true) {
-            $avgResponsibleProcessingRecord->geb_dpia_large_scale_processing = false;
-            $avgResponsibleProcessingRecord->geb_dpia_large_scale_monitoring = false;
-            $avgResponsibleProcessingRecord->geb_dpia_list_required = false;
-            $avgResponsibleProcessingRecord->geb_dpia_criteria_wp248 = false;
-            $avgResponsibleProcessingRecord->geb_dpia_high_risk_freedoms = false;
-            return;
-        }
-
-        if ($avgResponsibleProcessingRecord->geb_dpia_large_scale_processing === true) {
-            $avgResponsibleProcessingRecord->geb_dpia_large_scale_monitoring = false;
-            $avgResponsibleProcessingRecord->geb_dpia_list_required = false;
-            $avgResponsibleProcessingRecord->geb_dpia_criteria_wp248 = false;
-            $avgResponsibleProcessingRecord->geb_dpia_high_risk_freedoms = false;
-            return;
-        }
-
-        if ($avgResponsibleProcessingRecord->geb_dpia_large_scale_monitoring === true) {
-            $avgResponsibleProcessingRecord->geb_dpia_list_required = false;
-            $avgResponsibleProcessingRecord->geb_dpia_criteria_wp248 = false;
-            $avgResponsibleProcessingRecord->geb_dpia_high_risk_freedoms = false;
-            return;
-        }
-
-        if ($avgResponsibleProcessingRecord->geb_dpia_list_required === true) {
-            $avgResponsibleProcessingRecord->geb_dpia_criteria_wp248 = false;
-            $avgResponsibleProcessingRecord->geb_dpia_high_risk_freedoms = false;
-            return;
-        }
-
-        if ($avgResponsibleProcessingRecord->geb_dpia_criteria_wp248 === true) {
-            $avgResponsibleProcessingRecord->geb_dpia_high_risk_freedoms = false;
         }
     }
 }

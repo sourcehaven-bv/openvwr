@@ -32,10 +32,15 @@ class AlgorithmRecordResourceFormSchemas
     public static function getProcessingName(): array
     {
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.algorithm_record.step_processing_name_title'),
+                __('information_blocks.algorithm_record.step_processing_name_info'),
+            ),
             EntityNumber::make()
                 ->label(__('algorithm_record.number')),
             TextInput::make('name')
                 ->label(__('general.name'))
+                ->helperText(__('algorithm_record.help_name'))
                 ->required()
                 ->maxLength(100),
             Textarea::make('description')
@@ -69,17 +74,14 @@ class AlgorithmRecordResourceFormSchemas
                 AlgorithmPublicationCategory::class,
                 'name',
             )
-                ->label(__('algorithm_record.publication_category')),
+                ->label(__('algorithm_record.publication_category'))
+                ->helperText(__('algorithm_record.help_publication_category')),
             TextInput::make('source_link')
                 ->label(__('algorithm_record.source_link'))
                 ->helperText(__('algorithm_record.help_source_link'))
                 ->columns(1)
                 ->url()
                 ->maxLength(500),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.algorithm_record.step_processing_name_title'),
-                __('information_blocks.algorithm_record.step_processing_name_info'),
-            ),
         ];
     }
 
@@ -89,6 +91,10 @@ class AlgorithmRecordResourceFormSchemas
     public static function getResponsibleUse(): array
     {
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.algorithm_record.step_responsible_use_title'),
+                __('information_blocks.algorithm_record.step_responsible_use_info'),
+            ),
             Textarea::make('resp_goal_and_impact')
                 ->label(__('algorithm_record.resp_goal_and_impact'))
                 ->maxLength(2500),
@@ -124,10 +130,6 @@ class AlgorithmRecordResourceFormSchemas
             Textarea::make('resp_impact_tests_description')
                 ->label(__('algorithm_record.resp_impact_tests_description'))
                 ->maxLength(2500),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.algorithm_record.step_responsible_use_title'),
-                __('information_blocks.algorithm_record.step_responsible_use_info'),
-            ),
         ];
     }
 
@@ -137,6 +139,10 @@ class AlgorithmRecordResourceFormSchemas
     public static function getMechanics(): array
     {
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.algorithm_record.step_mechanics_title'),
+                __('information_blocks.algorithm_record.step_mechanics_info'),
+            ),
             TextInput::make('oper_data_title')
                 ->label(__('algorithm_record.oper_data_title'))
                 ->maxLength(500),
@@ -157,10 +163,6 @@ class AlgorithmRecordResourceFormSchemas
                 ->label(__('algorithm_record.oper_source_code_link'))
                 ->url()
                 ->maxLength(500),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.algorithm_record.step_mechanics_title'),
-                __('information_blocks.algorithm_record.step_mechanics_info'),
-            ),
         ];
     }
 
@@ -170,6 +172,10 @@ class AlgorithmRecordResourceFormSchemas
     public static function getMeta(): array
     {
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.algorithm_record.step_meta_title'),
+                __('information_blocks.algorithm_record.step_meta_info'),
+            ),
             // 'meta_lang' en 'meta_schema' zijn bewust geen invulvelden: de publicatiestandaard
             // legt deze vast op respectievelijk 'nld' en de versie van de standaard zelf. De
             // aanlever-API van het Algoritmeregister vult ze server-side in.
@@ -194,10 +200,6 @@ class AlgorithmRecordResourceFormSchemas
                 ->label(__('algorithm_record.meta_tags'))
                 ->helperText(__('algorithm_record.help_meta_tags'))
                 ->maxLength(2500),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.algorithm_record.step_meta_title'),
-                __('information_blocks.algorithm_record.step_meta_info'),
-            ),
         ];
     }
 
@@ -207,6 +209,10 @@ class AlgorithmRecordResourceFormSchemas
     public static function getImpact(): array
     {
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.algorithm_record.step_impact_title'),
+                __('information_blocks.algorithm_record.step_impact_info'),
+            ),
             self::makeRadio('impact_with_consequences'),
             self::makeRadio('impact_more_algorithms_applied'),
             self::makeRadio('impact_effect_on_outcome'),
@@ -222,11 +228,6 @@ class AlgorithmRecordResourceFormSchemas
                     self::isYes($get('impact_with_consequences'))
                     && self::isYes($get('impact_more_algorithms_applied'))
                     && self::isYes($get('impact_effect_on_outcome'))),
-
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.algorithm_record.step_impact_title'),
-                __('information_blocks.algorithm_record.step_impact_info'),
-            ),
         ];
     }
 
@@ -236,11 +237,11 @@ class AlgorithmRecordResourceFormSchemas
     public static function getValidation(): array
     {
         return [
-            self::makeRadio('validation_answers_checked_by_product_owner'),
             InformationBlockSection::makeCollapsible(
                 __('information_blocks.algorithm_record.step_validation_title'),
                 __('information_blocks.algorithm_record.step_validation_info'),
             ),
+            self::makeRadio('validation_answers_checked_by_product_owner'),
         ];
     }
 
@@ -250,6 +251,10 @@ class AlgorithmRecordResourceFormSchemas
     public static function getAttachments(): array
     {
         return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.algorithm_record.step_attachments_title'),
+                __('information_blocks.algorithm_record.step_attachments_info'),
+            ),
             SelectMultipleWithLookup::makeForRelationshipWithCreate(
                 'document_id',
                 'documents',
@@ -258,10 +263,6 @@ class AlgorithmRecordResourceFormSchemas
                 'name',
             )
                 ->label(__('document.model_plural')),
-            InformationBlockSection::makeCollapsible(
-                __('information_blocks.algorithm_record.step_attachments_title'),
-                __('information_blocks.algorithm_record.step_attachments_info'),
-            ),
         ];
     }
 

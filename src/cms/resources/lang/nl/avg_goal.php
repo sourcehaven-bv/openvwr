@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 return [
-    'model_singular' => 'AVG Doel',
-    'model_plural' => 'AVG Doelen',
-    'table_empty_heading' => 'Geen AVG Doelen',
+    'model_singular' => 'AVG doel',
+    'model_plural' => 'AVG doelen',
+    'table_empty_heading' => 'Geen AVG doelen',
     'add_action_label' => 'Doel toevoegen',
 
     'goal' => 'Doel',

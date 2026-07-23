@@ -23,9 +23,9 @@ return [
 
     'notification_options' => [
         'none' => 'geen',
-        'expires_at' => 'op datum zelf',
-        '1_month_before' => '1 maand van tevoren',
-        '3_months_before' => '3 maanden van tevoren',
+        'expires_at' => 'Op de vervaldatum',
+        '1_month_before' => '1 maand voor de vervaldatum',
+        '3_months_before' => '3 maanden voor de vervaldatum',
         'custom' => 'anders, namelijk',
     ],
 

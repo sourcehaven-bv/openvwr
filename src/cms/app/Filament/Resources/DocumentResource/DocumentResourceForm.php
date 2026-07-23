@@ -28,6 +28,7 @@ use Filament\Forms\Set;
 use Webmozart\Assert\Assert;
 
 use function __;
+use function filled;
 
 class DocumentResourceForm
 {
@@ -51,6 +52,7 @@ class DocumentResourceForm
     private static function getGeneralSection(): Section
     {
         return Section::make()
+            ->columns(1)
             ->schema([
                 TextInput::make('name')
                     ->label(__('document.name'))
@@ -71,59 +73,50 @@ class DocumentResourceForm
                         Action::make('notify_at_expires_at')
                             ->label(__('document.notification_options.expires_at'))
                             ->icon('heroicon-m-clock')
+                            ->color('gray')
+                            ->visible(static fn (Get $get): bool => filled($get('expires_at')))
                             ->action(static function (Get $get, Set $set): void {
-                                $expiresAt = $get('expires_at');
-                                Assert::nullOrString($expiresAt);
-
-                                if ($expiresAt === null) {
-                                    return;
-                                }
-
-                                $set('notify_at', CarbonImmutable::createFromFormat('Y-m-d H:i:s', $expiresAt));
+                                $set('notify_at', self::readExpiresAt($get));
                             }),
                     )
                     ->hintAction(
                         Action::make('notify_at_1_month_before')
                             ->label(__('document.notification_options.1_month_before'))
                             ->icon('heroicon-m-clock')
+                            ->color('gray')
+                            ->visible(static fn (Get $get): bool => filled($get('expires_at')))
                             ->action(static function (Get $get, Set $set): void {
-                                $expiresAt = $get('expires_at');
-                                Assert::nullOrString($expiresAt);
-
-                                if ($expiresAt === null) {
-                                    return;
-                                }
-
-                                $expiresAt = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $expiresAt);
-                                Assert::isInstanceOf($expiresAt, CarbonImmutable::class);
-
-                                $set('notify_at', $expiresAt->subMonth());
+                                $set('notify_at', self::readExpiresAt($get)->subMonth());
                             }),
                     )
                     ->hintAction(
                         Action::make('notify_at_3_months_before')
                             ->label(__('document.notification_options.3_months_before'))
                             ->icon('heroicon-m-clock')
+                            ->color('gray')
+                            ->visible(static fn (Get $get): bool => filled($get('expires_at')))
                             ->action(static function (Get $get, Set $set): void {
-                                $expiresAt = $get('expires_at');
-                                Assert::nullOrString($expiresAt);
-
-                                if ($expiresAt === null) {
-                                    return;
-                                }
-
-                                $expiresAt = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $expiresAt);
-                                Assert::isInstanceOf($expiresAt, CarbonImmutable::class);
-
-                                $set('notify_at', $expiresAt->subMonths(3));
+                                $set('notify_at', self::readExpiresAt($get)->subMonths(3));
                             }),
                     ),
                 Textarea::make('location')
-                    ->label(__('document.location'))
-                    ->columnSpan(2),
-                AttachmentFileField::make('Attachments')
-                    ->columnSpan(2),
+                    ->label(__('document.location')),
+                AttachmentFileField::make('Attachments'),
             ]);
+    }
+
+    /**
+     * Read the expires_at field state as a date. A DatePicker stores its value
+     * as a plain "Y-m-d" string, so parse leniently rather than with a fixed
+     * date-time format. Only called from actions that are visible when
+     * expires_at is filled, so the value is guaranteed to be a non-empty string.
+     */
+    private static function readExpiresAt(Get $get): CarbonImmutable
+    {
+        $expiresAt = $get('expires_at');
+        Assert::stringNotEmpty($expiresAt);
+
+        return CarbonImmutable::parse($expiresAt);
     }
 
     private static function getAttachProcessingRecordsSection(): Section
@@ -140,7 +133,7 @@ class DocumentResourceForm
                 )
                     ->label(__('avg_responsible_processing_record.model_plural'))
                     ->visible(Authorization::hasPermission(Permission::CORE_ENTITY_VIEW))
-                    ->columnSpan(2),
+                    ->columnSpanFull(),
                 SelectMultipleWithLookup::makeForRelationship(
                     'avg_processor_processing_record_id',
                     'avgProcessorProcessingRecords',
@@ -149,7 +142,7 @@ class DocumentResourceForm
                 )
                     ->label(__('avg_processor_processing_record.model_plural'))
                     ->visible(Authorization::hasPermission(Permission::CORE_ENTITY_VIEW))
-                    ->columnSpan(2),
+                    ->columnSpanFull(),
                 SelectMultipleWithLookup::makeForRelationship(
                     'wpg_processing_record_id',
                     'WpgProcessingRecords',
@@ -158,7 +151,7 @@ class DocumentResourceForm
                 )
                     ->label(__('wpg_processing_record.model_plural'))
                     ->visible(Authorization::hasPermission(Permission::CORE_ENTITY_VIEW))
-                    ->columnSpan(2),
+                    ->columnSpanFull(),
                 SelectMultipleWithLookup::makeForRelationship(
                     'algorithm_record_id',
                     'AlgorithmRecords',
@@ -167,7 +160,7 @@ class DocumentResourceForm
                 )
                     ->label(__('algorithm_record.model_plural'))
                     ->visible(Authorization::hasPermission(Permission::CORE_ENTITY_VIEW))
-                    ->columnSpan(2),
+                    ->columnSpanFull(),
                 SelectMultipleWithLookup::makeForRelationship(
                     'data_breach_record_id',
                     'DataBreachRecords',
@@ -176,7 +169,7 @@ class DocumentResourceForm
                 )
                     ->label(__('data_breach_record.model_plural'))
                     ->visible(Authorization::hasPermission(Permission::DATA_BREACH_RECORD_VIEW))
-                    ->columnSpan(2),
+                    ->columnSpanFull(),
             ]);
     }
 }
