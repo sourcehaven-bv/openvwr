@@ -114,3 +114,22 @@ it('unlinks a document through the remove action', function (): void {
     expect($algorithmRecord->documents->pluck('id')->toArray())
         ->toEqual([$keep->getKey()]);
 });
+
+it('ignores the remove action when no id is given', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $document = Document::factory()->recycle($organisation)->create();
+
+    $algorithmRecord = AlgorithmRecord::factory()->recycle($organisation)->create();
+    $algorithmRecord->documents()->attach($document);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAlgorithmRecord::class, [
+            'record' => $algorithmRecord->getRouteKey(),
+        ])
+        ->fillForm([
+            'meta_owner_algorithm' => fake()->name(),
+            'meta_product_owner_algorithm' => fake()->name(),
+        ])
+        ->callFormComponentAction('document_id', RelationTable::REMOVE_ACTION, arguments: [])
+        ->assertFormSet(['document_id' => [$document->getKey()->toString()]]);
+});

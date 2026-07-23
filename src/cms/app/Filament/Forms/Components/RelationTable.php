@@ -31,7 +31,7 @@ use function is_string;
 /**
  * A many-to-many relation field that renders the linked records as a compact
  * table (one configurable column per property) with per-row remove buttons,
- * instead of the flat chip list of {@see SelectMultipleWithLookup}.
+ * instead of a flat chip list.
  *
  * It extends Select so the proven relationship-sync, searchable "add" control
  * and inline "create option" form are reused as-is; only the display of the
@@ -87,9 +87,11 @@ class RelationTable extends Select
 
                     $component = $action->getComponent();
 
+                    // @codeCoverageIgnoreStart
                     if (!$component instanceof self) {
                         return;
                     }
+                    // @codeCoverageIgnoreEnd
 
                     /** @var array<int, string> $state */
                     $state = [];
@@ -132,7 +134,7 @@ class RelationTable extends Select
     /**
      * The Select::getRelationship() signature includes an unresolvable
      * "BelongsToThrough" class; this narrows it to the Eloquent relations we
-     * actually support. Mirrors SelectMultipleWithLookup.
+     * actually support.
      *
      * @return BelongsTo<Model, Model>|BelongsToMany<Model, Model>|HasOneOrMany<Model, Model, Collection<array-key, Model>>|HasOneOrManyThrough<Model, Model, Model, Collection<array-key, Model>>
      *

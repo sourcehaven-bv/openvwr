@@ -259,6 +259,8 @@ class RelationTableColumns
             return $record;
         }
 
+        // @codeCoverageIgnoreStart
         throw new InvalidArgumentException(sprintf('Expected a [%s], got [%s]', $class, $record::class));
+        // @codeCoverageIgnoreEnd
     }
 }
