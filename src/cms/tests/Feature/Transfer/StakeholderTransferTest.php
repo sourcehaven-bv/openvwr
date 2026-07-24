@@ -44,7 +44,7 @@ it('exports a stakeholder with its data items and imports them into another orga
         $dataItem->id->toString() => ['selected' => true, 'strategy' => null],
     ];
 
-    $result = app(BundleImporter::class)->import(
+    $result = app(BundleImporter::class)->importZip(
         Storage::disk('filament')->path($path),
         $plan,
         $destinationOrganisation,

@@ -50,6 +50,39 @@ recreates document files and finishes with a notification.
 Lookup-list values are always matched by name and created when missing; they are not shown in
 the selection screen.
 
+## Direct copy to another organisation
+
+For a user who administers more than one organisation, the same content can be copied straight
+into another organisation without the download/upload round-trip. On the register overview
+pages, selecting rows shows a **Kopiëren naar organisatie** bulk action (visible only when the
+user may export here *and* holds the import permission in at least one other organisation).
+
+It opens the `TransferCopy` page, which lets the user pick a target organisation and the
+related items to include, then shows the same conflict preview as the file import. Confirming
+runs `CrossOrgCopier`, which reuses the export graph collection and the import pipeline in
+memory (no zip); document files are read straight from the source media library.
+
+Authorization is enforced server-side, not only in the UI: the acting user must hold the
+`export` permission in the source organisation and the `import` permission in the destination,
+each evaluated with the roles they hold *in that organisation* (see `CrossOrgAuthorization`).
+Both the page and `CrossOrgCopier` re-check this; every id and organisation from the request is
+re-scoped and re-authorized.
+
+### Smart re-copy (last_synced_at)
+
+Copies are stamped with `last_synced_at` — the moment the row last matched its source. On a
+later copy, each existing match is classified:
+
+- **not edited since sync** (`updated_at` and every relation pivot are older than
+  `last_synced_at`) → overwritten silently;
+- **edited locally** (the record or one of its relation links changed after the sync) → flagged
+  so the user chooses skip / overwrite / add-a-copy.
+
+A match that was never synced (e.g. matched only by name, or predating this feature) is treated
+as edited, so the user is always asked rather than silently overwritten. Relations without pivot
+timestamps (tags, data-breach links) cannot report edits this way and do not, on their own,
+mark a copy as edited.
+
 ## Limits
 
 `config/transfer.php` caps uploaded zips (`TRANSFER_MAX_ZIPPED_NUMBER_OF_FILES`, default 5000

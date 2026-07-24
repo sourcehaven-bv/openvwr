@@ -11,11 +11,8 @@ use App\Facades\Authorization;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Jobs\TransferImportJob;
 use App\Rules\Virusscanner;
-use App\Transfer\ConflictStrategy;
 use App\Transfer\Import\BundleReader;
-use App\Transfer\Import\ImportMatcher;
-use App\Transfer\Import\TransferBundle;
-use App\Transfer\TransferEntityType;
+use App\Transfer\Import\PreviewBuilder;
 use App\Transfer\TransferException;
 use Carbon\CarbonImmutable;
 use Filament\Forms\Components\FileUpload;
@@ -107,7 +104,7 @@ class TransferImport extends Page implements HasForms
         ]);
     }
 
-    public function analyse(BundleReader $bundleReader, ImportMatcher $importMatcher): void
+    public function analyse(BundleReader $bundleReader, PreviewBuilder $previewBuilder): void
     {
         $form = $this->getForm('form');
         $formState = $form?->getState();
@@ -136,54 +133,14 @@ class TransferImport extends Page implements HasForms
             return;
         }
 
-        $items = $this->buildItems($bundle, $importMatcher);
-
         $this->bundlePath = $bundlePath;
         $this->sourceOrganisation = $bundle->sourceOrganisationName();
         $this->exportedAt = $bundle->exportedAt() === ''
             ? null
             : CarbonImmutable::parse($bundle->exportedAt())->format('d-m-Y H:i');
-        $this->items = $items;
+        $this->items = $previewBuilder->build($bundle, Authentication::organisation());
 
         $form->fill();
-    }
-
-    /**
-     * Build the selection rows shown in the preview: one per selectable entity,
-     * annotated with whether the destination organisation already has it.
-     *
-     * @return array<string, array<string, mixed>>
-     */
-    private function buildItems(TransferBundle $bundle, ImportMatcher $importMatcher): array
-    {
-        $organisation = Authentication::organisation();
-        $items = [];
-
-        foreach ($bundle->entities as $id => $entity) {
-            // BundleReader::read() has already validated every entity's type as a known enum value.
-            $typeValue = $entity['type'] ?? null;
-            Assert::string($typeValue);
-
-            $type = TransferEntityType::from($typeValue);
-
-            if ($type->isOwned() || $type->isLookup()) {
-                continue;
-            }
-
-            $match = $importMatcher->match($type, $entity, $organisation);
-            $name = $entity['name'] ?? null;
-
-            $items[$id] = [
-                'type_label' => $type->label(),
-                'name' => is_string($name) ? $name : $id,
-                'selected' => true,
-                'has_match' => $match !== null,
-                'match_name' => $match === null ? null : $type->displayName($match),
-                'strategy' => $match === null ? null : ConflictStrategy::SKIP->value,
-            ];
-        }
-
-        return $items;
     }
 
     /**

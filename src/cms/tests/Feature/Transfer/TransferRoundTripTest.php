@@ -74,7 +74,7 @@ it('exports records with related items and imports them into another organisatio
 
     expect(Storage::disk('filament')->exists($path))->toBeTrue();
 
-    $result = app(BundleImporter::class)->import(
+    $result = app(BundleImporter::class)->importZip(
         Storage::disk('filament')->path($path),
         $plan,
         $destinationOrganisation,
@@ -131,14 +131,14 @@ it('skips items that already exist when the strategy is skip', function (): void
     $importer = app(BundleImporter::class);
     $absolutePath = Storage::disk('filament')->path($path);
 
-    $importer->import($absolutePath, $plan, $destinationOrganisation, $user);
+    $importer->importZip($absolutePath, $plan, $destinationOrganisation, $user);
 
     $skipPlan = array_map(static fn (array $item): array => [
         'selected' => true,
         'strategy' => 'skip',
     ], $plan);
 
-    $result = $importer->import($absolutePath, $skipPlan, $destinationOrganisation, $user);
+    $result = $importer->importZip($absolutePath, $skipPlan, $destinationOrganisation, $user);
 
     expect($result->created)->toBe(0)
         ->and($result->skipped)->toBe(4)
@@ -158,7 +158,7 @@ it('overwrites existing items when the strategy is overwrite', function (): void
     $importer = app(BundleImporter::class);
     $absolutePath = Storage::disk('filament')->path($path);
 
-    $importer->import($absolutePath, $plan, $destinationOrganisation, $user);
+    $importer->importZip($absolutePath, $plan, $destinationOrganisation, $user);
 
     $imported = AvgResponsibleProcessingRecord::query()
         ->whereBelongsTo($destinationOrganisation)
@@ -170,7 +170,7 @@ it('overwrites existing items when the strategy is overwrite', function (): void
         'strategy' => 'overwrite',
     ], $plan);
 
-    $result = $importer->import($absolutePath, $overwritePlan, $destinationOrganisation, $user);
+    $result = $importer->importZip($absolutePath, $overwritePlan, $destinationOrganisation, $user);
 
     expect($result->overwritten)->toBe(4)
         ->and($imported->refresh()->name)->toBe('Verwerking A')
@@ -189,12 +189,12 @@ it('adds a copy when the strategy is copy', function (): void {
     $importer = app(BundleImporter::class);
     $absolutePath = Storage::disk('filament')->path($path);
 
-    $importer->import($absolutePath, $plan, $destinationOrganisation, $user);
+    $importer->importZip($absolutePath, $plan, $destinationOrganisation, $user);
 
     $copyPlan = $plan;
     $copyPlan[$record->id->toString()]['strategy'] = 'copy';
 
-    $result = $importer->import($absolutePath, $copyPlan, $destinationOrganisation, $user);
+    $result = $importer->importZip($absolutePath, $copyPlan, $destinationOrganisation, $user);
 
     expect($result->created)->toBe(1)
         ->and($result->skipped)->toBe(3);
@@ -220,7 +220,7 @@ it('matches existing content by name when there is no origin id', function (): v
     // pre-existing processor with the same name in the destination organisation
     $existingProcessor = Processor::factory()->for($destinationOrganisation)->create(['name' => 'Verwerker 1']);
 
-    $result = app(BundleImporter::class)->import(
+    $result = app(BundleImporter::class)->importZip(
         Storage::disk('filament')->path($path),
         $plan,
         $destinationOrganisation,
@@ -248,7 +248,7 @@ it('does not import items that are deselected', function (): void {
 
     $plan[$processor->id->toString()]['selected'] = false;
 
-    app(BundleImporter::class)->import(
+    app(BundleImporter::class)->importZip(
         Storage::disk('filament')->path($path),
         $plan,
         $destinationOrganisation,

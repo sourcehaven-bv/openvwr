@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 
+use App\Filament\Actions\TransferCopyBulkAction;
 use App\Filament\Actions\TransferExportBulkAction;
 use App\Filament\Tables\Actions\GoToStaticWebsiteAction;
 use App\Filament\Tables\Columns\CreatedAtColumn;
@@ -55,6 +56,7 @@ class AvgResponsibleProcessingRecordResourceTable
             ])
             ->bulkActions([
                 TransferExportBulkAction::make(),
+                TransferCopyBulkAction::make(),
             ])
             ->filters([
                 TagFilter::make(),

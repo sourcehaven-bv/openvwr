@@ -18,7 +18,12 @@ trait HasOrganisation
 {
     final public function initializeHasOrganisation(): void
     {
-        $this->mergeCasts(['organisation_id' => UuidCast::class]);
+        $this->mergeCasts([
+            'organisation_id' => UuidCast::class,
+            // Copyable entities carry this cross-org copy watermark; harmless no-op on
+            // organisation-scoped tables that do not have the column (lookups, snapshots).
+            'last_synced_at' => 'datetime',
+        ]);
         $this->mergeFillable(['organisation_id']);
     }
 
