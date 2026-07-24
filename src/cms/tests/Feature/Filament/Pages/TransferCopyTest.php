@@ -45,7 +45,8 @@ function seedCopyRecordWithProcessor(Organisation $organisation): AvgResponsible
 function assertCopyPageAborts(int $status, string $type, string $records): void
 {
     try {
-        Livewire::test(TransferCopy::class, ['type' => $type, 'records' => $records]);
+        Livewire::withQueryParams(['type' => $type, 'records' => $records]);
+        Livewire::test(TransferCopy::class);
         expect(false)->toBeTrue('expected the copy page to abort but it mounted');
     } catch (HttpException $exception) {
         expect($exception->getStatusCode())->toBe($status);
@@ -101,7 +102,7 @@ it('ignores malformed related selections when copying', function (): void {
     $record = seedCopyRecordWithProcessor($source);
 
     $this->withFilamentSession($user, $source)
-        ->createLivewireTestable(TransferCopy::class, [
+        ->createLivewireTestable(TransferCopy::class, [], [
             'type' => TransferEntityType::AVG_RESPONSIBLE_PROCESSING_RECORD->value,
             'records' => $record->id->toString(),
         ])
@@ -122,7 +123,7 @@ it('protects the server-set record ids from client tampering', function (): void
 
     $this->withFilamentSession($user, $source);
 
-    expect(fn () => $this->createLivewireTestable(TransferCopy::class, [
+    expect(fn () => $this->createLivewireTestable(TransferCopy::class, [], [
         'type' => TransferEntityType::AVG_RESPONSIBLE_PROCESSING_RECORD->value,
         'records' => $record->id->toString(),
     ])->set('recordIds', ['tampered']))->toThrow(CannotUpdateLockedPropertyException::class);
@@ -135,7 +136,7 @@ it('lists the target organisations and pre-selects related items', function (): 
     $record = seedCopyRecordWithProcessor($source);
 
     $component = $this->withFilamentSession($user, $source)
-        ->createLivewireTestable(TransferCopy::class, [
+        ->createLivewireTestable(TransferCopy::class, [], [
             'type' => TransferEntityType::AVG_RESPONSIBLE_PROCESSING_RECORD->value,
             'records' => $record->id->toString(),
         ]);
@@ -151,7 +152,7 @@ it('warns when analyse is called without a target organisation', function (): vo
     $record = seedCopyRecordWithProcessor($source);
 
     $this->withFilamentSession($user, $source)
-        ->createLivewireTestable(TransferCopy::class, [
+        ->createLivewireTestable(TransferCopy::class, [], [
             'type' => TransferEntityType::AVG_RESPONSIBLE_PROCESSING_RECORD->value,
             'records' => $record->id->toString(),
         ])
@@ -167,7 +168,7 @@ it('analyses, resets and copies into the target organisation', function (): void
     $record = seedCopyRecordWithProcessor($source);
 
     $component = $this->withFilamentSession($user, $source)
-        ->createLivewireTestable(TransferCopy::class, [
+        ->createLivewireTestable(TransferCopy::class, [], [
             'type' => TransferEntityType::AVG_RESPONSIBLE_PROCESSING_RECORD->value,
             'records' => $record->id->toString(),
         ])
@@ -193,7 +194,7 @@ it('exposes the page title and navigation group', function (): void {
     $record = seedCopyRecordWithProcessor($source);
 
     $component = $this->withFilamentSession($user, $source)
-        ->createLivewireTestable(TransferCopy::class, [
+        ->createLivewireTestable(TransferCopy::class, [], [
             'type' => TransferEntityType::AVG_RESPONSIBLE_PROCESSING_RECORD->value,
             'records' => $record->id->toString(),
         ]);
@@ -209,7 +210,7 @@ it('does not analyse when the selected target no longer exists', function (): vo
     $record = seedCopyRecordWithProcessor($source);
 
     $this->withFilamentSession($user, $source)
-        ->createLivewireTestable(TransferCopy::class, [
+        ->createLivewireTestable(TransferCopy::class, [], [
             'type' => TransferEntityType::AVG_RESPONSIBLE_PROCESSING_RECORD->value,
             'records' => $record->id->toString(),
         ])
@@ -226,7 +227,7 @@ it('notifies and does not copy when the copier rejects the transfer', function (
     $record = seedCopyRecordWithProcessor($source);
 
     $component = $this->withFilamentSession($user, $source)
-        ->createLivewireTestable(TransferCopy::class, [
+        ->createLivewireTestable(TransferCopy::class, [], [
             'type' => TransferEntityType::AVG_RESPONSIBLE_PROCESSING_RECORD->value,
             'records' => $record->id->toString(),
         ])
@@ -255,7 +256,7 @@ it('does not copy into an organisation the user may not import into', function (
 
     $component = $this->withFilamentSession($user, $source)
         ->withoutExceptionHandling()
-        ->createLivewireTestable(TransferCopy::class, [
+        ->createLivewireTestable(TransferCopy::class, [], [
             'type' => TransferEntityType::AVG_RESPONSIBLE_PROCESSING_RECORD->value,
             'records' => $record->id->toString(),
         ]);

@@ -22,6 +22,7 @@ use Filament\Pages\Page;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Locked;
+use Livewire\Attributes\Url;
 
 use function __;
 use function abort_if;
@@ -51,6 +52,18 @@ class TransferCopy extends Page
     protected static bool $shouldRegisterNavigation = false;
     protected static string $view = 'filament.pages.transfer-copy';
 
+    /**
+     * The selected record type and ids arrive as query-string parameters from the bulk
+     * action. Bound with #[Url] so they hydrate from the query string in the real request
+     * (Filament does not map query params to mount arguments); mount() re-scopes and
+     * re-authorizes them into the locked recordType/recordIds below.
+     */
+    #[Url]
+    public ?string $type = null;
+
+    #[Url]
+    public ?string $records = null;
+
     /** @var list<string> */
     #[Locked]
     public array $recordIds = [];
@@ -74,16 +87,17 @@ class TransferCopy extends Page
     #[Locked]
     public bool $analysed = false;
 
-    public function mount(?string $type = null, ?string $records = null): void
+    public function mount(): void
     {
         abort_unless(Authorization::hasPermission(Permission::TRANSFER_EXPORT), 403);
 
-        $recordType = TransferEntityType::tryFrom((string) $type);
+        $recordType = TransferEntityType::tryFrom((string) $this->type);
 
         abort_if($recordType === null || !$recordType->isMainRecord(), 404);
 
         $this->recordType = $recordType->value;
-        $this->recordIds = $this->scopeRecordIds($recordType, $records === null ? [] : explode(',', $records));
+        $ids = $this->records === null || $this->records === '' ? [] : explode(',', $this->records);
+        $this->recordIds = $this->scopeRecordIds($recordType, $ids);
 
         abort_if($this->recordIds === [], 404);
 
