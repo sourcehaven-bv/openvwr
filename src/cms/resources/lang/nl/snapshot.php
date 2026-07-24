@@ -35,6 +35,7 @@ return [
 
     'back_to' => 'Terug naar :resource',
     'status_flow' => 'Statusverloop',
+    'status_flow_skipped' => 'Overgeslagen',
     'properties' => 'Gegevens',
     'public_data' => 'Publieke gegevens',
     'private_data' => 'Private gegevens',

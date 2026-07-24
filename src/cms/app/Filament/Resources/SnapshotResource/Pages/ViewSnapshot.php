@@ -18,6 +18,7 @@ use App\Filament\Resources\SnapshotResource;
 use App\Models\Snapshot;
 use App\Models\States\SnapshotState;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Facades\Filament;
 use Filament\Infolists\Components\Tabs;
 use Filament\Infolists\Infolist;
@@ -30,6 +31,7 @@ use Spatie\ModelStates\Exceptions\InvalidConfig;
 use Webmozart\Assert\Assert;
 
 use function __;
+use function sprintf;
 
 class ViewSnapshot extends ViewRecord
 {
@@ -130,7 +132,12 @@ class ViewSnapshot extends ViewRecord
     }
 
     /**
-     * @return array<Action>
+     * A single dropdown grouping every reachable transition. The trigger is
+     * labelled with the snapshot's current state; opening it lists the possible
+     * transitions, including forward states that skip intermediate steps (each
+     * item is only shown when the user has the target state's permission).
+     *
+     * @return array<Action|ActionGroup>
      *
      * @throws InvalidConfig
      */
@@ -138,11 +145,10 @@ class ViewSnapshot extends ViewRecord
     {
         /** @var Snapshot $snapshot */
         $snapshot = $this->record;
-        /** @var array<int, string> $transitionableStates */
-        $transitionableStates = $snapshot->state->transitionableStates();
+        $currentState = $snapshot->state;
 
         $actions = [];
-        foreach ($transitionableStates as $transitionableState) {
+        foreach ($currentState->orderedTransitionableStates() as $transitionableState) {
             /** @var SnapshotState $snapshotState */
             $snapshotState = SnapshotState::make($transitionableState, $snapshot);
             $action = $snapshotState::getAction();
@@ -150,7 +156,16 @@ class ViewSnapshot extends ViewRecord
             $actions[] = $action::makeForSnapshotState($snapshot, $snapshotState);
         }
 
-        return $actions;
+        if ($actions === []) {
+            return [];
+        }
+
+        return [
+            ActionGroup::make($actions)
+                ->label(__(sprintf('snapshot_state.label.%s', $currentState::$name)))
+                ->color($currentState::$color->value)
+                ->button(),
+        ];
     }
 
     public static function getNext(Snapshot $current): ?Snapshot

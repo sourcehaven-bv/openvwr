@@ -26,17 +26,21 @@
             @php
                 $reached = $station['reached'];
                 $current = $station['current'];
+                $skipped = $station['skipped'] ?? false;
             @endphp
 
             {{-- Connector from the previous station, aligned to the dot centre
-                 (dot is h-8 = 2rem, so its centre is 1rem from the top). --}}
+                 (dot is h-8 = 2rem, so its centre is 1rem from the top). A dashed
+                 connector leads into a skipped station to signal the jump. --}}
             @if ($index > 0)
                 <li aria-hidden="true" class="flex-1 min-w-6 px-1" style="padding-top: calc(1rem - 2px);">
                     <span
                         @class([
-                            'block h-1 w-full rounded-full',
-                            'bg-gray-300 dark:bg-gray-600' => $reached,
-                            'bg-gray-200 dark:bg-white/10' => ! $reached,
+                            'block h-1 w-full',
+                            'rounded-full bg-gray-300 dark:bg-gray-600' => $reached,
+                            'rounded-full bg-gray-200 dark:bg-white/10' => ! $reached && ! $skipped,
+                            // Skipped: dashed line instead of a solid bar.
+                            'border-t-2 border-dashed border-gray-300 dark:border-gray-600' => $skipped,
                         ])
                     ></span>
                 </li>
@@ -49,8 +53,10 @@
                         'flex h-8 w-8 items-center justify-center rounded-full',
                         // Past (reached, not current): neutral filled.
                         'bg-gray-300 dark:bg-gray-600' => $reached && ! $current,
+                        // Skipped: faint dashed outline, no fill.
+                        'border-2 border-dashed border-gray-300 dark:border-gray-600' => $skipped,
                         // Not reached yet: faint outline.
-                        'bg-gray-200 dark:bg-white/10' => ! $reached,
+                        'bg-gray-200 dark:bg-white/10' => ! $reached && ! $skipped,
                         // Current: coloured + ring.
                         'ring-4 ring-offset-2 ring-offset-white dark:ring-offset-gray-900' => $current,
                     ])
@@ -91,6 +97,10 @@
                             {{ $station['reached_by'] }}
                         </span>
                     @endif
+                @elseif ($skipped)
+                    <span class="mt-0.5 text-xs italic text-gray-400 dark:text-gray-500">
+                        {{ __('snapshot.status_flow_skipped') }}
+                    </span>
                 @endif
             </li>
         @endforeach

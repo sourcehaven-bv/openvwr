@@ -6,9 +6,6 @@ namespace App\Filament\Infolists\Components;
 
 use App\Models\Snapshot;
 use App\Models\SnapshotTransition;
-use App\Models\States\Snapshot\Approved;
-use App\Models\States\Snapshot\Established;
-use App\Models\States\Snapshot\InReview;
 use App\Models\States\Snapshot\Obsolete;
 use App\Models\States\SnapshotState;
 use Filament\Infolists\Components\ViewEntry;
@@ -26,14 +23,11 @@ use function sprintf;
 class SnapshotStatusFlow extends ViewEntry
 {
     /**
-     * The main line, in order. Obsolete is deliberately not on it: it is a
-     * branch drawn off to the side only when the snapshot actually reached it.
+     * The main line, in order: the shared forward happy path from the state
+     * model. Obsolete is deliberately not on it — it is a branch drawn off to the
+     * side only when the snapshot actually reached it.
      */
-    private const MAIN_LINE = [
-        InReview::class,
-        Approved::class,
-        Established::class,
-    ];
+    private const MAIN_LINE = SnapshotState::FORWARD_LINE;
 
     public static function make(string $name = 'status_flow'): static
     {
@@ -60,6 +54,17 @@ class SnapshotStatusFlow extends ViewEntry
 
         $currentState = $snapshot->state::$name;
 
+        // The furthest position the line has progressed to. The current state is
+        // always treated as reached (see below), so when it is on the line it is
+        // the furthest point; otherwise fall back to the last recorded station.
+        $furthestReachedIndex = 0;
+        foreach (self::MAIN_LINE as $index => $stateClass) {
+            $stateName = $stateClass::$name;
+            if ($currentState === $stateName || array_key_exists($stateName, $reachedAt)) {
+                $furthestReachedIndex = $index;
+            }
+        }
+
         $stations = [];
         foreach (self::MAIN_LINE as $index => $stateClass) {
             $stateName = $stateClass::$name;
@@ -70,13 +75,16 @@ class SnapshotStatusFlow extends ViewEntry
             // current station is always reached too: a state can be set directly
             // (e.g. seeded data) without a recorded transition.
             $reached = $transition !== null || $index === 0 || $isCurrent;
+            // A station the line moved past but never reached was skipped (e.g.
+            // established straight from review), as opposed to one not reached yet.
+            $skipped = !$reached && $index < $furthestReachedIndex;
 
-            $stations[] = self::station($stateClass, $reached, $isCurrent, $transition);
+            $stations[] = self::station($stateClass, $reached, $isCurrent, $skipped, $transition);
         }
 
         $obsolete = null;
         if ($currentState === Obsolete::$name) {
-            $obsolete = self::station(Obsolete::class, true, true, $reachedAt[Obsolete::$name] ?? null);
+            $obsolete = self::station(Obsolete::class, true, true, false, $reachedAt[Obsolete::$name] ?? null);
         }
 
         return ['stations' => $stations, 'obsolete' => $obsolete];
@@ -91,6 +99,7 @@ class SnapshotStatusFlow extends ViewEntry
         string $stateClass,
         bool $reached,
         bool $current,
+        bool $skipped,
         ?SnapshotTransition $transition,
     ): array {
         return [
@@ -98,6 +107,7 @@ class SnapshotStatusFlow extends ViewEntry
             'color' => $stateClass::$color->value,
             'reached' => $reached,
             'current' => $current,
+            'skipped' => $skipped,
             'reached_at' => $transition?->created_at,
             'reached_by' => $transition?->creator?->name,
         ];
