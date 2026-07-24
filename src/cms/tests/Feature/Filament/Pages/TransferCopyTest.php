@@ -228,6 +228,22 @@ it('still offers a copy when at least one item is new or edited', function (): v
     expect($component->instance()->allUnchanged())->toBeFalse();
 });
 
+it('is not all-unchanged before an analysis produced items', function (): void {
+    $source = Organisation::factory()->create();
+    $destination = Organisation::factory()->create();
+    $user = copyableFilamentUser($source, $destination);
+    $record = seedCopyRecordWithProcessor($source);
+
+    $component = $this->withFilamentSession($user, $source)
+        ->createLivewireTestable(TransferCopy::class, [], [
+            'type' => TransferEntityType::AVG_RESPONSIBLE_PROCESSING_RECORD->value,
+            'records' => $record->id->toString(),
+        ]);
+
+    // No analysis has run yet, so there are no items and nothing is "unchanged".
+    expect($component->instance()->allUnchanged())->toBeFalse();
+});
+
 it('exposes the page title and navigation group', function (): void {
     $source = Organisation::factory()->create();
     $destination = Organisation::factory()->create();
