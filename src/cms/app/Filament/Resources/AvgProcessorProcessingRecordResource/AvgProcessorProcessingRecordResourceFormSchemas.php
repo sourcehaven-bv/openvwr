@@ -8,12 +8,13 @@ use App\Filament\Forms\Components\Group\ProcessingRecordContactPersons;
 use App\Filament\Forms\Components\OutsideEuCountryInputGroup;
 use App\Filament\Forms\Components\PeriodicReviewField;
 use App\Filament\Forms\Components\Radio\CoreEntityDataCollectionSource;
+use App\Filament\Forms\Components\RelationTable;
+use App\Filament\Forms\Components\RelationTableColumns;
 use App\Filament\Forms\Components\RemarksField;
 use App\Filament\Forms\Components\Repeater\AvgGoalsRepeater;
 use App\Filament\Forms\Components\Section\InformationBlockSection;
 use App\Filament\Forms\Components\Select\ParentSelect;
 use App\Filament\Forms\Components\Select\SelectSingleWithLookup;
-use App\Filament\Forms\Components\SelectMultipleWithLookup;
 use App\Filament\Forms\Components\StakeholdersRepeater;
 use App\Filament\Forms\Components\TagsInput;
 use App\Filament\Forms\Components\TextInput\EntityNumber;
@@ -91,12 +92,13 @@ class AvgProcessorProcessingRecordResourceFormSchemas
                 __('information_blocks.avg_processor_processing_record.step_responsible_info'),
                 __('information_blocks.avg_processor_processing_record.step_responsible_extra_info'),
             ),
-            SelectMultipleWithLookup::makeForRelationshipWithCreate(
+            RelationTable::makeForRelationship(
                 'responsible_id',
                 'responsibles',
                 Responsible::class,
-                ResponsibleResourceForm::getSchema(),
                 'name',
+                RelationTableColumns::for(Responsible::class),
+                ResponsibleResourceForm::getSchema(),
             )
                 ->label(__('responsible.model_plural'))
                 ->helperText(__('avg_processor_processing_record.help_responsible'))
@@ -121,12 +123,13 @@ class AvgProcessorProcessingRecordResourceFormSchemas
                 ->default(false)
                 ->live(),
 
-            SelectMultipleWithLookup::makeForRelationshipWithCreate(
+            RelationTable::makeForRelationship(
                 'processors',
                 'processors',
                 Processor::class,
-                ProcessorResourceForm::getSchema(),
                 'name',
+                RelationTableColumns::for(Processor::class),
+                ProcessorResourceForm::getSchema(),
             )
                 ->label(__('avg_processor_processing_record.subprocessors'))
                 ->visible(FormHelper::isFieldEnabled('has_processors')),
@@ -144,12 +147,13 @@ class AvgProcessorProcessingRecordResourceFormSchemas
                 __('information_blocks.avg_processor_processing_record.step_receiver_info'),
                 __('information_blocks.avg_processor_processing_record.step_receiver_extra_info'),
             ),
-            SelectMultipleWithLookup::makeForRelationshipWithCreate(
+            RelationTable::makeForRelationship(
                 'receivers',
                 'receivers',
                 Receiver::class,
-                ReceiverResourceForm::getSchema(),
                 'description',
+                RelationTableColumns::for(Receiver::class),
+                ReceiverResourceForm::getSchema(),
             )
                 ->label(__('receiver.model_plural'))
                 ->helperText(__('avg_processor_processing_record.help_receivers')),
@@ -249,12 +253,13 @@ class AvgProcessorProcessingRecordResourceFormSchemas
                 ->default(false)
                 ->live(),
 
-            SelectMultipleWithLookup::makeForRelationshipWithCreate(
+            RelationTable::makeForRelationship(
                 'systems',
                 'systems',
                 System::class,
-                SystemResourceForm::getSchema(),
                 'description',
+                RelationTableColumns::for(System::class),
+                SystemResourceForm::getSchema(),
             )
                 ->label(__('system.model_plural'))
                 ->required()
@@ -394,12 +399,13 @@ class AvgProcessorProcessingRecordResourceFormSchemas
                 __('information_blocks.avg_processor_processing_record.step_attachments_title'),
                 __('information_blocks.avg_processor_processing_record.step_attachments_info'),
             ),
-            SelectMultipleWithLookup::makeForRelationshipWithCreate(
+            RelationTable::makeForRelationship(
                 'document_id',
                 'documents',
                 Document::class,
-                DocumentResourceForm::getSchema(),
                 'name',
+                RelationTableColumns::for(Document::class),
+                DocumentResourceForm::getSchema(),
             )
                 ->label(__('document.model_plural')),
         ];
