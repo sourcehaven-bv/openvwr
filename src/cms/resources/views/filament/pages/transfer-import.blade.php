@@ -33,9 +33,15 @@
                                     </label>
 
                                     @if ($item['has_match'])
-                                        <x-filament::badge color="warning">
-                                            {{ __('transfer.exists_as', ['name' => $item['match_name']]) }}
-                                        </x-filament::badge>
+                                        @if ($item['needs_decision'])
+                                            <x-filament::badge color="warning">
+                                                {{ __('transfer.exists_edited', ['name' => $item['match_name']]) }}
+                                            </x-filament::badge>
+                                        @else
+                                            <x-filament::badge color="gray">
+                                                {{ __('transfer.exists_unchanged', ['name' => $item['match_name']]) }}
+                                            </x-filament::badge>
+                                        @endif
 
                                         <div class="w-56 shrink-0">
                                             <x-filament::input.wrapper>

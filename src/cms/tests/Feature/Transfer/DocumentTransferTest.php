@@ -56,7 +56,7 @@ it('exports a document with its media and imports it into another organisation',
 
     [$path, $plan] = createExportedDocumentBundle($sourceOrganisation);
 
-    $result = app(BundleImporter::class)->import(
+    $result = app(BundleImporter::class)->importZip(
         Storage::disk('filament')->path($path),
         $plan,
         $destinationOrganisation,
@@ -96,7 +96,7 @@ it('imports media onto an overwritten document that has none yet', function (): 
     $overwritePlan = $plan;
     $overwritePlan[$document->id->toString()]['strategy'] = 'overwrite';
 
-    $result = $importer->import($absolutePath, $overwritePlan, $destinationOrganisation, $user);
+    $result = $importer->importZip($absolutePath, $overwritePlan, $destinationOrganisation, $user);
 
     expect($result->overwritten)->toBe(1);
 

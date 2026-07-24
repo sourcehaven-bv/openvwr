@@ -29,6 +29,7 @@ class EntitySerializer
         'number',
         'origin_id',
         'import_id',
+        'last_synced_at',
         'user_id',
         'created_at',
         'updated_at',

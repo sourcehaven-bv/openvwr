@@ -74,17 +74,39 @@ class BundleImporter
     }
 
     /**
+     * Import a transfer zip from disk. Convenience wrapper around import() that reads
+     * the bundle and resolves media from the zip.
+     *
      * @param array<string, array{selected: bool, strategy: ?string}> $plan
      */
-    public function import(string $zipPath, array $plan, Organisation $organisation, User $user): TransferImportResult
+    public function importZip(string $zipPath, array $plan, Organisation $organisation, User $user): TransferImportResult
     {
         $bundle = $this->bundleReader->read($zipPath);
+        $mediaResolver = new ZipMediaResolver($this->bundleReader, $zipPath);
+
+        return $this->import($bundle, $mediaResolver, $plan, $organisation, $user);
+    }
+
+    /**
+     * Import an in-memory bundle into the destination organisation. The media resolver
+     * abstracts where document bytes come from (a zip, or the source media library for a
+     * same-instance cross-org copy), so this pipeline is transport-agnostic.
+     *
+     * @param array<string, array{selected: bool, strategy: ?string}> $plan
+     */
+    public function import(
+        TransferBundle $bundle,
+        MediaResolver $mediaResolver,
+        array $plan,
+        Organisation $organisation,
+        User $user,
+    ): TransferImportResult {
         $result = new TransferImportResult();
 
         $this->idMap = [];
         $this->written = [];
 
-        DB::transaction(function () use ($bundle, $plan, $organisation, $user, $zipPath, $result): void {
+        DB::transaction(function () use ($bundle, $mediaResolver, $plan, $organisation, $user, $result): void {
             foreach ($this->sortedEntities($bundle) as $id => $entity) {
                 $type = $this->typeOf($entity);
 
@@ -98,7 +120,7 @@ class BundleImporter
                     continue;
                 }
 
-                $this->importEntity($type, $id, $entity, $plan, $organisation, $zipPath, $result);
+                $this->importEntity($type, $id, $entity, $plan, $organisation, $mediaResolver, $result);
             }
 
             $this->relationRestorer->restore($bundle, $this->idMap, $this->written);
@@ -181,7 +203,7 @@ class BundleImporter
         array $entity,
         array $plan,
         Organisation $organisation,
-        string $zipPath,
+        MediaResolver $mediaResolver,
         TransferImportResult $result,
     ): void {
         $planItem = $plan[$id] ?? null;
@@ -200,12 +222,12 @@ class BundleImporter
         }
 
         if ($existing !== null && $strategy === ConflictStrategy::OVERWRITE) {
-            $this->overwriteEntity($id, $entity, $existing, $zipPath, $result);
+            $this->overwriteEntity($id, $entity, $existing, $mediaResolver, $result);
 
             return;
         }
 
-        $this->createEntity($type, $id, $entity, $existing, $organisation, $zipPath, $result);
+        $this->createEntity($type, $id, $entity, $existing, $organisation, $mediaResolver, $result);
     }
 
     private function skipEntity(string $id, Model $existing, TransferImportResult $result): void
@@ -221,7 +243,7 @@ class BundleImporter
         string $id,
         array $entity,
         Model $existing,
-        string $zipPath,
+        MediaResolver $mediaResolver,
         TransferImportResult $result,
     ): void {
         $existing->forceFill($this->attributeRemapper->remap($entity, $this->idMap));
@@ -231,13 +253,14 @@ class BundleImporter
         }
 
         $existing->save();
+        $this->markSynced($existing);
 
         $this->idMap[$id] = $existing;
         $this->written[$id] = true;
         $result->overwritten++;
 
         if ($existing instanceof Document && $existing->media->isEmpty()) {
-            $this->importMedia($existing, $entity, $zipPath);
+            $this->importMedia($existing, $entity, $mediaResolver);
         }
     }
 
@@ -253,7 +276,7 @@ class BundleImporter
         array $entity,
         ?Model $existing,
         Organisation $organisation,
-        string $zipPath,
+        MediaResolver $mediaResolver,
         TransferImportResult $result,
     ): void {
         $attributes = $this->attributeRemapper->remap($entity, $this->idMap);
@@ -265,13 +288,33 @@ class BundleImporter
         $model->forceFill($attributes);
         $model->setAttribute('organisation_id', $organisation->id->toString());
         $model->save();
+        $this->markSynced($model);
 
         $this->idMap[$id] = $model;
         $this->written[$id] = true;
         $result->created++;
 
         if ($model instanceof Document) {
-            $this->importMedia($model, $entity, $zipPath);
+            $this->importMedia($model, $entity, $mediaResolver);
+        }
+    }
+
+    /**
+     * Stamp the watermark used later to tell an untouched copy (safe to overwrite
+     * silently) from a locally edited one. Written without bumping updated_at so a
+     * fresh copy never reads back as "edited since sync".
+     */
+    private function markSynced(Model $model): void
+    {
+        $model->setAttribute('last_synced_at', $model->freshTimestamp());
+
+        $timestamps = $model->timestamps;
+        $model->timestamps = false;
+
+        try {
+            $model->saveQuietly();
+        } finally {
+            $model->timestamps = $timestamps;
         }
     }
 
@@ -343,7 +386,7 @@ class BundleImporter
     /**
      * @param array<string, mixed> $entity
      */
-    private function importMedia(Document $document, array $entity, string $zipPath): void
+    private function importMedia(Document $document, array $entity, MediaResolver $mediaResolver): void
     {
         $mediaItems = $entity['media'] ?? [];
 
@@ -356,15 +399,14 @@ class BundleImporter
                 continue;
             }
 
-            $zipEntryPath = $mediaItem['zip_path'] ?? null;
             $fileName = $mediaItem['file_name'] ?? null;
             $collectionName = $mediaItem['collection_name'] ?? null;
 
-            if (!is_string($zipEntryPath) || !is_string($fileName) || !is_string($collectionName)) {
+            if (!is_string($fileName) || !is_string($collectionName)) {
                 continue;
             }
 
-            $contents = $this->bundleReader->readMedia($zipPath, $zipEntryPath);
+            $contents = $mediaResolver->resolve($mediaItem);
 
             if ($contents === null) {
                 continue;

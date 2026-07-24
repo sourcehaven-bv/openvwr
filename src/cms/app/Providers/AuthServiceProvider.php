@@ -40,6 +40,7 @@ use App\Policies\ResponsiblePolicy;
 use App\Policies\TagPolicy;
 use App\Policies\UserPolicy;
 use App\Services\AuthorizationService;
+use App\Services\CrossOrgAuthorization;
 use App\Services\OneTimePassword\OneTimePassword;
 use App\Services\OneTimePassword\OneTimePasswordManager;
 use App\Services\OneTimePassword\TimedOneTimePassword;
@@ -103,6 +104,10 @@ class AuthServiceProvider extends IlluminateAuthServiceProvider
         parent::register();
 
         $this->app->when(AuthorizationService::class)
+            ->needs('$rolesAndPermissions')
+            ->giveConfig('permissions.roles_and_permissions');
+
+        $this->app->when(CrossOrgAuthorization::class)
             ->needs('$rolesAndPermissions')
             ->giveConfig('permissions.roles_and_permissions');
 
