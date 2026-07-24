@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AvgProcessorProcessingRecordResource;
 
+use App\Filament\Forms\Components\ChildrenRelationTable;
 use App\Filament\Forms\Components\Group\ProcessingRecordContactPersons;
 use App\Filament\Forms\Components\OutsideEuCountryInputGroup;
 use App\Filament\Forms\Components\PeriodicReviewField;
@@ -25,6 +26,7 @@ use App\Filament\Resources\ProcessorResource\ProcessorResourceForm;
 use App\Filament\Resources\ReceiverResource\ReceiverResourceForm;
 use App\Filament\Resources\ResponsibleResource\ResponsibleResourceForm;
 use App\Filament\Resources\SystemResource\SystemResourceForm;
+use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgProcessorProcessingRecordService;
 use App\Models\Document;
 use App\Models\Processor;
@@ -78,6 +80,7 @@ class AvgProcessorProcessingRecordResourceFormSchemas
             PeriodicReviewField::make(),
             ParentSelect::make()
                 ->helperText(__('general.parent_help')),
+            ChildrenRelationTable::makeForChildren(AvgProcessorProcessingRecord::class),
         ];
     }
 

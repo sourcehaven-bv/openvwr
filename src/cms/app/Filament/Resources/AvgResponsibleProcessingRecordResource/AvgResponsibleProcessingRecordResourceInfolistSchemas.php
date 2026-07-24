@@ -55,6 +55,8 @@ class AvgResponsibleProcessingRecordResourceInfolistSchemas
             DateEntry::make('review_at')
                 ->label(__('general.review_at')),
             ParentSelectEntry::make(),
+            SelectMultipleEntry::make('children.name')
+                ->label(__('general.children')),
             InformationBlockSection::makeCollapsible(
                 __('information_blocks.avg_responsible_processing_record.step_processing_name_title'),
                 __('information_blocks.avg_responsible_processing_record.step_processing_name_info'),

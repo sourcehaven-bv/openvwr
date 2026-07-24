@@ -5,11 +5,14 @@ declare(strict_types=1);
 use App\Enums\Media\MediaGroup;
 use App\Filament\Forms\Components\RelationTable;
 use App\Filament\Resources\AlgorithmRecordResource\Pages\EditAlgorithmRecord;
+use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\EditAvgResponsibleProcessingRecord;
 use App\Filament\Resources\DocumentResource;
 use App\Models\Algorithm\AlgorithmRecord;
+use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Document;
 use Illuminate\Support\Facades\Storage;
 use Tests\Helpers\Model\OrganisationTestHelper;
+use Tests\Helpers\Model\UserTestHelper;
 
 it('shows the linked documents as table rows', function (): void {
     $organisation = OrganisationTestHelper::create();
@@ -136,6 +139,44 @@ it('ignores the remove action when no id is given', function (): void {
         ])
         ->callFormComponentAction('document_id', RelationTable::REMOVE_ACTION, arguments: [])
         ->assertFormSet(['document_id' => [$document->getKey()->toString()]]);
+});
+
+it('shows the linked users with name and email as table rows', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation);
+
+    $processingRecord = AvgResponsibleProcessingRecord::factory()->recycle($organisation)->create();
+    $processingRecord->users()->attach($user);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $processingRecord->getRouteKey(),
+        ])
+        ->assertFormSet(['users' => [$user->getKey()->toString()]])
+        ->assertSee($user->name)
+        ->assertSee($user->email);
+});
+
+it('does not render users from another organisation injected into the state', function (): void {
+    $organisation = OrganisationTestHelper::create();
+
+    // The pivot-scoped user table must not render users that are only
+    // attached to a different organisation.
+    $otherOrganisation = OrganisationTestHelper::create();
+    $foreignUser = UserTestHelper::createForOrganisation($otherOrganisation, [
+        'name' => 'geheime-andere-gebruiker',
+    ]);
+
+    $processingRecord = AvgResponsibleProcessingRecord::factory()->recycle($organisation)->create();
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $processingRecord->getRouteKey(),
+        ])
+        ->fillForm([
+            'users' => [$foreignUser->getKey()->toString()],
+        ])
+        ->assertDontSee($foreignUser->name);
 });
 
 it('does not render records from another organisation injected into the state', function (): void {

@@ -7,9 +7,7 @@ namespace App\Filament\Resources;
 use App\Enums\RegisterLayout;
 use App\Facades\Authentication;
 use App\Filament\NavigationGroups\NavigationGroup;
-use App\Filament\RelationManagers\ProcessingRecordUsersRelationManager;
 use App\Filament\RelationManagers\SnapshotsRelationManager;
-use App\Filament\RelationManagers\WpgProcessingRecordChildrenRelationManager;
 use App\Filament\Resources\WpgProcessingRecordResource\Pages;
 use App\Filament\Resources\WpgProcessingRecordResource\WpgProcessingRecordResourceForm;
 use App\Filament\Resources\WpgProcessingRecordResource\WpgProcessingRecordResourceInfolist;
@@ -58,8 +56,6 @@ class WpgProcessingRecordResource extends Resource
     {
         return [
             SnapshotsRelationManager::class,
-            WpgProcessingRecordChildrenRelationManager::class,
-            ProcessingRecordUsersRelationManager::class,
         ];
     }
 
