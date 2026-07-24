@@ -60,7 +60,7 @@ it('ignores an owned entity without a valid owner reference', function (): void 
         ],
     ]);
 
-    $result = app(BundleImporter::class)->import($path, [], $organisation, $user);
+    $result = app(BundleImporter::class)->importZip($path, [], $organisation, $user);
 
     expect($result->created)->toBe(0);
 });
@@ -87,7 +87,7 @@ it('does not suffix a copy when the match column value is not a string', functio
 
     $plan = [$stakeholderId => ['selected' => true, 'strategy' => 'copy']];
 
-    $result = app(BundleImporter::class)->import($path, $plan, $organisation, $user);
+    $result = app(BundleImporter::class)->importZip($path, $plan, $organisation, $user);
 
     // a copy is created even though the description could not be suffixed
     expect($result->created)->toBe(1)
@@ -122,7 +122,7 @@ it('ignores an owned entity whose written owner lacks the relation', function ()
 
     $plan = [$recordId => ['selected' => true, 'strategy' => null]];
 
-    $result = app(BundleImporter::class)->import($path, $plan, $organisation, $user);
+    $result = app(BundleImporter::class)->importZip($path, $plan, $organisation, $user);
 
     // the record is created; the address is silently ignored (no address relation on the owner)
     expect($result->created)->toBe(1);
@@ -166,7 +166,7 @@ it('ignores media payloads that are not well formed', function (): void {
 
     $plan = [$documentId => ['selected' => true, 'strategy' => null]];
 
-    $result = app(BundleImporter::class)->import($path, $plan, $organisation, $user);
+    $result = app(BundleImporter::class)->importZip($path, $plan, $organisation, $user);
 
     expect($result->created)->toBe(1);
 
@@ -203,7 +203,47 @@ it('ignores a media block that is not a list', function (): void {
 
     $plan = [$documentId => ['selected' => true, 'strategy' => null]];
 
-    $result = app(BundleImporter::class)->import($path, $plan, $organisation, $user);
+    $result = app(BundleImporter::class)->importZip($path, $plan, $organisation, $user);
 
     expect($result->created)->toBe(1);
+});
+
+it('skips a media item with a missing file name', function (): void {
+    $organisation = Organisation::factory()->create();
+    $user = User::factory()->create();
+    Storage::fake('media-library');
+
+    $documentId = fake()->uuid();
+    $documentTypeId = fake()->uuid();
+
+    $path = writeImporterZip([
+        [
+            'type' => 'document_type',
+            'id' => $documentTypeId,
+            'origin_id' => $documentTypeId,
+            'name' => 'Soort',
+            'attributes' => ['name' => 'Soort'],
+        ],
+        [
+            'type' => 'document',
+            'id' => $documentId,
+            'origin_id' => $documentId,
+            'name' => 'Document',
+            'attributes' => ['name' => 'Document', 'document_type_id' => $documentTypeId],
+            // a media entry whose file_name is not a string -> skipped by importMedia
+            'media' => [
+                ['collection_name' => 'attachments', 'file_name' => null, 'zip_path' => 'media/x/y'],
+                'not-even-an-array',
+            ],
+        ],
+    ]);
+
+    $plan = [$documentId => ['selected' => true, 'strategy' => null]];
+
+    $result = app(BundleImporter::class)->importZip($path, $plan, $organisation, $user);
+
+    $document = Document::query()->whereBelongsTo($organisation)->firstOrFail();
+
+    expect($result->created)->toBe(1)
+        ->and($document->media()->count())->toBe(0);
 });

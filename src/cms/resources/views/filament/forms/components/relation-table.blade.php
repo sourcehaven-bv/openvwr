@@ -38,20 +38,27 @@
                                     @php
                                         $value = $column['get']($record);
                                         $href = isset($column['href']) ? $column['href']($record) : null;
+                                        $download = isset($column['download']) ? $column['download']($record) : null;
                                     @endphp
                                     <td class="px-3 py-2 text-sm text-gray-950 dark:text-white">
                                         @if (filled($value) && filled($href))
                                             <a
                                                 href="{{ $href }}"
-                                                target="_blank"
-                                                rel="noopener"
-                                                class="fi-link inline-flex items-center gap-1 text-primary-600 hover:underline dark:text-primary-400"
-                                            >
-                                                {{ $value }}
-                                                <x-dynamic-component :component="$column['icon'] ?? 'heroicon-m-arrow-down-tray'" class="h-4 w-4" />
-                                            </a>
+                                                class="fi-link text-primary-600 hover:underline dark:text-primary-400"
+                                            >{{ $value }}</a>
                                         @else
                                             {{ $value }}
+                                        @endif
+                                        @if (filled($download))
+                                            <a
+                                                href="{{ $download }}"
+                                                download
+                                                title="{{ __('general.download') }}"
+                                                class="ms-1 inline-flex rounded-md p-1 align-middle text-gray-400 transition hover:bg-gray-50 hover:text-primary-600 dark:hover:bg-white/5 dark:hover:text-primary-400"
+                                            >
+                                                <x-heroicon-m-arrow-down-tray class="h-4 w-4" />
+                                                <span class="sr-only">{{ __('general.download') }}</span>
+                                            </a>
                                         @endif
                                     </td>
                                 @endforeach

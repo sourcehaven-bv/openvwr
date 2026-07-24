@@ -6,22 +6,15 @@ namespace App\Transfer\Export;
 
 use App\Models\Document;
 use App\Models\Organisation;
-use App\Models\Stakeholder;
-use App\Transfer\ModelGraph;
 use App\Transfer\TransferEntityType;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Webmozart\Assert\Assert;
 use ZipArchive;
 
-use function array_keys;
-use function array_shift;
 use function array_values;
-use function in_array;
-use function is_string;
 use function json_encode;
 use function sprintf;
 
@@ -38,6 +31,7 @@ class BundleExporter
     public const string EXPORT_DIRECTORY = 'transfer/exports';
 
     public function __construct(
+        private readonly EntityGraphCollector $entityGraphCollector,
         private readonly EntitySerializer $entitySerializer,
     ) {
     }
@@ -59,126 +53,9 @@ class BundleExporter
             ->whereIn('id', $recordIds)
             ->get();
 
-        $entities = $this->collectEntities(array_values($records->all()), $selectedRelated);
+        $entities = $this->entityGraphCollector->collect(array_values($records->all()), $selectedRelated);
 
         return $this->writeZip($entities, $organisation);
-    }
-
-    /**
-     * @param list<Model> $records
-     * @param array<string, list<string>> $selectedRelated
-     *
-     * @return array<string, Model> all bundle entities, keyed by uuid
-     */
-    private function collectEntities(array $records, array $selectedRelated): array
-    {
-        /** @var array<string, Model> $entities */
-        $entities = [];
-        /** @var list<Model> $queue */
-        $queue = [];
-
-        foreach ($records as $record) {
-            $queue[] = $record;
-        }
-
-        foreach ($records as $record) {
-            foreach (array_keys(TransferEntityType::SELECTABLE_RELATIONS) as $relationName) {
-                $selectedIds = $selectedRelated[$relationName] ?? [];
-
-                foreach (ModelGraph::related($record, $relationName) as $related) {
-                    if (!in_array(ModelGraph::id($related), $selectedIds, true)) {
-                        continue;
-                    }
-
-                    $queue[] = $related;
-                }
-            }
-        }
-
-        while ($queue !== []) {
-            $model = array_shift($queue);
-            $id = ModelGraph::id($model);
-
-            if (isset($entities[$id])) {
-                continue;
-            }
-
-            $entities[$id] = $model;
-
-            foreach ($this->expand($model) as $dependency) {
-                $queue[] = $dependency;
-            }
-        }
-
-        return $entities;
-    }
-
-    /**
-     * Entities that always travel with the given model: lookup values referenced by
-     * foreign keys, and owned entities (address, remarks, FG remark, stakeholder data items).
-     *
-     * @return list<Model>
-     */
-    private function expand(Model $model): array
-    {
-        return [
-            ...$this->referencedByForeignKey($model),
-            ...$this->ownedEntities($model),
-        ];
-    }
-
-    /**
-     * Lookup values and other transferable entities referenced by a `<type>_id` column.
-     *
-     * @return list<Model>
-     */
-    private function referencedByForeignKey(Model $model): array
-    {
-        $referenced = [];
-
-        foreach ($model->getAttributes() as $column => $value) {
-            if (!is_string($value) || !Str::endsWith($column, '_id')) {
-                continue;
-            }
-
-            $referencedType = TransferEntityType::tryFrom(Str::beforeLast($column, '_id'));
-
-            if ($referencedType === null) {
-                continue;
-            }
-
-            $referencedModel = $referencedType->modelClass()::query()->find($value);
-
-            if ($referencedModel !== null) {
-                $referenced[] = $referencedModel;
-            }
-        }
-
-        return $referenced;
-    }
-
-    /**
-     * Entities that belong to the model itself: address, remarks, FG remark and
-     * (for stakeholders) their data items.
-     *
-     * @return list<Model>
-     */
-    private function ownedEntities(Model $model): array
-    {
-        $owned = [
-            ...ModelGraph::related($model, 'remarks'),
-            ...($model instanceof Stakeholder ? ModelGraph::related($model, 'stakeholderDataItems') : []),
-        ];
-
-        foreach (['address', 'fgRemark'] as $relationName) {
-            $related = ModelGraph::relatedOne($model, $relationName);
-
-            if ($related !== null) {
-                $owned[] = $related;
-            }
-        }
-
-        return $owned;
     }
 
     /**

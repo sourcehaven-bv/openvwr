@@ -54,7 +54,7 @@ class TransferImportJob implements ShouldQueue
         $buildContextService->disableBuild();
 
         try {
-            $result = $bundleImporter->import($disk->path($this->bundlePath), $this->plan, $organisation, $user);
+            $result = $bundleImporter->importZip($disk->path($this->bundlePath), $this->plan, $organisation, $user);
         } catch (Throwable $exception) {
             Log::error('transfer import failed', ['message' => $exception->getMessage()]);
 

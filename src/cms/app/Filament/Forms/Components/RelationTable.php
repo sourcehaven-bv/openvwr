@@ -47,7 +47,7 @@ class RelationTable extends Select
     /** @var class-string<Model> */
     protected string $relatedModel;
 
-    /** @var array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null), icon?: string}> */
+    /** @var array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null), download?: Closure(Model): (string|null)}> */
     protected array $tableColumns = [];
 
     /** @var Closure(Builder<Model>): void */
@@ -55,7 +55,7 @@ class RelationTable extends Select
 
     /**
      * @param class-string<Model> $model
-     * @param array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null), icon?: string}> $columns
+     * @param array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null), download?: Closure(Model): (string|null)}> $columns
      * @param array<Component> $createForm the schema for the inline "create new" modal
      * @param (Closure(Builder<Model>): void)|null $scope tenant scope for the search and render queries;
      *        defaults to the organisation_id column scope, override for models
@@ -224,7 +224,7 @@ class RelationTable extends Select
     }
 
     /**
-     * @return array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null), icon?: string}>
+     * @return array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null), download?: Closure(Model): (string|null)}>
      */
     public function getTableColumns(): array
     {

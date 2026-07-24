@@ -50,6 +50,8 @@ it('allows the transitions', function (string $state, string $newState): void {
 })->with([
     [InReview::class, Approved::class],
     [Approved::class, Established::class],
+    // Direct skip: establish straight from review, bypassing approval.
+    [InReview::class, Established::class],
     [InReview::class, Obsolete::class],
     [Approved::class, Obsolete::class],
     [Established::class, Obsolete::class],
@@ -69,7 +71,6 @@ it('does not allow the transitions', function (string $state, string $newState):
     expect($snapshot->state)
         ->toBeInstanceOf($newState);
 })->throws(TransitionNotFound::class)->with([
-    [InReview::class, Established::class],
     [Approved::class, InReview::class],
     [Established::class, InReview::class],
     [Obsolete::class, InReview::class],
