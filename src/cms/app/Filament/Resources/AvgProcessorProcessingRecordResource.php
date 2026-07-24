@@ -8,16 +8,8 @@ use App\Enums\RegisterLayout;
 use App\Facades\Authentication;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\RelationManagers\AvgProcessorProcessingRecordChildrenRelationManager;
-use App\Filament\RelationManagers\AvgProcessorProcessingRecordParentRelationManager;
-use App\Filament\RelationManagers\DocumentRelationManager;
-use App\Filament\RelationManagers\ProcessingRecordContactPersonRelationManager;
 use App\Filament\RelationManagers\ProcessingRecordUsersRelationManager;
-use App\Filament\RelationManagers\ProcessorRelationManager;
-use App\Filament\RelationManagers\ReceiverRelationManager;
-use App\Filament\RelationManagers\ResponsibleRelationManager;
 use App\Filament\RelationManagers\SnapshotsRelationManager;
-use App\Filament\RelationManagers\SystemRelationManager;
-use App\Filament\RelationManagers\TagRelationManager;
 use App\Filament\Resources\AvgProcessorProcessingRecordResource\AvgProcessorProcessingRecordResourceForm;
 use App\Filament\Resources\AvgProcessorProcessingRecordResource\AvgProcessorProcessingRecordResourceInfolist;
 use App\Filament\Resources\AvgProcessorProcessingRecordResource\AvgProcessorProcessingRecordResourceTable;
@@ -76,16 +68,8 @@ class AvgProcessorProcessingRecordResource extends Resource
     {
         return [
             SnapshotsRelationManager::class,
-            DocumentRelationManager::class,
-            AvgProcessorProcessingRecordParentRelationManager::class,
             AvgProcessorProcessingRecordChildrenRelationManager::class,
-            ResponsibleRelationManager::class,
-            ProcessorRelationManager::class,
-            ReceiverRelationManager::class,
-            SystemRelationManager::class,
             ProcessingRecordUsersRelationManager::class,
-            ProcessingRecordContactPersonRelationManager::class,
-            TagRelationManager::class,
         ];
     }
 

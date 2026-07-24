@@ -10,7 +10,6 @@ use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\RelationManagers\AlgorithmPublicationCategoryRelationManager;
 use App\Filament\RelationManagers\AlgorithmStatusRelationManager;
 use App\Filament\RelationManagers\AlgorithmThemeRelationManager;
-use App\Filament\RelationManagers\DocumentRelationManager;
 use App\Filament\RelationManagers\SnapshotsRelationManager;
 use App\Filament\Resources\AlgorithmRecordResource\AlgorithmRecordResourceForm;
 use App\Filament\Resources\AlgorithmRecordResource\AlgorithmRecordResourceInfolist;
@@ -60,7 +59,6 @@ class AlgorithmRecordResource extends Resource
     {
         return [
             SnapshotsRelationManager::class,
-            DocumentRelationManager::make(),
             AlgorithmThemeRelationManager::class,
             AlgorithmStatusRelationManager::class,
             AlgorithmPublicationCategoryRelationManager::class,

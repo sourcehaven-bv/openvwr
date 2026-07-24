@@ -3,21 +3,21 @@
 declare(strict_types=1);
 
 use App\Filament\RelationManagers\DocumentRelationManager;
-use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\EditAvgResponsibleProcessingRecord;
-use App\Models\Avg\AvgResponsibleProcessingRecord;
+use App\Filament\Resources\DataBreachRecord\Pages\EditDataBreachRecord;
+use App\Models\DataBreachRecord;
 use App\Models\Document;
 
 it('loads the table', function (): void {
     $document = Document::factory()
         ->create();
-    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+    $dataBreachRecord = DataBreachRecord::factory()
         ->hasAttached($document)
         ->create();
 
     $this->asFilamentUser()
         ->createLivewireTestable(DocumentRelationManager::class, [
-            'ownerRecord' => $avgResponsibleProcessingRecord,
-            'pageClass' => EditAvgResponsibleProcessingRecord::class,
+            'ownerRecord' => $dataBreachRecord,
+            'pageClass' => EditDataBreachRecord::class,
         ])
         ->assertCanSeeTableRecords([$document]);
 });

@@ -7,16 +7,9 @@ namespace App\Filament\Resources;
 use App\Enums\RegisterLayout;
 use App\Facades\Authentication;
 use App\Filament\NavigationGroups\NavigationGroup;
-use App\Filament\RelationManagers\DocumentRelationManager;
-use App\Filament\RelationManagers\ProcessingRecordContactPersonRelationManager;
 use App\Filament\RelationManagers\ProcessingRecordUsersRelationManager;
-use App\Filament\RelationManagers\ProcessorRelationManager;
-use App\Filament\RelationManagers\ResponsibleRelationManager;
 use App\Filament\RelationManagers\SnapshotsRelationManager;
-use App\Filament\RelationManagers\SystemRelationManager;
-use App\Filament\RelationManagers\TagRelationManager;
 use App\Filament\RelationManagers\WpgProcessingRecordChildrenRelationManager;
-use App\Filament\RelationManagers\WpgProcessingRecordParentRelationManager;
 use App\Filament\Resources\WpgProcessingRecordResource\Pages;
 use App\Filament\Resources\WpgProcessingRecordResource\WpgProcessingRecordResourceForm;
 use App\Filament\Resources\WpgProcessingRecordResource\WpgProcessingRecordResourceInfolist;
@@ -65,15 +58,8 @@ class WpgProcessingRecordResource extends Resource
     {
         return [
             SnapshotsRelationManager::class,
-            DocumentRelationManager::class,
-            WpgProcessingRecordParentRelationManager::class,
             WpgProcessingRecordChildrenRelationManager::class,
-            ResponsibleRelationManager::class,
-            ProcessorRelationManager::class,
-            SystemRelationManager::class,
             ProcessingRecordUsersRelationManager::class,
-            ProcessingRecordContactPersonRelationManager::class,
-            TagRelationManager::class,
         ];
     }
 
