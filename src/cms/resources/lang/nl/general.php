@@ -28,6 +28,7 @@ return [
     'delete' => 'Verwijderen',
     'deleted' => 'Verwijderd',
     'disabled' => 'Uitgeschakeld',
+    'download' => 'Downloaden',
     'enabled' => 'Ingeschakeld',
     'error' => 'Fout',
     'export' => 'Exporteren',

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Forms\Components;
 
 use App\Enums\Media\MediaGroup;
+use App\Filament\Resources\DocumentResource;
 use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
@@ -36,7 +37,7 @@ class RelationTableColumns
     /**
      * @param class-string<Model> $model
      *
-     * @return array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null)}>
+     * @return array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null), download?: Closure(Model): (string|null)}>
      */
     public static function for(string $model): array
     {
@@ -57,7 +58,7 @@ class RelationTableColumns
     }
 
     /**
-     * @return array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null)}>
+     * @return array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null), download?: Closure(Model): (string|null)}>
      */
     private static function documents(): array
     {
@@ -65,8 +66,9 @@ class RelationTableColumns
             [
                 'label' => __('document.name'),
                 'get' => static fn (Model $record): string => self::as($record, Document::class)->name,
-                // When the document has an uploaded file, its name links to the download.
-                'href' => static fn (Model $record): ?string => self::as($record, Document::class)
+                'href' => static fn (Model $record): string => DocumentResource::getUrl('view', ['record' => $record]),
+                // When the document has an uploaded file, a download icon follows the name.
+                'download' => static fn (Model $record): ?string => self::as($record, Document::class)
                     ->getFirstMedia(MediaGroup::ATTACHMENTS->value)?->getFullUrl(),
             ],
             [

@@ -46,12 +46,12 @@ class RelationTable extends Select
     /** @var class-string<Model> */
     protected string $relatedModel;
 
-    /** @var array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null)}> */
+    /** @var array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null), download?: Closure(Model): (string|null)}> */
     protected array $tableColumns = [];
 
     /**
      * @param class-string<Model> $model
-     * @param array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null)}> $columns
+     * @param array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null), download?: Closure(Model): (string|null)}> $columns
      * @param array<Component> $createForm the schema for the inline "create new" modal
      */
     public static function makeForRelationship(
@@ -199,7 +199,7 @@ class RelationTable extends Select
     }
 
     /**
-     * @return array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null)}>
+     * @return array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null), download?: Closure(Model): (string|null)}>
      */
     public function getTableColumns(): array
     {

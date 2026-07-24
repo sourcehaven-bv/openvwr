@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Enums\Media\MediaGroup;
 use App\Filament\Forms\Components\RelationTable;
 use App\Filament\Resources\AlgorithmRecordResource\Pages\EditAlgorithmRecord;
+use App\Filament\Resources\DocumentResource;
 use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Document;
 use Illuminate\Support\Facades\Storage;
@@ -31,7 +32,7 @@ it('shows the linked documents as table rows', function (): void {
         });
 });
 
-it('links a document name to its file when the document has an attachment', function (): void {
+it('links a document name to its screen and adds a download icon when it has an attachment', function (): void {
     Storage::fake('filament');
     Storage::fake('media-library');
 
@@ -55,8 +56,11 @@ it('links a document name to its file when the document has an attachment', func
         ->createLivewireTestable(EditAlgorithmRecord::class, [
             'record' => $algorithmRecord->getRouteKey(),
         ])
-        ->assertSeeHtml('href="' . $downloadUrl . '"')
-        ->assertDontSeeHtml('>' . $withoutFile->name . '</a>');
+        // Both names link to the document's own screen.
+        ->assertSeeHtml('href="' . DocumentResource::getUrl('view', ['record' => $withFile, 'tenant' => $organisation]) . '"')
+        ->assertSeeHtml('href="' . DocumentResource::getUrl('view', ['record' => $withoutFile, 'tenant' => $organisation]) . '"')
+        // Only the document with an attachment gets the direct-download icon.
+        ->assertSeeHtml('href="' . $downloadUrl . '"');
 });
 
 it('links a document when it is selected and saved', function (): void {
