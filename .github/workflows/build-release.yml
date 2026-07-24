@@ -4,7 +4,12 @@ on:
   workflow_call:
     inputs:
       version:
+        description: "Package label baked into the archive (e.g. dev-<sha> or v20260721)"
         required: true
+        type: string
+      ref:
+        description: "Git ref to check out. Defaults to `version` for tag builds; the dev path passes a real SHA."
+        required: false
         type: string
     outputs:
       archive:
@@ -28,10 +33,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          # Build the requested version, not the triggering ref. On a
-          # dispatched run the triggering ref is the branch, which would
-          # otherwise package current main under the tag's name.
-          ref: ${{ inputs.version }}
+          # Build the requested ref, not the triggering ref. On a dispatched
+          # run the triggering ref is the branch, which would otherwise package
+          # current main under the tag's name. `version` is only a label baked
+          # into the archive and may not be a real ref (e.g. dev-<sha>), so
+          # tag builds fall back to it while the dev path passes a SHA.
+          ref: ${{ inputs.ref || inputs.version }}
 
       - name: Install just
         uses: extractions/setup-just@v2
