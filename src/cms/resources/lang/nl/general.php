@@ -39,12 +39,15 @@ return [
     'help_country' => 'De landen buiten de EER waarnaar persoonsgegevens worden doorgegeven.',
 
     'parent' => 'Hoofdverwerking',
-    'parent_hint_icon_text' => 'Indien deze verwerking een subverwerking is van een hoofdverwerking kunt u de hoofdverwerking hier aangeven. Bij de hoofdverwerking zijn alle subverwerkingen te vinden in de tabel "Subverwerkingen" onderaan deze pagina.',
+    'parent_hint_icon_text' => 'Indien deze verwerking een subverwerking is van een hoofdverwerking kunt u de hoofdverwerking hier aangeven. Bij de hoofdverwerking zijn alle subverwerkingen te vinden in de tabel "Subverwerkingen".',
     'parent_help' => 'Alleen invullen als deze verwerking onderdeel is van een grotere '
         . 'verwerking. Kies dan de overkoepelende verwerking; deze verschijnt daar '
-        . 'onderaan bij "Subverwerkingen". Laat leeg voor een zelfstandige verwerking.',
+        . 'in de tabel "Subverwerkingen". Laat leeg voor een zelfstandige verwerking.',
     'child' => 'Subverwerking',
     'children' => 'Subverwerkingen',
+    'children_help' => 'De verwerkingen die onder deze verwerking vallen. Alleen '
+        . 'zelfstandige verwerkingen kunnen worden gekoppeld; na het ontkoppelen is '
+        . 'de verwerking weer zelfstandig.',
 
     'data_loss_confirm_title' => 'Weet u het zeker?',
     'data_loss_confirm_submit' => 'Ja, gegevens verwijderen',

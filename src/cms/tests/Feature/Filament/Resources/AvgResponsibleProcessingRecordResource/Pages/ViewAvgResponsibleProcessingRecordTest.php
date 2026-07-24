@@ -129,3 +129,21 @@ it('shows the data of the publications when the record is published', function (
             'end' => '1 februari 2020 01:00',
         ]));
 });
+
+it('shows the subverwerkingen', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create();
+
+    $child = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create(['parent_id' => $avgResponsibleProcessingRecord->id->toString()]);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ViewAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->getRouteKey(),
+        ])
+        ->assertSee(__('general.children'))
+        ->assertSee($child->name);
+});

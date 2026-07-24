@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\WpgProcessingRecordResource;
 
+use App\Filament\Forms\Components\ChildrenRelationTable;
 use App\Filament\Forms\Components\Group\ProcessingRecordContactPersons;
 use App\Filament\Forms\Components\PeriodicReviewField;
 use App\Filament\Forms\Components\Radio\CoreEntityDataCollectionSource;
@@ -26,6 +27,7 @@ use App\Models\Document;
 use App\Models\Processor;
 use App\Models\Responsible;
 use App\Models\System;
+use App\Models\Wpg\WpgProcessingRecord;
 use App\Models\Wpg\WpgProcessingRecordService;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Component;
@@ -75,6 +77,7 @@ class WpgProcessingRecordResourceFormSchemas
             PeriodicReviewField::make(),
             ParentSelect::make()
                 ->helperText(__('general.parent_help')),
+            ChildrenRelationTable::makeForChildren(WpgProcessingRecord::class),
         ];
     }
 

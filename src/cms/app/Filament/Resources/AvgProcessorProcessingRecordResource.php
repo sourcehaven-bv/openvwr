@@ -7,8 +7,6 @@ namespace App\Filament\Resources;
 use App\Enums\RegisterLayout;
 use App\Facades\Authentication;
 use App\Filament\NavigationGroups\NavigationGroup;
-use App\Filament\RelationManagers\AvgProcessorProcessingRecordChildrenRelationManager;
-use App\Filament\RelationManagers\ProcessingRecordUsersRelationManager;
 use App\Filament\RelationManagers\SnapshotsRelationManager;
 use App\Filament\Resources\AvgProcessorProcessingRecordResource\AvgProcessorProcessingRecordResourceForm;
 use App\Filament\Resources\AvgProcessorProcessingRecordResource\AvgProcessorProcessingRecordResourceInfolist;
@@ -68,8 +66,6 @@ class AvgProcessorProcessingRecordResource extends Resource
     {
         return [
             SnapshotsRelationManager::class,
-            AvgProcessorProcessingRecordChildrenRelationManager::class,
-            ProcessingRecordUsersRelationManager::class,
         ];
     }
 

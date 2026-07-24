@@ -14,6 +14,7 @@ use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -46,13 +47,21 @@ class RelationTable extends Select
     /** @var class-string<Model> */
     protected string $relatedModel;
 
-    /** @var array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null)}> */
+    /** @var array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null), icon?: string}> */
     protected array $tableColumns = [];
+
+    /** @var Closure(Builder<Model>): void */
+    protected Closure $tenantScope;
 
     /**
      * @param class-string<Model> $model
-     * @param array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null)}> $columns
+     * @param array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null), icon?: string}> $columns
      * @param array<Component> $createForm the schema for the inline "create new" modal
+     * @param (Closure(Builder<Model>): void)|null $scope tenant scope for the search and render queries;
+     *        defaults to the organisation_id column scope, override for models
+     *        that relate to the organisation differently (e.g. via a pivot)
+     * @param array<mixed>|null $rules validation rules; default requires the id to
+     *        exist on the model's table within the current organisation
      */
     public static function makeForRelationship(
         string $name,
@@ -61,20 +70,25 @@ class RelationTable extends Select
         string $titleAttribute,
         array $columns,
         array $createForm = [],
+        ?Closure $scope = null,
+        ?array $rules = null,
     ): static {
         $component = parent::make($name);
 
+        $scope ??= TenantScoped::getAsClosure();
+
         $component
-            ->relationship($relationshipName, $titleAttribute, TenantScoped::getAsClosure())
+            ->relationship($relationshipName, $titleAttribute, $scope)
             ->multiple()
             ->searchable([$titleAttribute])
             // Commit selections to the server so the table re-renders when a
             // record is linked (the choices.js control is otherwise client-only).
             ->live()
-            ->rules([CurrentOrganisation::forModel($model)]);
+            ->rules($rules ?? [CurrentOrganisation::forModel($model)]);
 
         $component->relatedModel = $model;
         $component->tableColumns = $columns;
+        $component->tenantScope = $scope;
 
         $component->registerActions([
             Action::make(self::REMOVE_ACTION)
@@ -157,16 +171,14 @@ class RelationTable extends Select
     }
 
     /**
-     * The records currently linked, resolved from the field state so the table
-     * reflects unsaved add/remove edits made in this form session.
+     * The ids currently in the field state, filtered down to non-empty strings.
      *
-     * @return Collection<int, Model>
+     * @return array<int, string>
      */
-    public function getLinkedRecords(): Collection
+    protected function getStateIds(): array
     {
         $state = $this->getState();
 
-        /** @var array<int, string> $ids */
         $ids = [];
         if (is_iterable($state)) {
             foreach ($state as $value) {
@@ -175,6 +187,19 @@ class RelationTable extends Select
                 }
             }
         }
+
+        return $ids;
+    }
+
+    /**
+     * The records currently linked, resolved from the field state so the table
+     * reflects unsaved add/remove edits made in this form session.
+     *
+     * @return Collection<int, Model>
+     */
+    public function getLinkedRecords(): Collection
+    {
+        $ids = $this->getStateIds();
 
         /** @var Model $model */
         $model = new $this->relatedModel();
@@ -191,7 +216,7 @@ class RelationTable extends Select
         // without it a crafted id would render another organisation's record.
         /** @var Collection<int, Model> $records */
         $records = $model->newQuery()
-            ->tap(TenantScoped::getAsClosure())
+            ->tap($this->tenantScope)
             ->whereIn($model->getKeyName(), $ids)
             ->get();
 
@@ -199,7 +224,7 @@ class RelationTable extends Select
     }
 
     /**
-     * @return array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null)}>
+     * @return array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null), icon?: string}>
      */
     public function getTableColumns(): array
     {

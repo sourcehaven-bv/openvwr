@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Forms\Components;
 
 use App\Enums\Media\MediaGroup;
+use App\Filament\Resources\Resource;
 use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
@@ -15,9 +16,11 @@ use App\Models\Processor;
 use App\Models\Receiver;
 use App\Models\Responsible;
 use App\Models\System;
+use App\Models\User;
 use App\Models\Wpg\WpgProcessingRecord;
 use App\Services\DateFormatService;
 use Closure;
+use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Model;
 use InvalidArgumentException;
 
@@ -36,7 +39,7 @@ class RelationTableColumns
     /**
      * @param class-string<Model> $model
      *
-     * @return array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null)}>
+     * @return array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null), icon?: string}>
      */
     public static function for(string $model): array
     {
@@ -47,6 +50,7 @@ class RelationTableColumns
             Receiver::class => self::simpleDescription(),
             System::class => self::simpleDescription(),
             ContactPerson::class => self::contactPersons(),
+            User::class => self::users(),
             AvgResponsibleProcessingRecord::class,
             AvgProcessorProcessingRecord::class,
             WpgProcessingRecord::class => self::processingRecords(),
@@ -163,9 +167,26 @@ class RelationTableColumns
     }
 
     /**
+     * @return array<int, array{label: string, get: Closure(Model): (string|null)}>
+     */
+    private static function users(): array
+    {
+        return [
+            [
+                'label' => __('user.name'),
+                'get' => static fn (Model $record): string => self::as($record, User::class)->name,
+            ],
+            [
+                'label' => __('user.email'),
+                'get' => static fn (Model $record): string => self::as($record, User::class)->email,
+            ],
+        ];
+    }
+
+    /**
      * The AVG/WPG processing records share the same shape (number + name).
      *
-     * @return array<int, array{label: string, get: Closure(Model): (string|null)}>
+     * @return array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null), icon?: string}>
      */
     private static function processingRecords(): array
     {
@@ -173,6 +194,8 @@ class RelationTableColumns
             [
                 'label' => __('processing_record.number'),
                 'get' => static fn (Model $record): ?string => self::entityNumber($record),
+                'href' => static fn (Model $record): ?string => self::recordUrl($record),
+                'icon' => 'heroicon-m-arrow-top-right-on-square',
             ],
             [
                 'label' => __('general.name'),
@@ -223,6 +246,22 @@ class RelationTableColumns
                 ),
             ],
         ];
+    }
+
+    /**
+     * The edit (or, without update rights, view) page of the linked record,
+     * resolved through its Filament resource.
+     */
+    private static function recordUrl(Model $record): ?string
+    {
+        /** @var class-string<Resource>|null $resource */
+        $resource = Filament::getModelResource($record);
+
+        if ($resource === null) {
+            return null;
+        }
+
+        return $resource::getUrl($resource::canEdit($record) ? 'edit' : 'view', ['record' => $record]);
     }
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 
+use App\Filament\Forms\Components\ChildrenRelationTable;
 use App\Filament\Forms\Components\DataLossToggle;
 use App\Filament\Forms\Components\Group\ProcessingRecordContactPersons;
 use App\Filament\Forms\Components\OutsideEuCountryInputGroup;
@@ -85,6 +86,7 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
             PeriodicReviewField::make(),
             ParentSelect::make()
                 ->helperText(__('general.parent_help')),
+            ChildrenRelationTable::makeForChildren(AvgResponsibleProcessingRecord::class),
         ];
     }
 

@@ -10,9 +10,9 @@ use App\Filament\Forms\Components\RelationTableColumns;
 use App\Filament\Resources\LookupListResource\LookupListResourceForm;
 use App\Models\ContactPerson;
 use App\Models\OrganisationUser;
+use App\Models\User;
 use App\Rules\CurrentOrganisation;
 use Filament\Forms\Components\Group;
-use Filament\Forms\Components\Select;
 use Illuminate\Database\Eloquent\Builder;
 
 use function __;
@@ -22,12 +22,20 @@ class ProcessingRecordContactPersons extends Group
     public static function makeGroup(): static
     {
         return parent::make([
-            Select::make('users')
-                ->multiple()
-                ->relationship('users', 'name', static function (Builder $query): void {
+            RelationTable::makeForRelationship(
+                'users',
+                'users',
+                User::class,
+                'name',
+                RelationTableColumns::for(User::class),
+                // Users are linked to the organisation through a pivot, not an
+                // organisation_id column, so the default scope/rule don't apply.
+                scope: static function (Builder $query): void {
                     $query->whereAttachedTo(Authentication::organisation());
-                })
-                ->rules([CurrentOrganisation::forModel(OrganisationUser::class, 'user_id')])
+                },
+                rules: [CurrentOrganisation::forModel(OrganisationUser::class, 'user_id')],
+            )
+                ->preload()
                 ->default([Authentication::user()->id->toString()])
                 ->label(__('contact_person.form_title_users'))
                 ->helperText(__('contact_person.help_form_title_users')),

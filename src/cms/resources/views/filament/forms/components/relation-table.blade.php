@@ -48,7 +48,7 @@
                                                 class="fi-link inline-flex items-center gap-1 text-primary-600 hover:underline dark:text-primary-400"
                                             >
                                                 {{ $value }}
-                                                <x-heroicon-m-arrow-down-tray class="h-4 w-4" />
+                                                <x-dynamic-component :component="$column['icon'] ?? 'heroicon-m-arrow-down-tray'" class="h-4 w-4" />
                                             </a>
                                         @else
                                             {{ $value }}
