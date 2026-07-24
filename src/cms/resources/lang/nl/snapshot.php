@@ -13,6 +13,12 @@ return [
     'created' => 'Versie aangemaakt',
     'unsaved_changes' => 'Versie niet aangemaakt, er zijn nog niet opgeslagen wijzingen',
 
+    'compare' => 'Vergelijken',
+    'compare_title' => 'Versies vergelijken: :name',
+    'compare_from' => 'Oude versie',
+    'compare_to' => 'Nieuwe versie',
+    'compare_no_changes' => 'Geen wijzigingen',
+
     'number' => 'Nummer verwerking',
     'name' => 'Naam versie',
     'state' => 'Status',

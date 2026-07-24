@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\SnapshotResource\Pages\CompareSnapshots;
 use App\Filament\Resources\SnapshotResource\Pages\ViewSnapshot;
 use App\Models\Snapshot;
 
@@ -18,6 +19,7 @@ class SnapshotResource extends Resource
     {
         return [
             'view' => ViewSnapshot::route('/{record}'),
+            'compare' => CompareSnapshots::route('/{record}/compare'),
         ];
     }
 
