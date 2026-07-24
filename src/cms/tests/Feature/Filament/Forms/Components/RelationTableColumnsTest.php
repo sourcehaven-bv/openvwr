@@ -48,6 +48,19 @@ it('renders an empty number when the record has no entity number', function (): 
     expect(relationTableColumnValue($columns, __('processing_record.number'), $record))->toBeNull();
 });
 
+it('has no number link for a model without a filament resource', function (): void {
+    $columns = RelationTableColumns::for(WpgProcessingRecord::class);
+
+    foreach ($columns as $column) {
+        if ($column['label'] !== __('processing_record.number')) {
+            continue;
+        }
+
+        expect(($column['href'] ?? null))->not->toBeNull()
+            ->and(($column['href'])(new EntityNumber()))->toBeNull();
+    }
+});
+
 it('throws when no columns are defined for a model', function (): void {
     RelationTableColumns::for(Model::class);
 })->throws(InvalidArgumentException::class);

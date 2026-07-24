@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Filament\Forms\Components\RelationTable;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource;
+use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\CreateAvgResponsibleProcessingRecord;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\EditAvgResponsibleProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use Tests\Helpers\Model\OrganisationTestHelper;
@@ -76,9 +77,11 @@ it('unlinks a subverwerking through the remove action, making it standalone agai
     $organisation = OrganisationTestHelper::create();
     $record = createEditableRecord($organisation);
 
-    $child = AvgResponsibleProcessingRecord::factory()
+    [$keep, $remove] = AvgResponsibleProcessingRecord::factory()
         ->recycle($organisation)
-        ->create(['parent_id' => $record->id->toString()]);
+        ->count(2)
+        ->create(['parent_id' => $record->id->toString()])
+        ->all();
 
     $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
@@ -87,14 +90,95 @@ it('unlinks a subverwerking through the remove action, making it standalone agai
         ->callFormComponentAction(
             'children',
             RelationTable::REMOVE_ACTION,
-            arguments: ['id' => $child->id->toString()],
+            arguments: ['id' => $remove->id->toString()],
         )
-        ->assertFormSet(['children' => []])
+        ->assertFormSet(['children' => [$keep->id->toString()]])
         ->call('save')
         ->assertHasNoFormErrors();
 
-    expect($child->refresh()->parent_id)
-        ->toBeNull();
+    expect($remove->refresh()->parent_id)
+        ->toBeNull()
+        ->and($keep->refresh()->parent_id?->toString())
+        ->toBe($record->id->toString());
+});
+
+it('offers only linkable verwerkingen in the picker', function (): void {
+    $organisation = OrganisationTestHelper::create();
+
+    $parent = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create(['name' => 'zoekterm hoofdverwerking']);
+
+    $record = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create([
+            'name' => 'zoekterm zelf',
+            'parent_id' => $parent->id->toString(),
+        ]);
+
+    $ownChild = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create([
+            'name' => 'zoekterm eigen subverwerking',
+            'parent_id' => $record->id->toString(),
+        ]);
+
+    $standalone = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create(['name' => 'zoekterm kandidaat']);
+
+    $otherParent = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create(['name' => 'andere hoofdverwerking']);
+    AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create([
+            'name' => 'zoekterm subverwerking van ander',
+            'parent_id' => $otherParent->id->toString(),
+        ]);
+
+    // Offered: the standalone candidate and the already-linked child. Not
+    // offered: the record itself, its hoofdverwerking (would create a cycle)
+    // and another record's subverwerking.
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $record->getRouteKey(),
+        ])
+        ->call('getFormSelectSearchResults', 'data.children', 'zoekterm')
+        ->assertReturned(function (array $results) use ($standalone, $ownChild): bool {
+            $values = array_column($results, 'value');
+            sort($values);
+
+            $expected = [$standalone->id->toString(), $ownChild->id->toString()];
+            sort($expected);
+
+            return $values === $expected;
+        });
+});
+
+it('offers only standalone verwerkingen in the picker for a new record', function (): void {
+    $organisation = OrganisationTestHelper::create();
+
+    $standalone = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create(['name' => 'zoekterm kandidaat']);
+
+    $otherParent = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create(['name' => 'andere hoofdverwerking']);
+    AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create([
+            'name' => 'zoekterm subverwerking van ander',
+            'parent_id' => $otherParent->id->toString(),
+        ]);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(CreateAvgResponsibleProcessingRecord::class)
+        ->call('getFormSelectSearchResults', 'data.children', 'zoekterm')
+        ->assertReturned(function (array $results) use ($standalone): bool {
+            return array_column($results, 'value') === [$standalone->id->toString()];
+        });
 });
 
 it('does not steal a subverwerking that belongs to another hoofdverwerking', function (): void {
