@@ -13,6 +13,12 @@ return [
     'created' => 'Versie aangemaakt',
     'unsaved_changes' => 'Versie niet aangemaakt, er zijn nog niet opgeslagen wijzingen',
 
+    'compare' => 'Vergelijken',
+    'compare_title' => 'Versies vergelijken: :name',
+    'compare_from' => 'Oude versie',
+    'compare_to' => 'Nieuwe versie',
+    'compare_no_changes' => 'Geen wijzigingen',
+
     'number' => 'Nummer verwerking',
     'name' => 'Naam versie',
     'state' => 'Status',
@@ -29,6 +35,7 @@ return [
 
     'back_to' => 'Terug naar :resource',
     'status_flow' => 'Statusverloop',
+    'status_flow_skipped' => 'Overgeslagen',
     'properties' => 'Gegevens',
     'public_data' => 'Publieke gegevens',
     'private_data' => 'Private gegevens',

@@ -71,6 +71,20 @@ class FilamentServiceProvider extends PanelProvider
                 return view('filament.topbar.organisation_name');
             },
         );
+
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::FOOTER,
+            static function (): View {
+                return view('filament.footer');
+            },
+        );
+
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::HEAD_END,
+            static function (): View {
+                return view('filament.version_meta');
+            },
+        );
     }
 
     /**

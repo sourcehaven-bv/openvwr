@@ -11,16 +11,21 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.VERSION }}
+      sha: ${{ steps.version.outputs.SHA }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Get version string
         id: version
-        run: echo "VERSION=dev-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+        run: |
+          echo "VERSION=dev-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "SHA=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 
   build:
     needs: version
     uses: ./.github/workflows/build-release.yml
     with:
+      # dev-<sha> is only a label; check out the actual commit, not a ref by that name.
       version: ${{ needs.version.outputs.version }}
+      ref: ${{ needs.version.outputs.sha }}

@@ -8,7 +8,6 @@ use App\Config\Config;
 use App\Events\StaticWebsite\BuildEvent;
 use App\Models\Contracts\Reviewable;
 use App\Models\Snapshot;
-use App\Models\States\Snapshot\Approved;
 use App\Models\States\Snapshot\Established;
 use App\Models\States\Snapshot\Obsolete;
 use App\ValueObjects\CalendarDate;
@@ -28,9 +27,9 @@ class SnapshotObserver
         $currentState = $snapshot->state;
 
         if ($currentState instanceof Established) {
-            if ($originalState instanceof Approved) {
-                $this->dispatchBuildEvent();
-            }
+            // Publish whenever a snapshot becomes established, whether it went
+            // through approval or was established straight from review.
+            $this->dispatchBuildEvent();
 
             $this->setReviewAt($snapshot);
         }

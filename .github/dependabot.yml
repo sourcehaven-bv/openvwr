@@ -43,6 +43,29 @@ updates:
       - "dependencies"
       - "npm"
 
+  # CMS composer dependencies
+  - package-ecosystem: "composer"
+    directory: "/src/cms"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Amsterdam"
+    # Majors are proposed too, but ungrouped: one breaking major in a
+    # grouped PR would otherwise block every other update in it.
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    commit-message:
+      prefix: "deps(cms)"
+    labels:
+      - "dependencies"
+      - "composer"
+
   # Docker base images
   - package-ecosystem: "docker"
     directory: "/src/cms"

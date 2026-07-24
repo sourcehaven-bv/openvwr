@@ -688,3 +688,146 @@ it('shows the obsolete branch in the status flow when a snapshot is obsolete', f
         ])
         ->assertSee(__('snapshot_state.label.obsolete'));
 });
+
+it('offers a forward skip transition when the user has the target permission', function (): void {
+    // Target-only gating: the established permission alone unlocks the skip from
+    // review, without the (bypassed) approve permission.
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisationWithPermissions($organisation, [
+        Permission::SNAPSHOT_VIEW,
+        Permission::SNAPSHOT_STATE_TO_ESTABLISHED,
+    ]);
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create([
+            'state' => InReview::class,
+        ]);
+
+    $this->withFilamentSession($user, $organisation)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshot->getRouteKey(),
+        ])
+        ->assertActionExists(sprintf('snapshot_transition_to_%s', Established::$name));
+});
+
+it('hides a forward skip transition when the user lacks the target permission', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisationWithPermissions($organisation, [
+        Permission::SNAPSHOT_VIEW,
+        Permission::SNAPSHOT_STATE_TO_APPROVE,
+    ]);
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create([
+            'state' => InReview::class,
+        ]);
+
+    $this->withFilamentSession($user, $organisation)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshot->getRouteKey(),
+        ])
+        ->assertActionHidden(sprintf('snapshot_transition_to_%s', Established::$name));
+});
+
+it('establishes straight from review when the skip transition is triggered from the page', function (): void {
+    // Target-only gating: establishing from review needs only the established
+    // permission, not the bypassed approve permission.
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisationWithPermissions($organisation, [
+        Permission::SNAPSHOT_VIEW,
+        Permission::SNAPSHOT_STATE_TO_ESTABLISHED,
+    ]);
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create([
+            'state' => InReview::class,
+        ]);
+
+    $this->withFilamentSession($user, $organisation)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshot->getRouteKey(),
+        ])
+        ->callAction(sprintf('snapshot_transition_to_%s', Established::$name));
+
+    expect($snapshot->refresh()->state)->toBeInstanceOf(Established::class);
+
+    // The bypassed approval step is not recorded: only established.
+    $recordedStates = SnapshotTransition::where('snapshot_id', $snapshot->id)
+        ->get()
+        ->map(static fn (SnapshotTransition $transition): string => $transition->state::$name)
+        ->all();
+    expect($recordedStates)
+        ->toContain(Established::$name)
+        ->not->toContain(Approved::$name);
+});
+
+it('replaces the transition button with the next one after transitioning', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create([
+            'state' => InReview::class,
+        ]);
+    SnapshotApproval::factory()->create([
+        'snapshot_id' => $snapshot->id,
+        'status' => SnapshotApprovalStatus::APPROVED,
+    ]);
+
+    // The transition action dispatches the refresh event that re-renders the
+    // page, so the header rebuilds itself against the new state instead of
+    // keeping the stale "Goedkeuren" button.
+    $component = $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshot->getRouteKey(),
+        ])
+        ->assertActionExists(sprintf('snapshot_transition_to_%s', Approved::$name))
+        ->callAction(sprintf('snapshot_transition_to_%s', Approved::$name))
+        ->assertDispatched(ViewSnapshot::REFRESH_LIVEWIRE_COMPONENT);
+
+    // After the re-render the approve transition is gone (no longer valid from
+    // the approved state), while the onward transitions remain.
+    $component->dispatch(ViewSnapshot::REFRESH_LIVEWIRE_COMPONENT)
+        ->assertActionDoesNotExist(sprintf('snapshot_transition_to_%s', Approved::$name))
+        ->assertActionExists(sprintf('snapshot_transition_to_%s', Established::$name));
+});
+
+it('marks a bypassed station as skipped in the status flow', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = User::factory()->create(['name' => 'Statuswijziger']);
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create([
+            'state' => Established::class,
+        ]);
+
+    // History of a direct establish-from-review: only In review and Vastgesteld
+    // were recorded, Goedgekeurd was skipped.
+    foreach ([InReview::class, Established::class] as $state) {
+        SnapshotTransition::factory()
+            ->recycle($snapshot)
+            ->recycle($user)
+            ->create(['state' => $state]);
+    }
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshot->getRouteKey(),
+        ])
+        ->assertSee(__('snapshot_state.label.approved'))
+        ->assertSee(__('snapshot.status_flow_skipped'));
+});
+
+it('does not mark a not-yet-reached station as skipped', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create([
+            'state' => InReview::class,
+        ]);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshot->getRouteKey(),
+        ])
+        ->assertDontSee(__('snapshot.status_flow_skipped'));
+});

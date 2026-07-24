@@ -44,6 +44,7 @@ it(
 )->with([
     'old in_review, new approved' => [InReview::class, Approved::class, false],
     'old approved, new established' => [Approved::class, Established::class, true],
+    'old in_review, new established' => [InReview::class, Established::class, true],
     'old in_review, new obsolete' => [InReview::class, Obsolete::class, false],
     'old approved, new obsolete' => [Approved::class, Obsolete::class, false],
     'old established, new obsolete' => [Established::class, Obsolete::class, true],

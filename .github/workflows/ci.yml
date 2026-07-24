@@ -70,6 +70,9 @@ jobs:
       - name: Composer install
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
+      - name: Composer audit
+        run: composer audit --no-interaction --locked
+
       - name: Prepare application
         run: php artisan key:generate
 
