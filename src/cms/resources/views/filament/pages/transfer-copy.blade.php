@@ -77,16 +77,10 @@
                                         <span class="truncate text-sm text-gray-950 dark:text-white">{{ $item['name'] }}</span>
                                     </label>
 
-                                    @if ($item['has_match'])
-                                        @if ($item['needs_decision'])
-                                            <x-filament::badge color="warning">
-                                                {{ __('transfer.exists_edited', ['name' => $item['match_name']]) }}
-                                            </x-filament::badge>
-                                        @else
-                                            <x-filament::badge color="gray">
-                                                {{ __('transfer.exists_unchanged', ['name' => $item['match_name']]) }}
-                                            </x-filament::badge>
-                                        @endif
+                                    @if ($item['needs_decision'])
+                                        <x-filament::badge color="warning">
+                                            {{ __('transfer.exists_edited', ['name' => $item['match_name']]) }}
+                                        </x-filament::badge>
 
                                         <div class="w-56 shrink-0">
                                             <x-filament::input.wrapper>
@@ -97,6 +91,10 @@
                                                 </x-filament::input.select>
                                             </x-filament::input.wrapper>
                                         </div>
+                                    @elseif ($item['unchanged'])
+                                        <span class="text-sm text-gray-500 dark:text-gray-400 shrink-0">
+                                            {{ __('transfer.exists_unchanged', ['name' => $item['match_name']]) }}
+                                        </span>
                                     @endif
                                 </li>
                             @endforeach
@@ -107,8 +105,16 @@
 
             <p class="mt-6 text-sm text-gray-500 dark:text-gray-400">{{ __('transfer.lookup_note') }}</p>
 
+            @if ($this->allUnchanged())
+                <x-filament::badge color="success" class="mt-6">
+                    {{ __('transfer.copy_all_unchanged') }}
+                </x-filament::badge>
+            @endif
+
             <div class="mt-6 flex gap-3">
-                <x-filament::button wire:click="copy">{{ __('transfer.copy_submit') }}</x-filament::button>
+                @unless ($this->allUnchanged())
+                    <x-filament::button wire:click="copy">{{ __('transfer.copy_submit') }}</x-filament::button>
+                @endunless
                 <x-filament::button color="gray" wire:click="resetAnalysis">{{ __('transfer.copy_back') }}</x-filament::button>
             </div>
         </x-filament::section>

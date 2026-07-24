@@ -44,7 +44,7 @@ function previewFor(BundleBuilder $builder, PreviewBuilder $preview, Organisatio
     return $preview->build($bundle, $destination);
 }
 
-it('flags a freshly copied record as not edited and defaults to silent overwrite', function (): void {
+it('flags a freshly copied record as unchanged, so there is nothing to copy', function (): void {
     $source = Organisation::factory()->create();
     $destination = Organisation::factory()->create();
     $user = copyableUser($source, $destination);
@@ -55,9 +55,11 @@ it('flags a freshly copied record as not edited and defaults to silent overwrite
     $preview = previewFor(app(BundleBuilder::class), app(PreviewBuilder::class), $source, $destination, $record);
     $recordPreview = $preview[$record->id->toString()];
 
+    // An identical existing copy is skipped: no decision to make, no re-copy.
     expect($recordPreview['has_match'])->toBeTrue()
+        ->and($recordPreview['unchanged'])->toBeTrue()
         ->and($recordPreview['needs_decision'])->toBeFalse()
-        ->and($recordPreview['strategy'])->toBe(ConflictStrategy::OVERWRITE->value);
+        ->and($recordPreview['strategy'])->toBe(ConflictStrategy::SKIP->value);
 });
 
 it('flags a locally edited copy as needing a decision and defaults to skip', function (): void {
@@ -122,7 +124,7 @@ it('re-copies an untouched copy without creating duplicates', function (): void 
     copyOnce($source, $destination, $user, $record);
     $countAfterFirst = AvgResponsibleProcessingRecord::query()->whereBelongsTo($destination)->count();
 
-    // Re-copy with the smart defaults: untouched → overwrite in place.
+    // Re-copying overwrites in place rather than duplicating (overwrite is idempotent here).
     copyOnce($source, $destination, $user, $record);
     $countAfterSecond = AvgResponsibleProcessingRecord::query()->whereBelongsTo($destination)->count();
 

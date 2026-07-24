@@ -187,6 +187,47 @@ it('analyses, resets and copies into the target organisation', function (): void
         ->toBeTrue();
 });
 
+it('reports nothing to copy when every analysed item already exists unchanged', function (): void {
+    $source = Organisation::factory()->create();
+    $destination = Organisation::factory()->create();
+    $user = copyableFilamentUser($source, $destination);
+    $record = seedCopyRecordWithProcessor($source);
+
+    $component = $this->withFilamentSession($user, $source)
+        ->createLivewireTestable(TransferCopy::class, [], [
+            'type' => TransferEntityType::AVG_RESPONSIBLE_PROCESSING_RECORD->value,
+            'records' => $record->id->toString(),
+        ])
+        ->set('targetOrganisationId', $destination->id->toString());
+
+    // First copy creates the items in the destination.
+    $component->call('analyse')->call('copy');
+
+    // Re-analysing the same, unchanged selection leaves nothing to copy.
+    $component->call('analyse')->assertSet('analysed', true);
+
+    expect($component->instance()->allUnchanged())->toBeTrue()
+        ->and(collect($component->get('items'))->every(fn (array $item): bool => $item['unchanged'] === true))->toBeTrue();
+});
+
+it('still offers a copy when at least one item is new or edited', function (): void {
+    $source = Organisation::factory()->create();
+    $destination = Organisation::factory()->create();
+    $user = copyableFilamentUser($source, $destination);
+    $record = seedCopyRecordWithProcessor($source);
+
+    $component = $this->withFilamentSession($user, $source)
+        ->createLivewireTestable(TransferCopy::class, [], [
+            'type' => TransferEntityType::AVG_RESPONSIBLE_PROCESSING_RECORD->value,
+            'records' => $record->id->toString(),
+        ])
+        ->set('targetOrganisationId', $destination->id->toString())
+        ->call('analyse');
+
+    // Nothing exists in the destination yet, so this is not an all-unchanged state.
+    expect($component->instance()->allUnchanged())->toBeFalse();
+});
+
 it('exposes the page title and navigation group', function (): void {
     $source = Organisation::factory()->create();
     $destination = Organisation::factory()->create();

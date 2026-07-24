@@ -324,4 +324,23 @@ class TransferCopy extends Page
     {
         return collect($this->items)->groupBy('type_label', true);
     }
+
+    /**
+     * Every analysed item already exists in the target and is unchanged, so there is nothing
+     * to copy. Used to replace the copy button with a "nothing to do" notice.
+     */
+    public function allUnchanged(): bool
+    {
+        if ($this->items === []) {
+            return false;
+        }
+
+        foreach ($this->items as $item) {
+            if (($item['unchanged'] ?? false) !== true) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

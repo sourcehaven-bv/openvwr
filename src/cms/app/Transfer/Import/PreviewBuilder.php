@@ -60,27 +60,31 @@ readonly class PreviewBuilder
         $match = $this->importMatcher->match($type, $entity, $organisation);
         $name = $entity['name'] ?? null;
 
+        $hasMatch = $match !== null;
         $edited = $match !== null && $this->editDetector->isEditedSinceSync($match);
+        // An existing copy that has not been edited since it was last synced is identical to
+        // the source: copying it again would be a no-op, so it is skipped and not offered as a
+        // choice. Only edited copies need a decision from the user.
+        $unchanged = $hasMatch && !$edited;
 
         return [
             'type_label' => $type->label(),
             'name' => is_string($name) ? $name : $id,
             'selected' => true,
-            'has_match' => $match !== null,
+            'has_match' => $hasMatch,
+            'unchanged' => $unchanged,
             'match_name' => $match === null ? null : $type->displayName($match),
             // No match: create (null strategy). Matched + edited: default to skip and prompt.
-            // Matched + untouched since sync: overwrite silently.
+            // Matched + unchanged: skip, no prompt (nothing to copy).
             'needs_decision' => $edited,
-            'strategy' => $this->defaultStrategy($match !== null, $edited),
+            'strategy' => $this->defaultStrategy($hasMatch),
         ];
     }
 
-    private function defaultStrategy(bool $hasMatch, bool $edited): ?string
+    private function defaultStrategy(bool $hasMatch): ?string
     {
-        if (!$hasMatch) {
-            return null;
-        }
-
-        return $edited ? ConflictStrategy::SKIP->value : ConflictStrategy::OVERWRITE->value;
+        // No match: create (null). Any match — edited or unchanged — defaults to skip: an
+        // unchanged copy is a no-op, and an edited copy waits for the user's explicit choice.
+        return $hasMatch ? ConflictStrategy::SKIP->value : null;
     }
 }
