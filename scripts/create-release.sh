@@ -41,6 +41,19 @@ Installation Instructions:
 EOF
 cp ../../.db_requirements ./
 
+# Stamp the deployment version into the app (overwrites the committed dev defaults).
+GIT_COMMIT_SHORT=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+cat >"config/version.php" <<EOF
+<?php
+
+declare(strict_types=1);
+
+return [
+    'label' => '$RELEASE_NAME',
+    'sha' => '$GIT_COMMIT_SHORT',
+];
+EOF
+
 # Prepare static-website
 cp -R ../static-website/ ./
 echo "{ \"version\": \"$RELEASE_NAME\", \"git_ref\": \"$GIT_COMMIT\"}" >./static-website/static/version.json
