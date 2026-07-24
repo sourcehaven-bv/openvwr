@@ -42,28 +42,9 @@ class SnapshotStatusFlow extends ViewEntry
      */
     public static function buildFlow(Snapshot $snapshot): array
     {
-        // The first time each state was reached, keyed by state name.
-        /** @var array<string, SnapshotTransition> $reachedAt */
-        $reachedAt = [];
-        foreach ($snapshot->snapshotTransitions as $transition) {
-            $stateName = $transition->state::$name;
-            if (!array_key_exists($stateName, $reachedAt)) {
-                $reachedAt[$stateName] = $transition;
-            }
-        }
-
+        $reachedAt = self::reachedTransitions($snapshot);
         $currentState = $snapshot->state::$name;
-
-        // The furthest position the line has progressed to. The current state is
-        // always treated as reached (see below), so when it is on the line it is
-        // the furthest point; otherwise fall back to the last recorded station.
-        $furthestReachedIndex = 0;
-        foreach (self::MAIN_LINE as $index => $stateClass) {
-            $stateName = $stateClass::$name;
-            if ($currentState === $stateName || array_key_exists($stateName, $reachedAt)) {
-                $furthestReachedIndex = $index;
-            }
-        }
+        $furthestReachedIndex = self::furthestReachedIndex($currentState, $reachedAt);
 
         $stations = [];
         foreach (self::MAIN_LINE as $index => $stateClass) {
@@ -88,6 +69,44 @@ class SnapshotStatusFlow extends ViewEntry
         }
 
         return ['stations' => $stations, 'obsolete' => $obsolete];
+    }
+
+    /**
+     * The first time each state was reached, keyed by state name.
+     *
+     * @return array<string, SnapshotTransition>
+     */
+    private static function reachedTransitions(Snapshot $snapshot): array
+    {
+        $reachedAt = [];
+        foreach ($snapshot->snapshotTransitions as $transition) {
+            $stateName = $transition->state::$name;
+            if (!array_key_exists($stateName, $reachedAt)) {
+                $reachedAt[$stateName] = $transition;
+            }
+        }
+
+        return $reachedAt;
+    }
+
+    /**
+     * The furthest position the line has progressed to. The current state is
+     * always treated as reached, so when it is on the line it is the furthest
+     * point; otherwise fall back to the last recorded station.
+     *
+     * @param array<string, SnapshotTransition> $reachedAt
+     */
+    private static function furthestReachedIndex(string $currentState, array $reachedAt): int
+    {
+        $furthestReachedIndex = 0;
+        foreach (self::MAIN_LINE as $index => $stateClass) {
+            $stateName = $stateClass::$name;
+            if ($currentState === $stateName || array_key_exists($stateName, $reachedAt)) {
+                $furthestReachedIndex = $index;
+            }
+        }
+
+        return $furthestReachedIndex;
     }
 
     /**
