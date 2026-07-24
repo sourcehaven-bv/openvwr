@@ -12,8 +12,6 @@ use App\Filament\Actions\ExportToPdfAction;
 use App\Filament\Infolists\Tabs\Snapshot\ViewApprovalTab;
 use App\Filament\Infolists\Tabs\Snapshot\ViewHistoryTab;
 use App\Filament\Infolists\Tabs\Snapshot\ViewInfoTab;
-use App\Filament\Resources\PersonalSnapshotApprovalResource;
-use App\Filament\Resources\PersonalSnapshotApprovalResource\Pages\ListPersonalSnapshotApprovalItems;
 use App\Filament\Resources\SnapshotResource;
 use App\Models\Snapshot;
 use App\Models\States\SnapshotState;
@@ -44,19 +42,20 @@ class ViewSnapshot extends ViewRecord
     {
         $snapshot = $this->record;
         Assert::isInstanceOf($snapshot, Snapshot::class);
-        $snapshoutSource = $snapshot->snapshotSource;
+        $snapshotSource = $snapshot->snapshotSource;
 
-        if ($snapshoutSource === null) {
+        if ($snapshotSource === null) {
             return [];
         }
 
-        /** @var class-string<Resource> $resource */
-        $resource = Filament::getModelResource($snapshoutSource);
-        $resourceUrl = $resource::getGlobalSearchResultUrl($snapshoutSource);
+        $resourceUrl = self::getSourceUrl($snapshot);
 
         if ($resourceUrl === null) {
             return [];
         }
+
+        /** @var class-string<Resource> $resource */
+        $resource = Filament::getModelResource($snapshotSource);
 
         return [
             $resourceUrl => __('snapshot.back_to', ['resource' => $resource::getModelLabel()]),
@@ -85,10 +84,12 @@ class ViewSnapshot extends ViewRecord
             Action::make('approve_view_all')
                 ->label(__('snapshot_approval.view_all'))
                 ->color('success')
-                ->visible(Authorization::hasPermission(Permission::SNAPSHOT_APPROVAL_UPDATE_PERSONAL))
-                ->url(PersonalSnapshotApprovalResource::getUrl(parameters: [
-                    'activeTab' => ListPersonalSnapshotApprovalItems::TAB_ID_UNREVIEWED,
-                ])),
+                ->visible(static function (Snapshot $record): bool {
+                    return self::getSourceUrl($record) !== null;
+                })
+                ->url(static function (Snapshot $record): ?string {
+                    return self::getSourceUrl($record);
+                }),
             Action::make('compare')
                 ->label(__('snapshot.compare'))
                 ->icon('heroicon-o-arrows-right-left')
@@ -151,6 +152,20 @@ class ViewSnapshot extends ViewRecord
         }
 
         return $actions;
+    }
+
+    public static function getSourceUrl(Snapshot $snapshot): ?string
+    {
+        $snapshotSource = $snapshot->snapshotSource;
+
+        if ($snapshotSource === null) {
+            return null;
+        }
+
+        /** @var class-string<Resource> $resource */
+        $resource = Filament::getModelResource($snapshotSource);
+
+        return $resource::getGlobalSearchResultUrl($snapshotSource);
     }
 
     public static function getNext(Snapshot $current): ?Snapshot
