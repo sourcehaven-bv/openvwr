@@ -97,8 +97,8 @@ dev-shell:
 dev-reset:
     cd src/cms && composer run reset
 
-# Print a passwordless login link for local dev (default: demo@example.com)
-login-link email="demo@example.com":
+# Print a passwordless login link for local dev (default: admin@example.com)
+login-link email="admin@example.com":
     cd src/cms && php artisan dev:login-link --email={{email}}
 
 # Build frontend assets
