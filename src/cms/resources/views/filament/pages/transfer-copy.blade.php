@@ -72,10 +72,15 @@
                         <ul class="divide-y divide-gray-100 dark:divide-white/10">
                             @foreach ($groupItems as $id => $item)
                                 <li class="flex items-center gap-4 py-2" wire:key="copy-item-{{ $id }}">
-                                    <label class="flex items-center gap-3 flex-1 min-w-0">
-                                        <x-filament::input.checkbox wire:model="items.{{ $id }}.selected" />
-                                        <span class="truncate text-sm text-gray-950 dark:text-white">{{ $item['name'] }}</span>
-                                    </label>
+                                    @if ($item['unchanged'])
+                                        {{-- Unchanged items are a no-op: nothing to select, so no checkbox. --}}
+                                        <span class="truncate text-sm text-gray-500 dark:text-gray-400 flex-1 min-w-0">{{ $item['name'] }}</span>
+                                    @else
+                                        <label class="flex items-center gap-3 flex-1 min-w-0">
+                                            <x-filament::input.checkbox wire:model="items.{{ $id }}.selected" />
+                                            <span class="truncate text-sm text-gray-950 dark:text-white">{{ $item['name'] }}</span>
+                                        </label>
+                                    @endif
 
                                     @if ($item['needs_decision'])
                                         <x-filament::badge color="warning">
