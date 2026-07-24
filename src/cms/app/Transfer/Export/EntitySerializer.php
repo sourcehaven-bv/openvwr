@@ -162,7 +162,7 @@ class EntitySerializer
     }
 
     /**
-     * @return list<array<string, string>>
+     * @return list<array<string, ?string>>
      */
     private function serializeMedia(Document $document): array
     {
@@ -175,6 +175,9 @@ class EntitySerializer
                 'file_name' => $mediaItem->file_name,
                 'name' => $mediaItem->name,
                 'mime_type' => $mediaItem->mime_type,
+                // sha256 of the file bytes. Carried so a re-copy can tell whether the
+                // destination file already matches the source without moving any bytes.
+                'content_hash' => $mediaItem->content_hash,
                 'zip_path' => sprintf('media/%s/%s', $mediaItem->uuid, $mediaItem->file_name),
             ];
         }

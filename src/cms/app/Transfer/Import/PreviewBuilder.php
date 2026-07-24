@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Transfer\Import;
 
+use App\Models\Document;
 use App\Models\Organisation;
 use App\Transfer\ConflictStrategy;
 use App\Transfer\TransferEntityType;
+use Illuminate\Database\Eloquent\Model;
 use Webmozart\Assert\Assert;
 
 use function is_string;
@@ -23,6 +25,7 @@ readonly class PreviewBuilder
     public function __construct(
         private ImportMatcher $importMatcher,
         private EditDetector $editDetector,
+        private MediaHashes $mediaHashes,
     ) {
     }
 
@@ -61,7 +64,11 @@ readonly class PreviewBuilder
         $name = $entity['name'] ?? null;
 
         $hasMatch = $match !== null;
-        $edited = $match !== null && $this->editDetector->isEditedSinceSync($match);
+        // A copy counts as changed when it was edited locally since sync, or when its
+        // attachment no longer matches the source file (a document whose only difference is
+        // its binary content). Either way the user should be asked rather than told "identiek".
+        $edited = $match !== null
+            && ($this->editDetector->isEditedSinceSync($match) || $this->mediaDiffersFromSource($match, $entity));
         // An existing copy that has not been edited since it was last synced is identical to
         // the source: copying it again would be a no-op, so it is skipped and not offered as a
         // choice. Only edited copies need a decision from the user.
@@ -79,6 +86,23 @@ readonly class PreviewBuilder
             'needs_decision' => $edited,
             'strategy' => $this->defaultStrategy($hasMatch),
         ];
+    }
+
+    /**
+     * True when the destination document's attachments no longer match the source's, by
+     * content_hash. EditDetector only sees local edits; source-file drift is a separate
+     * signal, checked here where both the source (the bundle entity) and the destination
+     * document are in hand.
+     *
+     * @param array<string, mixed> $entity
+     */
+    private function mediaDiffersFromSource(Model $match, array $entity): bool
+    {
+        if (!$match instanceof Document) {
+            return false;
+        }
+
+        return !$this->mediaHashes->match($match, $entity);
     }
 
     private function defaultStrategy(bool $hasMatch): ?string

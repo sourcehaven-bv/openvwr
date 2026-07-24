@@ -70,6 +70,7 @@ class BundleImporter
         private readonly ImportMatcher $importMatcher,
         private readonly RelationRestorer $relationRestorer,
         private readonly AttributeRemapper $attributeRemapper,
+        private readonly DocumentMediaImporter $documentMediaImporter,
     ) {
     }
 
@@ -259,8 +260,8 @@ class BundleImporter
         $this->written[$id] = true;
         $result->overwritten++;
 
-        if ($existing instanceof Document && $existing->media->isEmpty()) {
-            $this->importMedia($existing, $entity, $mediaResolver);
+        if ($existing instanceof Document) {
+            $this->documentMediaImporter->sync($existing, $entity, $mediaResolver);
         }
     }
 
@@ -295,7 +296,7 @@ class BundleImporter
         $result->created++;
 
         if ($model instanceof Document) {
-            $this->importMedia($model, $entity, $mediaResolver);
+            $this->documentMediaImporter->import($model, $entity, $mediaResolver);
         }
     }
 
@@ -381,43 +382,5 @@ class BundleImporter
         }
 
         $relation->updateOrCreate([], $type === TransferEntityType::ADDRESS ? $attributes : ['body' => $body]);
-    }
-
-    /**
-     * @param array<string, mixed> $entity
-     */
-    private function importMedia(Document $document, array $entity, MediaResolver $mediaResolver): void
-    {
-        $mediaItems = $entity['media'] ?? [];
-
-        if (!is_array($mediaItems)) {
-            return;
-        }
-
-        foreach ($mediaItems as $mediaItem) {
-            if (!is_array($mediaItem)) {
-                continue;
-            }
-
-            $fileName = $mediaItem['file_name'] ?? null;
-            $collectionName = $mediaItem['collection_name'] ?? null;
-
-            if (!is_string($fileName) || !is_string($collectionName)) {
-                continue;
-            }
-
-            $contents = $mediaResolver->resolve($mediaItem);
-
-            if ($contents === null) {
-                continue;
-            }
-
-            $name = $mediaItem['name'] ?? null;
-
-            $document->addMediaFromString($contents)
-                ->usingFileName($fileName)
-                ->usingName(is_string($name) ? $name : $fileName)
-                ->toMediaCollection($collectionName);
-        }
     }
 }
