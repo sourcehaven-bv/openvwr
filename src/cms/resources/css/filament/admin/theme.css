@@ -145,14 +145,25 @@
     @apply text-xl font-semibold;
 }
 
+/* Accent bar on the header block itself rather than just the heading text,
+   so it reads as a marker for the whole header (heading + description)
+   instead of underlining just the words. Clipping to the card's rounded
+   corner is added to the overflow-hidden below, on the section itself. */
+.onepage-layout [data-onepage-section] > .fi-section-header {
+    @apply border-l-4 border-primary-600 dark:border-primary-400;
+}
+
 /* Nested information blocks are cards inside a card; flatten them so each
    section reads as one object rather than a box-in-a-box. */
 .onepage-layout [data-onepage-section] .fi-section .fi-section {
     @apply shadow-none ring-0 bg-gray-50 dark:bg-white/5;
 }
 
-/* Land jump targets below the sticky topbar instead of flush under it. */
+/* Land jump targets below the sticky topbar instead of flush under it.
+   overflow-hidden clips the header's accent bar to the card's rounded
+   corner instead of letting its square edge poke past the curve. */
 .onepage-layout [data-onepage-section] {
+    @apply overflow-hidden;
     scroll-margin-top: 5rem;
 }
 
