@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DataBreachRecord\Pages;
 
+use App\Filament\Actions\ToggleRegisterLayoutAction;
 use App\Filament\Resources\DataBreachRecordResource;
 use App\Filament\Widgets\FgRemarksWidget;
 use App\Models\DataBreachRecord;
@@ -20,6 +21,7 @@ class ViewDataBreachRecord extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            ToggleRegisterLayoutAction::make(),
             ...$this->getDataBreachRecordWorkflowActions(),
             DeleteAction::make(),
         ];

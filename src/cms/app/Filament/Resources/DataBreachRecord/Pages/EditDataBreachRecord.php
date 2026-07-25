@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DataBreachRecord\Pages;
 
+use App\Filament\Actions\ToggleRegisterLayoutAction;
 use App\Filament\Pages\ProcessingRecordEditRecord;
 use App\Filament\Resources\DataBreachRecordResource;
 use App\Models\DataBreachRecord;
@@ -21,6 +22,7 @@ class EditDataBreachRecord extends ProcessingRecordEditRecord
     protected function getHeaderActions(): array
     {
         return [
+            ToggleRegisterLayoutAction::make(),
             DeleteAction::make(),
         ];
     }
