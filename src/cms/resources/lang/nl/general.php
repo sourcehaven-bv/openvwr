@@ -70,6 +70,7 @@ return [
     'manual' => 'Handleiding',
     'go_to_public_page' => 'Bekijk op de publieke website',
     'edit' => 'Bewerken',
+    'onepage_nav_label' => 'Snel naar onderdeel',
 
     'country' => 'Landen',
     'country_other' => 'Anders, namelijk:',

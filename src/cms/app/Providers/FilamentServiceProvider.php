@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use App\Facades\Authentication;
 use App\Filament\NavigationGroups\NavigationGroup;
+use App\Filament\OnePageLayoutRenderHooks;
 use App\Filament\Pages\Login;
 use App\Filament\Pages\Profile;
 use App\Filament\SimpleAvatarProvider;
@@ -85,6 +86,8 @@ class FilamentServiceProvider extends PanelProvider
                 return view('filament.version_meta');
             },
         );
+
+        OnePageLayoutRenderHooks::register();
     }
 
     /**
