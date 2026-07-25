@@ -61,64 +61,49 @@ class AvgResponsibleProcessingRecordResourceInfolist
             ->schema([
                 Section::make(__('avg_responsible_processing_record.step_processing_name'))
                     ->schema(AvgResponsibleProcessingRecordResourceInfolistSchemas::getProcessingName())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_processing_name']),
                 Section::make(__('avg_responsible_processing_record.step_responsible'))
                     ->schema(AvgResponsibleProcessingRecordResourceInfolistSchemas::getResponsible())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_responsible']),
                 Section::make(__('avg_responsible_processing_record.step_processor'))
                     ->schema(AvgResponsibleProcessingRecordResourceInfolistSchemas::getProcessor())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_processor']),
                 Section::make(__('avg_responsible_processing_record.step_receiver'))
                     ->schema(AvgResponsibleProcessingRecordResourceInfolistSchemas::getReceiver())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_receiver']),
                 Section::make(__('avg_responsible_processing_record.step_processing_goal'))
                     ->schema(AvgResponsibleProcessingRecordResourceInfolistSchemas::getProcessingGoal())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_processing_goal']),
                 Section::make(__('avg_responsible_processing_record.step_stakeholder_data'))
                     ->schema(AvgResponsibleProcessingRecordResourceInfolistSchemas::getStakeholder())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_stakeholder_data']),
                 Section::make(__('avg_responsible_processing_record.step_decision_making'))
                     ->schema(AvgResponsibleProcessingRecordResourceInfolistSchemas::getDecisionMaking())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_decision_making']),
                 Section::make(__('avg_responsible_processing_record.step_system'))
                     ->schema(AvgResponsibleProcessingRecordResourceInfolistSchemas::getSystem())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_system']),
                 Section::make(__('avg_responsible_processing_record.step_security'))
                     ->schema(AvgResponsibleProcessingRecordResourceInfolistSchemas::getSecurity())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_security']),
                 Section::make(__('avg_responsible_processing_record.step_passthrough'))
                     ->schema(AvgResponsibleProcessingRecordResourceInfolistSchemas::getPassthrough())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_passthrough']),
                 Section::make(__('avg_responsible_processing_record.step_geb_dpia'))
                     ->schema(AvgResponsibleProcessingRecordResourceInfolistSchemas::getGebDpia())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_geb_dpia']),
                 Section::make(__('avg_responsible_processing_record.step_contact_person'))
                     ->schema(AvgResponsibleProcessingRecordResourceInfolistSchemas::getContactPerson())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_contact_person']),
                 Section::make(__('avg_responsible_processing_record.step_attachments'))
                     ->schema(AvgResponsibleProcessingRecordResourceInfolistSchemas::getAttachments())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_attachments']),
                 Section::make(__('avg_responsible_processing_record.step_remarks'))
                     ->schema(AvgResponsibleProcessingRecordResourceInfolistSchemas::getRemarks())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_remarks']),
                 Section::make(__('avg_responsible_processing_record.step_publish'))
                     ->schema(AvgResponsibleProcessingRecordResourceInfolistSchemas::getPublish())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_publish']),
             ]);
     }
 }

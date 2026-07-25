@@ -46,3 +46,160 @@
     list-style-position: outside;
     margin-left: 1rem;
 }
+
+/*
+ * One-page register layout.
+ *
+ * The sections render as a single full-width column: no ->aside(), so the
+ * fields use the whole card instead of being squeezed into a 2/3 grid track.
+ * These rules give the long page a scannable rhythm -- a clear size step
+ * between section heading and field labels, and enough air between sections
+ * that the headings read as landmarks while scrolling fast.
+ */
+/*
+ * Two columns: the form beside the navigation, with the relation managers
+ * spanning both underneath.
+ *
+ * A grid rather than a flex row because it lets the navigation share a row
+ * with the form only. Sticky positioning is bounded by the containing block,
+ * so the navigation scrolls away with the end of the form instead of staying
+ * pinned over the full-width tables below it.
+ */
+.onepage-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    /* Rows: form sections, the form's save/cancel actions, relation managers.
+       The navigation occupies the first row only. */
+    grid-template-rows: auto auto auto;
+    align-items: start;
+    gap: 20px;
+    width: 100%;
+}
+
+/*
+ * The panel caps content at screen-2xl, which the 25rem sidebar then eats into
+ * -- on a wide monitor that leaves the long form squeezed into the left of the
+ * window with dead space beside it. The one-page layout is the one place that
+ * genuinely wants the room, so let its page break out of the cap.
+ */
+.fi-main:has(.onepage-layout) {
+    max-width: none;
+}
+
+/*
+ * The form spans the sections row and the actions row, so the navigation
+ * column can be bounded to the sections alone (see the row definitions on
+ * .onepage-layout). Making it a grid lets its two parts line up with those
+ * rows: sections in row 1, the save/cancel actions in row 2.
+ */
+.onepage-layout > .fi-form {
+    grid-column: 1;
+    min-width: 0;
+    /* Without subgrid the form stays a single-row item: the navigation then
+       ends level with the buttons instead of above them, which is a slightly
+       worse stopping point rather than a broken layout. */
+    grid-row: 1;
+}
+
+@supports (grid-template-rows: subgrid) {
+    .onepage-layout > .fi-form {
+        grid-row: 1 / span 2;
+        display: grid;
+        grid-template-rows: subgrid;
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+/*
+ * The navigation sits in a wrapper that spans the form's full height, and the
+ * sticky element lives inside it. A sticky box cannot be pushed past the
+ * bottom of its containing block, so this is what makes the navigation scroll
+ * up and away with the end of the form rather than hang over the tables.
+ */
+.onepage-layout > .onepage-nav-ctn {
+    grid-column: 2;
+    grid-row: 1;
+    height: 100%;
+}
+
+/*
+ * Relation managers (Versies, Subverwerkingen, Primair contact) are tables and
+ * the navigation has run out of items by the time they appear, so let them
+ * span both columns instead of being squeezed beside empty space.
+ */
+.onepage-layout > .fi-resource-relation-managers {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    min-width: 0;
+}
+
+/* Section rhythm: the "beat" the eye follows when scrolling quickly. */
+.onepage-layout [data-onepage-section] + [data-onepage-section] {
+    margin-top: 1.5rem;
+}
+
+/* The size step that was missing: headings were text-base, same as body.
+   Scoped to the section's own header so nested information blocks keep
+   their smaller heading and the hierarchy stays readable. */
+.onepage-layout [data-onepage-section] > .fi-section-header .fi-section-header-heading {
+    @apply text-xl font-semibold;
+}
+
+/* Nested information blocks are cards inside a card; flatten them so each
+   section reads as one object rather than a box-in-a-box. */
+.onepage-layout [data-onepage-section] .fi-section .fi-section {
+    @apply shadow-none ring-0 bg-gray-50 dark:bg-white/5;
+}
+
+/* Land jump targets below the sticky topbar instead of flush under it. */
+.onepage-layout [data-onepage-section] {
+    scroll-margin-top: 5rem;
+}
+
+/* Quick-jump nav: mirrors the wizard's step-list card so both layouts share
+   a visual language. Sticky, because its whole purpose is orientation while
+   scrolling a long page. */
+.onepage-nav {
+    @apply bg-white rounded-xl shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10;
+    position: sticky;
+    top: 5rem;
+    /* align-self keeps the sticky box at its natural height so it can travel
+       within the row rather than being stretched to fill it. */
+    align-self: start;
+    max-height: calc(100vh - 7rem);
+    overflow-y: auto;
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+.onepage-nav__item {
+    @apply flex w-full items-center gap-x-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400;
+    text-align: left;
+    /* Section labels are full sentences in places; wrap rather than overflow. */
+    word-break: break-word;
+}
+
+.onepage-nav__item:hover {
+    @apply bg-gray-100 text-gray-950 dark:bg-white/5 dark:text-white;
+}
+
+.onepage-nav__item.fi-active {
+    @apply bg-gray-300 text-gray-900 dark:bg-gray-700 dark:text-white;
+}
+
+/* Below md the nav would eat the whole viewport; the page is scrollable
+   anyway, so drop it and let the content run full width. */
+@media (max-width: 1279px) {
+    /* Hide the whole column, not just the card, so it does not take a grid
+       slot beside the form. */
+    .onepage-layout > .onepage-nav-ctn {
+        display: none;
+    }
+
+    /* Collapse to a single column so the form uses the full width. */
+    .onepage-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

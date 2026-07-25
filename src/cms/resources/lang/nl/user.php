@@ -113,6 +113,8 @@ return [
                 RegisterLayout::STEPS->value => 'Stapsgewijs met navigatie rechts',
                 RegisterLayout::ONE_PAGE->value => 'Alle gegevens onder elkaar',
             ],
+            'register_layout_switch_to_one_page' => 'Alles onder elkaar',
+            'register_layout_switch_to_steps' => 'Stapsgewijs',
         ],
     ],
 ];
