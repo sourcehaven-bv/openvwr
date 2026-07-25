@@ -25,16 +25,51 @@ brew install php@8.4 node
 # PostgreSQL: Postgres.app of `brew install postgresql@15`
 ```
 
-Draai onderstaande commando's met de 8.4-binary als je systeem-PHP nieuwer is:
+## Setup (macOS + Homebrew)
+
+Eén commando installeert de dependencies, maakt de database aan, bouwt de
+assets en vult de database met testdata:
 
 ```bash
-PHP=/opt/homebrew/opt/php@8.4/bin/php
+just setup-native
 ```
 
-## Setup
+Het script is idempotent: het slaat over wat er al is, en laat een bestaande
+`.env` ongemoeid. Daarna:
+
+```bash
+just dev-native          # start op http://127.0.0.1:8000
+just dev-native-login    # print een magic link om in te loggen
+```
+
+Verdere commando's:
+
+| Commando | Doet |
+|---|---|
+| `just setup-native` | Volledige setup vanaf niets |
+| `just doctor-native` | Controleert de omgeving en meldt wat ontbreekt |
+| `just dev-native [port]` | Start de applicatie (standaard poort 8000) |
+| `just dev-native-login [email]` | Magic link (standaard `admin@example.com`) |
+| `just dev-native-reset` | Database opnieuw opbouwen en seeden |
+| `just test-native [args]` | Testsuite draaien met PHP 8.4 |
+
+Werkt er iets niet, draai dan `just doctor-native`: die controleert PHP-versie
+en -extensies, de tools, beide databases, `.env`, `APP_KEY`, dependencies en de
+gebouwde assets, en noemt per probleem het commando dat het oplost.
+
+De vier vereiste extensies (`pdo_pgsql`, `fileinfo`, `sockets`, `zip`) zitten
+ingebouwd in Homebrew's `php@8.4` — ontbreekt er één, dan wijst dat op een
+kapotte installatie (`brew reinstall php@8.4`) eerder dan op een ontbrekend
+pecl-pakket.
+
+## Handmatig, stap voor stap
+
+Wat `just setup-native` doet, met de hand. Draai de commando's met de
+8.4-binary als je systeem-PHP nieuwer is:
 
 ```bash
 cd src/cms
+PHP=$(brew --prefix php@8.4)/bin/php
 
 # 1. Database + rol
 psql -h 127.0.0.1 -d postgres -c "CREATE ROLE sail LOGIN PASSWORD 'password' SUPERUSER;"
@@ -45,7 +80,7 @@ cp .env.nodocker.example .env
 $PHP artisan key:generate   # vóór het seeden, zie waarschuwing hieronder
 
 # 3. Dependencies en assets
-$PHP /opt/homebrew/bin/composer install
+$PHP $(command -v composer) install
 npm install && npm run build          # zonder assets rendert de UI ongestyled
 
 # 4. Database vullen
@@ -85,15 +120,11 @@ testen.
 
 De applicatie kent geen wachtwoorden: inloggen gaat via een ondertekende
 magic link. `MAIL_MAILER=log` logt alleen metadata, niet de link zelf. Genereer
-daarom een login-URL via artisan:
+daarom een login-URL:
 
 ```bash
-$PHP artisan tinker --execute='
-$u = App\Models\User::where("email", "admin@example.com")->firstOrFail();
-app(App\Services\UserLoginToken\UserLoginService::class)->sendPasswordLessLoginLink($u, "/");
-$t = $u->userLoginTokens()->orderByDesc("expires_at")->firstOrFail();
-echo (new App\Mail\Authentication\PasswordLessLoginLink($t))->link;
-'
+just dev-native-login                    # admin@example.com
+just dev-native-login fg@example.com     # of een andere rol
 ```
 
 Open de URL, klik op "Inloggen", en vul op het tweefactorscherm een willekeurige
@@ -110,5 +141,12 @@ screenshots, niet als vervanging van de Docker-omgeving:
 - `QUEUE_CONNECTION=sync` verwerkt jobs synchroon. Zodra het project een echte
   queue-driver gebruikt, worden jobs lokaal niet meer verwerkt zonder worker.
 - Virusscanning en objectopslag worden niet echt getest.
+- De vier `HugoStaticWebsiteGenerator`-tests falen zonder het `hugo`-binary
+  (`brew install hugo`). De rest van de suite slaagt native.
 
-Draai de testsuite en CI daarom op de Docker-setup.
+**PHP 8.4 is een harde eis, ook voor de tests.** Op 8.5 faalt het overgrote
+deel van de suite (±800 tests) op `HasUuidAsId`: het custom `Uuid`-object kan
+daar niet meer als array-key worden gebruikt. `just test-native` gebruikt
+daarom expliciet de 8.4-binary.
+
+Draai de testsuite en CI daarom bij voorkeur op de Docker-setup.
