@@ -101,6 +101,35 @@ dev-reset:
 login-link email="admin@example.com":
     cd src/cms && php artisan dev:login-link --email={{email}}
 
+# Native Development (no Docker)
+# ==============================
+# macOS + Homebrew only. See docs/local_development_without_docker.md.
+
+# Install dependencies, create the database, and seed test data
+setup-native:
+    ./scripts/setup-local-dev.sh
+
+# Check the native environment and report what is missing
+doctor-native:
+    ./scripts/check-local-dev.sh
+
+# Serve the application natively on http://127.0.0.1:8000
+dev-native port="8000":
+    cd src/cms && "$(brew --prefix php@8.4)/bin/php" artisan serve --host=127.0.0.1 --port={{port}}
+
+# Print a magic-link to log in (defaults to admin@example.com), pinned to PHP 8.4
+dev-native-login email="admin@example.com":
+    cd src/cms && "$(brew --prefix php@8.4)/bin/php" artisan dev:login-link --email={{email}}
+
+# Run the test suite natively (needs PHP 8.4; 8.5 fails on UUID casts)
+test-native +args="":
+    cd src/cms && "$(brew --prefix php@8.4)/bin/php" -d memory_limit=4G ./vendor/bin/pest {{args}}
+
+# Rebuild the native database from scratch and reseed
+dev-native-reset:
+    cd src/cms && "$(brew --prefix php@8.4)/bin/php" artisan migrate:fresh --force \
+        && "$(brew --prefix php@8.4)/bin/php" artisan db:seed --class=TestDataSeeder --force
+
 # Build frontend assets
 dev-build:
     @echo "🎨 Building frontend assets..."
