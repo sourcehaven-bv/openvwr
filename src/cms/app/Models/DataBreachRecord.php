@@ -22,16 +22,20 @@ use App\Models\Concerns\HasTimestamps;
 use App\Models\Concerns\HasUuidAsId;
 use App\Models\Contracts\EntityNumerable;
 use App\Models\Contracts\TenantAware;
+use App\Models\States\DataBreachRecordState;
 use App\Models\Wpg\WpgProcessingRecord;
 use Carbon\CarbonImmutable;
 use Database\Factories\DataBreachRecordFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Spatie\ModelStates\HasStates;
+use Spatie\ModelStates\HasStatesContract;
 
 /**
  * @property string $name
  * @property string $type
+ * @property DataBreachRecordState $state
  * @property CarbonImmutable|null $reported_at
  * @property bool $ap_reported
  * @property CarbonImmutable|null $discovered_at
@@ -59,7 +63,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
  * @property-read ResponsibleCollection $responsibles
  * @property-read WpgProcessingRecordCollection $wpgProcessingRecords
  */
-class DataBreachRecord extends Model implements EntityNumerable, TenantAware
+class DataBreachRecord extends Model implements EntityNumerable, HasStatesContract, TenantAware
 {
     use HasDocuments;
     use HasEntityNumber;
@@ -69,6 +73,7 @@ class DataBreachRecord extends Model implements EntityNumerable, TenantAware
     use HasOrganisation;
     use HasResponsibles;
     use HasSoftDeletes;
+    use HasStates;
     use HasTimestamps;
     use HasUuidAsId;
 
@@ -76,6 +81,7 @@ class DataBreachRecord extends Model implements EntityNumerable, TenantAware
     protected $fillable = [
         'name',
         'type',
+        'state',
         'reported_at',
         'ap_reported',
 
@@ -104,6 +110,7 @@ class DataBreachRecord extends Model implements EntityNumerable, TenantAware
     {
         return [
             'ap_reported' => 'boolean',
+            'state' => DataBreachRecordState::class,
 
             'reported_at' => 'date',
             'discovered_at' => 'date',
