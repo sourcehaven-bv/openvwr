@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Filament\Resources\DataBreachRecord\Pages\ViewDataBreachRecord;
+use App\Filament\Resources\DataBreachRecord\Pages\EditDataBreachRecord;
 use App\Mail\DataBreachRecordApReportedNotification;
 use App\Models\DataBreachRecord;
 use Tests\Helpers\ConfigTestHelper;
@@ -11,7 +11,7 @@ it('has the correct content', function (): void {
     $dataBreachRecord = DataBreachRecord::factory()->create();
     $mailable = new DataBreachRecordApReportedNotification($dataBreachRecord);
 
-    $link = ViewDataBreachRecord::getUrl([
+    $link = EditDataBreachRecord::getUrl([
         'record' => $dataBreachRecord,
         'tenant' => $dataBreachRecord->organisation,
     ]);

@@ -6,6 +6,8 @@ namespace App\Filament\Resources\DataBreachRecord\Pages;
 
 use App\Filament\Actions\ToggleRegisterLayoutAction;
 use App\Filament\Pages\ProcessingRecordEditRecord;
+use App\Filament\Resources\DataBreachRecord\Pages\Concerns\HasDataBreachRecordWorkflowActions;
+use App\Filament\Resources\DataBreachRecord\Pages\Contracts\RefreshesDataBreachRecordWorkflow;
 use App\Filament\Resources\DataBreachRecordResource;
 use App\Models\DataBreachRecord;
 use App\Services\Notification\DataBreachNotificationService;
@@ -15,13 +17,16 @@ use Webmozart\Assert\Assert;
 
 use function sprintf;
 
-class EditDataBreachRecord extends ProcessingRecordEditRecord
+class EditDataBreachRecord extends ProcessingRecordEditRecord implements RefreshesDataBreachRecordWorkflow
 {
+    use HasDataBreachRecordWorkflowActions;
+
     protected static string $resource = DataBreachRecordResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
+            ...$this->getDataBreachRecordWorkflowActions(),
             ToggleRegisterLayoutAction::make(),
             DeleteAction::make(),
         ];

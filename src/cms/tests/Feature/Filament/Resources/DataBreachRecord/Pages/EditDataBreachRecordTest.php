@@ -8,7 +8,13 @@ use App\Filament\Resources\DataBreachRecordResource;
 use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\DataBreachRecord;
+use App\Models\DataBreachRecordTransition;
 use App\Models\Document;
+use App\Models\States\DataBreachRecord\Closed;
+use App\Models\States\DataBreachRecord\InResponse;
+use App\Models\States\DataBreachRecord\NoBreach;
+use App\Models\States\DataBreachRecord\Reported;
+use App\Models\States\DataBreachRecord\Verified;
 use App\Models\Wpg\WpgProcessingRecord;
 use App\Services\Notification\DataBreachNotificationService;
 use Filament\Forms\Components\Select;
@@ -306,6 +312,121 @@ it('can do a lookup for a document', function (): void {
                 ];
             },
         );
+});
+
+it('can transition a data breach record through a header action', function (
+    string $fromState,
+    string $toState,
+): void {
+    $organisation = OrganisationTestHelper::create();
+
+    $dataBreachRecord = DataBreachRecord::factory()
+        ->recycle($organisation)
+        ->inState($fromState)
+        ->create();
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditDataBreachRecord::class, [
+            'record' => $dataBreachRecord->getRouteKey(),
+        ])
+        ->callAction(sprintf('data_breach_record_transition_to_%s', $toState::$name));
+
+    $this->assertDatabaseHas(DataBreachRecord::class, [
+        'id' => $dataBreachRecord->id,
+        'state' => $toState::$name,
+    ]);
+})->with([
+    // Forward through the workflow — covers every concrete action class.
+    'verify' => [Reported::class, Verified::class],
+    'respond' => [Verified::class, InResponse::class],
+    'close' => [InResponse::class, Closed::class],
+    'mark as no breach' => [Reported::class, NoBreach::class],
+    // A correction backwards — covers the reopen action and the
+    // transition_back label branch.
+    'reopen' => [Closed::class, InResponse::class],
+]);
+
+it('keeps unsaved form input when transitioning', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $dataBreachRecord = DataBreachRecord::factory()
+        ->recycle($organisation)
+        ->withValidState()
+        ->inState(Reported::class)
+        ->create();
+    $unsavedName = fake()->uuid();
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditDataBreachRecord::class, [
+            'record' => $dataBreachRecord->getRouteKey(),
+        ])
+        // Type into the form, then change the status without saving first.
+        ->fillForm(['name' => $unsavedName])
+        ->callAction(sprintf('data_breach_record_transition_to_%s', Verified::$name))
+        ->assertNoRedirect()
+        // The typed-but-unsaved value must survive the transition.
+        ->assertFormSet(['name' => $unsavedName]);
+
+    // The status change itself is persisted immediately, independent of the form.
+    $dataBreachRecord->refresh();
+    expect($dataBreachRecord->state)->toBeInstanceOf(Verified::class)
+        ->and($dataBreachRecord->name)->not->toBe($unsavedName);
+});
+
+it('offers the transitions of the new state without a page reload', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $dataBreachRecord = DataBreachRecord::factory()
+        ->recycle($organisation)
+        ->withValidState()
+        ->inState(Reported::class)
+        ->create();
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditDataBreachRecord::class, [
+            'record' => $dataBreachRecord->getRouteKey(),
+        ])
+        ->callAction(sprintf('data_breach_record_transition_to_%s', Verified::$name))
+        // Reachable from verified, but not from the reported state we started in.
+        ->assertActionExists(sprintf('data_breach_record_transition_to_%s', InResponse::$name));
+});
+
+it('records who made a transition and when', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation);
+
+    $dataBreachRecord = DataBreachRecord::factory()
+        ->recycle($organisation)
+        ->inState(Reported::class)
+        ->create();
+
+    $this->asFilamentUser($user)
+        ->createLivewireTestable(EditDataBreachRecord::class, [
+            'record' => $dataBreachRecord->getRouteKey(),
+        ])
+        ->callAction(sprintf('data_breach_record_transition_to_%s', Verified::$name));
+
+    $this->assertDatabaseHas(DataBreachRecordTransition::class, [
+        'data_breach_record_id' => $dataBreachRecord->id,
+        'created_by' => $user->id,
+        'state' => Verified::$name,
+    ]);
+});
+
+it('does not offer transitions that are not reachable from the current state', function (): void {
+    $organisation = OrganisationTestHelper::create();
+
+    $dataBreachRecord = DataBreachRecord::factory()
+        ->recycle($organisation)
+        ->inState(Reported::class)
+        ->create();
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditDataBreachRecord::class, [
+            'record' => $dataBreachRecord->getRouteKey(),
+        ])
+        // Reachable from reported.
+        ->assertActionExists(sprintf('data_breach_record_transition_to_%s', Verified::$name))
+        // Only reachable further along the workflow.
+        ->assertActionDoesNotExist(sprintf('data_breach_record_transition_to_%s', Closed::$name));
 });
 
 it('can be cloned', function (): void {

@@ -75,9 +75,8 @@ class OnePageLayoutRenderHooks
      * a register record page, for a user who selected that layout.
      *
      * Matching on the record-page contract rather than on the project's own
-     * base classes: not every register extends those (ViewDataBreachRecord
-     * extends Filament's ViewRecord directly), and the layout is chosen per
-     * resource, not per base class.
+     * base classes: not every register page extends those, and the layout is
+     * chosen per resource, not per base class.
      */
     private static function isOnePageRegisterPage(): bool
     {

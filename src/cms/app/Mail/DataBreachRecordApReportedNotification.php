@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Mail;
 
-use App\Filament\Resources\DataBreachRecord\Pages\ViewDataBreachRecord;
+use App\Filament\Resources\DataBreachRecord\Pages\EditDataBreachRecord;
 use App\Models\DataBreachRecord;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailables\Content;
@@ -22,7 +22,7 @@ class DataBreachRecordApReportedNotification extends Mailable
     public function __construct(
         public DataBreachRecord $dataBreachRecord,
     ) {
-        $this->link = ViewDataBreachRecord::getUrl([
+        $this->link = EditDataBreachRecord::getUrl([
             'record' => $dataBreachRecord,
             'tenant' => $dataBreachRecord->organisation,
         ]);
