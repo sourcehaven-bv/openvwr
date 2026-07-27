@@ -66,7 +66,14 @@ readonly class SnapshotDataMarkdownRenderer
 
         /** @var RelatedSnapshotSource $relatedSnapshotSource */
         foreach ($relatedSnapshotSources as $relatedSnapshotSource) {
-            $relatedSnapshot = $relatedSnapshotSource->snapshotSource->getLatestSnapshotWithState([Established::class]);
+            // The polymorphic target carries no foreign key, so a hard-deleted
+            // source leaves an orphan row that resolves to null.
+            $source = $relatedSnapshotSource->snapshotSource;
+            if ($source === null) {
+                continue;
+            }
+
+            $relatedSnapshot = $source->getLatestSnapshotWithState([Established::class]);
             if ($relatedSnapshot === null) {
                 continue;
             }

@@ -21,7 +21,10 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property class-string<SnapshotSource&Model> $snapshot_source_type
  * @property UuidInterface $snapshot_source_id
  *
- * @property-read SnapshotSource&Model $snapshotSource
+ * The polymorphic target carries no foreign key (uuidMorphs indexes only), so
+ * a hard-deleted source leaves an orphan row whose relation resolves to null.
+ *
+ * @property-read (SnapshotSource&Model)|null $snapshotSource
  * @property-read Snapshot $snapshot
  */
 class RelatedSnapshotSource extends Model
@@ -47,11 +50,17 @@ class RelatedSnapshotSource extends Model
     }
 
     /**
+     * The owner key must be passed explicitly: without it MorphTo falls back to
+     * $result->getKey(), which HasUuidAsId overrides to return a UuidInterface
+     * object, and that cannot be used as an array offset when matching results.
+     * Naming the relation 'snapshotSource' keeps eager-loaded results readable
+     * through the accessor of the same name.
+     *
      * @return MorphTo<Model, $this>
      */
     public function snapshotSource(): MorphTo
     {
-        return $this->morphTo('snapshot_source')
+        return $this->morphTo('snapshotSource', 'snapshot_source_type', 'snapshot_source_id', 'id')
             ->withTrashed();
     }
 

@@ -123,3 +123,36 @@ it('can load the table', function (): void {
             $obsoleteProcessorSnapshotSource,
         ]);
 });
+
+it('renders rows whose source has been hard-deleted', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->create();
+    $snapshot = Snapshot::factory()
+        ->for($avgResponsibleProcessingRecord, 'snapshotSource')
+        ->recycle($organisation)
+        ->create();
+
+    // The polymorphic target has no foreign key, so hard-deleting the source
+    // leaves an orphan row. The table must still render: no record link, no
+    // view action, and a placeholder instead of a display name.
+    $processor = Processor::factory()
+        ->recycle($organisation)
+        ->create();
+    $orphan = RelatedSnapshotSource::factory()
+        ->for($snapshot)
+        ->create([
+            'snapshot_id' => $snapshot->id,
+            'snapshot_source_id' => $processor->id,
+            'snapshot_source_type' => Processor::class,
+        ]);
+    Processor::query()->whereKey($processor->id)->forceDelete();
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(RelatedSnapshotSources::class, [
+            'snapshot' => $snapshot,
+        ])
+        ->assertOk()
+        ->assertCanSeeTableRecords([$orphan])
+        ->assertTableActionHidden('view', $orphan);
+});

@@ -34,8 +34,15 @@ class RelatedSnapshotSourceResourceTable
     {
         return $table
             ->recordUrl(static function (RelatedSnapshotSource $relatedSnapshotSource): ?string {
-                Assert::methodExists($relatedSnapshotSource->snapshotSource, 'trashed');
-                if ($relatedSnapshotSource->snapshotSource->trashed()) {
+                // Orphan rows (hard-deleted source, no foreign key) have no
+                // record to link to.
+                $source = $relatedSnapshotSource->snapshotSource;
+                if ($source === null) {
+                    return null;
+                }
+
+                Assert::methodExists($source, 'trashed');
+                if ($source->trashed()) {
                     return null;
                 }
 
@@ -51,13 +58,14 @@ class RelatedSnapshotSourceResourceTable
                     ->label(__('snapshot.snapshot_source_display_name'))
                     ->limit(25)
                     ->formatStateUsing(static function (RelatedSnapshotSource $relatedSnapshotSource): string {
-                        return $relatedSnapshotSource->snapshotSource->getDisplayName();
+                        return $relatedSnapshotSource->snapshotSource?->getDisplayName() ?? __('general.deleted');
                     }),
                 TextColumn::make('snapshot_latest_established')
                     ->label(__('snapshot.latest_established'))
                     ->dateTime(DateFormatService::FORMAT_DATE_TIME, DateFormatService::getDisplayTimezone())
                     ->default(static function (RelatedSnapshotSource $relatedSnapshotSource): ?CarbonInterface {
-                        $snapshot = $relatedSnapshotSource->snapshotSource->getLatestSnapshotWithState([Established::class]);
+                        $snapshot = $relatedSnapshotSource->snapshotSource
+                            ?->getLatestSnapshotWithState([Established::class]);
 
                         return $snapshot?->created_at;
                     }),
@@ -69,8 +77,13 @@ class RelatedSnapshotSourceResourceTable
             ->actions([
                 ViewAction::make()
                     ->visible(static function (RelatedSnapshotSource $relatedSnapshotSource): bool {
-                        Assert::methodExists($relatedSnapshotSource->snapshotSource, 'trashed');
-                        return !$relatedSnapshotSource->snapshotSource->trashed();
+                        $source = $relatedSnapshotSource->snapshotSource;
+                        if ($source === null) {
+                            return false;
+                        }
+
+                        Assert::methodExists($source, 'trashed');
+                        return !$source->trashed();
                     })
                     ->url(static function (RelatedSnapshotSource $relatedSnapshotSource): string {
                         return self::getRelatedSnapshotSourceUrl($relatedSnapshotSource);
@@ -80,7 +93,12 @@ class RelatedSnapshotSourceResourceTable
             ->groups([
                 Group::make('snapshot_source_type')
                     ->getTitleFromRecordUsing(static function (RelatedSnapshotSource $relatedSnapshotSource): string {
-                        return __(sprintf('%s.model_singular', Str::snake(class_basename($relatedSnapshotSource->snapshotSource))));
+                        // Derive from the stored type: it is still present when
+                        // the source row itself has been hard-deleted.
+                        return __(sprintf(
+                            '%s.model_singular',
+                            Str::snake(class_basename($relatedSnapshotSource->snapshot_source_type)),
+                        ));
                     })
                     ->titlePrefixedWithLabel(false),
             ])
@@ -93,7 +111,11 @@ class RelatedSnapshotSourceResourceTable
         /** @var class-string<Resource> $resource */
         $resource = Filament::getModelResource($relatedSnapshotSource->snapshot_source_type);
 
-        $url = $resource::getGlobalSearchResultUrl($relatedSnapshotSource->snapshotSource);
+        // Callers only reach this for rows with a resolvable source.
+        $source = $relatedSnapshotSource->snapshotSource;
+        Assert::isInstanceOf($source, SnapshotSource::class);
+
+        $url = $resource::getGlobalSearchResultUrl($source);
         Assert::string($url);
 
         return $url;

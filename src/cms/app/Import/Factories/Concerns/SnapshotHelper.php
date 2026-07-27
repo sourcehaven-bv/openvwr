@@ -76,28 +76,35 @@ trait SnapshotHelper
     private function createRelatedSnapshots(Snapshot $snapshot, string $snapshotState, SnapshotFactory $snapshotFactory): void
     {
         foreach ($snapshot->relatedSnapshotSources as $relatedSnapshotSource) {
-            if ($relatedSnapshotSource->snapshotSource->getLatestSnapshotWithState([Established::class]) !== null) {
+            // The polymorphic target carries no foreign key, so a hard-deleted
+            // source leaves an orphan row that resolves to null.
+            $snapshotSource = $relatedSnapshotSource->snapshotSource;
+            if ($snapshotSource === null) {
+                continue;
+            }
+
+            if ($snapshotSource->getLatestSnapshotWithState([Established::class]) !== null) {
                 continue;
             }
 
             if ($snapshotState === Established::class) {
-                $snapshotFactory->fromSnapshotSource($relatedSnapshotSource->snapshotSource, $snapshotState);
+                $snapshotFactory->fromSnapshotSource($snapshotSource, $snapshotState);
                 continue;
             }
 
             if (
                 $snapshotState === Approved::class
-                && $relatedSnapshotSource->snapshotSource->getLatestSnapshotWithState([Approved::class]) === null
+                && $snapshotSource->getLatestSnapshotWithState([Approved::class]) === null
             ) {
-                $snapshotFactory->fromSnapshotSource($relatedSnapshotSource->snapshotSource, $snapshotState);
+                $snapshotFactory->fromSnapshotSource($snapshotSource, $snapshotState);
                 continue;
             }
 
             if (
                 $snapshotState === InReview::class
-                && $relatedSnapshotSource->snapshotSource->getLatestSnapshotWithState([InReview::class]) === null
+                && $snapshotSource->getLatestSnapshotWithState([InReview::class]) === null
             ) {
-                $snapshotFactory->fromSnapshotSource($relatedSnapshotSource->snapshotSource, $snapshotState);
+                $snapshotFactory->fromSnapshotSource($snapshotSource, $snapshotState);
             }
         }
     }
