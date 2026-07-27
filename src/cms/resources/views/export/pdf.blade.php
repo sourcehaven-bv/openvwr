@@ -6,20 +6,20 @@
         }
 
         h1, h2, h3, h4, h5, h6 {
-            color: #d97706;
+            color: #F84F39;
             margin: 1rem 0 0.5rem 0;
         }
 
         h1 {
             font-size: 1.5rem;
             padding: 0.5rem;
-            background-color: #e4cfb6ff;
+            background-color: #fedcd7;
             border-radius: 0.2rem;
         }
 
         body > h1:first-of-type {
             color: #fff;
-            background-color: #d97706;
+            background-color: #F84F39;
         }
 
         h2 { font-size: 1.4rem; }
