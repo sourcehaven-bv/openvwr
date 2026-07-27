@@ -6,6 +6,8 @@ namespace App\Services\Dashboard;
 
 use App\Collections\DataBreachRecordCollection;
 use App\Collections\SnapshotApprovalCollection;
+use App\Enums\Authorization\Permission;
+use App\Facades\Authorization;
 use App\Filament\Resources\AvgProcessorProcessingRecordResource;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 use App\Filament\Resources\Resource;
@@ -13,6 +15,8 @@ use App\Filament\Resources\WpgProcessingRecordResource;
 use App\Models\Document;
 use App\Models\Organisation;
 use App\Models\SnapshotApproval;
+use App\Models\States\DataBreachRecord\Closed;
+use App\Models\States\DataBreachRecord\NoBreach;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -102,11 +106,14 @@ readonly class AttentionCountService
     /**
      * Data breaches whose handling is not finished, longest open first.
      *
-     * Scoped on completed_at alone rather than on ap_reported: whether a breach
-     * had to be reported to the Autoriteit Persoonsgegevens depends on the risk
-     * it poses, which the register keeps as free text in estimated_risk. A
-     * breach that was correctly assessed as not notifiable and then closed is
-     * finished work, and filtering on ap_reported would keep flagging it.
+     * "Finished" comes from the state machine: closed, or assessed as not being
+     * a breach at all. Not from ap_reported — whether a report to the Autoriteit
+     * Persoonsgegevens was required depends on the risk to those involved, and a
+     * breach correctly judged not notifiable is done, not overdue.
+     *
+     * completed_at is checked as well because it predates the state machine and
+     * is still filled in by hand, so older records can be finished without ever
+     * having left the default state.
      *
      * Breaches without a discovery date sort last: they need attention, but a
      * handful of them must never push every dated breach off a capped list.
@@ -115,6 +122,7 @@ readonly class AttentionCountService
     {
         $dataBreachRecords = $organisation->dataBreachRecords()
             ->whereNull('completed_at')
+            ->whereNotIn('state', [Closed::$name, NoBreach::$name])
             ->orderByRaw('discovered_at is null')
             ->orderBy('discovered_at')
             ->limit($limit)
@@ -163,12 +171,17 @@ readonly class AttentionCountService
             }
         }
 
-        $documents = $this->dateWindow->overdue($organisation->documents()->getQuery(), 'expires_at')->get();
+        // Documents carry their own view permission. Every role that may see
+        // core entities happens to hold it too, but that is configuration
+        // rather than a guarantee, so the two are checked separately here.
+        if (Authorization::hasPermission(Permission::DOCUMENT_VIEW)) {
+            $documents = $this->dateWindow->overdue($organisation->documents()->getQuery(), 'expires_at')->get();
 
-        foreach ($documents as $document) {
-            Assert::isInstanceOf($document, Document::class);
+            foreach ($documents as $document) {
+                Assert::isInstanceOf($document, Document::class);
 
-            $items[] = OverdueItem::forDocument($document);
+                $items[] = OverdueItem::forDocument($document);
+            }
         }
 
         usort($items, static function (OverdueItem $a, OverdueItem $b): int {

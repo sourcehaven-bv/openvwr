@@ -105,6 +105,26 @@ it('does not serve one user\'s approvals to another in the same organisation', f
         ->toBeFalse();
 });
 
+it('leaves documents out for a user who may not view them', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation);
+
+    $record = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create(['name' => 'Wel zichtbaar', 'review_at' => CarbonImmutable::yesterday()->toDateString()]);
+    $document = Document::factory()
+        ->recycle($organisation)
+        ->create(['name' => 'Niet zichtbaar', 'expires_at' => CarbonImmutable::today()->subYear()]);
+
+    // Core entities but no documents. Every current role grants both, so this
+    // guards the service rather than a live configuration.
+    $this->withPermissions($user, [Permission::CORE_ENTITY_VIEW])
+        ->withFilamentSession($user, $organisation)
+        ->createLivewireTestable(OverdueItemsWidget::class)
+        ->assertSee($record->name)
+        ->assertDontSee($document->name);
+});
+
 it('does not claim all clear to someone who cannot see the register', function (): void {
     $organisation = OrganisationTestHelper::create();
     $user = UserTestHelper::createForOrganisation($organisation);

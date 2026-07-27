@@ -5,6 +5,11 @@ declare(strict_types=1);
 use App\Enums\Authorization\Permission;
 use App\Filament\Widgets\OpenDataBreachesWidget;
 use App\Models\DataBreachRecord;
+use App\Models\States\DataBreachRecord\Closed;
+use App\Models\States\DataBreachRecord\InResponse;
+use App\Models\States\DataBreachRecord\NoBreach;
+use App\Models\States\DataBreachRecord\Reported;
+use App\Models\States\DataBreachRecord\Verified;
 use App\Services\Dashboard\DataBreachProgress;
 use Carbon\CarbonImmutable;
 use Tests\Helpers\Model\OrganisationTestHelper;
@@ -60,6 +65,50 @@ it('drops a breach once its handling is completed, reported or not', function (b
 })->with([
     'assessed as not notifiable' => [false],
     'reported to the ap' => [true],
+]);
+
+it('drops a breach the state machine considers finished', function (string $state): void {
+    $organisation = OrganisationTestHelper::create();
+
+    DataBreachRecord::factory()
+        ->recycle($organisation)
+        ->create([
+            // completed_at deliberately left empty: the state alone must be
+            // enough to take the breach off the list.
+            'completed_at' => null,
+            'state' => $state,
+            'discovered_at' => CarbonImmutable::now()->subMonths(4),
+        ]);
+
+    $this->asFilamentOrganisationUser($organisation);
+
+    expect(OpenDataBreachesWidget::canView())
+        ->toBeFalse();
+})->with([
+    'closed' => [Closed::$name],
+    'assessed as no breach' => [NoBreach::$name],
+]);
+
+it('keeps listing a breach that is still moving through the workflow', function (string $state): void {
+    $organisation = OrganisationTestHelper::create();
+
+    DataBreachRecord::factory()
+        ->recycle($organisation)
+        ->create([
+            'name' => 'Nog in behandeling',
+            'completed_at' => null,
+            'state' => $state,
+            'discovered_at' => CarbonImmutable::now()->subDays(2),
+        ]);
+
+    $this->asFilamentOrganisationUser($organisation);
+
+    expect(OpenDataBreachesWidget::canView())
+        ->toBeTrue();
+})->with([
+    'reported' => [Reported::$name],
+    'verified' => [Verified::$name],
+    'in response' => [InResponse::$name],
 ]);
 
 it('does not show another organisation\'s breaches', function (): void {
