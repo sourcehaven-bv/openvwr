@@ -147,10 +147,15 @@
 
 /* Accent bar on the header block itself rather than just the heading text,
    so it reads as a marker for the whole header (heading + description)
-   instead of underlining just the words. Clipping to the card's rounded
-   corner is added to the overflow-hidden below, on the section itself. */
+   instead of underlining just the words.
+
+   The bar follows the card's rounded top-left corner via its own
+   border-radius rather than by clipping it at the section. The section must
+   stay overflow-visible so select dropdowns can escape the card (see below),
+   which rules out the overflow-hidden this used to rely on. */
 .onepage-layout [data-onepage-section] > .fi-section-header {
     @apply border-l-4 border-primary-600 dark:border-primary-400;
+    border-top-left-radius: theme('borderRadius.xl');
 }
 
 /* Nested information blocks are cards inside a card; flatten them so each
@@ -160,10 +165,14 @@
 }
 
 /* Land jump targets below the sticky topbar instead of flush under it.
-   overflow-hidden clips the header's accent bar to the card's rounded
-   corner instead of letting its square edge poke past the curve. */
+
+   Deliberately overflow-visible: the searchable multi-selects render their
+   dropdown as a sibling inside the section, so any clipping here cuts the
+   option list off at the card edge -- and a select near the bottom of a
+   section loses its dropdown entirely. The accent bar rounds its own corner
+   (above) so nothing needs the section to clip. */
 .onepage-layout [data-onepage-section] {
-    @apply overflow-hidden;
+    overflow: visible;
     scroll-margin-top: 5rem;
 }
 
