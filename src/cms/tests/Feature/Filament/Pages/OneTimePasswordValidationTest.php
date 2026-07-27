@@ -24,7 +24,7 @@ it('redirects user to home on valid session', function (): void {
 
     $this->asFilamentOrganisationUser($organisation)
         ->get(sprintf('%s/two-factor-authentication', $organisation->slug))
-        ->assertRedirect(sprintf('%s/avg-responsible-processing-records', $organisation->slug));
+        ->assertRedirect($organisation->slug);
 });
 
 it('redirects with a valid code', function (): void {
@@ -43,7 +43,7 @@ it('redirects with a valid code', function (): void {
         ])
         ->call('authenticate')
         ->assertHasNoFormErrors()
-        ->assertRedirect(sprintf('%s/avg-responsible-processing-records', $organisation->slug));
+        ->assertRedirect($organisation->slug);
 });
 
 it('fails with a invalid code', function (): void {

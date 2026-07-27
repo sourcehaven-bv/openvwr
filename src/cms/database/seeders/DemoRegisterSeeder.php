@@ -67,7 +67,9 @@ final class DemoRegisterSeeder
                     'responsibility_distribution' => $definition['description'],
                     'outside_eu' => false,
                     'decision_making' => false,
-                    'review_at' => now()->addMonths(14)->toDateString(),
+                    // Due inside the three-month window, so the "verloopt
+                    // binnenkort" filter has something to find.
+                    'review_at' => now()->addMonths(2)->toDateString(),
                 ]);
 
             $record->responsibles()->attach($related->responsible->id);
@@ -113,7 +115,9 @@ final class DemoRegisterSeeder
                     . 'bevoegde instanties op grond van de Wet politiegegevens.',
                 'explanation_transfer' => 'Er vindt geen doorgifte plaats naar landen buiten de EER.',
 
-                'review_at' => now()->addMonths(10)->toDateString(),
+                // Overdue on purpose: puts a Wpg record on the dashboard's
+                // overdue list, so it shows more than one register type.
+                'review_at' => now()->subMonths(3)->toDateString(),
             ]);
 
             $snapshot = $this->makeSnapshot(

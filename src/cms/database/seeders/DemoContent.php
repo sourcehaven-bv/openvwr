@@ -208,7 +208,8 @@ final class DemoContent
             'receivers' => [1, 3],
             'tags' => [0, 4, 5],
             'state' => 'established',
-            'review_offset_months' => 2,
+            // Overdue: shows how a lapsed periodic review reads on the dashboard.
+            'review_offset_months' => -5,
             'dpia' => true,
             'outside_eu' => false,
             'description' => 'Gezondheidsgegevens worden uitsluitend verwerkt door de arbodienst. '
@@ -525,6 +526,21 @@ final class DemoContent
             'type' => 'DPIA',
             'location' => 'Documentbeheer — map Privacy/DPIA',
             'expires_offset_months' => -2,
+        ],
+        [
+            // Expired: a lapsed processor agreement is the classic finding in an
+            // audit, and shows a second document type on the overdue list.
+            'name' => 'Verwerkersovereenkomst Salarisservice Van Dijk B.V.',
+            'type' => 'Verwerkersovereenkomst',
+            'location' => 'Contractbeheer — dossier leveranciers',
+            'expires_offset_months' => -7,
+        ],
+        [
+            // Expired longest, so it heads the list and shows the ordering.
+            'name' => 'Bewerkersprotocol gemeentelijke basisadministratie',
+            'type' => 'Beveiligingsbeleid',
+            'location' => 'Intranet — Beleid en kaders',
+            'expires_offset_months' => -14,
         ],
         [
             'name' => 'Verwerkersovereenkomst AFAS Software B.V.',

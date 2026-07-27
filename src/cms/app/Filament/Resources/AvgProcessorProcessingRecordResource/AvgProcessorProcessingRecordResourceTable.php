@@ -13,6 +13,7 @@ use App\Filament\Tables\Columns\ImportNumberColumn;
 use App\Filament\Tables\Columns\SnapshotStatusColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
 use App\Filament\Tables\ContactPersonFilter;
+use App\Filament\Tables\DateWindowFilter;
 use App\Filament\Tables\DocumentFilter;
 use App\Filament\Tables\ProcessorFilter;
 use App\Filament\Tables\ReceiverFilter;
@@ -57,6 +58,8 @@ class AvgProcessorProcessingRecordResourceTable
                 TransferCopyBulkAction::make(),
             ])
             ->filters([
+                DateWindowFilter::make('review_at')
+                    ->label(__('general.review_at')),
                 ResponsibleFilter::make(),
                 ProcessorFilter::make(),
                 ReceiverFilter::make(),

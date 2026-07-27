@@ -243,5 +243,23 @@ parameters:
 		-
 			message: '#^Dynamic call to static method App\\Models\\Builders\\SnapshotApprovalBuilder\:\:count\(\)\.$#'
 			identifier: staticMethod.dynamicCall
+			count: 1
+			path: app/Services/Dashboard/AttentionCountService.php
+
+		-
+			message: '#^Dynamic call to static method App\\Models\\Builders\\SnapshotApprovalBuilder\:\:limit\(\)\.$#'
+			identifier: staticMethod.dynamicCall
+			count: 1
+			path: app/Services/Dashboard/AttentionCountService.php
+
+		-
+			message: '#^Dynamic call to static method App\\Models\\Builders\\SnapshotApprovalBuilder\:\:orderBy\(\)\.$#'
+			identifier: staticMethod.dynamicCall
+			count: 1
+			path: app/Services/Dashboard/AttentionCountService.php
+
+		-
+			message: '#^Dynamic call to static method App\\Models\\Builders\\SnapshotApprovalBuilder\:\:count\(\)\.$#'
+			identifier: staticMethod.dynamicCall
 			count: 2
 			path: app/Services/Snapshot/SnapshotService.php
