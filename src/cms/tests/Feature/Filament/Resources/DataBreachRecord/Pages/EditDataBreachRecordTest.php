@@ -346,6 +346,49 @@ it('can transition a data breach record through a header action', function (
     'reopen' => [Closed::class, InResponse::class],
 ]);
 
+it('keeps unsaved form input when transitioning', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $dataBreachRecord = DataBreachRecord::factory()
+        ->recycle($organisation)
+        ->withValidState()
+        ->inState(Reported::class)
+        ->create();
+    $unsavedName = fake()->uuid();
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditDataBreachRecord::class, [
+            'record' => $dataBreachRecord->getRouteKey(),
+        ])
+        // Type into the form, then change the status without saving first.
+        ->fillForm(['name' => $unsavedName])
+        ->callAction(sprintf('data_breach_record_transition_to_%s', Verified::$name))
+        ->assertNoRedirect()
+        // The typed-but-unsaved value must survive the transition.
+        ->assertFormSet(['name' => $unsavedName]);
+
+    // The status change itself is persisted immediately, independent of the form.
+    $dataBreachRecord->refresh();
+    expect($dataBreachRecord->state)->toBeInstanceOf(Verified::class)
+        ->and($dataBreachRecord->name)->not->toBe($unsavedName);
+});
+
+it('offers the transitions of the new state without a page reload', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $dataBreachRecord = DataBreachRecord::factory()
+        ->recycle($organisation)
+        ->withValidState()
+        ->inState(Reported::class)
+        ->create();
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditDataBreachRecord::class, [
+            'record' => $dataBreachRecord->getRouteKey(),
+        ])
+        ->callAction(sprintf('data_breach_record_transition_to_%s', Verified::$name))
+        // Reachable from verified, but not from the reported state we started in.
+        ->assertActionExists(sprintf('data_breach_record_transition_to_%s', InResponse::$name));
+});
+
 it('records who made a transition and when', function (): void {
     $organisation = OrganisationTestHelper::create();
     $user = UserTestHelper::createForOrganisation($organisation);

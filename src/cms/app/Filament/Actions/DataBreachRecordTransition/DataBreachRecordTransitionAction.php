@@ -6,7 +6,7 @@ namespace App\Filament\Actions\DataBreachRecordTransition;
 
 use App\Enums\Authorization\Permission;
 use App\Facades\Authorization;
-use App\Filament\Resources\DataBreachRecordResource;
+use App\Filament\Resources\DataBreachRecord\Pages\Contracts\RefreshesDataBreachRecordWorkflow;
 use App\Models\DataBreachRecord;
 use App\Models\States\DataBreachRecordState;
 use Filament\Actions\Action;
@@ -24,13 +24,19 @@ abstract class DataBreachRecordTransitionAction extends Action
             ->color($dataBreachRecordState::$color->value)
             ->label(self::getTransitionLabel($dataBreachRecord->state, $dataBreachRecordState))
             ->visible(Authorization::hasPermission(Permission::DATA_BREACH_RECORD_UPDATE))
-            ->action(static function () use ($dataBreachRecord, $dataBreachRecordState): void {
+            ->action(static function (Action $action) use ($dataBreachRecord, $dataBreachRecordState): void {
                 $dataBreachRecord->state->transitionTo($dataBreachRecordState);
-            })
-            ->after(static function (Action $action) use ($dataBreachRecord): void {
-                // Which transitions are offered depends on the state, so the
-                // page is reloaded to rebuild the header actions.
-                $action->redirect(DataBreachRecordResource::getUrl('edit', ['record' => $dataBreachRecord]));
+
+                // Deliberately no redirect: the record is edited on this same
+                // page, and a page load would throw away unsaved form input.
+                // Instead the page refreshes its own record and rebuilds its
+                // header actions, so the dropdown offers the transitions of the
+                // new state while the form keeps whatever was typed into it.
+                $livewire = $action->getLivewire();
+
+                if ($livewire instanceof RefreshesDataBreachRecordWorkflow) {
+                    $livewire->refreshDataBreachRecordHeaderActions();
+                }
             })
             ->requiresConfirmation();
     }

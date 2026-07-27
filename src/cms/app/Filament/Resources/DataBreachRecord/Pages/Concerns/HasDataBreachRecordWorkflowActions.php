@@ -16,6 +16,22 @@ use function sprintf;
 trait HasDataBreachRecordWorkflowActions
 {
     /**
+     * Bring the workflow actions back in step with the record after a
+     * transition. The header actions are cached once when the page boots, so
+     * without this the dropdown would keep offering the transitions of the state
+     * the record was in before.
+     */
+    final public function refreshDataBreachRecordHeaderActions(): void
+    {
+        $dataBreachRecord = $this->getRecord();
+        Assert::isInstanceOf($dataBreachRecord, DataBreachRecord::class);
+        $dataBreachRecord->refresh();
+
+        $this->cachedHeaderActions = [];
+        $this->cacheHeaderActions();
+    }
+
+    /**
      * A single dropdown grouping every reachable transition. The trigger is
      * labelled with the record's current state; opening it lists the transitions
      * that are possible from there.
