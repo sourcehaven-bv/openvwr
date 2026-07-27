@@ -7,10 +7,8 @@ use App\Enums\Authorization\Role;
 use App\Enums\Media\MediaGroup;
 use App\Models\Avg\AvgGoal;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
-use App\Models\Avg\AvgResponsibleProcessingRecordService;
 use App\Models\Document;
 use App\Models\Organisation;
-use App\Models\Processor;
 use App\Models\System;
 use App\Models\Tag;
 use App\Models\User;
@@ -21,51 +19,6 @@ use App\Transfer\Import\PreviewBuilder;
 use App\Transfer\TransferEntityType;
 use App\Transfer\TransferException;
 use Illuminate\Support\Facades\Storage;
-
-/**
- * @return array{0: AvgResponsibleProcessingRecord, 1: Processor, 2: System, 3: Tag}
- */
-function seedCopyableRecord(Organisation $organisation): array
-{
-    $service = AvgResponsibleProcessingRecordService::factory()
-        ->for($organisation)
-        ->create(['name' => 'Burgerzaken']);
-
-    $record = AvgResponsibleProcessingRecord::factory()
-        ->for($organisation)
-        ->create([
-            'name' => 'Bijstandsuitkeringen',
-            'avg_responsible_processing_record_service_id' => $service->id,
-            'has_processors' => true,
-            'has_systems' => true,
-        ]);
-
-    $processor = Processor::factory()->for($organisation)->create(['name' => 'KoboToolbox']);
-    $system = System::factory()->for($organisation)->create(['description' => 'BRP Koppeling']);
-    $tag = Tag::factory()->for($organisation)->create(['name' => 'AVG-kritisch']);
-    $goal = AvgGoal::factory()->for($organisation)->create(['goal' => 'Participatiewet']);
-
-    $record->processors()->attach($processor);
-    $record->systems()->attach($system);
-    $record->tags()->attach($tag);
-    $record->avgGoals()->attach($goal);
-
-    return [$record, $processor, $system, $tag];
-}
-
-function copyableUser(Organisation ...$organisations): User
-{
-    $user = User::factory()->hasAttached(collect($organisations))->create();
-
-    foreach ($organisations as $organisation) {
-        $user->organisationRoles()->create([
-            'organisation_id' => $organisation->id,
-            'role' => Role::CHIEF_PRIVACY_OFFICER,
-        ]);
-    }
-
-    return $user;
-}
 
 it('copies a record and its related graph into another organisation', function (): void {
     $source = Organisation::factory()->create();

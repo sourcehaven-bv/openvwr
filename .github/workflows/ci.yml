@@ -58,7 +58,7 @@ jobs:
         with:
           php-version: 8.4
           extensions: pgsql
-          coverage: xdebug
+          coverage: pcov
 
       - name: Install exiftool
         run: sudo apt-get update && sudo apt-get install -y exiftool
@@ -105,6 +105,6 @@ jobs:
         run: vendor/bin/phpmd app github ./phpmd.xml
 
       - name: Phpunit
-        run: vendor/bin/pest --coverage --coverage-text --min=100 --log-junit=reports/report-phpunit.xml --coverage-clover=reports/coverage-phpunit.xml
+        run: php artisan test --parallel --coverage --min=100 --log-junit=reports/report-phpunit.xml --coverage-clover=reports/coverage-phpunit.xml
         env:
           DB_PORT: ${{ job.services.postgres.ports[5432] }}
