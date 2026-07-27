@@ -9,8 +9,10 @@ use App\Filament\Resources\SnapshotResource;
 use App\Filament\Resources\SnapshotResource\Pages\CompareSnapshots;
 use App\Filament\Resources\SnapshotResource\Pages\ViewSnapshot;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
+use App\Models\RelatedSnapshotSource;
 use App\Models\Snapshot;
 use App\Models\SnapshotData;
+use App\Models\System;
 use Tests\Helpers\Model\OrganisationTestHelper;
 use Tests\Helpers\Model\UserTestHelper;
 
@@ -253,6 +255,88 @@ it('the compare header action targets the latest version', function (): void {
             'pageClass' => EditAvgResponsibleProcessingRecord::class,
         ])
         ->assertTableActionHasUrl('compare', SnapshotResource::getUrl('compare', ['record' => $latest]));
+});
+
+it('shows related entities added between versions', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $source = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create();
+    // Identical markdown on both sides: the only difference is the attached
+    // system, which lives in related_snapshot_sources rather than the markdown.
+    [, $to] = createComparableSnapshots($source, 'zelfde-inhoud', 'zelfde-inhoud');
+
+    $system = System::factory()
+        ->recycle($organisation)
+        ->create(['description' => 'toegevoegd-systeem']);
+    RelatedSnapshotSource::factory()->create([
+        'snapshot_id' => $to->id,
+        'snapshot_source_id' => $system->id,
+        'snapshot_source_type' => System::class,
+    ]);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(CompareSnapshots::class, [
+            'record' => $to->getRouteKey(),
+        ])
+        ->assertOk()
+        ->assertSee(__('snapshot.related_snapshot_sources'))
+        ->assertSee(__('system.model_singular'))
+        ->assertSee('toegevoegd-systeem');
+});
+
+it('shows related entities removed between versions', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $source = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create();
+    [$from, $to] = createComparableSnapshots($source, 'zelfde-inhoud', 'zelfde-inhoud');
+
+    $system = System::factory()
+        ->recycle($organisation)
+        ->create(['description' => 'verwijderd-systeem']);
+    RelatedSnapshotSource::factory()->create([
+        'snapshot_id' => $from->id,
+        'snapshot_source_id' => $system->id,
+        'snapshot_source_type' => System::class,
+    ]);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(CompareSnapshots::class, [
+            'record' => $to->getRouteKey(),
+        ])
+        ->assertOk()
+        ->assertSee('verwijderd-systeem');
+});
+
+it('reports no changes when both versions share the same related entities', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $source = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create();
+    [$from, $to] = createComparableSnapshots($source, 'zelfde-inhoud', 'zelfde-inhoud');
+
+    $system = System::factory()
+        ->recycle($organisation)
+        ->create(['description' => 'ongewijzigd-systeem']);
+
+    foreach ([$from, $to] as $snapshot) {
+        RelatedSnapshotSource::factory()->create([
+            'snapshot_id' => $snapshot->id,
+            'snapshot_source_id' => $system->id,
+            'snapshot_source_type' => System::class,
+        ]);
+    }
+
+    // An unchanged link must not surface as a difference, so the section
+    // collapses to the same "no changes" message the markdown sections use.
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(CompareSnapshots::class, [
+            'record' => $to->getRouteKey(),
+        ])
+        ->assertOk()
+        ->assertSee(__('snapshot.compare_no_changes'))
+        ->assertDontSee('ongewijzigd-systeem');
 });
 
 it('hides the compare header action when only one version exists', function (): void {

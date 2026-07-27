@@ -43,10 +43,10 @@
         </div>
     </x-filament::section>
 
-    @foreach ($diffs as $section => $diff)
+    @foreach ($diffs as $heading => $diff)
         <x-filament::section>
             <x-slot name="heading">
-                {{ __('snapshot.' . $section . '_data') }}
+                {{ $heading }}
             </x-slot>
 
             <div class="snapshot-diff">

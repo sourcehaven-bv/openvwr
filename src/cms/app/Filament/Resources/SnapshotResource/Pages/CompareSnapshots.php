@@ -10,6 +10,7 @@ use App\Facades\Authorization;
 use App\Facades\DateFormat;
 use App\Filament\Resources\SnapshotResource;
 use App\Models\Contracts\SnapshotSource;
+use App\Models\RelatedSnapshotSource;
 use App\Models\Snapshot;
 use App\ValueObjects\Markdown;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
@@ -17,17 +18,27 @@ use Filament\Resources\Pages\Page;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 use Jfcherng\Diff\DiffHelper;
 use Livewire\Attributes\Url;
 use Webmozart\Assert\Assert;
 
 use function __;
 use function abort_unless;
+use function class_basename;
+use function implode;
 use function sprintf;
 
 class CompareSnapshots extends Page
 {
     use InteractsWithRecord;
+
+    /**
+     * Diff key for the related-entities section. Unlike the other sections it
+     * has no SnapshotDataSection counterpart: it is derived from the snapshot's
+     * relations rather than from a snapshot_data column.
+     */
+    private const string RELATED_SECTION = 'related_snapshot_sources';
 
     protected static string $resource = SnapshotResource::class;
     protected static string $view = 'filament.resources.snapshot-resource.pages.compare-snapshots';
@@ -113,7 +124,10 @@ class CompareSnapshots extends Page
     public function getSnapshots(): Collection
     {
         return $this->snapshots ??= $this->getSource()->snapshots()
-            ->with('snapshotData')
+            // snapshotSource is deliberately not eager-loaded with the rest:
+            // its morph key is a Uuid value object, which MorphTo cannot use as
+            // an array offset when building its dictionary.
+            ->with(['snapshotData', 'relatedSnapshotSources'])
             ->get()
             ->sortByDesc('version')
             ->keyBy(static fn (Snapshot $snapshot): string => $snapshot->id->toString());
@@ -139,7 +153,7 @@ class CompareSnapshots extends Page
     }
 
     /**
-     * Side-by-side HTML diffs for each snapshot-data section.
+     * Side-by-side HTML diffs, keyed by the heading to show above each one.
      *
      * @return array<string, HtmlString>
      */
@@ -155,15 +169,61 @@ class CompareSnapshots extends Page
         }
 
         return [
-            SnapshotDataSection::PUBLIC->value => $this->diffSection(
+            __(sprintf('snapshot.%s_data', SnapshotDataSection::PUBLIC->value)) => $this->diffSection(
                 $from->snapshotData?->public_markdown,
                 $to->snapshotData?->public_markdown,
             ),
-            SnapshotDataSection::PRIVATE->value => $this->diffSection(
+            __(sprintf('snapshot.%s_data', SnapshotDataSection::PRIVATE->value)) => $this->diffSection(
                 $from->snapshotData?->private_markdown,
                 $to->snapshotData?->private_markdown,
             ),
+            __(sprintf('snapshot.%s', self::RELATED_SECTION)) => $this->diffText(
+                $this->relatedSourcesText($from),
+                $this->relatedSourcesText($to),
+            ),
         ];
+    }
+
+    /**
+     * The many-to-many links (systems, processors, receivers, ...) captured on
+     * a snapshot live in `related_snapshot_sources`, not in the stored
+     * markdown -- the markdown only holds an inert placeholder tag that is
+     * identical across versions. Diffing the markdown alone therefore reports
+     * "no changes" even when a whole system was added or removed, so we render
+     * the captured links to a stable text block and diff that separately.
+     *
+     * Only the entity's identity is used. The renderer resolves each link to
+     * its currently-established snapshot at render time, which is not a
+     * function of this version and would produce phantom differences.
+     */
+    private function relatedSourcesText(Snapshot $snapshot): string
+    {
+        /** @var Collection<int, array{type: string, name: string}> $entries */
+        $entries = $snapshot->relatedSnapshotSources
+            ->map(static fn (RelatedSnapshotSource $related): array => [
+                'type' => __(sprintf(
+                    '%s.model_singular',
+                    Str::snake(class_basename($related->snapshot_source_type)),
+                )),
+                'name' => $related->snapshotSource->getDisplayName(),
+            ])
+            ->toBase();
+
+        // Sort on both levels so a merely reordered capture is not reported as
+        // a change: only genuine additions and removals should surface.
+        $lines = [];
+        $currentType = null;
+
+        foreach ($entries->sortBy(['type', 'name'])->all() as $entry) {
+            if ($entry['type'] !== $currentType) {
+                $currentType = $entry['type'];
+                $lines[] = $currentType . ':';
+            }
+
+            $lines[] = sprintf('  - %s', $entry['name']);
+        }
+
+        return implode("\n", $lines);
     }
 
     private function diffSection(?Markdown $from, ?Markdown $to): HtmlString
@@ -172,9 +232,14 @@ class CompareSnapshots extends Page
         // SnapshotDataMarkdownRenderer injects the currently-established related
         // snapshots at render time, so its output is not a stable function of the
         // version and would produce phantom differences.
+        return $this->diffText((string) $from?->toString(), (string) $to?->toString());
+    }
+
+    private function diffText(string $from, string $to): HtmlString
+    {
         $html = DiffHelper::calculate(
-            (string) $from?->toString(),
-            (string) $to?->toString(),
+            $from,
+            $to,
             'SideBySide',
             [
                 'context' => 3,
