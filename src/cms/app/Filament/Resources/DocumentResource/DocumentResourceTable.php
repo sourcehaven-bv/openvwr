@@ -9,6 +9,7 @@ use App\Filament\Resources\DocumentResource;
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\ExpiringDateColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
+use App\Filament\Tables\DateWindowFilter;
 use App\Models\Document;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
@@ -40,6 +41,8 @@ class DocumentResourceTable
                 UpdatedAtColumn::make(),
             ])
             ->filters([
+                DateWindowFilter::make('expires_at')
+                    ->label(__('document.expires_at')),
                 SelectFilter::make('type')
                     ->relationship('documentType', 'name', static function (Builder $query): void {
                         $query->whereBelongsTo(Authentication::organisation());

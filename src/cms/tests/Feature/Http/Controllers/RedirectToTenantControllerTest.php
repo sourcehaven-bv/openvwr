@@ -9,7 +9,6 @@ use App\Models\Organisation;
 use App\Models\User;
 
 use function it;
-use function sprintf;
 
 it('redirects when no user is logged in', function (): void {
     $this->get('/')->assertRedirect('login');
@@ -46,7 +45,7 @@ it('redirects to organisation when user has organisation role', function (): voi
 
     $this->withFilamentSession($user, $organisation)
         ->get('/')
-        ->assertRedirect(sprintf('%s/avg-responsible-processing-records', $organisation->slug));
+        ->assertRedirect($organisation->slug);
 });
 
 
@@ -60,5 +59,5 @@ it('redirects to organisation when user has global role', function (): void {
 
     $this->withFilamentSession($user, $organisation)
         ->get('/')
-        ->assertRedirect(sprintf('%s/avg-responsible-processing-records', $organisation->slug));
+        ->assertRedirect($organisation->slug);
 });

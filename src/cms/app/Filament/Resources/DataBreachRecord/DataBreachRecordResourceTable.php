@@ -10,6 +10,7 @@ use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\EntityNumber;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
 use App\Filament\Tables\DocumentFilter;
+use App\Filament\Tables\OpenDataBreachFilter;
 use App\Filament\Tables\ResponsibleFilter;
 use App\Services\DateFormatService;
 use Filament\Tables\Actions\EditAction;
@@ -56,6 +57,7 @@ class DataBreachRecordResourceTable
                 TransferCopyBulkAction::make(),
             ])
             ->filters([
+                OpenDataBreachFilter::make(),
                 TernaryFilter::make('ap_reported')
                     ->label(__('data_breach_record.ap_reported')),
                 ResponsibleFilter::make(),
