@@ -9,6 +9,7 @@ use App\Filament\Resources\SnapshotResource;
 use App\Filament\Resources\SnapshotResource\Pages\CompareSnapshots;
 use App\Filament\Resources\SnapshotResource\Pages\ViewSnapshot;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
+use App\Models\Processor;
 use App\Models\RelatedSnapshotSource;
 use App\Models\Snapshot;
 use App\Models\SnapshotData;
@@ -328,15 +329,90 @@ it('reports no changes when both versions share the same related entities', func
         ]);
     }
 
-    // An unchanged link must not surface as a difference, so the section
-    // collapses to the same "no changes" message the markdown sections use.
+    // Assert on the diff the page actually built: a "no changes" message alone
+    // would also pass if the section were empty or the feature were broken.
+    $component = $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(CompareSnapshots::class, [
+            'record' => $to->getRouteKey(),
+        ])
+        ->assertOk();
+
+    $diff = (string) $component->instance()->getDiffs()['related_snapshot_sources'];
+
+    expect($diff)->toContain(__('snapshot.compare_no_changes'))
+        ->and($diff)->not->toContain('<ins')
+        ->and($diff)->not->toContain('<del');
+});
+
+it('groups related entities by type and sorts them case-insensitively', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $source = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create();
+    [, $to] = createComparableSnapshots($source, 'zelfde-inhoud', 'zelfde-inhoud');
+
+    // Two types, two entities each, deliberately attached out of order and with
+    // mixed capitalisation: the output must still group per type and sort
+    // case-insensitively, so a reorder never reads as a change.
+    $zebra = System::factory()->recycle($organisation)->create(['description' => 'zebra-systeem']);
+    $beer = System::factory()->recycle($organisation)->create(['description' => 'Beer-systeem']);
+    $processor = Processor::factory()->recycle($organisation)->create(['name' => 'alpha-verwerker']);
+
+    foreach ([[$zebra, System::class], [$beer, System::class], [$processor, Processor::class]] as [$entity, $type]) {
+        RelatedSnapshotSource::factory()->create([
+            'snapshot_id' => $to->id,
+            'snapshot_source_id' => $entity->id,
+            'snapshot_source_type' => $type,
+        ]);
+    }
+
+    $component = $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(CompareSnapshots::class, [
+            'record' => $to->getRouteKey(),
+        ])
+        ->assertOk();
+
+    $text = strip_tags((string) $component->instance()->getDiffs()['related_snapshot_sources']);
+
+    expect($text)->toContain(__('processor.model_singular'))
+        ->and($text)->toContain(__('system.model_singular'))
+        // "Beer-systeem" before "zebra-systeem" despite the capital B.
+        ->and(mb_strpos($text, 'Beer-systeem'))->toBeLessThan(mb_strpos($text, 'zebra-systeem'));
+});
+
+it('skips related entities whose source no longer exists', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $source = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create();
+    [, $to] = createComparableSnapshots($source, 'zelfde-inhoud', 'zelfde-inhoud');
+
+    $system = System::factory()
+        ->recycle($organisation)
+        ->create(['description' => 'blijft-bestaan']);
+    RelatedSnapshotSource::factory()->create([
+        'snapshot_id' => $to->id,
+        'snapshot_source_id' => $system->id,
+        'snapshot_source_type' => System::class,
+    ]);
+
+    // The polymorphic target has no foreign key, so an orphan row is a real
+    // state (past migrations hard-deleted retired source types). It must not
+    // take the whole compare page down with a null dereference.
+    $orphan = System::factory()->recycle($organisation)->create();
+    RelatedSnapshotSource::factory()->create([
+        'snapshot_id' => $to->id,
+        'snapshot_source_id' => $orphan->id,
+        'snapshot_source_type' => System::class,
+    ]);
+    System::query()->whereKey($orphan->id)->forceDelete();
+
     $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(CompareSnapshots::class, [
             'record' => $to->getRouteKey(),
         ])
         ->assertOk()
-        ->assertSee(__('snapshot.compare_no_changes'))
-        ->assertDontSee('ongewijzigd-systeem');
+        ->assertSee('blijft-bestaan');
 });
 
 it('hides the compare header action when only one version exists', function (): void {

@@ -124,10 +124,7 @@ class CompareSnapshots extends Page
     public function getSnapshots(): Collection
     {
         return $this->snapshots ??= $this->getSource()->snapshots()
-            // snapshotSource is deliberately not eager-loaded with the rest:
-            // its morph key is a Uuid value object, which MorphTo cannot use as
-            // an array offset when building its dictionary.
-            ->with(['snapshotData', 'relatedSnapshotSources'])
+            ->with(['snapshotData', 'relatedSnapshotSources.snapshotSource'])
             ->get()
             ->sortByDesc('version')
             ->keyBy(static fn (Snapshot $snapshot): string => $snapshot->id->toString());
@@ -153,7 +150,9 @@ class CompareSnapshots extends Page
     }
 
     /**
-     * Side-by-side HTML diffs, keyed by the heading to show above each one.
+     * Side-by-side HTML diffs, keyed by section slug. The keys stay
+     * locale-independent so callers and tests can address a section without
+     * knowing its translation; the view resolves the heading.
      *
      * @return array<string, HtmlString>
      */
@@ -169,19 +168,31 @@ class CompareSnapshots extends Page
         }
 
         return [
-            __(sprintf('snapshot.%s_data', SnapshotDataSection::PUBLIC->value)) => $this->diffSection(
+            SnapshotDataSection::PUBLIC->value => $this->diffSection(
                 $from->snapshotData?->public_markdown,
                 $to->snapshotData?->public_markdown,
             ),
-            __(sprintf('snapshot.%s_data', SnapshotDataSection::PRIVATE->value)) => $this->diffSection(
+            SnapshotDataSection::PRIVATE->value => $this->diffSection(
                 $from->snapshotData?->private_markdown,
                 $to->snapshotData?->private_markdown,
             ),
-            __(sprintf('snapshot.%s', self::RELATED_SECTION)) => $this->diffText(
+            self::RELATED_SECTION => $this->diffText(
                 $this->relatedSourcesText($from),
                 $this->relatedSourcesText($to),
             ),
         ];
+    }
+
+    /**
+     * Heading for a section key returned by getDiffs(). The related-entities
+     * section is not backed by a snapshot_data column, so it does not follow
+     * the '<section>_data' naming the other two share.
+     */
+    public function getDiffHeading(string $section): string
+    {
+        return $section === self::RELATED_SECTION
+            ? __(sprintf('snapshot.%s', self::RELATED_SECTION))
+            : __(sprintf('snapshot.%s_data', $section));
     }
 
     /**
@@ -198,23 +209,40 @@ class CompareSnapshots extends Page
      */
     private function relatedSourcesText(Snapshot $snapshot): string
     {
-        /** @var Collection<int, array{type: string, name: string}> $entries */
         $entries = $snapshot->relatedSnapshotSources
-            ->map(static fn (RelatedSnapshotSource $related): array => [
-                'type' => __(sprintf(
-                    '%s.model_singular',
-                    Str::snake(class_basename($related->snapshot_source_type)),
-                )),
-                'name' => $related->snapshotSource->getDisplayName(),
-            ])
-            ->toBase();
+            ->toBase()
+            /** @return array{type: string, name: string, sort: string}|null */
+            ->map(static function (RelatedSnapshotSource $related): ?array {
+                // The morph target has no foreign key (uuidMorphs indexes only),
+                // so a hard-deleted source leaves an orphan row resolving to
+                // null. Skip it rather than take the whole compare page down.
+                $source = $related->snapshotSource;
+
+                if ($source === null) {
+                    return null;
+                }
+
+                $name = $source->getDisplayName();
+
+                return [
+                    'type' => __(sprintf(
+                        '%s.model_singular',
+                        Str::snake(class_basename($related->snapshot_source_type)),
+                    )),
+                    'name' => $name,
+                    // Case-insensitive sort key: capitalisation drift between
+                    // versions must not reorder lines into a phantom diff.
+                    'sort' => Str::lower($name),
+                ];
+            })
+            ->filter();
 
         // Sort on both levels so a merely reordered capture is not reported as
         // a change: only genuine additions and removals should surface.
         $lines = [];
         $currentType = null;
 
-        foreach ($entries->sortBy(['type', 'name'])->all() as $entry) {
+        foreach ($entries->sortBy(['type', 'sort'])->all() as $entry) {
             if ($entry['type'] !== $currentType) {
                 $currentType = $entry['type'];
                 $lines[] = $currentType . ':';
