@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DataBreachRecord;
 
+use App\Filament\Infolists\Components\DataBreachRecordStateEntry;
 use App\Filament\Infolists\Components\DateEntry;
 use App\Filament\Infolists\Components\EntityNumberEntry;
 use App\Filament\Infolists\Components\Section\InformationBlockSection;
@@ -27,6 +28,7 @@ class DataBreachRecordResourceInfolistSchemas
             EntityNumberEntry::make(),
             TextEntry::make('name')
                 ->label(__('data_breach_record.name')),
+            DataBreachRecordStateEntry::make(),
             DateEntry::make('reported_at')
                 ->label(__('data_breach_record.reported_at')),
             TextEntry::make('type')
