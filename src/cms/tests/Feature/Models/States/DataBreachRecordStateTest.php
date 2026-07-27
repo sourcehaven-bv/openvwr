@@ -63,6 +63,13 @@ it('allows the transitions', function (string $state, string $newState): void {
     [NoBreach::class, Reported::class],
 ]);
 
+it('orders transitionable states along the workflow, with no breach last', function (): void {
+    $dataBreachRecord = DataBreachRecord::factory()->inState(Verified::class)->create();
+
+    expect($dataBreachRecord->state->orderedTransitionableStates())
+        ->toBe([Reported::$name, InResponse::$name, NoBreach::$name]);
+});
+
 it('does not allow skipping steps', function (string $state, string $newState): void {
     $dataBreachRecord = DataBreachRecord::factory()->inState($state)->create();
 

@@ -13,12 +13,10 @@ use App\Filament\RelationManagers\DocumentRelationManager;
 use App\Filament\RelationManagers\ResponsibleRelationManager;
 use App\Filament\RelationManagers\WpgProcessingRecordRelationManager;
 use App\Filament\Resources\DataBreachRecord\DataBreachRecordResourceForm;
-use App\Filament\Resources\DataBreachRecord\DataBreachRecordResourceInfolist;
 use App\Filament\Resources\DataBreachRecord\DataBreachRecordResourceTable;
 use App\Filament\Resources\DataBreachRecord\Pages;
 use App\Models\DataBreachRecord;
 use Filament\Forms\Form;
-use Filament\Infolists\Infolist;
 use Filament\Tables\Table;
 
 use function __;
@@ -43,14 +41,6 @@ class DataBreachRecordResource extends Resource
         };
     }
 
-    public static function infolist(Infolist $infolist): Infolist
-    {
-        return match (Authentication::user()->register_layout) {
-            RegisterLayout::STEPS => DataBreachRecordResourceInfolist::stepsInfolist($infolist),
-            RegisterLayout::ONE_PAGE => DataBreachRecordResourceInfolist::onePageInfolist($infolist),
-        };
-    }
-
     public static function table(Table $table): Table
     {
         return DataBreachRecordResourceTable::table($table);
@@ -72,7 +62,6 @@ class DataBreachRecordResource extends Resource
         return [
             'index' => Pages\ListDataBreachRecords::route('/'),
             'create' => Pages\CreateDataBreachRecord::route('/create'),
-            'view' => Pages\ViewDataBreachRecord::route('/{record}'),
             'edit' => Pages\EditDataBreachRecord::route('/{record}/edit'),
         ];
     }

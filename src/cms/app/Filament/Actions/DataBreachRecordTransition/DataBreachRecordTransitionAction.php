@@ -30,7 +30,7 @@ abstract class DataBreachRecordTransitionAction extends Action
             ->after(static function (Action $action) use ($dataBreachRecord): void {
                 // Which transitions are offered depends on the state, so the
                 // page is reloaded to rebuild the header actions.
-                $action->redirect(DataBreachRecordResource::getUrl('view', ['record' => $dataBreachRecord]));
+                $action->redirect(DataBreachRecordResource::getUrl('edit', ['record' => $dataBreachRecord]));
             })
             ->requiresConfirmation();
     }

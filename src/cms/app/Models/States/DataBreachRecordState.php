@@ -21,12 +21,28 @@ use Spatie\ModelStates\Exceptions\InvalidConfig;
 use Spatie\ModelStates\State;
 use Spatie\ModelStates\StateConfig;
 
+use function usort;
+
+use const PHP_INT_MAX;
+
 /**
  * @extends State<DataBreachRecord>
  */
 abstract class DataBreachRecordState extends State
 {
     public const DEFAULT_STATE = Reported::class;
+
+    /**
+     * The forward "happy path", in display order. Used to order the transition
+     * menu consistently. NoBreach is not on it: it is a branch reachable from any
+     * state in the flow, and is listed after the line.
+     */
+    public const FORWARD_LINE = [
+        Reported::class,
+        Verified::class,
+        InResponse::class,
+        Closed::class,
+    ];
 
     public static StateColor $color = StateColor::GRAY;
     public static string $name = 'none';
@@ -41,6 +57,41 @@ abstract class DataBreachRecordState extends State
      * @return class-string<DataBreachRecordTransitionAction>
      */
     abstract public static function getAction(): string;
+
+    /**
+     * The states this record may transition to, ordered for the transition menu:
+     * forward along FORWARD_LINE, then the off-line states (no breach).
+     * Reachability comes from the state machine itself; this only imposes a
+     * stable display order.
+     *
+     * @return array<int, string>
+     */
+    public function orderedTransitionableStates(): array
+    {
+        /** @var array<int, string> $states */
+        $states = $this->transitionableStates();
+
+        usort($states, static function (string $a, string $b): int {
+            return self::lineOrder($a) <=> self::lineOrder($b);
+        });
+
+        return $states;
+    }
+
+    /**
+     * Display rank of a state: its position on FORWARD_LINE, with anything off
+     * the line (no breach) sorted last.
+     */
+    private static function lineOrder(string $stateName): int
+    {
+        foreach (self::FORWARD_LINE as $index => $stateClass) {
+            if ($stateClass::$name === $stateName) {
+                return $index;
+            }
+        }
+
+        return PHP_INT_MAX;
+    }
 
     /**
      * @throws InvalidConfig

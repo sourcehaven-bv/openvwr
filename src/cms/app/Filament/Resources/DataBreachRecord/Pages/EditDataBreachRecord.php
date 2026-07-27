@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\DataBreachRecord\Pages;
 
 use App\Filament\Pages\ProcessingRecordEditRecord;
+use App\Filament\Resources\DataBreachRecord\Pages\Concerns\HasDataBreachRecordWorkflowActions;
 use App\Filament\Resources\DataBreachRecordResource;
 use App\Models\DataBreachRecord;
 use App\Services\Notification\DataBreachNotificationService;
@@ -16,11 +17,14 @@ use function sprintf;
 
 class EditDataBreachRecord extends ProcessingRecordEditRecord
 {
+    use HasDataBreachRecordWorkflowActions;
+
     protected static string $resource = DataBreachRecordResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
+            ...$this->getDataBreachRecordWorkflowActions(),
             DeleteAction::make(),
         ];
     }
