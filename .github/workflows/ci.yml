@@ -105,6 +105,6 @@ jobs:
         run: vendor/bin/phpmd app github ./phpmd.xml
 
       - name: Phpunit
-        run: vendor/bin/pest --coverage --coverage-text --min=100 --log-junit=reports/report-phpunit.xml --coverage-clover=reports/coverage-phpunit.xml
+        run: php artisan test --parallel --coverage --min=100 --log-junit=reports/report-phpunit.xml --coverage-clover=reports/coverage-phpunit.xml
         env:
           DB_PORT: ${{ job.services.postgres.ports[5432] }}
