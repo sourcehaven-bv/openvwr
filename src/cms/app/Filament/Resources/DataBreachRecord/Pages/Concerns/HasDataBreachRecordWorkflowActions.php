@@ -56,10 +56,8 @@ trait HasDataBreachRecordWorkflowActions
             $actions[] = $action::makeForDataBreachRecordState($dataBreachRecord, $dataBreachRecordState);
         }
 
-        if ($actions === []) {
-            return [];
-        }
-
+        // No empty-list guard: every state in this workflow can be left again,
+        // so there is always at least one transition to offer.
         return [
             ActionGroup::make($actions)
                 ->label(__(sprintf('data_breach_record_state.label.%s', $currentState::$name)))
