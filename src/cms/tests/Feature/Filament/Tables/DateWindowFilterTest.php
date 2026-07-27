@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\ListAvgResponsibleProcessingRecords;
 use App\Filament\Tables\DateWindowFilter;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
+use App\Services\Dashboard\DateWindow;
 use Carbon\CarbonImmutable;
 use Tests\Helpers\Model\OrganisationTestHelper;
 
@@ -66,3 +67,31 @@ it('excludes records without a review date from both windows', function (string 
     DateWindowFilter::OVERDUE,
     DateWindowFilter::SOON,
 ]);
+
+it('leaves the register untouched when no window is chosen', function (): void {
+    $organisation = OrganisationTestHelper::create();
+
+    $overdue = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create(['review_at' => CarbonImmutable::yesterday()->toDateString()]);
+    $upcoming = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create(['review_at' => CarbonImmutable::today()->addMonth()->toDateString()]);
+
+    // The empty value is the "no filter" state the table starts in; it must not
+    // narrow anything away.
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(
+            ListAvgResponsibleProcessingRecords::class,
+            queryParameters: ['tableFilters' => ['review_at' => ['value' => '']]],
+        )
+        ->assertCanSeeTableRecords([$overdue, $upcoming]);
+});
+
+it('carries a custom horizon into the filter', function (): void {
+    $filter = DateWindowFilter::make('review_at')
+        ->dateWindow(new DateWindow(1));
+
+    expect($filter->getDateWindow()->soonInMonths)
+        ->toBe(1);
+});
