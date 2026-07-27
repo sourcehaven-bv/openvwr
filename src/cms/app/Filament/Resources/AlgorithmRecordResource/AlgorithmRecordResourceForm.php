@@ -46,32 +46,25 @@ class AlgorithmRecordResourceForm
             ->schema([
                 Section::make(__('algorithm_record.step_processing_name'))
                     ->schema(AlgorithmRecordResourceFormSchemas::getProcessingName())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_processing_name']),
                 Section::make(__('algorithm_record.step_responsible_use'))
                     ->schema(AlgorithmRecordResourceFormSchemas::getResponsibleUse())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_responsible_use']),
                 Section::make(__('algorithm_record.step_mechanics'))
                     ->schema(AlgorithmRecordResourceFormSchemas::getMechanics())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_mechanics']),
                 Section::make(__('algorithm_record.step_meta'))
                     ->schema(AlgorithmRecordResourceFormSchemas::getMeta())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_meta']),
                 Section::make(__('algorithm_record.step_impact'))
                     ->schema(AlgorithmRecordResourceFormSchemas::getImpact())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_impact']),
                 Section::make(__('algorithm_record.step_validation'))
                     ->schema(AlgorithmRecordResourceFormSchemas::getValidation())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_validation']),
                 Section::make(__('algorithm_record.step_attachments'))
                     ->schema(AlgorithmRecordResourceFormSchemas::getAttachments())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_attachments']),
             ]);
     }
 }
