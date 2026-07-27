@@ -9,7 +9,7 @@ use App\Facades\Authorization;
 use Filament\Widgets\Widget;
 
 /**
- * Shown only when every attention list is empty.
+ * Shown whenever every attention list is empty.
  *
  * Without it, a user with nothing to do gets a dashboard that is literally
  * blank, which reads as a broken page rather than as good news. This says the
@@ -17,6 +17,10 @@ use Filament\Widgets\Widget;
  *
  * It asks each list widget whether it would render, so a new list added later
  * only has to be named here to be accounted for.
+ *
+ * Someone who may see no register at all still gets a message; only the wording
+ * changes, via hasRegisterAccess(). Rendering nothing for them would leave the
+ * page blank, which is the failure this widget exists to prevent.
  */
 class AllClearWidget extends Widget
 {
@@ -38,10 +42,6 @@ class AllClearWidget extends Widget
 
     public static function canView(): bool
     {
-        if (!self::hasAnyAttentionPermission()) {
-            return false;
-        }
-
         foreach (self::ATTENTION_WIDGETS as $widget) {
             if ($widget::canView()) {
                 return false;
@@ -52,12 +52,20 @@ class AllClearWidget extends Widget
     }
 
     /**
-     * Whether the viewer can see any of the things the lists report on.
+     * Whether the viewer can see the register the message talks about.
      *
-     * Without this a user who simply has no register permissions — the
-     * functional manager holds none — would be told that nothing requires their
-     * attention, which reads as "your register is clean" when it means "you
-     * cannot see the register at all".
+     * Drives the wording rather than whether the widget renders: a functional
+     * manager holds no register permissions, so telling them the register is
+     * clean would state something they cannot know. They still get a message —
+     * an empty page reads as broken — but one about their own dashboard.
+     */
+    public function hasRegisterAccess(): bool
+    {
+        return self::hasAnyAttentionPermission();
+    }
+
+    /**
+     * Whether the viewer can see any of the things the lists report on.
      */
     private static function hasAnyAttentionPermission(): bool
     {

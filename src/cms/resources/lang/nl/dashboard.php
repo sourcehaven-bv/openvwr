@@ -27,6 +27,17 @@ return [
         'heading' => 'Geen openstaande acties binnen dit verwerkingsregister',
         'description' => 'Er zijn geen verlopen reviews, verlopen documenten, openstaande meldingen, '
             . 'te ondertekenen versies of versies die op vaststelling wachten.',
+
+        /**
+         * For someone without register permissions — the functioneel beheerder.
+         * Deliberately says nothing about the register being clean: they cannot
+         * see it, so that would be a claim they have no way to check.
+         */
+        'no_register' => [
+            'heading' => 'Geen openstaande acties',
+            'description' => 'Uw rol heeft geen taken in het verwerkingsregister. '
+                . 'Gebruik het menu om organisaties en gebruikers te beheren.',
+        ],
     ],
 
     'overdue' => [
