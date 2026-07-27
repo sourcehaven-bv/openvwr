@@ -10,6 +10,7 @@ use App\Models\DataBreachRecordTransition;
 use App\Models\States\DataBreachRecordState;
 use App\Models\User;
 use Filament\Facades\Filament;
+use Illuminate\Support\Facades\DB;
 use Spatie\ModelStates\Transition;
 
 abstract class DataBreachRecordStateTransition extends Transition
@@ -22,18 +23,24 @@ abstract class DataBreachRecordStateTransition extends Transition
     abstract public function handle(): DataBreachRecord;
 
     /**
+     * The status change and its audit record are written together: a status that
+     * ended up in the register without a matching trail entry would be an
+     * untraceable change, so either both land or neither does.
+     *
      * @param class-string<DataBreachRecordState> $stateClass
      */
     protected function transitionToState(string $stateClass): void
     {
-        $this->dataBreachRecord->state = new $stateClass($this->dataBreachRecord);
-        $this->dataBreachRecord->save();
+        DB::transaction(function () use ($stateClass): void {
+            $this->dataBreachRecord->state = new $stateClass($this->dataBreachRecord);
+            $this->dataBreachRecord->save();
 
-        DataBreachRecordTransition::create([
-            'data_breach_record_id' => $this->dataBreachRecord->id,
-            'created_by' => $this->getActingUserId(),
-            'state' => $this->dataBreachRecord->state,
-        ]);
+            DataBreachRecordTransition::create([
+                'data_breach_record_id' => $this->dataBreachRecord->id,
+                'created_by' => $this->getActingUserId(),
+                'state' => $this->dataBreachRecord->state,
+            ]);
+        });
     }
 
     /**

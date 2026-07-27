@@ -10,11 +10,13 @@ use App\Filament\Actions\DataBreachRecordTransition\ReportAction;
 use App\Filament\Actions\DataBreachRecordTransition\RespondAction;
 use App\Filament\Actions\DataBreachRecordTransition\VerifyAction;
 use App\Models\DataBreachRecord;
+use App\Models\DataBreachRecordTransition;
 use App\Models\States\DataBreachRecord\Closed;
 use App\Models\States\DataBreachRecord\InResponse;
 use App\Models\States\DataBreachRecord\NoBreach;
 use App\Models\States\DataBreachRecord\Reported;
 use App\Models\States\DataBreachRecord\Verified;
+use RuntimeException;
 use Spatie\ModelStates\Exceptions\TransitionNotFound;
 
 use function expect;
@@ -68,6 +70,27 @@ it('orders transitionable states along the workflow, with no breach last', funct
 
     expect($dataBreachRecord->state->orderedTransitionableStates())
         ->toBe([Reported::$name, InResponse::$name, NoBreach::$name]);
+});
+
+it('does not persist a status change when the audit record cannot be written', function (): void {
+    $dataBreachRecord = DataBreachRecord::factory()->inState(Reported::class)->create();
+
+    // Force the second write to fail, so only the status change would remain.
+    DataBreachRecordTransition::creating(static function (): void {
+        throw new RuntimeException('audit trail unavailable');
+    });
+
+    try {
+        expect(static fn () => $dataBreachRecord->state->transitionTo(Verified::class))
+            ->toThrow(RuntimeException::class);
+
+        // A status without a trail entry would be an untraceable change.
+        $dataBreachRecord->refresh();
+        expect($dataBreachRecord->state)->toBeInstanceOf(Reported::class)
+            ->and(DataBreachRecordTransition::query()->count())->toBe(0);
+    } finally {
+        DataBreachRecordTransition::flushEventListeners();
+    }
 });
 
 it('does not allow skipping steps', function (string $state, string $newState): void {
