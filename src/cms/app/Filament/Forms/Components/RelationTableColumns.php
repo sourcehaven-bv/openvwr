@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Forms\Components;
 
 use App\Enums\Media\MediaGroup;
-use App\Filament\Resources\DocumentResource;
 use App\Filament\Resources\Resource;
 use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Avg\AvgProcessorProcessingRecord;
@@ -70,7 +69,7 @@ class RelationTableColumns
             [
                 'label' => __('document.name'),
                 'get' => static fn (Model $record): string => self::as($record, Document::class)->name,
-                'href' => static fn (Model $record): string => DocumentResource::getUrl('view', ['record' => $record]),
+                'href' => static fn (Model $record): ?string => self::recordUrl($record),
                 // When the document has an uploaded file, a download icon follows the name.
                 'download' => static fn (Model $record): ?string => self::as($record, Document::class)
                     ->getFirstMedia(MediaGroup::ATTACHMENTS->value)?->getFullUrl(),
@@ -91,7 +90,7 @@ class RelationTableColumns
     }
 
     /**
-     * @return array<int, array{label: string, get: Closure(Model): (string|null)}>
+     * @return array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null)}>
      */
     private static function responsibles(): array
     {
@@ -99,12 +98,13 @@ class RelationTableColumns
             [
                 'label' => __('responsible.name'),
                 'get' => static fn (Model $record): string => self::as($record, Responsible::class)->name,
+                'href' => static fn (Model $record): ?string => self::recordUrl($record),
             ],
         ];
     }
 
     /**
-     * @return array<int, array{label: string, get: Closure(Model): (string|null)}>
+     * @return array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null)}>
      */
     private static function processors(): array
     {
@@ -112,6 +112,7 @@ class RelationTableColumns
             [
                 'label' => __('processor.name'),
                 'get' => static fn (Model $record): string => self::as($record, Processor::class)->name,
+                'href' => static fn (Model $record): ?string => self::recordUrl($record),
             ],
             [
                 'label' => __('processor.email'),
@@ -127,7 +128,7 @@ class RelationTableColumns
     /**
      * Receiver and System are both titled by their `description` attribute.
      *
-     * @return array<int, array{label: string, get: Closure(Model): (string|null)}>
+     * @return array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null)}>
      */
     private static function simpleDescription(): array
     {
@@ -139,12 +140,13 @@ class RelationTableColumns
 
                     return is_string($description) ? $description : null;
                 },
+                'href' => static fn (Model $record): ?string => self::recordUrl($record),
             ],
         ];
     }
 
     /**
-     * @return array<int, array{label: string, get: Closure(Model): (string|null)}>
+     * @return array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null)}>
      */
     private static function contactPersons(): array
     {
@@ -152,6 +154,7 @@ class RelationTableColumns
             [
                 'label' => __('general.name'),
                 'get' => static fn (Model $record): string => self::as($record, ContactPerson::class)->name,
+                'href' => static fn (Model $record): ?string => self::recordUrl($record),
             ],
             [
                 'label' => __('contact_person_position.model_singular'),
@@ -169,7 +172,7 @@ class RelationTableColumns
     }
 
     /**
-     * @return array<int, array{label: string, get: Closure(Model): (string|null)}>
+     * @return array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null)}>
      */
     private static function users(): array
     {
@@ -177,6 +180,7 @@ class RelationTableColumns
             [
                 'label' => __('user.name'),
                 'get' => static fn (Model $record): string => self::as($record, User::class)->name,
+                'href' => static fn (Model $record): ?string => self::recordUrl($record),
             ],
             [
                 'label' => __('user.email'),
@@ -210,7 +214,7 @@ class RelationTableColumns
     }
 
     /**
-     * @return array<int, array{label: string, get: Closure(Model): (string|null)}>
+     * @return array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null)}>
      */
     private static function algorithmRecords(): array
     {
@@ -218,6 +222,7 @@ class RelationTableColumns
             [
                 'label' => __('processing_record.number'),
                 'get' => static fn (Model $record): ?string => self::entityNumber($record),
+                'href' => static fn (Model $record): ?string => self::recordUrl($record),
             ],
             [
                 'label' => __('general.name'),
@@ -227,7 +232,7 @@ class RelationTableColumns
     }
 
     /**
-     * @return array<int, array{label: string, get: Closure(Model): (string|null)}>
+     * @return array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null)}>
      */
     private static function dataBreachRecords(): array
     {
@@ -235,6 +240,7 @@ class RelationTableColumns
             [
                 'label' => __('processing_record.number'),
                 'get' => static fn (Model $record): ?string => self::entityNumber($record),
+                'href' => static fn (Model $record): ?string => self::recordUrl($record),
             ],
             [
                 'label' => __('general.name'),
@@ -251,7 +257,10 @@ class RelationTableColumns
 
     /**
      * The edit (or, without update rights, view) page of the linked record,
-     * resolved through its Filament resource.
+     * resolved through its Filament resource. Returns null when the model has
+     * no resource, the resource does not register the page (e.g. a register
+     * without a separate view page) or the user may not open it — the column
+     * then renders as plain text.
      */
     private static function recordUrl(Model $record): ?string
     {
@@ -262,7 +271,15 @@ class RelationTableColumns
             return null;
         }
 
-        return $resource::getUrl($resource::canEdit($record) ? 'edit' : 'view', ['record' => $record]);
+        if ($resource::hasPage('edit') && $resource::canEdit($record)) {
+            return $resource::getUrl('edit', ['record' => $record]);
+        }
+
+        if ($resource::hasPage('view') && $resource::canView($record)) {
+            return $resource::getUrl('view', ['record' => $record]);
+        }
+
+        return null;
     }
 
     /**

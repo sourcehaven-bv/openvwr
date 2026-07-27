@@ -7,9 +7,11 @@ use App\Filament\Forms\Components\RelationTable;
 use App\Filament\Resources\AlgorithmRecordResource\Pages\EditAlgorithmRecord;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\EditAvgResponsibleProcessingRecord;
 use App\Filament\Resources\DocumentResource;
+use App\Filament\Resources\SystemResource;
 use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Document;
+use App\Models\System;
 use Illuminate\Support\Facades\Storage;
 use Tests\Helpers\Model\OrganisationTestHelper;
 use Tests\Helpers\Model\UserTestHelper;
@@ -59,9 +61,10 @@ it('links a document name to its screen and adds a download icon when it has an 
         ->createLivewireTestable(EditAlgorithmRecord::class, [
             'record' => $algorithmRecord->getRouteKey(),
         ])
-        // Both names link to the document's own screen.
-        ->assertSeeHtml('href="' . DocumentResource::getUrl('view', ['record' => $withFile, 'tenant' => $organisation]) . '"')
-        ->assertSeeHtml('href="' . DocumentResource::getUrl('view', ['record' => $withoutFile, 'tenant' => $organisation]) . '"')
+        // Both names link to the document's own screen; the user may edit, so
+        // the link goes straight to the edit page.
+        ->assertSeeHtml('href="' . DocumentResource::getUrl('edit', ['record' => $withFile, 'tenant' => $organisation]) . '"')
+        ->assertSeeHtml('href="' . DocumentResource::getUrl('edit', ['record' => $withoutFile, 'tenant' => $organisation]) . '"')
         // Only the document with an attachment gets the direct-download icon.
         ->assertSeeHtml('href="' . $downloadUrl . '"');
 });
@@ -139,6 +142,25 @@ it('ignores the remove action when no id is given', function (): void {
         ])
         ->callFormComponentAction('document_id', RelationTable::REMOVE_ACTION, arguments: [])
         ->assertFormSet(['document_id' => [$document->getKey()->toString()]]);
+});
+
+it('links a linked system to its own screen', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $system = System::factory()->recycle($organisation)->create();
+
+    $processingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create(['has_systems' => true]);
+    $processingRecord->systems()->attach($system);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $processingRecord->getRouteKey(),
+        ])
+        ->assertSeeHtml('href="' . SystemResource::getUrl('edit', [
+            'record' => $system,
+            'tenant' => $organisation,
+        ]) . '"');
 });
 
 it('shows the linked users with name and email as table rows', function (): void {
