@@ -7,7 +7,6 @@ namespace App\Models;
 use App\Collections\Avg\AvgProcessorProcessingRecordCollection;
 use App\Collections\Avg\AvgResponsibleProcessingRecordCollection;
 use App\Collections\DataBreachRecordCollection;
-use App\Collections\DataBreachRecordTransitionCollection;
 use App\Collections\DocumentCollection;
 use App\Collections\ResponsibleCollection;
 use App\Collections\Wpg\WpgProcessingRecordCollection;
@@ -29,7 +28,6 @@ use Carbon\CarbonImmutable;
 use Database\Factories\DataBreachRecordFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Spatie\ModelStates\HasStates;
 use Spatie\ModelStates\HasStatesContract;
@@ -61,7 +59,6 @@ use Spatie\ModelStates\HasStatesContract;
  *
  * @property-read AvgProcessorProcessingRecordCollection $avgProcessorProcessingRecords
  * @property-read AvgResponsibleProcessingRecordCollection $avgResponsibleProcessingRecords
- * @property-read DataBreachRecordTransitionCollection $dataBreachRecordTransitions
  * @property-read DocumentCollection $documents
  * @property-read ResponsibleCollection $responsibles
  * @property-read WpgProcessingRecordCollection $wpgProcessingRecords
@@ -126,15 +123,6 @@ class DataBreachRecord extends Model implements EntityNumerable, HasStatesContra
             'personal_data_special_categories' => 'array',
             'reported_to_involved_communication' => 'array',
         ];
-    }
-
-    /**
-     * @return HasMany<DataBreachRecordTransition, $this>
-     */
-    public function dataBreachRecordTransitions(): HasMany
-    {
-        return $this->hasMany(DataBreachRecordTransition::class)
-            ->orderBy('created_at');
     }
 
     /**
