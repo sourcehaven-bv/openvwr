@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DataBreachRecord\Pages;
 
+use App\Filament\Actions\ToggleRegisterLayoutAction;
 use App\Filament\Pages\EntityNumberCreateRecord;
 use App\Filament\Resources\DataBreachRecordResource;
 use App\Models\DataBreachRecord;
@@ -14,6 +15,13 @@ use Webmozart\Assert\Assert;
 class CreateDataBreachRecord extends EntityNumberCreateRecord
 {
     protected static string $resource = DataBreachRecordResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            ToggleRegisterLayoutAction::make(),
+        ];
+    }
 
     protected function afterCreate(): void
     {

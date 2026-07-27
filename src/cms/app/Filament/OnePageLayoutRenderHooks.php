@@ -11,6 +11,7 @@ use App\Filament\Resources\AvgProcessorProcessingRecordResource;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 use App\Filament\Resources\DataBreachRecordResource;
 use App\Filament\Resources\WpgProcessingRecordResource;
+use Filament\Resources\Pages\CreateRecord;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Support\Facades\FilamentView;
@@ -76,7 +77,9 @@ class OnePageLayoutRenderHooks
      *
      * Matching on the record-page contract rather than on the project's own
      * base classes: not every register page extends those, and the layout is
-     * chosen per resource, not per base class.
+     * chosen per resource, not per base class. Create pages count too: the
+     * resource builds the same one-page schema there, so without this the new
+     * record form loses the section styling the edit form has.
      */
     private static function isOnePageRegisterPage(): bool
     {
@@ -86,7 +89,7 @@ class OnePageLayoutRenderHooks
 
         $page = self::getLivewireComponent();
 
-        if (!$page instanceof EditRecord && !$page instanceof ViewRecord) {
+        if (!$page instanceof EditRecord && !$page instanceof ViewRecord && !$page instanceof CreateRecord) {
             return false;
         }
 
@@ -98,7 +101,7 @@ class OnePageLayoutRenderHooks
      * which is what the navigation reads. Resources without them (users,
      * organisations, lookup lists) are left untouched.
      */
-    private static function rendersOnePageLayout(EditRecord|ViewRecord $page): bool
+    private static function rendersOnePageLayout(CreateRecord|EditRecord|ViewRecord $page): bool
     {
         return in_array($page::getResource(), self::ONE_PAGE_RESOURCES, true);
     }
