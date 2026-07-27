@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Filament\Widgets\AllClearWidget;
+use App\Filament\Widgets\AwaitingEstablishmentWidget;
 use App\Filament\Widgets\MyApprovalsWidget;
 use App\Filament\Widgets\OpenDataBreachesWidget;
 use App\Filament\Widgets\OverdueItemsWidget;
@@ -43,6 +44,7 @@ class Dashboard extends BaseDashboard
     {
         return [
             MyApprovalsWidget::class,
+            AwaitingEstablishmentWidget::class,
             OpenDataBreachesWidget::class,
             OverdueItemsWidget::class,
             AllClearWidget::class,

@@ -24,8 +24,20 @@ return [
     'show_all' => 'Toon alle',
 
     'all_clear' => [
-        'heading' => 'Niets vereist op dit moment uw aandacht',
-        'description' => 'Er zijn geen verlopen reviews, verlopen documenten, openstaande meldingen of te ondertekenen versies.',
+        'heading' => 'Geen openstaande acties binnen dit verwerkingsregister',
+        'description' => 'Er zijn geen verlopen reviews, verlopen documenten, openstaande meldingen, '
+            . 'te ondertekenen versies of versies die op vaststelling wachten.',
+
+        /**
+         * For someone without register permissions — the functioneel beheerder.
+         * Deliberately says nothing about the register being clean: they cannot
+         * see it, so that would be a claim they have no way to check.
+         */
+        'no_register' => [
+            'heading' => 'Geen openstaande acties',
+            'description' => 'Uw rol heeft geen taken in het verwerkingsregister. '
+                . 'Gebruik het menu om organisaties en gebruikers te beheren.',
+        ],
     ],
 
     'overdue' => [
@@ -49,6 +61,13 @@ return [
     'approvals' => [
         'heading' => 'Te ondertekenen',
         'description' => 'Versies die op uw handtekening wachten.',
+    ],
+
+    'awaiting_establishment' => [
+        'heading' => 'Vast te stellen',
+        'description' => 'Versies die ter goedkeuring zijn aangeboden en volledig zijn ondertekend. '
+            . 'U kunt ze beoordelen en vaststellen.',
+        'signed' => 'Volledig ondertekend',
     ],
 
     'breach' => [

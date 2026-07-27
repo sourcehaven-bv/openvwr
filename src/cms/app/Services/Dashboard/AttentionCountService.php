@@ -6,7 +6,9 @@ namespace App\Services\Dashboard;
 
 use App\Collections\DataBreachRecordCollection;
 use App\Collections\SnapshotApprovalCollection;
+use App\Collections\SnapshotCollection;
 use App\Enums\Authorization\Permission;
+use App\Enums\Snapshot\SnapshotApprovalStatus;
 use App\Facades\Authorization;
 use App\Filament\Resources\AvgProcessorProcessingRecordResource;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource;
@@ -17,6 +19,7 @@ use App\Models\Organisation;
 use App\Models\SnapshotApproval;
 use App\Models\States\DataBreachRecord\Closed;
 use App\Models\States\DataBreachRecord\NoBreach;
+use App\Models\States\Snapshot\Approved;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -149,6 +152,57 @@ readonly class AttentionCountService
         Assert::isInstanceOf($snapshotApprovals, SnapshotApprovalCollection::class);
 
         return $snapshotApprovals;
+    }
+
+    /**
+     * Snapshots that have been through approval and are now waiting to be
+     * established, longest waiting first.
+     *
+     * "Waiting" is the combination of two things, because neither alone means
+     * it: the snapshot sits in the approved state — it was submitted for
+     * approval, which is what notified the mandate holders — and every approval
+     * on it has been signed. A snapshot still missing a signature is the mandate
+     * holders' work, not the privacy officer's, and appears on their own list.
+     *
+     * Signed covers declined as well as approved. A declined signature is an
+     * answer, and the decision about what to do with it is the privacy
+     * officer's to make; leaving those rows off would hide a snapshot that no
+     * one is going to act on otherwise.
+     *
+     * Snapshots carrying no approvals at all are excluded. They cannot have been
+     * signed, so counting their empty approval list as "all signed" would put a
+     * snapshot on this list the moment it was submitted, before anyone had
+     * looked at it.
+     */
+    public function snapshotsAwaitingEstablishment(Organisation $organisation, int $limit): SnapshotCollection
+    {
+        $snapshots = $organisation->snapshots()
+            ->getQuery()
+            ->whereState('state', Approved::class)
+            ->whereHas('snapshotApprovals')
+            ->whereDoesntHave('snapshotApprovals', $this->unsignedApproval(...))
+            ->reorder()
+            ->orderBy('updated_at')
+            ->limit($limit)
+            ->get();
+
+        Assert::isInstanceOf($snapshots, SnapshotCollection::class);
+
+        return $snapshots;
+    }
+
+    /**
+     * Constrains an approval subquery to the signatures still outstanding.
+     *
+     * A named method rather than a closure inline: the relation resolves to the
+     * approval model's own builder, so a closure typed against that builder does
+     * not match the generic signature whereDoesntHave() declares.
+     *
+     * @param Builder<SnapshotApproval> $query
+     */
+    private function unsignedApproval(Builder $query): void
+    {
+        $query->whereIn('status', SnapshotApprovalStatus::unsigned());
     }
 
     /**

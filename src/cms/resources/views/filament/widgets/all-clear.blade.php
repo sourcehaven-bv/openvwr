@@ -7,12 +7,21 @@
             />
 
             <div>
-                <p class="text-sm font-medium text-gray-950 dark:text-white">
-                    {{ __('dashboard.all_clear.heading') }}
-                </p>
-                <p class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ __('dashboard.all_clear.description') }}
-                </p>
+                @if ($this->hasRegisterAccess())
+                    <p class="text-sm font-medium text-gray-950 dark:text-white">
+                        {{ __('dashboard.all_clear.heading') }}
+                    </p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        {{ __('dashboard.all_clear.description') }}
+                    </p>
+                @else
+                    <p class="text-sm font-medium text-gray-950 dark:text-white">
+                        {{ __('dashboard.all_clear.no_register.heading') }}
+                    </p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        {{ __('dashboard.all_clear.no_register.description') }}
+                    </p>
+                @endif
             </div>
         </div>
     </x-filament::section>

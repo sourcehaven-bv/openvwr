@@ -74,7 +74,8 @@ it('says so when there is nothing at all to do', function (): void {
         ->and(MyApprovalsWidget::canView())->toBeFalse();
 
     $this->createLivewireTestable(AllClearWidget::class)
-        ->assertSee(__('dashboard.all_clear.heading'));
+        ->assertSee(__('dashboard.all_clear.heading'))
+        ->assertDontSee(__('dashboard.all_clear.no_register.description'));
 });
 
 it('does not serve one user\'s approvals to another in the same organisation', function (): void {
@@ -129,13 +130,18 @@ it('does not claim all clear to someone who cannot see the register', function (
     $organisation = OrganisationTestHelper::create();
     $user = UserTestHelper::createForOrganisation($organisation);
 
-    // A functional manager holds no register permissions at all. Telling them
-    // nothing needs attention would state something they cannot know.
+    // A functional manager holds no register permissions at all. They still get
+    // a message — a blank dashboard reads as broken — but not one that claims
+    // the register is clean, which they have no way to check.
     $this->withPermissions($user, [Permission::USER_VIEW])
         ->withFilamentSession($user, $organisation);
 
-    expect(AllClearWidget::canView())
-        ->toBeFalse();
+    expect(AllClearWidget::canView())->toBeTrue()
+        ->and((new AllClearWidget())->hasRegisterAccess())->toBeFalse();
+
+    $this->createLivewireTestable(AllClearWidget::class)
+        ->assertSee(__('dashboard.all_clear.no_register.description'))
+        ->assertDontSee(__('dashboard.all_clear.description'));
 });
 
 it('stays quiet about being all clear while any list has rows', function (): void {
