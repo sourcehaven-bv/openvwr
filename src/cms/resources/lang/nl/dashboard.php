@@ -24,8 +24,9 @@ return [
     'show_all' => 'Toon alle',
 
     'all_clear' => [
-        'heading' => 'Niets vereist op dit moment uw aandacht',
-        'description' => 'Er zijn geen verlopen reviews, verlopen documenten, openstaande meldingen of te ondertekenen versies.',
+        'heading' => 'Geen openstaande acties binnen dit verwerkingsregister',
+        'description' => 'Er zijn geen verlopen reviews, verlopen documenten, openstaande meldingen, '
+            . 'te ondertekenen versies of versies die op vaststelling wachten.',
     ],
 
     'overdue' => [
@@ -49,6 +50,13 @@ return [
     'approvals' => [
         'heading' => 'Te ondertekenen',
         'description' => 'Versies die op uw handtekening wachten.',
+    ],
+
+    'awaiting_establishment' => [
+        'heading' => 'Vast te stellen',
+        'description' => 'Versies die ter goedkeuring zijn aangeboden en volledig zijn ondertekend. '
+            . 'U kunt ze beoordelen en vaststellen.',
+        'signed' => 'Volledig ondertekend',
     ],
 
     'breach' => [

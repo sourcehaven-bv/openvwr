@@ -27,6 +27,7 @@ class AllClearWidget extends Widget
         OpenDataBreachesWidget::class,
         OverdueItemsWidget::class,
         MyApprovalsWidget::class,
+        AwaitingEstablishmentWidget::class,
     ];
 
     // Last, so that on the one render where it appears it is not competing with
@@ -65,6 +66,7 @@ class AllClearWidget extends Widget
             Permission::DOCUMENT_VIEW,
             Permission::DATA_BREACH_RECORD_VIEW,
             Permission::SNAPSHOT_APPROVAL_UPDATE_PERSONAL,
+            Permission::SNAPSHOT_STATE_TO_ESTABLISHED,
         ];
 
         foreach ($permissions as $permission) {
