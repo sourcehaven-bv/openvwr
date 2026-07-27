@@ -7,6 +7,7 @@ namespace App\Filament\Actions;
 use App\Enums\RegisterLayout;
 use App\Facades\Authentication;
 use Filament\Actions\Action;
+use Filament\Resources\Pages\CreateRecord;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Resources\Pages\ViewRecord;
 
@@ -38,17 +39,19 @@ class ToggleRegisterLayoutAction extends Action
             ->color('gray')
             // The layout is chosen when the form schema is built, so switching
             // it has to reload the page rather than re-render in place.
-            ->action(static function (Action $action, EditRecord|ViewRecord $livewire): void {
+            ->action(static function (Action $action, CreateRecord|EditRecord|ViewRecord $livewire): void {
                 $user = Authentication::user();
                 $user->register_layout = self::targetLayout();
                 $user->save();
 
                 // Livewire's own URL is the AJAX endpoint, so rebuild the
-                // record page URL from the page class instead of the referer.
-                $action->redirect(
-                    $livewire::getUrl(['record' => $livewire->getRecord()]),
-                    navigate: false,
-                );
+                // page URL from the page class instead of the referer. A create
+                // page has no record yet, so it takes no record parameter.
+                $parameters = $livewire instanceof CreateRecord
+                    ? []
+                    : ['record' => $livewire->getRecord()];
+
+                $action->redirect($livewire::getUrl($parameters), navigate: false);
             });
     }
 
