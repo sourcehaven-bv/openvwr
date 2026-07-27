@@ -7,6 +7,9 @@ use App\Config\Config;
 use App\Import\Factories\Concerns\SnapshotHelper;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Organisation;
+use App\Models\Receiver;
+use App\Models\RelatedSnapshotSource;
+use App\Models\Snapshot;
 use App\Models\States\Snapshot\Established;
 use App\Services\Snapshot\SnapshotFactory;
 use App\ValueObjects\CalendarDate;
@@ -89,4 +92,49 @@ it('creates snapshot and sets review_at', function (): void {
         ->toBe(1)
         ->and($avgResponsibleProcessingRecord->refresh()->review_at->equalTo($expectedReviewAt))
         ->toBeTrue();
+});
+
+it('skips related snapshot sources that have been hard-deleted', function (): void {
+    $organisation = Organisation::factory()->create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->for($organisation)
+        ->create();
+
+    // The polymorphic target has no foreign key, so hard-deleting the source
+    // leaves an orphan row. Creating related snapshots must skip it rather
+    // than dereference null.
+    $receiver = Receiver::factory()
+        ->hasAttached($avgResponsibleProcessingRecord)
+        ->recycle($organisation)
+        ->create();
+
+    // SnapshotFactory rebuilds related rows from the live relation, which drops
+    // hard-deleted records. Insert the orphan directly onto the snapshot that
+    // createRelatedSnapshots() iterates, then remove the record it points at.
+    $factory = new class {
+        use SnapshotHelper;
+
+        public function test(Snapshot $snapshot, SnapshotFactory $snapshotFactory): void
+        {
+            $this->createRelatedSnapshots($snapshot, Established::class, $snapshotFactory);
+        }
+    };
+
+    $snapshot = Snapshot::factory()
+        ->for($avgResponsibleProcessingRecord, 'snapshotSource')
+        ->recycle($organisation)
+        ->create();
+
+    RelatedSnapshotSource::factory()->create([
+        'snapshot_id' => $snapshot->id,
+        'snapshot_source_id' => $receiver->id,
+        'snapshot_source_type' => Receiver::class,
+    ]);
+
+    Receiver::query()->whereKey($receiver->id)->forceDelete();
+
+    $factory->test($snapshot->fresh(), app(SnapshotFactory::class));
+
+    // The orphan row is skipped, so no snapshot is created for the receiver.
+    expect(Snapshot::query()->where('snapshot_source_id', $receiver->id)->count())->toBe(0);
 });
