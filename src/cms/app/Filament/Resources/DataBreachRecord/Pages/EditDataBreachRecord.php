@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DataBreachRecord\Pages;
 
+use App\Filament\Actions\ToggleRegisterLayoutAction;
 use App\Filament\Pages\ProcessingRecordEditRecord;
 use App\Filament\Resources\DataBreachRecord\Pages\Concerns\HasDataBreachRecordWorkflowActions;
 use App\Filament\Resources\DataBreachRecord\Pages\Contracts\RefreshesDataBreachRecordWorkflow;
@@ -26,6 +27,7 @@ class EditDataBreachRecord extends ProcessingRecordEditRecord implements Refresh
     {
         return [
             ...$this->getDataBreachRecordWorkflowActions(),
+            ToggleRegisterLayoutAction::make(),
             DeleteAction::make(),
         ];
     }

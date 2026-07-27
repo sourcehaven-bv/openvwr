@@ -59,60 +59,46 @@ class AvgProcessorProcessingRecordResourceInfolist
             ->schema([
                 Section::make(__('avg_processor_processing_record.step_processing_name'))
                     ->schema(AvgProcessorProcessingRecordResourceInfolistSchemas::getProcessingName())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_processing_name']),
                 Section::make(__('avg_processor_processing_record.step_responsible'))
                     ->schema(AvgProcessorProcessingRecordResourceInfolistSchemas::getResponsible())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_responsible']),
                 Section::make(__('avg_processor_processing_record.step_processor'))
                     ->schema(AvgProcessorProcessingRecordResourceInfolistSchemas::getProcessors())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_processor']),
                 Section::make(__('avg_processor_processing_record.step_receiver'))
                     ->schema(AvgProcessorProcessingRecordResourceInfolistSchemas::getReceiver())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_receiver']),
                 Section::make(__('avg_processor_processing_record.step_processing_goal'))
                     ->schema(AvgProcessorProcessingRecordResourceInfolistSchemas::getProcessingGoal())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_processing_goal']),
                 Section::make(__('avg_processor_processing_record.step_involved_data'))
                     ->schema(AvgProcessorProcessingRecordResourceInfolistSchemas::getInvolvedData())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_involved_data']),
                 Section::make(__('avg_processor_processing_record.step_decision_making'))
                     ->schema(AvgProcessorProcessingRecordResourceInfolistSchemas::getDecisionMaking())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_decision_making']),
                 Section::make(__('avg_processor_processing_record.step_system'))
                     ->schema(AvgProcessorProcessingRecordResourceInfolistSchemas::getSystem())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_system']),
                 Section::make(__('avg_processor_processing_record.step_security'))
                     ->schema(AvgProcessorProcessingRecordResourceInfolistSchemas::getSecurity())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_security']),
                 Section::make(__('avg_processor_processing_record.step_passthrough'))
                     ->schema(AvgProcessorProcessingRecordResourceInfolistSchemas::getPassthrough())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_passthrough']),
                 Section::make(__('avg_processor_processing_record.step_geb_pia'))
                     ->schema(AvgProcessorProcessingRecordResourceInfolistSchemas::getGebPia())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_geb_pia']),
                 Section::make(__('avg_processor_processing_record.step_contact_person'))
                     ->schema(AvgProcessorProcessingRecordResourceInfolistSchemas::getContactPerson())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_contact_person']),
                 Section::make(__('avg_processor_processing_record.step_attachments'))
                     ->schema(AvgProcessorProcessingRecordResourceInfolistSchemas::getAttachments())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_attachments']),
                 Section::make(__('avg_processor_processing_record.step_remarks'))
                     ->schema(AvgProcessorProcessingRecordResourceInfolistSchemas::getRemarks())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_remarks']),
             ]);
     }
 }

@@ -30,7 +30,7 @@ it('gets redirected to the users organisation tenant scoped main page', function
 
     $this->asFilamentOrganisationUser($organisation)
         ->get('/')
-        ->assertRedirect(sprintf('/%s/avg-responsible-processing-records', $organisation->slug));
+        ->assertRedirect(sprintf('/%s', $organisation->slug));
 });
 
 it('is not allowed to access an unauthorized organisation', function (): void {

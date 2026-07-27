@@ -6,13 +6,19 @@ namespace App\Filament;
 
 use App\Enums\RegisterLayout;
 use App\Facades\Authentication;
-use App\Filament\Pages\ProcessingRecordEditRecord;
-use App\Filament\Pages\ProcessingRecordViewRecord;
+use App\Filament\Resources\AlgorithmRecordResource;
+use App\Filament\Resources\AvgProcessorProcessingRecordResource;
+use App\Filament\Resources\AvgResponsibleProcessingRecordResource;
+use App\Filament\Resources\DataBreachRecordResource;
+use App\Filament\Resources\WpgProcessingRecordResource;
+use Filament\Resources\Pages\EditRecord;
+use Filament\Resources\Pages\ViewRecord;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
 use Livewire\Component;
 
 use function app;
+use function in_array;
 use function view;
 
 /**
@@ -26,6 +32,17 @@ use function view;
  */
 class OnePageLayoutRenderHooks
 {
+    /**
+     * The registers that render their record pages with the one-page layout.
+     */
+    private const ONE_PAGE_RESOURCES = [
+        AlgorithmRecordResource::class,
+        AvgProcessorProcessingRecordResource::class,
+        AvgResponsibleProcessingRecordResource::class,
+        DataBreachRecordResource::class,
+        WpgProcessingRecordResource::class,
+    ];
+
     public static function register(): void
     {
         FilamentView::registerRenderHook(
@@ -56,6 +73,10 @@ class OnePageLayoutRenderHooks
     /**
      * The navigation is only useful where the one-page layout actually renders:
      * a register record page, for a user who selected that layout.
+     *
+     * Matching on the record-page contract rather than on the project's own
+     * base classes: not every register page extends those, and the layout is
+     * chosen per resource, not per base class.
      */
     private static function isOnePageRegisterPage(): bool
     {
@@ -65,7 +86,21 @@ class OnePageLayoutRenderHooks
 
         $page = self::getLivewireComponent();
 
-        return $page instanceof ProcessingRecordEditRecord || $page instanceof ProcessingRecordViewRecord;
+        if (!$page instanceof EditRecord && !$page instanceof ViewRecord) {
+            return false;
+        }
+
+        return self::rendersOnePageLayout($page);
+    }
+
+    /**
+     * A resource opts in by exposing sections carrying the one-page anchor,
+     * which is what the navigation reads. Resources without them (users,
+     * organisations, lookup lists) are left untouched.
+     */
+    private static function rendersOnePageLayout(EditRecord|ViewRecord $page): bool
+    {
+        return in_array($page::getResource(), self::ONE_PAGE_RESOURCES, true);
     }
 
     private static function getLivewireComponent(): ?Component

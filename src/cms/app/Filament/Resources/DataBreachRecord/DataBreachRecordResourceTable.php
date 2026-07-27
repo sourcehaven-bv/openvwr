@@ -11,6 +11,7 @@ use App\Filament\Tables\Columns\DataBreachRecordStateColumn;
 use App\Filament\Tables\Columns\EntityNumber;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
 use App\Filament\Tables\DocumentFilter;
+use App\Filament\Tables\OpenDataBreachFilter;
 use App\Filament\Tables\ResponsibleFilter;
 use App\Models\States\DataBreachRecordState;
 use App\Services\DateFormatService;
@@ -62,6 +63,7 @@ class DataBreachRecordResourceTable
                 TransferCopyBulkAction::make(),
             ])
             ->filters([
+                OpenDataBreachFilter::make(),
                 SelectFilter::make('state')
                     ->label(__('data_breach_record.state'))
                     ->multiple()

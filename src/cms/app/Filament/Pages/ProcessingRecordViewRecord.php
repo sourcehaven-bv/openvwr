@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Filament\Actions\CreateSnapshotAction;
+use App\Filament\Actions\ToggleRegisterLayoutAction;
 use App\Filament\Widgets\FgRemarksWidget;
 use App\Models\Contracts\EntityNumerable;
 use App\Models\Contracts\SnapshotSource;
@@ -19,6 +20,7 @@ class ProcessingRecordViewRecord extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            ToggleRegisterLayoutAction::make(),
             CreateSnapshotAction::make(),
             DeleteAction::make(),
         ];

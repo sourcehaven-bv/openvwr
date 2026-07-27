@@ -59,60 +59,46 @@ class WpgProcessingRecordResourceInfolist
             ->schema([
                 Section::make(__('wpg_processing_record.step_processing_name'))
                     ->schema(WpgProcessingRecordResourceInfolistSchemas::getProcessingName())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_processing_name']),
                 Section::make(__('wpg_processing_record.step_responsible'))
                     ->schema(WpgProcessingRecordResourceInfolistSchemas::getResponsible())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_responsible']),
                 Section::make(__('wpg_processing_record.step_processor'))
                     ->schema(WpgProcessingRecordResourceInfolistSchemas::getProcessor())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_processor']),
                 Section::make(__('wpg_processing_record.step_receiver'))
                     ->schema(WpgProcessingRecordResourceInfolistSchemas::getReceiver())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_receiver']),
                 Section::make(__('wpg_processing_record.step_wpg_goal'))
                     ->schema(WpgProcessingRecordResourceInfolistSchemas::getProcessingGoal())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_wpg_goal']),
                 Section::make(__('wpg_processing_record.step_special_police_data'))
                     ->schema(WpgProcessingRecordResourceInfolistSchemas::getSpecialPoliceData())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_special_police_data']),
                 Section::make(__('wpg_processing_record.step_decision_making'))
                     ->schema(WpgProcessingRecordResourceInfolistSchemas::getDecisionMaking())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_decision_making']),
                 Section::make(__('wpg_processing_record.step_system_application'))
                     ->schema(WpgProcessingRecordResourceInfolistSchemas::getSystems())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_system_application']),
                 Section::make(__('wpg_processing_record.step_security'))
                     ->schema(WpgProcessingRecordResourceInfolistSchemas::getSecurity())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_security']),
                 Section::make(__('wpg_processing_record.step_geb_dpia'))
                     ->schema(WpgProcessingRecordResourceInfolistSchemas::getGebDpia())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_geb_dpia']),
                 Section::make(__('wpg_processing_record.step_contact_person'))
                     ->schema(WpgProcessingRecordResourceInfolistSchemas::getContactPersons())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_contact_person']),
                 Section::make(__('wpg_processing_record.step_attachments'))
                     ->schema(WpgProcessingRecordResourceInfolistSchemas::getAttachments())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_attachments']),
                 Section::make(__('wpg_processing_record.step_remarks'))
                     ->schema(WpgProcessingRecordResourceInfolistSchemas::getRemarks())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_remarks']),
                 Section::make(__('wpg_processing_record.step_categories_involved'))
                     ->schema(WpgProcessingRecordResourceInfolistSchemas::getCategoriesInvolved())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_categories_involved']),
             ]);
     }
 }

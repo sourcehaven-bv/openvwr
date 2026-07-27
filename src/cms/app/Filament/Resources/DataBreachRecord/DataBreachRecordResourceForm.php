@@ -44,28 +44,22 @@ class DataBreachRecordResourceForm
             ->schema([
                 Section::make(__('data_breach_record.step_name'))
                     ->schema(DataBreachRecordResourceFormSchemas::getName())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_name']),
                 Section::make(__('data_breach_record.step_responsible'))
                     ->schema(DataBreachRecordResourceFormSchemas::getResponsible())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_responsible']),
                 Section::make(__('data_breach_record.step_dates'))
                     ->schema(DataBreachRecordResourceFormSchemas::getDates())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_dates']),
                 Section::make(__('data_breach_record.step_incident'))
                     ->schema(DataBreachRecordResourceFormSchemas::getIncident())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_incident']),
                 Section::make(__('data_breach_record.step_processing_records'))
                     ->schema(DataBreachRecordResourceFormSchemas::getProcessingRecords())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_processing_records']),
                 Section::make(__('data_breach_record.step_attachments'))
                     ->schema(DataBreachRecordResourceFormSchemas::getAttachments())
-                    ->compact()
-                    ->aside(),
+                    ->extraAttributes(['data-onepage-section' => 'step_attachments']),
             ]);
     }
 }
