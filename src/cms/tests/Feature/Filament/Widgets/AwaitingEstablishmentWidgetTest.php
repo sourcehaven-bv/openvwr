@@ -120,6 +120,32 @@ it('ignores an approved snapshot that carries no approvals at all', function () 
     expect(AwaitingEstablishmentWidget::canView())->toBeFalse();
 });
 
+it('caps the list and links to the full overview once there is more', function () use ($snapshotWithApprovals): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation);
+
+    foreach (range(1, AwaitingEstablishmentWidget::LIMIT + 1) as $number) {
+        $snapshotWithApprovals(
+            $organisation,
+            Approved::class,
+            [SnapshotApprovalStatus::APPROVED],
+            sprintf('Versie %d', $number),
+        );
+    }
+
+    $this->withPermissions($user, [Permission::SNAPSHOT_STATE_TO_ESTABLISHED])
+        ->withFilamentSession($user, $organisation);
+
+    $widget = new AwaitingEstablishmentWidget();
+
+    expect($widget->getRows())->toHaveCount(AwaitingEstablishmentWidget::LIMIT)
+        ->and($widget->hasMore())->toBeTrue()
+        ->and($widget->getAllUrl())->toBeString();
+
+    $this->createLivewireTestable(AwaitingEstablishmentWidget::class)
+        ->assertSee(__('dashboard.show_all'));
+});
+
 it('hides the list from someone who may not establish', function () use ($snapshotWithApprovals): void {
     $organisation = OrganisationTestHelper::create();
     $user = UserTestHelper::createForOrganisation($organisation);
