@@ -45,10 +45,30 @@ class FormEnvironment
      */
     private const MAX_REPAIRS = 60;
 
+    /** De verbinding die actief was voordat boot() werd aangeroepen. */
+    private ?string $previousConnection = null;
+
     public function boot(): void
     {
         $this->bootDatabase();
         $this->bootTenant();
+    }
+
+    /**
+     * Zet de databaseverbinding terug zoals hij was.
+     *
+     * In een testomgeving draait de rest van de suite gewoon door op de echte
+     * verbinding; die mag deze generator niet omzetten en laten staan.
+     */
+    public function restore(): void
+    {
+        if ($this->previousConnection === null) {
+            return;
+        }
+
+        DB::setDefaultConnection($this->previousConnection);
+        DB::purge(self::CONNECTION);
+        $this->previousConnection = null;
     }
 
     /**
@@ -108,6 +128,8 @@ class FormEnvironment
                 'foreign_key_constraints' => false,
             ],
         ]);
+
+        $this->previousConnection = DB::getDefaultConnection();
 
         DB::purge(self::CONNECTION);
         DB::setDefaultConnection(self::CONNECTION);

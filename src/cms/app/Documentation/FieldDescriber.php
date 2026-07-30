@@ -24,7 +24,6 @@ use Throwable;
 use function class_basename;
 use function implode;
 use function is_array;
-use function is_string;
 use function preg_replace;
 use function str_contains;
 use function strip_tags;
@@ -100,16 +99,10 @@ class FieldDescriber
         }
 
         try {
-            $description = $component->getDescription();
+            return $this->toText($component->getDescription());
         } catch (Throwable) {
             return '';
         }
-
-        if (!$description instanceof Htmlable && !is_string($description)) {
-            return '';
-        }
-
-        return $this->toText($description);
     }
 
     public function kind(Component $component): string

@@ -11,6 +11,7 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
+use Filament\Resources\Resource;
 use Illuminate\Support\Str;
 use RuntimeException;
 
@@ -41,7 +42,7 @@ class RegisterRenderer
     }
 
     /**
-     * @param class-string $resourceClass
+     * @param class-string<Resource> $resourceClass
      */
     public function render(mixed $form, string $resourceClass, string $title): string
     {
@@ -219,19 +220,14 @@ class RegisterRenderer
     /**
      * De omschrijving van het register, uit het taalbestand van het model.
      *
-     * @param class-string $resourceClass
+     * @param class-string<Resource> $resourceClass
      */
     private function registerDescription(string $resourceClass): ?string
     {
-        $model = $resourceClass::getModel();
-        if (!is_string($model)) {
-            return null;
-        }
-
-        $key = Str::snake(class_basename($model)) . '.register_description';
+        $key = Str::snake(class_basename($resourceClass::getModel())) . '.register_description';
 
         $translation = __($key);
-        if (!is_string($translation) || $translation === $key) {
+        if ($translation === $key) {
             return null;
         }
 

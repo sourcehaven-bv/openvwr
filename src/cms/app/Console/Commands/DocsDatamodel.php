@@ -57,6 +57,15 @@ class DocsDatamodel extends Command
         $environment = new FormEnvironment();
         $environment->boot();
 
+        try {
+            return $this->generate($environment);
+        } finally {
+            $environment->restore();
+        }
+    }
+
+    private function generate(FormEnvironment $environment): int
+    {
         $describer = new FieldDescriber();
         $notes = new SectionNotes($environment, $describer);
         $renderer = new RegisterRenderer($describer, $notes);

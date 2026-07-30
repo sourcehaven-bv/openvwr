@@ -135,11 +135,7 @@ class SectionNotes
 
     private function nameOf(Field $field): ?string
     {
-        try {
-            $name = $field->getName();
-        } catch (Throwable) {
-            return null;
-        }
+        $name = $field->getName();
 
         return $name === '' ? null : $name;
     }
@@ -180,21 +176,17 @@ class SectionNotes
     {
         $reflection = new ReflectionClass($resourceClass);
 
-        $fileName = $reflection->getFileName();
-        if ($fileName === false) {
-            return [];
-        }
-
         // FooResource staat in App\Filament\Resources; de bijbehorende schema's
         // in de gelijknamige submap daaronder.
-        $directory = dirname($fileName) . '/' . class_basename($resourceClass);
+        $directory = dirname((string) $reflection->getFileName())
+            . '/' . class_basename($resourceClass);
         if (!is_dir($directory)) {
             return [];
         }
 
         $files = glob($directory . '/*Schemas.php');
         if ($files === false) {
-            return [];
+            $files = [];
         }
 
         $namespace = $reflection->getNamespaceName() . '\\' . class_basename($resourceClass);
