@@ -14,7 +14,7 @@ use App\Transfer\TransferEntityType;
 use Illuminate\Support\Facades\Storage;
 
 it('exports a stakeholder with its data items and imports them into another organisation', function (): void {
-    Storage::fake('filament');
+    Storage::fake('transfer');
 
     $sourceOrganisation = Organisation::factory()->create();
     $destinationOrganisation = Organisation::factory()->create();
@@ -45,7 +45,7 @@ it('exports a stakeholder with its data items and imports them into another orga
     ];
 
     $result = app(BundleImporter::class)->importZip(
-        Storage::disk('filament')->path($path),
+        Storage::disk('transfer')->path($path),
         $plan,
         $destinationOrganisation,
         $user,
@@ -62,7 +62,7 @@ it('exports a stakeholder with its data items and imports them into another orga
 });
 
 it('does not export related items that were not selected', function (): void {
-    Storage::fake('filament');
+    Storage::fake('transfer');
 
     $organisation = Organisation::factory()->create();
 
@@ -84,7 +84,7 @@ it('does not export related items that were not selected', function (): void {
     );
 
     $zip = new ZipArchive();
-    $zip->open(Storage::disk('filament')->path($path));
+    $zip->open(Storage::disk('transfer')->path($path));
 
     $hasProcessorEntity = false;
     for ($i = 0; $i < $zip->count(); $i++) {
@@ -98,7 +98,7 @@ it('does not export related items that were not selected', function (): void {
 });
 
 it('deduplicates an entity reached through two exported records', function (): void {
-    Storage::fake('filament');
+    Storage::fake('transfer');
 
     $organisation = Organisation::factory()->create();
 
@@ -125,7 +125,7 @@ it('deduplicates an entity reached through two exported records', function (): v
     );
 
     $zip = new ZipArchive();
-    $zip->open(Storage::disk('filament')->path($path));
+    $zip->open(Storage::disk('transfer')->path($path));
 
     $processorEntities = 0;
     for ($i = 0; $i < $zip->count(); $i++) {

@@ -11,7 +11,7 @@ use App\Transfer\Import\BundleImporter;
 use Illuminate\Support\Facades\Storage;
 
 it('exports records with related items and imports them into another organisation', function (): void {
-    Storage::fake('filament');
+    Storage::fake('transfer');
 
     $sourceOrganisation = Organisation::factory()->create();
     $destinationOrganisation = Organisation::factory()->create();
@@ -19,10 +19,10 @@ it('exports records with related items and imports them into another organisatio
 
     [$path, $plan, $record, $processor] = createExportedBundle($sourceOrganisation, $user);
 
-    expect(Storage::disk('filament')->exists($path))->toBeTrue();
+    expect(Storage::disk('transfer')->exists($path))->toBeTrue();
 
     $result = app(BundleImporter::class)->importZip(
-        Storage::disk('filament')->path($path),
+        Storage::disk('transfer')->path($path),
         $plan,
         $destinationOrganisation,
         $user,
@@ -67,7 +67,7 @@ it('exports records with related items and imports them into another organisatio
 });
 
 it('skips items that already exist when the strategy is skip', function (): void {
-    Storage::fake('filament');
+    Storage::fake('transfer');
 
     $sourceOrganisation = Organisation::factory()->create();
     $destinationOrganisation = Organisation::factory()->create();
@@ -76,7 +76,7 @@ it('skips items that already exist when the strategy is skip', function (): void
     [$path, $plan] = createExportedBundle($sourceOrganisation, $user);
 
     $importer = app(BundleImporter::class);
-    $absolutePath = Storage::disk('filament')->path($path);
+    $absolutePath = Storage::disk('transfer')->path($path);
 
     $importer->importZip($absolutePath, $plan, $destinationOrganisation, $user);
 
@@ -94,7 +94,7 @@ it('skips items that already exist when the strategy is skip', function (): void
 });
 
 it('overwrites existing items when the strategy is overwrite', function (): void {
-    Storage::fake('filament');
+    Storage::fake('transfer');
 
     $sourceOrganisation = Organisation::factory()->create();
     $destinationOrganisation = Organisation::factory()->create();
@@ -103,7 +103,7 @@ it('overwrites existing items when the strategy is overwrite', function (): void
     [$path, $plan] = createExportedBundle($sourceOrganisation, $user);
 
     $importer = app(BundleImporter::class);
-    $absolutePath = Storage::disk('filament')->path($path);
+    $absolutePath = Storage::disk('transfer')->path($path);
 
     $importer->importZip($absolutePath, $plan, $destinationOrganisation, $user);
 
@@ -125,7 +125,7 @@ it('overwrites existing items when the strategy is overwrite', function (): void
 });
 
 it('adds a copy when the strategy is copy', function (): void {
-    Storage::fake('filament');
+    Storage::fake('transfer');
 
     $sourceOrganisation = Organisation::factory()->create();
     $destinationOrganisation = Organisation::factory()->create();
@@ -134,7 +134,7 @@ it('adds a copy when the strategy is copy', function (): void {
     [$path, $plan, $record] = createExportedBundle($sourceOrganisation, $user);
 
     $importer = app(BundleImporter::class);
-    $absolutePath = Storage::disk('filament')->path($path);
+    $absolutePath = Storage::disk('transfer')->path($path);
 
     $importer->importZip($absolutePath, $plan, $destinationOrganisation, $user);
 
@@ -156,7 +156,7 @@ it('adds a copy when the strategy is copy', function (): void {
 });
 
 it('matches existing content by name when there is no origin id', function (): void {
-    Storage::fake('filament');
+    Storage::fake('transfer');
 
     $sourceOrganisation = Organisation::factory()->create();
     $destinationOrganisation = Organisation::factory()->create();
@@ -168,7 +168,7 @@ it('matches existing content by name when there is no origin id', function (): v
     $existingProcessor = Processor::factory()->for($destinationOrganisation)->create(['name' => 'Verwerker 1']);
 
     $result = app(BundleImporter::class)->importZip(
-        Storage::disk('filament')->path($path),
+        Storage::disk('transfer')->path($path),
         $plan,
         $destinationOrganisation,
         $user,
@@ -185,7 +185,7 @@ it('matches existing content by name when there is no origin id', function (): v
 });
 
 it('does not import items that are deselected', function (): void {
-    Storage::fake('filament');
+    Storage::fake('transfer');
 
     $sourceOrganisation = Organisation::factory()->create();
     $destinationOrganisation = Organisation::factory()->create();
@@ -196,7 +196,7 @@ it('does not import items that are deselected', function (): void {
     $plan[$processor->id->toString()]['selected'] = false;
 
     app(BundleImporter::class)->importZip(
-        Storage::disk('filament')->path($path),
+        Storage::disk('transfer')->path($path),
         $plan,
         $destinationOrganisation,
         $user,

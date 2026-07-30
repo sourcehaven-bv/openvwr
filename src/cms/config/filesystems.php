@@ -10,6 +10,48 @@ Assert::string($sharedStoragePath);
 $staticWebsiteRoot = env('FILESYSTEM_STATIC_WEBSITE_ROOT', storage_path('app/static-website'));
 Assert::string($staticWebsiteRoot);
 
+// Object storage is opt-in: set FILESYSTEM_SHARED_DRIVER=s3 to move the shared
+// disks (uploads, exports, transfer) to an S3-compatible bucket. Everything
+// defaults to 'local', so dev, CI and existing deployments keep working
+// untouched. See docs/object_storage.md.
+$sharedDriver = env('FILESYSTEM_SHARED_DRIVER', 'local');
+Assert::inArray($sharedDriver, ['local', 's3'], 'FILESYSTEM_SHARED_DRIVER must be "local" or "s3", got "%s".');
+
+/**
+ * Build a shared disk definition for whichever driver is configured.
+ *
+ * The two branches are deliberately equivalent in behaviour: `$subPath` is a
+ * directory under the shared root on local, and a key prefix inside the bucket
+ * on s3, so stored paths are identical either way.
+ *
+ * @param array<string, mixed> $extra disk settings that do not depend on the driver
+ *
+ * @return array<string, mixed>
+ */
+$sharedDisk = static function (
+    string $subPath,
+    string $bucketEnvKey,
+    array $extra = [],
+) use (
+    $sharedDriver,
+    $sharedStoragePath,
+): array {
+    if ($sharedDriver === 'local') {
+        return ['driver' => 'local', 'root' => $sharedStoragePath . '/' . $subPath, ...$extra];
+    }
+
+    return [
+        'driver' => 's3',
+        'bucket' => env($bucketEnvKey, $subPath),
+        'endpoint' => env('AWS_ENDPOINT'),
+        'key' => env('AWS_ACCESS_KEY_ID'),
+        'secret' => env('AWS_SECRET_ACCESS_KEY'),
+        'region' => env('AWS_DEFAULT_REGION', 'eu-central-1'),
+        'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true),
+        ...$extra,
+    ];
+};
+
 return [
 
     /*
@@ -48,14 +90,20 @@ return [
         ],
 
         // used by filament, .e.g export
-        'filament' => [
-            'driver' => 'local',
-            'root' => $sharedStoragePath . '/exports',
+        'filament' => $sharedDisk('exports', 'EXPORTS_BUCKET', [
             'throw' => false,
             'allowed_mimetypes' => ['xlsx'],
             'max_file_size' => '20mb',
             'visibility' => 'public',
-        ],
+        ]),
+
+        // Transfer bundles: exports awaiting download and uploaded imports being
+        // staged. Private, and separate from 'filament' because these zips hold a
+        // full register export -- on a public bucket they would be world-readable.
+        'transfer' => $sharedDisk('transfer', 'TRANSFER_BUCKET', [
+            'throw' => false,
+            'visibility' => 'private',
+        ]),
 
         // used for static-website output (see config/static-website.php)
         'static-website' => [
@@ -65,14 +113,12 @@ return [
         ],
 
         // used for uploading images (see config/media-library.php)
-        'media-library' => [
-            'driver' => 'local',
-            'root' => $sharedStoragePath . '/uploads',
+        'media-library' => $sharedDisk('uploads', 'UPLOADS_BUCKET', [
             'throw' => false,
             'allowed_extensions' => ['pdf', 'png', 'jpg', 'jpeg', 'webp', 'docx', 'odt', 'md', 'txt', 'eml', 'msg'],
             'max_file_size' => '20mb',
             'visibility' => 'private',
-        ],
+        ]),
 
         // used to store generated sql-migration files (see config/sql-generator.php)
         'sql-generation' => [

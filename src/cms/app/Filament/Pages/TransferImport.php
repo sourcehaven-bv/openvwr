@@ -13,6 +13,7 @@ use App\Jobs\TransferImportJob;
 use App\Rules\Virusscanner;
 use App\Transfer\Import\BundleReader;
 use App\Transfer\Import\PreviewBuilder;
+use App\Transfer\TransferBundleStorage;
 use App\Transfer\TransferException;
 use Carbon\CarbonImmutable;
 use Filament\Forms\Components\FileUpload;
@@ -22,7 +23,6 @@ use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Locked;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
@@ -32,7 +32,6 @@ use function __;
 use function app;
 use function basename;
 use function collect;
-use function fopen;
 use function is_array;
 use function is_string;
 use function sprintf;
@@ -41,7 +40,7 @@ class TransferImport extends Page implements HasForms
 {
     use InteractsWithForms;
 
-    public const string DISK = 'filament';
+    public const string DISK = TransferBundleStorage::DISK;
     public const string IMPORT_DIRECTORY = 'transfer/imports';
 
     protected static ?string $slug = 'transfer-import';
@@ -87,6 +86,13 @@ class TransferImport extends Page implements HasForms
         return __('transfer.import_page_title');
     }
 
+    // Resolved on demand rather than injected: Livewire components have no
+    // constructor arguments, and public properties get serialized per request.
+    private function bundleStorage(): TransferBundleStorage
+    {
+        return app(TransferBundleStorage::class);
+    }
+
     public function form(Form $form): Form
     {
         return $form->schema([
@@ -113,16 +119,15 @@ class TransferImport extends Page implements HasForms
         $file = is_array($files) ? collect($files)->first() : $files;
         Assert::isInstanceOf($file, TemporaryUploadedFile::class);
 
-        $disk = Storage::disk(self::DISK);
         $bundlePath = sprintf('%s/%s.zip', self::IMPORT_DIRECTORY, Uuid::generate()->toString());
-        $stream = fopen($file->getRealPath(), 'rb');
-        Assert::resource($stream);
-        $disk->put($bundlePath, $stream);
+        $this->bundleStorage()->putFile($bundlePath, $file->getRealPath());
 
         try {
-            $bundle = $bundleReader->read($disk->path($bundlePath));
+            // Read the upload where it already sits locally; the copy on the disk
+            // is only there for the queued job to pick up later.
+            $bundle = $bundleReader->read($file->getRealPath());
         } catch (TransferException $exception) {
-            $disk->delete($bundlePath);
+            $this->bundleStorage()->delete($bundlePath);
 
             Notification::make()
                 ->title(__('transfer.import_invalid_file'))
@@ -198,7 +203,7 @@ class TransferImport extends Page implements HasForms
         $bundlePath = $this->safeBundlePath();
 
         if ($bundlePath !== null) {
-            Storage::disk(self::DISK)->delete($bundlePath);
+            $this->bundleStorage()->delete($bundlePath);
         }
 
         $this->reset('bundlePath', 'sourceOrganisation', 'exportedAt', 'items');

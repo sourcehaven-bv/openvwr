@@ -11,6 +11,7 @@ use App\Models\Organisation;
 use App\Models\User;
 use App\Services\BuildContextService;
 use App\Transfer\Import\BundleImporter;
+use App\Transfer\TransferBundleStorage;
 use Filament\Notifications\Notification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -18,7 +19,6 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Throwable;
 
 use function __;
@@ -30,7 +30,7 @@ class TransferImportJob implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
-    public const string DISK = 'filament';
+    public const string DISK = TransferBundleStorage::DISK;
 
     /**
      * @param array<string, array{selected: bool, strategy: ?string}> $plan
@@ -44,17 +44,23 @@ class TransferImportJob implements ShouldQueue
         $this->onQueue(Queue::DEFAULT);
     }
 
-    public function handle(BundleImporter $bundleImporter, BuildContextService $buildContextService): void
-    {
+    public function handle(
+        BundleImporter $bundleImporter,
+        BuildContextService $buildContextService,
+        TransferBundleStorage $bundleStorage,
+    ): void {
         $organisation = Organisation::query()->findOrFail($this->organisationId);
         $user = User::query()->findOrFail($this->userId);
-
-        $disk = Storage::disk(self::DISK);
 
         $buildContextService->disableBuild();
 
         try {
-            $result = $bundleImporter->importZip($disk->path($this->bundlePath), $this->plan, $organisation, $user);
+            // The bundle may live in object storage, so work on a local copy:
+            // importZip() opens it with ZipArchive, which needs a real path.
+            $result = $bundleStorage->withLocalCopy(
+                $this->bundlePath,
+                fn (string $localPath) => $bundleImporter->importZip($localPath, $this->plan, $organisation, $user),
+            );
         } catch (Throwable $exception) {
             Log::error('transfer import failed', ['message' => $exception->getMessage()]);
 
@@ -67,7 +73,7 @@ class TransferImportJob implements ShouldQueue
             return;
         } finally {
             $buildContextService->enableBuild();
-            $disk->delete($this->bundlePath);
+            $bundleStorage->delete($this->bundlePath);
         }
 
         BuildEvent::dispatch();

@@ -8,6 +8,7 @@ PHP_FORMULA="php@8.4"
 DB_PORT="${DB_PORT:-5432}"
 DB_NAME="${DB_NAME:-openvwr_local}"
 TEST_DB_NAME="${TEST_DB_NAME:-testing}"
+MINIO_PORT="${MINIO_PORT:-9000}"
 
 if [[ -t 1 ]]; then
     C_GREEN=$'\033[0;32m'; C_YELLOW=$'\033[0;33m'; C_RED=$'\033[0;31m'; C_OFF=$'\033[0m'
@@ -108,6 +109,21 @@ if pg_isready -h 127.0.0.1 -p "$DB_PORT" >/dev/null 2>&1; then
 else
     bad "PostgreSQL not reachable on 127.0.0.1:$DB_PORT"
     hint "brew services start postgresql@15, or start Postgres.app"
+fi
+
+# --- Object storage ---------------------------------------------------------
+
+# Only a problem when the .env opts in: on the default local driver there is
+# nothing to run, and a missing minio is the expected state.
+if grep -qE '^FILESYSTEM_SHARED_DRIVER=s3' "$CMS_DIR/.env" 2>/dev/null; then
+    if curl -sf "http://127.0.0.1:${MINIO_PORT}/minio/health/live" >/dev/null 2>&1; then
+        ok "Object storage reachable on port $MINIO_PORT (FILESYSTEM_SHARED_DRIVER=s3)"
+    else
+        bad ".env sets FILESYSTEM_SHARED_DRIVER=s3 but nothing answers on 127.0.0.1:$MINIO_PORT"
+        hint "brew services start minio, or unset FILESYSTEM_SHARED_DRIVER to use local disks"
+    fi
+else
+    ok "Shared disks on the local filesystem (object storage not enabled)"
 fi
 
 # --- Application ------------------------------------------------------------

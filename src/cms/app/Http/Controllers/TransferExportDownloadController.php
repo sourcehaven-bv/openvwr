@@ -9,15 +9,14 @@ use App\Transfer\Export\BundleExporter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Webmozart\Assert\InvalidArgumentException;
 
 use function abort_if;
 use function abort_unless;
 use function basename;
 use function redirect;
-use function response;
 use function sprintf;
 
 class TransferExportDownloadController extends Controller
@@ -27,7 +26,7 @@ class TransferExportDownloadController extends Controller
     ) {
     }
 
-    public function __invoke(Request $request, string $filename): RedirectResponse|BinaryFileResponse
+    public function __invoke(Request $request, string $filename): RedirectResponse|StreamedResponse
     {
         try {
             $user = $this->authenticationService->user();
@@ -42,6 +41,8 @@ class TransferExportDownloadController extends Controller
 
         abort_unless($disk->exists($path), Response::HTTP_NOT_FOUND);
 
-        return response()->download($disk->path($path));
+        // Streamed rather than a file download: on object storage there is no
+        // local path to hand to the kernel.
+        return $disk->download($path, basename($filename));
     }
 }

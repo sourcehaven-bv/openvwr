@@ -49,7 +49,7 @@ function createExportedDocumentBundle(Organisation $organisation): array
 }
 
 it('exports a document with its media and imports it into another organisation', function (): void {
-    Storage::fake('filament');
+    Storage::fake('transfer');
     Storage::fake('media-library');
 
     $sourceOrganisation = Organisation::factory()->create();
@@ -59,7 +59,7 @@ it('exports a document with its media and imports it into another organisation',
     [$path, $plan] = createExportedDocumentBundle($sourceOrganisation);
 
     $result = app(BundleImporter::class)->importZip(
-        Storage::disk('filament')->path($path),
+        Storage::disk('transfer')->path($path),
         $plan,
         $destinationOrganisation,
         $user,
@@ -80,7 +80,7 @@ it('exports a document with its media and imports it into another organisation',
 });
 
 it('imports media onto an overwritten document that has none yet', function (): void {
-    Storage::fake('filament');
+    Storage::fake('transfer');
     Storage::fake('media-library');
 
     $sourceOrganisation = Organisation::factory()->create();
@@ -88,7 +88,7 @@ it('imports media onto an overwritten document that has none yet', function (): 
     $user = User::factory()->create();
 
     [$path, $plan, $document] = createExportedDocumentBundle($sourceOrganisation);
-    $absolutePath = Storage::disk('filament')->path($path);
+    $absolutePath = Storage::disk('transfer')->path($path);
     $importer = app(BundleImporter::class);
 
     // pre-existing document in the destination, matched by name, without media
@@ -107,7 +107,7 @@ it('imports media onto an overwritten document that has none yet', function (): 
 });
 
 it('refreshes a stale attachment on overwrite when the source file changed', function (): void {
-    Storage::fake('filament');
+    Storage::fake('transfer');
     Storage::fake('media-library');
 
     $sourceOrganisation = Organisation::factory()->create();
@@ -117,7 +117,7 @@ it('refreshes a stale attachment on overwrite when the source file changed', fun
 
     // First copy: destination gets the original file bytes.
     [$firstPath, $firstPlan, $document] = createExportedDocumentBundle($sourceOrganisation);
-    $importer->importZip(Storage::disk('filament')->path($firstPath), $firstPlan, $destinationOrganisation, $user);
+    $importer->importZip(Storage::disk('transfer')->path($firstPath), $firstPlan, $destinationOrganisation, $user);
 
     $copy = Document::query()->whereBelongsTo($destinationOrganisation)->where('name', 'Beleid')->firstOrFail();
     expect($copy->getFirstMedia(MediaGroup::ATTACHMENTS->value)?->getPathRelativeToRoot())
@@ -144,7 +144,7 @@ it('refreshes a stale attachment on overwrite when the source file changed', fun
         $document->id->toString() => ['selected' => true, 'strategy' => 'overwrite'],
     ];
 
-    $result = $importer->importZip(Storage::disk('filament')->path($secondPath), $overwritePlan, $destinationOrganisation, $user);
+    $result = $importer->importZip(Storage::disk('transfer')->path($secondPath), $overwritePlan, $destinationOrganisation, $user);
 
     expect($result->overwritten)->toBe(2);
 
@@ -156,7 +156,7 @@ it('refreshes a stale attachment on overwrite when the source file changed', fun
 });
 
 it('leaves an unchanged attachment in place on overwrite', function (): void {
-    Storage::fake('filament');
+    Storage::fake('transfer');
     Storage::fake('media-library');
 
     $sourceOrganisation = Organisation::factory()->create();
@@ -165,7 +165,7 @@ it('leaves an unchanged attachment in place on overwrite', function (): void {
     $importer = app(BundleImporter::class);
 
     [$firstPath, $firstPlan] = createExportedDocumentBundle($sourceOrganisation);
-    $importer->importZip(Storage::disk('filament')->path($firstPath), $firstPlan, $destinationOrganisation, $user);
+    $importer->importZip(Storage::disk('transfer')->path($firstPath), $firstPlan, $destinationOrganisation, $user);
 
     $copy = Document::query()->whereBelongsTo($destinationOrganisation)->where('name', 'Beleid')->firstOrFail();
     $originalUuid = $copy->getFirstMedia(MediaGroup::ATTACHMENTS->value)?->uuid;
@@ -177,7 +177,7 @@ it('leaves an unchanged attachment in place on overwrite', function (): void {
         $overwritePlan[$id]['strategy'] = 'overwrite';
     }
 
-    $importer->importZip(Storage::disk('filament')->path($firstPath), $overwritePlan, $destinationOrganisation, $user);
+    $importer->importZip(Storage::disk('transfer')->path($firstPath), $overwritePlan, $destinationOrganisation, $user);
 
     $copy->refresh()->load('media');
     expect($copy->media)->toHaveCount(1)
@@ -194,7 +194,7 @@ function copyDocumentOnceForPreview(): array
     $user = User::factory()->create();
 
     [$path, $plan, $document] = createExportedDocumentBundle($source);
-    app(BundleImporter::class)->importZip(Storage::disk('filament')->path($path), $plan, $destination, $user);
+    app(BundleImporter::class)->importZip(Storage::disk('transfer')->path($path), $plan, $destination, $user);
 
     $record = AvgResponsibleProcessingRecord::query()->whereBelongsTo($source)->firstOrFail();
 
@@ -214,7 +214,7 @@ function previewDocumentItem(Organisation $source, Organisation $destination, Do
 }
 
 it('flags a document whose source attachment changed as needing a decision', function (): void {
-    Storage::fake('filament');
+    Storage::fake('transfer');
     Storage::fake('media-library');
 
     [$source, $destination, $document, $record] = copyDocumentOnceForPreview();
@@ -234,7 +234,7 @@ it('flags a document whose source attachment changed as needing a decision', fun
 });
 
 it('flags a document with an identical attachment as unchanged', function (): void {
-    Storage::fake('filament');
+    Storage::fake('transfer');
     Storage::fake('media-library');
 
     [$source, $destination, $document, $record] = copyDocumentOnceForPreview();
@@ -245,4 +245,28 @@ it('flags a document with an identical attachment as unchanged', function (): vo
     expect($item['has_match'])->toBeTrue()
         ->and($item['unchanged'])->toBeTrue()
         ->and($item['needs_decision'])->toBeFalse();
+});
+
+it('skips an attachment whose file is missing from the media disk', function (): void {
+    Storage::fake('transfer');
+    Storage::fake('media-library');
+
+    $organisation = Organisation::factory()->create();
+
+    [$path, , $document] = createExportedDocumentBundle($organisation);
+    $mediaItem = $document->media->first();
+
+    // Drop the bytes but keep the media record: the export must still produce a
+    // readable bundle rather than failing on the one unreadable attachment.
+    Storage::disk('media-library')->delete($mediaItem->getPathRelativeToRoot());
+
+    $secondPath = app(BundleExporter::class)->export(
+        TransferEntityType::DOCUMENT,
+        [$document->id->toString()],
+        [],
+        $organisation,
+    );
+
+    expect(Storage::disk('transfer')->exists($secondPath))->toBeTrue()
+        ->and($path)->not->toBe($secondPath);
 });

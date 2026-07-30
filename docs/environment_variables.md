@@ -26,6 +26,7 @@ not set.
 - `OUTBOX_SMTP_FROM` from-address for sending e-mail, (default is not set)
 - `FILESYSTEM_STATIC_WEBSITE_ROOT` root-folder for the static-website (default: `<laravel-storage-path>/app`)
 - `FILESYSTEM_SHARED_STORAGE_PATH` root-folder for shared storage (default: `<laravel-storage-path>/app/shared-storage`)
+- `FILESYSTEM_SHARED_DRIVER` driver for the shared disks, `local` or `s3` (default: `local`). See [object_storage.md](object_storage.md)
 - `VIRUSSCANNER_DEFAULT` default virus-scanner (default: `clamav`)
 - `VIRUSSCANNER_SOCKET` socket for the virus-scanner (default: `unix:///var/run/clamav/clamd.ctl`)
 - `CLAMAV_SOCKET_READ_TIMEOUT` read timeout for the clamav socket (default: `30`)
@@ -90,6 +91,18 @@ The following environment variables are used to configure the application in `sr
 
 - `FILESYSTEM_SHARED_STORAGE_PATH` (default: `app/shared-storage`)
 - `FILESYSTEM_STATIC_WEBSITE_ROOT` (default: `app/static-website`)
+- `FILESYSTEM_SHARED_DRIVER` (default: `local`)
+
+**OBJECT STORAGE** (only when `FILESYSTEM_SHARED_DRIVER=s3`):
+
+- `AWS_ENDPOINT` endpoint of the S3-compatible service (default is not set)
+- `AWS_ACCESS_KEY_ID` (default is not set)
+- `AWS_SECRET_ACCESS_KEY` (default is not set)
+- `AWS_DEFAULT_REGION` (default: `eu-central-1`)
+- `AWS_USE_PATH_STYLE_ENDPOINT` (default: `true`)
+- `UPLOADS_BUCKET` bucket for the media-library disk (default: `uploads`)
+- `EXPORTS_BUCKET` bucket for the filament disk (default: `exports`)
+- `TRANSFER_BUCKET` bucket for the transfer disk (default: `transfer`)
 
 **LOGGING:**
 
