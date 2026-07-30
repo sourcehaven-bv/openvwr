@@ -50,6 +50,7 @@ use Illuminate\Support\Str;
 use Livewire\Component as LivewireComponent;
 use ReflectionClass;
 use ReflectionMethod;
+use RuntimeException;
 use Throwable;
 
 use function __;
@@ -565,6 +566,8 @@ class DocsDatamodel extends Command
             $lines[] = '';
         }
 
+        $sections = 0;
+
         foreach ($form->getComponents() as $section) {
             $heading = $this->headingOf($section);
             if ($heading === null) {
@@ -595,6 +598,14 @@ class DocsDatamodel extends Command
                 $lines[] = sprintf('| %s | %s | %s |', $row['field'], $row['kind'], $row['help']);
             }
             $lines[] = '';
+            $sections++;
+        }
+
+        // Een register zonder secties betekent dat het formulier niet goed is
+        // opgebouwd - bijvoorbeeld doordat een component onderweg afhaakte. Dan
+        // liever falen dan een hoofdstuk met alleen een kop opleveren.
+        if ($sections === 0) {
+            throw new RuntimeException('geen velden gevonden; is het formulier goed opgebouwd?');
         }
 
         return implode("\n", $lines);
