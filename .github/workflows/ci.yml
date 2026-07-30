@@ -136,14 +136,6 @@ jobs:
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
-      minio:
-        image: bitnami/minio:latest
-        env:
-          MINIO_ROOT_USER: minioadmin
-          MINIO_ROOT_PASSWORD: minioadmin
-        ports:
-          - 9000:9000
-        options: --health-cmd "mc ready local" --health-interval 10s --health-timeout 5s --health-retries 5
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -151,6 +143,23 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+
+      # Run as a step rather than a service container: minio needs `server /data`
+      # as its command, and service containers cannot set one -- the entrypoint
+      # then just prints its help and exits. Same pinned tag as docker-compose.
+      - name: Start MinIO
+        run: |
+          docker run -d \
+            --name minio \
+            -p 9000:9000 \
+            -e "MINIO_ROOT_USER=minioadmin" \
+            -e "MINIO_ROOT_PASSWORD=minioadmin" \
+            minio/minio:RELEASE.2025-09-07T16-13-09Z \
+            server /data
+
+          echo "Waiting for MinIO to be ready..."
+          timeout 60s bash -c 'until curl -sf http://localhost:9000/minio/health/live >/dev/null 2>&1; do sleep 2; done'
+          echo "MinIO is ready!"
 
       - name: Install PHP
         uses: shivammathur/setup-php@v2
@@ -189,3 +198,7 @@ jobs:
             tests/Feature/Console
         env:
           DB_PORT: ${{ job.services.postgres.ports[5432] }}
+
+      - name: Stop MinIO
+        if: always()
+        run: docker stop minio && docker rm minio || true
