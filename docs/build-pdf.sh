@@ -48,7 +48,6 @@ fi
 # DOC_MONOFONT een lettertype dat er wel is (zie build-release.yml).
 MAINFONT="${DOC_MAINFONT:-Helvetica Neue}"
 MONOFONT="${DOC_MONOFONT:-Menlo}"
-ARROWFONT="${DOC_ARROWFONT:-Apple Symbols}"
 
 echo "PDF genereren: $OUT"
 pandoc "$SRC" \
@@ -60,7 +59,6 @@ pandoc "$SRC" \
     --variable=logo:"$LOGO_PDF" \
     --variable=mainfont:"$MAINFONT" \
     --variable=monofont:"$MONOFONT" \
-    --variable=arrowfont:"$ARROWFONT" \
     --variable=title:"Wat legt OpenVWR vast?" \
     --variable=subtitle:"Overzicht van de vast te leggen gegevens per register" \
     --variable=date:"$(LC_TIME=nl_NL.UTF-8 date '+%-d %B %Y' 2>/dev/null || date '+%d-%m-%Y')"

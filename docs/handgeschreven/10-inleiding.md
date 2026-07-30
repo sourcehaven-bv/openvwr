@@ -29,7 +29,7 @@ In de kolom **Soort invoer** staat hoe een veld wordt ingevuld:
 | Lijst | Een herhaalbaar blok: de invuller kan er zoveel toevoegen als nodig, elk met eigen velden. |
 | Bestand | Een te uploaden document. |
 
-Een veld dat begint met **⤷** hoort bij het onderdeel erboven: het wordt per item van die lijst of
+Een veld dat begint met **»** hoort bij het onderdeel erboven: het wordt per item van die lijst of
 koppeling ingevuld. Een **vetgedrukte regel zonder soort invoer** is een tussenkop die bij elkaar
 horende vragen groepeert.
 

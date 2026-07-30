@@ -41,7 +41,11 @@ use Filament\Resources\Resource;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\QueryException;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Livewire\Component as LivewireComponent;
 use ReflectionClass;
@@ -56,6 +60,7 @@ use function basename;
 use function class_basename;
 use function class_exists;
 use function class_uses_recursive;
+use function config;
 use function count;
 use function dirname;
 use function file_get_contents;
@@ -68,6 +73,7 @@ use function is_dir;
 use function is_string;
 use function is_subclass_of;
 use function mkdir;
+use function preg_match;
 use function preg_replace;
 use function rtrim;
 use function sort;
@@ -283,6 +289,8 @@ class DocsDatamodel extends Command
      */
     private function bootContext(): void
     {
+        $this->bootDatabase();
+
         $organisation = new Organisation(['name' => 'Documentatie']);
         $organisation->id = Uuid::fromString(Str::uuid()->toString());
         Filament::setTenant($organisation, isQuiet: true);
@@ -291,6 +299,110 @@ class DocsDatamodel extends Command
         $user->id = Uuid::fromString(Str::uuid()->toString());
         $user->register_layout = RegisterLayout::ONE_PAGE;
         Auth::setUser($user);
+    }
+
+    /**
+     * Zorgt dat het opbouwen van een formulier geen database nodig heeft.
+     *
+     * Een enkel veld vraagt tijdens het opbouwen al gegevens op - welke keuzes
+     * uitgeschakeld zijn, bijvoorbeeld. Op een buildserver draait geen database
+     * en dan zou het hele commando falen. Deze hook vangt elke query af en
+     * levert een lege uitkomst.
+     *
+     * Dat is hier precies goed: wat er in een specifieke database staat is
+     * organisatiegebonden en hoort sowieso niet in dit document. Het gaat om de
+     * structuur van het formulier, niet om de inhoud van iemands register.
+     */
+    private function bootDatabase(): void
+    {
+        config([
+            'database.connections.docs' => [
+                'driver' => 'sqlite',
+                'database' => ':memory:',
+                'prefix' => '',
+                'foreign_key_constraints' => false,
+            ],
+        ]);
+
+        DB::purge('docs');
+        DB::setDefaultConnection('docs');
+
+        // De volledige migratie draaien lukt niet: die is op PostgreSQL
+        // geschreven. Alleen de tabellen die een formulier daadwerkelijk
+        // bevraagt worden aangemaakt, en dan zo ruim dat elke kolom bestaat.
+        Model::unguard();
+    }
+
+    /**
+     * Maakt onderweg de tabel aan waar een formulier om vraagt.
+     *
+     * Welke tabellen dat zijn hangt af van de formulieren, dus die lijst
+     * bijhouden zou weer een vorm van hardcoderen zijn. In plaats daarvan wordt
+     * de fout opgevangen en de ontbrekende tabel alsnog gemaakt, waarna de query
+     * opnieuw gaat. De tabel blijft leeg; het gaat puur om de structuur van het
+     * formulier.
+     */
+    private function withEmptyDatabase(callable $callback): mixed
+    {
+        for ($attempt = 0; $attempt < 60; $attempt++) {
+            try {
+                return $callback();
+            } catch (QueryException $e) {
+                if (!$this->repairSchema($e)) {
+                    throw $e;
+                }
+            }
+        }
+
+        return $callback();
+    }
+
+    /**
+     * Maakt de ontbrekende tabel of kolom uit een SQLite-fout alsnog aan.
+     *
+     * Geeft false terug als de fout ergens anders over gaat; die hoort dan
+     * gewoon door te komen.
+     */
+    private function repairSchema(QueryException $exception): bool
+    {
+        $message = $exception->getMessage();
+
+        if (preg_match('/no such table: ([A-Za-z0-9_]+)/', $message, $matches) === 1) {
+            Schema::connection('docs')->create($matches[1], static function (Blueprint $blueprint): void {
+                $blueprint->string('id')->nullable();
+            });
+
+            return true;
+        }
+
+        // "no such column: tabel.kolom" of "no such column: kolom"
+        if (preg_match('/no such column: (?:([A-Za-z0-9_]+)\.)?([A-Za-z0-9_]+)/', $message, $matches) === 1) {
+            $table = $matches[1] !== '' ? $matches[1] : $this->tableFromQuery($exception);
+            if ($table === null || !Schema::connection('docs')->hasTable($table)) {
+                return false;
+            }
+
+            Schema::connection('docs')->table($table, static function (Blueprint $blueprint) use ($matches): void {
+                $blueprint->string($matches[2])->nullable();
+            });
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * De eerste tabelnaam uit de mislukte query, voor foutmeldingen die de
+     * tabel niet zelf noemen.
+     */
+    private function tableFromQuery(QueryException $exception): ?string
+    {
+        if (preg_match('/\bfrom\s+"([A-Za-z0-9_]+)"/i', $exception->getSql(), $matches) !== 1) {
+            return null;
+        }
+
+        return $matches[1];
     }
 
     /**
@@ -388,7 +500,7 @@ class DocsDatamodel extends Command
         }
 
         try {
-            $components = $method->invoke(null);
+            $components = $this->withEmptyDatabase(static fn (): mixed => $method->invoke(null));
         } catch (Throwable) {
             return null;
         }
@@ -440,7 +552,10 @@ class DocsDatamodel extends Command
      */
     private function renderRegister(string $resourceClass, string $title): string
     {
-        $form = $resourceClass::form(Form::make($this->makeLivewireHost()));
+        /** @var Form $form */
+        $form = $this->withEmptyDatabase(
+            fn (): mixed => $resourceClass::form(Form::make($this->makeLivewireHost())),
+        );
 
         $lines = ['# ' . $title, ''];
 
@@ -574,7 +689,7 @@ class DocsDatamodel extends Command
 
         // Eén pijl per niveau: gegevens binnen een betrokkene binnen de
         // registratie krijgen er dus twee.
-        $prefix = str_repeat('⤷ ', $depth);
+        $prefix = str_repeat('» ', $depth);
 
         $rows[] = [
             'field' => $prefix . $this->escape($label),

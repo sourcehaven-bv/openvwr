@@ -38,7 +38,7 @@ In de kolom **Soort invoer** staat hoe een veld wordt ingevuld:
 | Lijst | Een herhaalbaar blok: de invuller kan er zoveel toevoegen als nodig, elk met eigen velden. |
 | Bestand | Een te uploaden document. |
 
-Een veld dat begint met **⤷** hoort bij het onderdeel erboven: het wordt per item van die lijst of
+Een veld dat begint met **»** hoort bij het onderdeel erboven: het wordt per item van die lijst of
 koppeling ingevuld. Een **vetgedrukte regel zonder soort invoer** is een tussenkop die bij elkaar
 horende vragen groepeert.
 
@@ -92,9 +92,9 @@ Verwerkingen van persoonsgegevens waarbij uw organisatie zelf het doel en de mid
 | Veld | Soort invoer | Toelichting |
 | --- | --- | --- |
 | AVG doelen | Lijst |  |
-| ⤷ Doel | Toelichting |  |
-| ⤷ AVG rechtsgronden | Keuze | Keuze uit: Toestemming betrokkene; Uitvoering overeenkomst; Wettelijke verplichting; Vitaal belang betrokkene; Taak van algemeen belang; Gerechtvaardigd belang verantwoordelijke. |
-| ⤷ Toelichting bij gekozen rechtsgrond | Toelichting |  |
+| » Doel | Toelichting |  |
+| » AVG rechtsgronden | Keuze | Keuze uit: Toestemming betrokkene; Uitvoering overeenkomst; Wettelijke verplichting; Vitaal belang betrokkene; Taak van algemeen belang; Gerechtvaardigd belang verantwoordelijke. |
+| » Toelichting bij gekozen rechtsgrond | Toelichting |  |
 
 ## Betrokkenen en gegevens
 
@@ -103,27 +103,27 @@ Het meest gedetailleerde onderdeel van de registratie. Per categorie betrokkenen
 | Veld | Soort invoer | Toelichting |
 | --- | --- | --- |
 | Betrokkenen | Lijst |  |
-| ⤷ Beschrijving | Toelichting |  |
+| » Beschrijving | Toelichting |  |
 | **Bijzondere gegevens** |  | Welke bijzondere gegevens die betrekking hebben op deze categorie van betrokkenen worden verwerkt? |
-| ⤷ Biometrische gegevens met het oog op de unieke identificatie van een persoon | Ja/nee |  |
-| ⤷ Persoonsgegevens waaruit religieuze of levensbeschouwelijke overtuigingen blijken | Ja/nee |  |
-| ⤷ Genetische gegevens | Ja/nee |  |
-| ⤷ Gegevens over gezondheid | Ja/nee |  |
-| ⤷ Persoonsgegevens waaruit politieke opvattingen blijken | Ja/nee |  |
-| ⤷ Persoonsgegevens waaruit ras of etnische afkomst blijkt | Ja/nee |  |
-| ⤷ Gegevens met betrekking tot iemands seksueel gedrag of seksuele gerichtheid | Ja/nee |  |
-| ⤷ Persoonsgegevens waaruit het lidmaatschap van een vakbond blijkt | Ja/nee |  |
-| ⤷ Uitleg doorbreking verwerkingsverbod | Toelichting |  |
+| » Biometrische gegevens met het oog op de unieke identificatie van een persoon | Ja/nee |  |
+| » Persoonsgegevens waaruit religieuze of levensbeschouwelijke overtuigingen blijken | Ja/nee |  |
+| » Genetische gegevens | Ja/nee |  |
+| » Gegevens over gezondheid | Ja/nee |  |
+| » Persoonsgegevens waaruit politieke opvattingen blijken | Ja/nee |  |
+| » Persoonsgegevens waaruit ras of etnische afkomst blijkt | Ja/nee |  |
+| » Gegevens met betrekking tot iemands seksueel gedrag of seksuele gerichtheid | Ja/nee |  |
+| » Persoonsgegevens waaruit het lidmaatschap van een vakbond blijkt | Ja/nee |  |
+| » Uitleg doorbreking verwerkingsverbod | Toelichting |  |
 | **Gevoelige gegevens** |  | Welke gevoelige gegevens die betrekking hebben op deze categorie van betrokkenen worden verwerkt? |
-| ⤷ Gegevens betreffende strafrechtelijke veroordelingen en strafbare feiten | Ja/nee |  |
-| ⤷ Burgerservicenummers | Ja/nee |  |
-| ⤷ Gegevens | Lijst |  |
-| ⤷ ⤷ Beschrijving | Toelichting |  |
-| ⤷ ⤷ Verzameldoel | Toelichting | Waarvoor juist deze gegevens nodig zijn binnen de verwerking. |
-| ⤷ ⤷ Bewaartermijn | Toelichting | Hoe lang de gegevens bewaard worden en op welke grond; er wordt niet automatisch verwijderd. |
-| ⤷ ⤷ Wie/wat is de bron van gegevens? | Toelichting | Van wie of waaruit de gegevens afkomstig zijn, bijvoorbeeld de betrokkene zelf of een basisregistratie. |
-| ⤷ ⤷ Is betrokkene verplicht de gevraagde gegevens aan te leveren? | Ja/nee |  |
-| ⤷ ⤷ Omschrijf de gevolgen voor de betrokkene als de gegevens niet worden aangeleverd | Toelichting | Wat er gebeurt als de betrokkene de gegevens niet verstrekt, bijvoorbeeld dat de aanvraag niet in behandeling kan worden genomen. |
+| » Gegevens betreffende strafrechtelijke veroordelingen en strafbare feiten | Ja/nee |  |
+| » Burgerservicenummers | Ja/nee |  |
+| » Gegevens | Lijst |  |
+| » » Beschrijving | Toelichting |  |
+| » » Verzameldoel | Toelichting | Waarvoor juist deze gegevens nodig zijn binnen de verwerking. |
+| » » Bewaartermijn | Toelichting | Hoe lang de gegevens bewaard worden en op welke grond; er wordt niet automatisch verwijderd. |
+| » » Wie/wat is de bron van gegevens? | Toelichting | Van wie of waaruit de gegevens afkomstig zijn, bijvoorbeeld de betrokkene zelf of een basisregistratie. |
+| » » Is betrokkene verplicht de gevraagde gegevens aan te leveren? | Ja/nee |  |
+| » » Omschrijf de gevolgen voor de betrokkene als de gegevens niet worden aangeleverd | Toelichting | Wat er gebeurt als de betrokkene de gegevens niet verstrekt, bijvoorbeeld dat de aanvraag niet in behandeling kan worden genomen. |
 
 ## Besluitvorming
 
@@ -194,7 +194,7 @@ Het meest gedetailleerde onderdeel van de registratie. Per categorie betrokkenen
 | Veld | Soort invoer | Toelichting |
 | --- | --- | --- |
 | Opmerkingen | Lijst |  |
-| ⤷ Opmerking | Toelichting |  |
+| » Opmerking | Toelichting |  |
 
 ## Publiceren
 
@@ -249,9 +249,9 @@ Verwerkingen van persoonsgegevens die uw organisatie in opdracht van een andere 
 | --- | --- | --- |
 | Doel & Grondslag | Ja/nee | Is er een specifiek doel voor deze verwerking vastgelegd? |
 | AVG doelen | Lijst |  |
-| ⤷ Doel | Toelichting |  |
-| ⤷ AVG rechtsgronden | Keuze | Keuze uit: Toestemming betrokkene; Uitvoering overeenkomst; Wettelijke verplichting; Vitaal belang betrokkene; Taak van algemeen belang; Gerechtvaardigd belang verantwoordelijke. |
-| ⤷ Toelichting bij gekozen rechtsgrond | Toelichting |  |
+| » Doel | Toelichting |  |
+| » AVG rechtsgronden | Keuze | Keuze uit: Toestemming betrokkene; Uitvoering overeenkomst; Wettelijke verplichting; Vitaal belang betrokkene; Taak van algemeen belang; Gerechtvaardigd belang verantwoordelijke. |
+| » Toelichting bij gekozen rechtsgrond | Toelichting |  |
 
 ## Betrokkenen en gegevens
 
@@ -259,27 +259,27 @@ Verwerkingen van persoonsgegevens die uw organisatie in opdracht van een andere 
 | --- | --- | --- |
 | Betrokkenen en gegevens | Ja/nee | Is er sprake van een (of meerdere) categorieën van betrokkenen? |
 | Betrokkenen | Lijst |  |
-| ⤷ Beschrijving | Toelichting |  |
+| » Beschrijving | Toelichting |  |
 | **Bijzondere gegevens** |  | Welke bijzondere gegevens die betrekking hebben op deze categorie van betrokkenen worden verwerkt? |
-| ⤷ Biometrische gegevens met het oog op de unieke identificatie van een persoon | Ja/nee |  |
-| ⤷ Persoonsgegevens waaruit religieuze of levensbeschouwelijke overtuigingen blijken | Ja/nee |  |
-| ⤷ Genetische gegevens | Ja/nee |  |
-| ⤷ Gegevens over gezondheid | Ja/nee |  |
-| ⤷ Persoonsgegevens waaruit politieke opvattingen blijken | Ja/nee |  |
-| ⤷ Persoonsgegevens waaruit ras of etnische afkomst blijkt | Ja/nee |  |
-| ⤷ Gegevens met betrekking tot iemands seksueel gedrag of seksuele gerichtheid | Ja/nee |  |
-| ⤷ Persoonsgegevens waaruit het lidmaatschap van een vakbond blijkt | Ja/nee |  |
-| ⤷ Uitleg doorbreking verwerkingsverbod | Toelichting |  |
+| » Biometrische gegevens met het oog op de unieke identificatie van een persoon | Ja/nee |  |
+| » Persoonsgegevens waaruit religieuze of levensbeschouwelijke overtuigingen blijken | Ja/nee |  |
+| » Genetische gegevens | Ja/nee |  |
+| » Gegevens over gezondheid | Ja/nee |  |
+| » Persoonsgegevens waaruit politieke opvattingen blijken | Ja/nee |  |
+| » Persoonsgegevens waaruit ras of etnische afkomst blijkt | Ja/nee |  |
+| » Gegevens met betrekking tot iemands seksueel gedrag of seksuele gerichtheid | Ja/nee |  |
+| » Persoonsgegevens waaruit het lidmaatschap van een vakbond blijkt | Ja/nee |  |
+| » Uitleg doorbreking verwerkingsverbod | Toelichting |  |
 | **Gevoelige gegevens** |  | Welke gevoelige gegevens die betrekking hebben op deze categorie van betrokkenen worden verwerkt? |
-| ⤷ Gegevens betreffende strafrechtelijke veroordelingen en strafbare feiten | Ja/nee |  |
-| ⤷ Burgerservicenummers | Ja/nee |  |
-| ⤷ Gegevens | Lijst |  |
-| ⤷ ⤷ Beschrijving | Toelichting |  |
-| ⤷ ⤷ Verzameldoel | Toelichting | Waarvoor juist deze gegevens nodig zijn binnen de verwerking. |
-| ⤷ ⤷ Bewaartermijn | Toelichting | Hoe lang de gegevens bewaard worden en op welke grond; er wordt niet automatisch verwijderd. |
-| ⤷ ⤷ Wie/wat is de bron van gegevens? | Toelichting | Van wie of waaruit de gegevens afkomstig zijn, bijvoorbeeld de betrokkene zelf of een basisregistratie. |
-| ⤷ ⤷ Is betrokkene verplicht de gevraagde gegevens aan te leveren? | Ja/nee |  |
-| ⤷ ⤷ Omschrijf de gevolgen voor de betrokkene als de gegevens niet worden aangeleverd | Toelichting | Wat er gebeurt als de betrokkene de gegevens niet verstrekt, bijvoorbeeld dat de aanvraag niet in behandeling kan worden genomen. |
+| » Gegevens betreffende strafrechtelijke veroordelingen en strafbare feiten | Ja/nee |  |
+| » Burgerservicenummers | Ja/nee |  |
+| » Gegevens | Lijst |  |
+| » » Beschrijving | Toelichting |  |
+| » » Verzameldoel | Toelichting | Waarvoor juist deze gegevens nodig zijn binnen de verwerking. |
+| » » Bewaartermijn | Toelichting | Hoe lang de gegevens bewaard worden en op welke grond; er wordt niet automatisch verwijderd. |
+| » » Wie/wat is de bron van gegevens? | Toelichting | Van wie of waaruit de gegevens afkomstig zijn, bijvoorbeeld de betrokkene zelf of een basisregistratie. |
+| » » Is betrokkene verplicht de gevraagde gegevens aan te leveren? | Ja/nee |  |
+| » » Omschrijf de gevolgen voor de betrokkene als de gegevens niet worden aangeleverd | Toelichting | Wat er gebeurt als de betrokkene de gegevens niet verstrekt, bijvoorbeeld dat de aanvraag niet in behandeling kan worden genomen. |
 
 ## Besluitvorming
 
@@ -344,7 +344,7 @@ Verwerkingen van persoonsgegevens die uw organisatie in opdracht van een andere 
 | Veld | Soort invoer | Toelichting |
 | --- | --- | --- |
 | Opmerkingen | Lijst |  |
-| ⤷ Opmerking | Toelichting |  |
+| » Opmerking | Toelichting |  |
 
 
 ---
@@ -407,17 +407,17 @@ Verwerkingen van politiegegevens die onder de Wet politiegegevens vallen in plaa
 | Veld | Soort invoer | Toelichting |
 | --- | --- | --- |
 | WPG doelen | Lijst |  |
-| ⤷ Omschrijving | Toelichting | Welke politiegegevens voor welk doel worden verwerkt. |
-| ⤷ Art. 8: Uitvoering dagelijkse politietaak (signaalafhandeling) | Ja/nee | De dagelijkse politietaak: binnenkomende signalen en meldingen die worden afgehandeld. |
-| ⤷ Art. 9: Onderzoek i.v.m. handhaving rechtsorde | Ja/nee | Een specifiek onderzoek naar een concreet strafbaar feit, met een afgebakende onderzoeksvraag. |
-| ⤷ Art. 10, lid 1a: Register zware criminaliteit | Ja/nee |  |
-| ⤷ Art. 10, lid 1b: Themaverwerkingen | Ja/nee | Verwerking rond een maatschappelijk verschijnsel in plaats van één concreet strafbaar feit. |
-| ⤷ Art. 10, lid 1c: Regionale Inlichtingen diensten Openbare Orde | Ja/nee | Verwerking door de Regionale Inlichtingendienst ten behoeve van de openbare orde. |
-| ⤷ Art. 12: Controle en beheer informanten | Ja/nee |  |
-| ⤷ Art. 13, lid 1: Landelijk raadpleegbare politiegegevens | Ja/nee |  |
-| ⤷ Art. 13, lid 2: Specialistische onderwerpen | Ja/nee | Gegevens over een specialistisch onderwerp, bijvoorbeeld verkeer of milieu. |
-| ⤷ Art. 13, lid 3: Geautomatiseerde vergelijking | Ja/nee | Het geautomatiseerd vergelijken van gegevensbestanden met elkaar. |
-| ⤷ Uitleg | Toelichting | Waarom de aangevinkte artikelen op deze verwerking van toepassing zijn. |
+| » Omschrijving | Toelichting | Welke politiegegevens voor welk doel worden verwerkt. |
+| » Art. 8: Uitvoering dagelijkse politietaak (signaalafhandeling) | Ja/nee | De dagelijkse politietaak: binnenkomende signalen en meldingen die worden afgehandeld. |
+| » Art. 9: Onderzoek i.v.m. handhaving rechtsorde | Ja/nee | Een specifiek onderzoek naar een concreet strafbaar feit, met een afgebakende onderzoeksvraag. |
+| » Art. 10, lid 1a: Register zware criminaliteit | Ja/nee |  |
+| » Art. 10, lid 1b: Themaverwerkingen | Ja/nee | Verwerking rond een maatschappelijk verschijnsel in plaats van één concreet strafbaar feit. |
+| » Art. 10, lid 1c: Regionale Inlichtingen diensten Openbare Orde | Ja/nee | Verwerking door de Regionale Inlichtingendienst ten behoeve van de openbare orde. |
+| » Art. 12: Controle en beheer informanten | Ja/nee |  |
+| » Art. 13, lid 1: Landelijk raadpleegbare politiegegevens | Ja/nee |  |
+| » Art. 13, lid 2: Specialistische onderwerpen | Ja/nee | Gegevens over een specialistisch onderwerp, bijvoorbeeld verkeer of milieu. |
+| » Art. 13, lid 3: Geautomatiseerde vergelijking | Ja/nee | Het geautomatiseerd vergelijken van gegevensbestanden met elkaar. |
+| » Uitleg | Toelichting | Waarom de aangevinkte artikelen op deze verwerking van toepassing zijn. |
 
 ## Bijzondere politiegegevens
 
@@ -485,7 +485,7 @@ Verwerkingen van politiegegevens die onder de Wet politiegegevens vallen in plaa
 | Veld | Soort invoer | Toelichting |
 | --- | --- | --- |
 | Opmerkingen | Lijst |  |
-| ⤷ Opmerking | Toelichting |  |
+| » Opmerking | Toelichting |  |
 
 ## Categorieën betrokkenen
 

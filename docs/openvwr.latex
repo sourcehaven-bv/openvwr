@@ -50,12 +50,8 @@
 \setmainfont{$if(mainfont)$$mainfont$$else$Helvetica Neue$endif$}
 \setmonofont[Scale=0.88]{$if(monofont)$$monofont$$else$Menlo$endif$}
 
-% Het teken ⤷ markeert in de tabellen een genest veld, maar zit niet in
-% Helvetica Neue. Deze fallback zet alleen dat teken in een font dat het wel
-% heeft, zodat de rest van de tekst onaangetast blijft.
-\newfontfamily\ovarrowfont{$if(arrowfont)$$arrowfont$$else$Apple Symbols$endif$}
-\usepackage{newunicodechar}
-\newunicodechar{⤷}{{\ovarrowfont\char"2937}}
+% Het teken » markeert in de tabellen een genest veld. Het zit zowel in de
+% macOS-fonts als in DejaVu (de buildserver), dus er is geen fallback nodig.
 
 \linespread{1.12}
 \setlength{\parindent}{0pt}

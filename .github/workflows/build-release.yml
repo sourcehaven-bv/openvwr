@@ -86,7 +86,6 @@ jobs:
           # DejaVu zit in de container; Helvetica Neue is macOS-only.
           DOC_MAINFONT: DejaVu Sans
           DOC_MONOFONT: DejaVu Sans Mono
-          DOC_ARROWFONT: DejaVu Sans
         run: ./docs/build-pdf.sh
 
       - name: Name the documentation after the release
