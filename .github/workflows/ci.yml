@@ -161,6 +161,21 @@ jobs:
           timeout 60s bash -c 'until curl -sf http://localhost:9000/minio/health/live >/dev/null 2>&1; do sleep 2; done'
           echo "MinIO is ready!"
 
+      - name: Install Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "18"
+          cache: "npm"
+          registry-url: "https://npm.pkg.github.com"
+          cache-dependency-path: "**/package-lock.json"
+
+      - name: Install npm dependencies
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=$NODE_AUTH_TOKEN"  >> ~/.npmrc
+          npm ci --ignore-scripts
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.REPO_READ_ONLY_TOKEN }}
+
       - name: Install PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -178,6 +193,12 @@ jobs:
 
       - name: Prepare application
         run: php artisan key:generate
+
+      # Blade views resolve assets through the Vite manifest, so tests that render
+      # a page fail without it -- unrelated to storage, but they sit in the same
+      # suites as the storage-sensitive ones.
+      - name: Npm build
+        run: npm run build
 
       - name: Clear Config
         run: php artisan config:clear
