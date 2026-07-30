@@ -76,9 +76,11 @@ jobs:
       - name: Install documentation toolchain
         if: inputs.documentation
         run: |
+          # php-sqlite3: de generator bouwt de formulieren op tegen een lege
+          # SQLite in het geheugen, zodat er geen database nodig is.
           apt-get install -y --no-install-recommends \
             pandoc texlive-xetex texlive-fonts-recommended \
-            librsvg2-bin fonts-dejavu
+            librsvg2-bin fonts-dejavu php-sqlite3
 
       - name: Build data-model documentation
         if: inputs.documentation

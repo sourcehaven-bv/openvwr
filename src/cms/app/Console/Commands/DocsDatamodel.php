@@ -48,6 +48,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Livewire\Component as LivewireComponent;
+use PDO;
 use ReflectionClass;
 use ReflectionMethod;
 use RuntimeException;
@@ -327,6 +328,17 @@ class DocsDatamodel extends Command
 
         DB::purge('docs');
         DB::setDefaultConnection('docs');
+
+        // Zonder de SQLite-driver mislukt elke query met "could not find
+        // driver", en dat is geen fout die de reparatielus kan verhelpen. Beter
+        // hier duidelijk maken wat er ontbreekt dan verderop stranden op een
+        // onbegrijpelijke melding.
+        if (!in_array('sqlite', PDO::getAvailableDrivers(), true)) {
+            throw new RuntimeException(
+                'De PHP-extensie pdo_sqlite ontbreekt. Die is nodig om de '
+                . 'formulieren op te bouwen zonder database (installeer php-sqlite3).',
+            );
+        }
 
         // De volledige migratie draaien lukt niet: die is op PostgreSQL
         // geschreven. Alleen de tabellen die een formulier daadwerkelijk
