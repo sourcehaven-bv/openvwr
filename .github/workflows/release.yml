@@ -21,6 +21,7 @@ jobs:
     uses: ./.github/workflows/build-release.yml
     with:
       version: ${{ inputs.tag }}
+      documentation: true
 
   publish:
     needs: build
@@ -36,5 +37,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ inputs.tag }}
-          files: "*.tar.gz"
+          files: |
+            *.tar.gz
+            *.pdf
           generate_release_notes: true

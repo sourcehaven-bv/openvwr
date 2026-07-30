@@ -1,0 +1,19 @@
+# TIJDELIJK — verwijderen voordat deze PR gemerged wordt.
+#
+# Draait exact hetzelfde build-pad als een release, met documentation: true,
+# zodat we op deze PR kunnen zien of de LaTeX-toolchain in de buildcontainer
+# werkt en of de PDF er goed uitziet. Bij een release gebeurt dit alleen op een
+# tag; deze workflow bestaat puur om dat één keer te verifiëren.
+name: TIJDELIJK - verifieer documentatiebuild
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-release.yml
+    with:
+      version: pr-verificatie
+      ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      documentation: true

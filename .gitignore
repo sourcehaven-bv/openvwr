@@ -5,3 +5,6 @@
 *.gz
 .db_requirements
 RELEASE_INFO.txt
+
+# De datamodel-PDF wordt gebouwd (just docs-pdf) en bij een release geattacht.
+docs/gegevensmodel-verwerkingen.pdf

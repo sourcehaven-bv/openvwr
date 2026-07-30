@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 
+use App\Documentation\DocNote;
 use App\Filament\Forms\Components\ChildrenRelationTable;
 use App\Filament\Forms\Components\DataLossToggle;
 use App\Filament\Forms\Components\Group\ProcessingRecordContactPersons;
@@ -192,6 +193,9 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
     /**
      * @return array<Component>
      */
+    #[DocNote('Het meest gedetailleerde onderdeel van de registratie. Per categorie '
+        . 'betrokkenen wordt vastgelegd welke gewone, bijzondere en gevoelige gegevens '
+        . 'worden verwerkt, en per gegeven het verzameldoel, de bewaartermijn en de bron.')]
     public static function getStakeholder(): array
     {
         return [

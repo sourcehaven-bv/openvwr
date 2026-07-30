@@ -9,6 +9,35 @@ default:
 release version="dev":
     ./scripts/create-release.sh {{version}}
 
+# Documentation
+# =============
+
+# Generate the data-model documentation (markdown) from the form definitions
+docs-datamodel:
+    @echo "📝 Generating data-model documentation..."
+    cd src/cms && php artisan docs:datamodel
+    @echo "✅ docs/gegevensmodel-verwerkingen.md updated"
+
+# Generate the data-model documentation and build the branded PDF
+docs-pdf:
+    @echo "📄 Building data-model PDF..."
+    ./docs/build-pdf.sh
+    @echo "✅ docs/gegevensmodel-verwerkingen.pdf updated"
+
+# Fail if the committed documentation is out of date with the code
+docs-check:
+    @echo "🔍 Checking whether the documentation matches the code..."
+    @cp docs/gegevensmodel-verwerkingen.md /tmp/docs-datamodel-committed.md
+    @cd src/cms && php artisan docs:datamodel >/dev/null
+    @if diff -q /tmp/docs-datamodel-committed.md docs/gegevensmodel-verwerkingen.md >/dev/null; then \
+        echo "✅ Documentation is up to date"; \
+    else \
+        echo "❌ Documentation is out of date. Run 'just docs-datamodel' and commit the result."; \
+        diff -u /tmp/docs-datamodel-committed.md docs/gegevensmodel-verwerkingen.md || true; \
+        cp /tmp/docs-datamodel-committed.md docs/gegevensmodel-verwerkingen.md; \
+        exit 1; \
+    fi
+
 # Extract and test a release archive
 test-release archive:
     ./scripts/test-release.sh {{archive}}

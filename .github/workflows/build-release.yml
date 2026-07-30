@@ -11,10 +11,18 @@ on:
         description: "Git ref to check out. Defaults to `version` for tag builds; the dev path passes a real SHA."
         required: false
         type: string
+      documentation:
+        description: "Build and attach the data-model PDF. Only worth the extra minutes on a real release; dev builds skip it."
+        required: false
+        default: false
+        type: boolean
     outputs:
       archive:
         description: "The release archive filename"
         value: ${{ jobs.build.outputs.archive }}
+      documentation:
+        description: "The data-model documentation PDF filename"
+        value: ${{ jobs.build.outputs.documentation }}
 
 jobs:
   build:
@@ -23,6 +31,7 @@ jobs:
       image: debian:13
     outputs:
       archive: ${{ steps.archive.outputs.ARCHIVE }}
+      documentation: ${{ steps.documentation.outputs.PDF }}
 
     steps:
       - name: Install dependencies
@@ -58,4 +67,43 @@ jobs:
         with:
           name: ${{ steps.archive.outputs.NAME }}
           path: ${{ steps.archive.outputs.ARCHIVE }}
+          retention-days: 7
+
+      # De datamodel-documentatie wordt uit de formulierdefinities gegenereerd,
+      # zodat de PDF bij een release altijd de werkelijke velden beschrijft.
+      # De LaTeX-toolchain kost een paar minuten, dus dit gebeurt alleen bij een
+      # echte release en niet bij elke dev-build.
+      - name: Install documentation toolchain
+        if: inputs.documentation
+        run: |
+          apt-get install -y --no-install-recommends \
+            pandoc texlive-xetex texlive-fonts-recommended \
+            librsvg2-bin fonts-dejavu
+
+      - name: Build data-model documentation
+        if: inputs.documentation
+        env:
+          # DejaVu zit in de container; Helvetica Neue is macOS-only.
+          DOC_MAINFONT: DejaVu Sans
+          DOC_MONOFONT: DejaVu Sans Mono
+          DOC_ARROWFONT: DejaVu Sans
+        run: ./docs/build-pdf.sh
+
+      - name: Name the documentation after the release
+        id: documentation
+        if: inputs.documentation
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          PDF="openvwr-datamodel-${VERSION}.pdf"
+          cp docs/gegevensmodel-verwerkingen.pdf "$PDF"
+          echo "PDF=${PDF}" >> "$GITHUB_OUTPUT"
+          echo "NAME=${PDF%.pdf}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload documentation
+        if: inputs.documentation
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.documentation.outputs.NAME }}
+          path: ${{ steps.documentation.outputs.PDF }}
           retention-days: 7
