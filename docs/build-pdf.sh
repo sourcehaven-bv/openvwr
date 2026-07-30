@@ -49,6 +49,13 @@ fi
 MAINFONT="${DOC_MAINFONT:-Helvetica Neue}"
 MONOFONT="${DOC_MONOFONT:-Menlo}"
 
+# De datum met de hand in het Nederlands zetten. Op `date` met een nl_NL-locale
+# kunnen we niet bouwen: die locale ontbreekt op een kale buildserver, en dan
+# valt hij stilzwijgend terug op Engels.
+MAANDEN=(januari februari maart april mei juni juli
+         augustus september oktober november december)
+DATUM="$(date '+%-d') ${MAANDEN[$(( 10#$(date '+%m') - 1 ))]} $(date '+%Y')"
+
 echo "PDF genereren: $OUT"
 pandoc "$SRC" \
     --output="$OUT" \
@@ -61,6 +68,6 @@ pandoc "$SRC" \
     --variable=monofont:"$MONOFONT" \
     --variable=title:"Wat legt OpenVWR vast?" \
     --variable=subtitle:"Overzicht van de vast te leggen gegevens per register" \
-    --variable=date:"$(LC_TIME=nl_NL.UTF-8 date '+%-d %B %Y' 2>/dev/null || date '+%d-%m-%Y')"
+    --variable=date:"$DATUM"
 
 echo "Klaar: $OUT"
