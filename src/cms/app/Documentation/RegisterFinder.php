@@ -12,6 +12,7 @@ use RuntimeException;
 
 use function __;
 use function array_filter;
+use function array_search;
 use function in_array;
 use function is_string;
 use function sprintf;
@@ -66,8 +67,17 @@ class RegisterFinder
             throw new RuntimeException('No resources found in the "Registers" navigation group.');
         }
 
-        usort($registers, static function (string $a, string $b): int {
-            return ($a::getNavigationSort() ?? PHP_INT_MAX) <=> ($b::getNavigationSort() ?? PHP_INT_MAX);
+        // The same order as the menu: group by group, and within a group by
+        // navigation sort. Sort numbers restart per group, so ordering on them
+        // alone would interleave the groups.
+        usort($registers, static function (string $a, string $b) use ($groups): int {
+            return [
+                array_search($a::getNavigationGroup(), $groups, true),
+                $a::getNavigationSort() ?? PHP_INT_MAX,
+            ] <=> [
+                array_search($b::getNavigationGroup(), $groups, true),
+                $b::getNavigationSort() ?? PHP_INT_MAX,
+            ];
         });
 
         return $registers;
