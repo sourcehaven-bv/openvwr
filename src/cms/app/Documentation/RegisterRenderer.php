@@ -109,7 +109,7 @@ class RegisterRenderer
         // Pandoc derives the column widths from the width of these dashes.
         // Without that the three columns end up equally wide, which leaves the
         // explanation cramped while the other two waste space.
-        $lines[] = '|' . str_repeat('-', 28) . '|' . str_repeat('-', 14) . '|' . str_repeat('-', 58) . '|';
+        $lines[] = '|' . str_repeat('-', 34) . '|' . str_repeat('-', 14) . '|' . str_repeat('-', 52) . '|';
 
         foreach ($rows as $row) {
             $lines[] = sprintf('| %s | %s | %s |', $row['field'], $row['kind'], $row['help']);

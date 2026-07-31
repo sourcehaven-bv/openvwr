@@ -70,6 +70,13 @@ $endif$
 \setlength{\parskip}{0.65em}
 \setlength{\emergencystretch}{3em}
 
+% Nederlandse samenstellingen zijn lang; zonder deze instelling loopt een woord
+% als "Verwerkingsverantwoordelijken" uit zijn tabelkolom. \hyphenpenalty houdt
+% afbreken in gewone tekst onaantrekkelijk, maar staat het wel toe waar het moet.
+\tolerance=2000
+\hyphenpenalty=200
+\hbadness=2000
+
 % --- Koppen ------------------------------------------------------------------
 % De markdown nummert de hoofdstukken zelf ("# 1. ...", "## 1.1 ...").
 % LaTeX telt daar niet overheen; anders zou er "1. 1. Verwerkingen" staan.
