@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Documentation\FormEnvironment;
 use App\Models\Organisation;
+use Illuminate\Database\Eloquent\Model;
 use Filament\Facades\Filament;
 use Filament\Forms\Contracts\HasForms;
 use Illuminate\Database\QueryException;
@@ -115,4 +116,14 @@ it('has a host that renders nothing', function (): void {
     $this->environment->boot();
 
     expect($this->environment->makeFormHost()->render())->toBe('');
+});
+
+it('leaves the mass-assignment guard alone', function (): void {
+    // Model::unguard() is global and permanent: switching it off here would let
+    // unrelated tests write to columns that do not exist, far away from this
+    // code and hard to trace back.
+    $this->environment = new FormEnvironment();
+    $this->environment->boot();
+
+    expect(Model::isUnguarded())->toBeFalse();
 });

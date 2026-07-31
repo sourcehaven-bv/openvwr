@@ -11,7 +11,6 @@ use App\Models\User;
 use Filament\Facades\Filament;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Auth;
@@ -141,8 +140,6 @@ class FormEnvironment
                 . 'forms without a database (install php-sqlite3).',
             );
         }
-
-        Model::unguard();
     }
 
     /**
