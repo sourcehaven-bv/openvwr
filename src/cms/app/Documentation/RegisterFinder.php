@@ -11,7 +11,6 @@ use ReflectionClass;
 use RuntimeException;
 
 use function __;
-use function array_filter;
 use function array_search;
 use function in_array;
 use function is_string;
@@ -59,7 +58,6 @@ class RegisterFinder
             $registers[] = $resourceClass;
         }
 
-        // The same order as the menu.
         // No registers at all means the navigation group was renamed or the
         // panel is misconfigured. Returning an empty list would quietly produce
         // a document without any content, so say so instead.
@@ -94,18 +92,15 @@ class RegisterFinder
      */
     protected function navigationGroups(): array
     {
-        // The DPIA module is not present in every installation, so its group
-        // is looked up by name rather than referenced directly.
-        $cases = array_filter([
-            NavigationGroup::REGISTERS,
-            NavigationGroup::tryFrom('navigation.dpia'),
-        ]);
+        // The DPIA module is not present in every installation, so its group is
+        // named rather than referenced through the enum.
+        $keys = [NavigationGroup::REGISTERS->value, 'navigation.dpia'];
 
         $groups = [];
 
-        foreach ($cases as $case) {
-            $label = __($case->value);
-            $groups[] = is_string($label) ? $label : $case->value;
+        foreach ($keys as $key) {
+            $label = __($key);
+            $groups[] = is_string($label) ? $label : $key;
         }
 
         return $groups;
