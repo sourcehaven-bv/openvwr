@@ -8,11 +8,11 @@ use App\Filament\NavigationGroups\NavigationGroup;
 use Filament\Facades\Filament;
 use Filament\Resources\Resource;
 use ReflectionClass;
-use Throwable;
+use RuntimeException;
 
 use function __;
 use function is_string;
-use function is_subclass_of;
+use function sprintf;
 use function usort;
 
 use const PHP_INT_MAX;
@@ -35,15 +35,20 @@ class RegisterFinder
             ? Filament::getPanel($panelId)
             : Filament::getDefaultPanel();
 
-        $group = __(NavigationGroup::REGISTERS->value);
+        // Filament falls back to the default panel for an unknown id, so a typo
+        // in --panel would silently document the wrong thing.
+        if (is_string($panelId) && $panelId !== '' && $panel->getId() !== $panelId) {
+            throw new RuntimeException(sprintf('Unknown Filament panel "%s".', $panelId));
+        }
+
+        $group = $this->navigationGroup();
+
+        /** @var array<int, class-string<Resource>> $resources */
+        $resources = $panel->getResources();
 
         $registers = [];
 
-        foreach ($panel->getResources() as $resourceClass) {
-            if (!is_subclass_of($resourceClass, Resource::class)) {
-                continue;
-            }
-
+        foreach ($resources as $resourceClass) {
             if (!$this->isRegister($resourceClass, $group)) {
                 continue;
             }
@@ -52,6 +57,13 @@ class RegisterFinder
         }
 
         // The same order as the menu.
+        // No registers at all means the navigation group was renamed or the
+        // panel is misconfigured. Returning an empty list would quietly produce
+        // a document without any content, so say so instead.
+        if ($registers === []) {
+            throw new RuntimeException('No resources found in the "Registers" navigation group.');
+        }
+
         usort($registers, static function (string $a, string $b): int {
             return ($a::getNavigationSort() ?? PHP_INT_MAX) <=> ($b::getNavigationSort() ?? PHP_INT_MAX);
         });
@@ -60,15 +72,21 @@ class RegisterFinder
     }
 
     /**
+     * The navigation group that marks a resource as a register.
+     */
+    protected function navigationGroup(): string
+    {
+        $group = __(NavigationGroup::REGISTERS->value);
+
+        return is_string($group) ? $group : NavigationGroup::REGISTERS->value;
+    }
+
+    /**
      * @param class-string<Resource> $resourceClass
      */
     private function isRegister(string $resourceClass, mixed $group): bool
     {
-        try {
-            if ($resourceClass::getNavigationGroup() !== $group) {
-                return false;
-            }
-        } catch (Throwable) {
+        if ($resourceClass::getNavigationGroup() !== $group) {
             return false;
         }
 
@@ -84,10 +102,6 @@ class RegisterFinder
     private function hasOwnForm(string $resourceClass): bool
     {
         $reflection = new ReflectionClass($resourceClass);
-
-        if (!$reflection->hasMethod('form')) {
-            return false;
-        }
 
         return $reflection->getMethod('form')->getDeclaringClass()->getName() === $resourceClass;
     }

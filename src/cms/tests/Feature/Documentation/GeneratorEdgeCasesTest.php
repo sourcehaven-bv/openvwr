@@ -15,11 +15,17 @@ use App\Documentation\RegisterRenderer;
 use App\Documentation\SectionNotes;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 use App\Filament\Resources\ContactPersonResource;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Illuminate\Support\Facades\File;
+use Tests\Fixtures\Documentation\BrokenRegisterResource;
 
 beforeEach(function (): void {
+    $this->output = sys_get_temp_dir() . '/docs-edge-' . uniqid() . '.md';
+    $this->prose = sys_get_temp_dir() . '/docs-edge-prose-' . uniqid();
+
     $this->environment = new FormEnvironment();
     $this->environment->boot();
 
@@ -30,6 +36,7 @@ beforeEach(function (): void {
 
 afterEach(function (): void {
     $this->environment->restore();
+    File::delete($this->output);
 });
 
 it('skips a section without a heading', function (): void {
@@ -84,4 +91,30 @@ it('has no register description when the translation is missing', function (): v
 
     // Only the title and the table, no stray introductory line before it.
     expect($markdown)->toStartWith("# Contactpersonen\n\n## Kop");
+});
+
+it('stops with an error when a register cannot be read', function (): void {
+    // A resource whose form throws stands for a form that bails out halfway.
+    // The command must report it and stop rather than leave half a document
+    // behind.
+    Filament::getPanel('admin')->resources([BrokenRegisterResource::class]);
+
+    $this->artisan('docs:datamodel', [
+        '--output' => $this->output,
+        '--prose' => $this->prose,
+    ])
+        ->expectsOutputToContain('Failed:')
+        ->assertExitCode(1);
+});
+
+it('reports a misconfigured panel instead of writing an empty document', function (): void {
+    // An unknown panel id is the clearest way a panel can be misconfigured. The
+    // command must say so rather than leave a document without content behind.
+    $this->artisan('docs:datamodel', [
+        '--output' => $this->output,
+        '--prose' => $this->prose,
+        '--panel' => 'a-panel-that-does-not-exist',
+    ])->assertExitCode(1);
+
+    expect(file_exists($this->output))->toBeFalse();
 });

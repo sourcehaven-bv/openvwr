@@ -83,10 +83,10 @@ class DocsDatamodel extends Command
         $notes = new SectionNotes($environment, $describer);
         $renderer = new RegisterRenderer($describer, $notes);
 
-        $registers = (new RegisterFinder())->find($this->option('panel'));
-
-        if ($registers === []) {
-            $this->error('No registers found in the "Registers" navigation group.');
+        try {
+            $registers = (new RegisterFinder())->find($this->option('panel'));
+        } catch (Throwable $e) {
+            $this->error($e->getMessage());
 
             return self::FAILURE;
         }

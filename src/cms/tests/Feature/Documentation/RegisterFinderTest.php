@@ -53,3 +53,20 @@ it('only returns resources that have their own form', function (): void {
             ->toBe($resource);
     }
 });
+
+it('refuses to return an empty list', function (): void {
+    // A panel without registers means the navigation group was renamed or the
+    // panel is misconfigured. Returning nothing would quietly yield a document
+    // without content, so the finder says so instead. Every panel in this
+    // application inherits the same resources, so the group name is pointed at
+    // something no resource returns.
+    $finder = new class extends RegisterFinder {
+        protected function navigationGroup(): string
+        {
+            return 'A group nothing belongs to';
+        }
+    };
+
+    expect(fn () => $finder->find('admin'))
+        ->toThrow(RuntimeException::class, 'No resources found');
+});

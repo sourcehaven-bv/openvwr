@@ -11,6 +11,7 @@ use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\TextInput;
+use Tests\Fixtures\Documentation\AwkwardNotesResource;
 
 beforeEach(function (): void {
     $this->environment = new FormEnvironment();
@@ -88,4 +89,14 @@ it('works for a resource without schema classes', function (): void {
 
 it('has no children for a component that cannot resolve them', function (): void {
     expect($this->notes->childrenOf(TextInput::make('a')))->toBe([]);
+});
+
+it('skips notes that cannot be resolved', function (): void {
+    // Every method in this fixture carries a #[DocNote] that cannot land in the
+    // document: no field to anchor it to, an argument it cannot supply, a
+    // method that throws, a return value that is not a schema, or a translation
+    // key that does not exist. None of them may derail the generator.
+    $this->notes->load(AwkwardNotesResource::class);
+
+    expect($this->notes->forSection([TextInput::make('untranslated')]))->toBeNull();
 });

@@ -18,11 +18,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Livewire\Component as LivewireComponent;
-use PDO;
 use RuntimeException;
 
 use function config;
-use function in_array;
 use function preg_match;
 
 /**
@@ -130,16 +128,6 @@ class FormEnvironment
 
         DB::purge(self::CONNECTION);
         DB::setDefaultConnection(self::CONNECTION);
-
-        // Without the SQLite driver every query fails with "could not find
-        // driver", which run() cannot repair. Better to say what is missing here
-        // than to strand on a cryptic message later on.
-        if (!in_array('sqlite', PDO::getAvailableDrivers(), true)) {
-            throw new RuntimeException(
-                'The pdo_sqlite PHP extension is missing. It is required to build the '
-                . 'forms without a database (install php-sqlite3).',
-            );
-        }
     }
 
     /**

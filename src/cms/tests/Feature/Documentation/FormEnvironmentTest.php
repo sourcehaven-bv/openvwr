@@ -127,3 +127,42 @@ it('leaves the mass-assignment guard alone', function (): void {
 
     expect(Model::isUnguarded())->toBeFalse();
 });
+
+it('gives up when the repairs never end', function (): void {
+    $this->environment = new FormEnvironment();
+    $this->environment->boot();
+
+    // A query naming a new table every time can never be satisfied by creating
+    // one more table; the loop must stop rather than spin forever.
+    $attempt = 0;
+
+    expect(fn () => $this->environment->run(static function () use (&$attempt): mixed {
+        $attempt++;
+
+        return DB::table('endless_table_' . $attempt)->get();
+    }))->toThrow(RuntimeException::class, 'Too many missing tables');
+});
+
+it('creates a column the query names without its table', function (): void {
+    $this->environment = new FormEnvironment();
+    $this->environment->boot();
+
+    // Not every query qualifies its columns; SQLite then reports just the
+    // column name and the table has to come from the query itself.
+    $result = $this->environment->run(
+        static fn (): mixed => DB::select('select unqualified from fourth_table'),
+    );
+
+    expect($result)->toHaveCount(0);
+});
+
+it('cannot repair a missing column without a table to add it to', function (): void {
+    $this->environment = new FormEnvironment();
+    $this->environment->boot();
+
+    // A column error from a query without a FROM clause leaves nowhere to add
+    // the column, so the error propagates.
+    expect(fn () => $this->environment->run(
+        static fn (): mixed => DB::select('select a_missing_column'),
+    ))->toThrow(QueryException::class);
+});
