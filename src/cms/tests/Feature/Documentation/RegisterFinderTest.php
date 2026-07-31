@@ -38,8 +38,8 @@ it('orders the registers the way the menu does', function (): void {
     // restart per group, so they only have to ascend inside a group.
     $perGroup = [];
     foreach ($registers as $resource) {
-        $perGroup[(string) $resource::getNavigationGroup()][] =
-            $resource::getNavigationSort() ?? PHP_INT_MAX;
+        $group = (string) $resource::getNavigationGroup();
+        $perGroup[$group][] = $resource::getNavigationSort() ?? PHP_INT_MAX;
     }
 
     foreach ($perGroup as $sorts) {
