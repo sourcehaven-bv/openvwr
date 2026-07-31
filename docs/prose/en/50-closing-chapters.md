@@ -5,13 +5,13 @@ automatically. These matter for demonstrating accountability.
 
 | Aspect | What is recorded |
 | --- | --- |
-| **Change history** | For every record, who changed what and when. Versions can be compared, including changes in linked items such as data subjects or systems. |
-| **Versions and approval** | Records can be captured in a version submitted for approval to mandate holders. Their sign-off is recorded with date and person. |
-| **Organisation** | Every record belongs to one organisation. Users only see the records of the organisation(s) they have access to. |
-| **Users and roles** | For users, the name, email address and assigned roles are recorded. Roles determine who may read, fill in, approve or administer. |
-| **Created and changed dates** | For every record and every linked item. |
-| **Deleted records** | Deleted records are retained and can be restored; they disappear from the regular overviews. |
-| **Import provenance** | For records taken over from an earlier register, the original provenance is retained. |
+| Change history | For every record, who changed what and when. Versions can be compared, including changes in linked items such as data subjects or systems. |
+| Versions and approval | Records can be captured in a version submitted for approval to mandate holders. Their sign-off is recorded with date and person. |
+| Organisation | Every record belongs to one organisation. Users only see the records of the organisation(s) they have access to. |
+| Users and roles | For users, the name, email address and assigned roles are recorded. Roles determine who may read, fill in, approve or administer. |
+| Created and changed dates | For every record and every linked item. |
+| Deleted records | Deleted records are retained and can be restored; they disappear from the regular overviews. |
+| Import provenance | For records taken over from an earlier register, the original provenance is retained. |
 
 # Reuse of data
 

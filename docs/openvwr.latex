@@ -13,6 +13,12 @@
 \documentclass[$if(fontsize)$$fontsize$$else$11pt$endif$,a4paper]{article}
 
 \usepackage{fontspec}
+
+% Zonder een taalinstelling breekt LaTeX Nederlandse woorden af volgens Engelse
+% regels ("beo-ordelen" in plaats van "be-oor-de-len"). polyglossia laadt de
+% juiste afbreekpatronen; de taal komt mee als variabele uit build-pdf.sh.
+\usepackage{polyglossia}
+\setmainlanguage{$if(lang)$$lang$$else$dutch$endif$}
 \usepackage{xcolor}
 \usepackage{geometry}
 \usepackage{longtable,booktabs,array}

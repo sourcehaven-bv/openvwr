@@ -5,13 +5,13 @@ de aantoonbaarheid van het register.
 
 | Onderdeel | Wat wordt vastgelegd |
 | --- | --- |
-| **Wijzigingshistorie** | Van elke registratie wordt bijgehouden wie wat wanneer heeft gewijzigd. Versies zijn onderling te vergelijken, inclusief wijzigingen in gekoppelde onderdelen zoals betrokkenen of systemen. |
-| **Versies en goedkeuring** | Registraties kunnen worden vastgelegd in een versie die ter goedkeuring wordt voorgelegd aan mandaathouders. Hun akkoord wordt met datum en persoon vastgelegd. |
-| **Organisatie** | Elke registratie hoort bij één organisatie. Gebruikers zien uitsluitend de registraties van de organisatie(s) waartoe zij toegang hebben. |
-| **Gebruikers en rollen** | Van gebruikers worden naam, e-mailadres en toegewezen rollen vastgelegd. Rollen bepalen wie mag lezen, invullen, goedkeuren of beheren. |
-| **Aanmaak- en wijzigingsdatum** | Van elke registratie en elk gekoppeld onderdeel. |
-| **Verwijderde registraties** | Verwijderde registraties blijven bewaard en zijn herstelbaar; ze verdwijnen uit de reguliere overzichten. |
-| **Import-herkomst** | Bij registraties die uit een eerder register zijn overgenomen, blijft de oorspronkelijke herkomst bewaard. |
+| Wijzigingshistorie | Van elke registratie wordt bijgehouden wie wat wanneer heeft gewijzigd. Versies zijn onderling te vergelijken, inclusief wijzigingen in gekoppelde onderdelen zoals betrokkenen of systemen. |
+| Versies en goedkeuring | Registraties kunnen worden vastgelegd in een versie die ter goedkeuring wordt voorgelegd aan mandaathouders. Hun akkoord wordt met datum en persoon vastgelegd. |
+| Organisatie | Elke registratie hoort bij één organisatie. Gebruikers zien uitsluitend de registraties van de organisatie(s) waartoe zij toegang hebben. |
+| Gebruikers en rollen | Van gebruikers worden naam, e-mailadres en toegewezen rollen vastgelegd. Rollen bepalen wie mag lezen, invullen, goedkeuren of beheren. |
+| Aanmaak- en wijzigingsdatum | Van elke registratie en elk gekoppeld onderdeel. |
+| Verwijderde registraties | Verwijderde registraties blijven bewaard en zijn herstelbaar; ze verdwijnen uit de reguliere overzichten. |
+| Import-herkomst | Bij registraties die uit een eerder register zijn overgenomen, blijft de oorspronkelijke herkomst bewaard. |
 
 # Hergebruik van gegevens
 

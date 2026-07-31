@@ -79,11 +79,13 @@ for LOCALE in "${LOCALES[@]}"; do
             TITLE="Wat legt OpenVWR vast?"
             SUBTITLE="Overzicht van de vast te leggen gegevens per register"
             DATE="$(date '+%-d') ${MONTHS_NL[$MONTH_INDEX]} $(date '+%Y')"
+            LANG_NAME="dutch"
             ;;
         en)
             TITLE="What does OpenVWR record?"
             SUBTITLE="An overview of the data each register can hold"
             DATE="${MONTHS_EN[$MONTH_INDEX]} $(date '+%-d, %Y')"
+            LANG_NAME="english"
             ;;
     esac
 
@@ -97,6 +99,7 @@ for LOCALE in "${LOCALES[@]}"; do
         --variable=logo:"$LOGO_PDF" \
         --variable=mainfont:"$MAINFONT" \
         --variable=monofont:"$MONOFONT" \
+        --variable=lang:"$LANG_NAME" \
         --variable=title:"$TITLE" \
         --variable=subtitle:"$SUBTITLE" \
         --variable=date:"$DATE"
