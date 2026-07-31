@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 use App\Documentation\FormEnvironment;
 use App\Models\Organisation;
-use Illuminate\Database\Eloquent\Model;
 use Filament\Facades\Filament;
 use Filament\Forms\Contracts\HasForms;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
