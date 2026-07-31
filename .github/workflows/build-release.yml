@@ -21,7 +21,7 @@ on:
         description: "The release archive filename"
         value: ${{ jobs.build.outputs.archive }}
       documentation:
-        description: "The data-model documentation PDF filename"
+        description: "Artifact name holding the data-model documentation PDFs"
         value: ${{ jobs.build.outputs.documentation }}
 
 jobs:
@@ -31,7 +31,7 @@ jobs:
       image: debian:13
     outputs:
       archive: ${{ steps.archive.outputs.ARCHIVE }}
-      documentation: ${{ steps.documentation.outputs.PDF }}
+      documentation: ${{ steps.documentation.outputs.NAME }}
 
     steps:
       - name: Install dependencies
@@ -69,15 +69,15 @@ jobs:
           path: ${{ steps.archive.outputs.ARCHIVE }}
           retention-days: 7
 
-      # De datamodel-documentatie wordt uit de formulierdefinities gegenereerd,
-      # zodat de PDF bij een release altijd de werkelijke velden beschrijft.
-      # De LaTeX-toolchain kost een paar minuten, dus dit gebeurt alleen bij een
-      # echte release en niet bij elke dev-build.
+      # The data-model documentation is generated from the form definitions, so
+      # the PDFs shipped with a release always describe the real fields. The
+      # LaTeX toolchain costs a few minutes, so this only runs for an actual
+      # release and not for every dev build.
       - name: Install documentation toolchain
         if: inputs.documentation
         run: |
-          # php-sqlite3: de generator bouwt de formulieren op tegen een lege
-          # SQLite in het geheugen, zodat er geen database nodig is.
+          # php-sqlite3: the generator builds the forms against an empty
+          # in-memory SQLite, so no database server is needed.
           apt-get install -y --no-install-recommends \
             pandoc texlive-xetex texlive-fonts-recommended \
             librsvg2-bin fonts-dejavu php-sqlite3
@@ -85,7 +85,7 @@ jobs:
       - name: Build data-model documentation
         if: inputs.documentation
         env:
-          # DejaVu zit in de container; Helvetica Neue is macOS-only.
+          # DejaVu ships with the container; Helvetica Neue is macOS-only.
           DOC_MAINFONT: DejaVu Sans
           DOC_MONOFONT: DejaVu Sans Mono
         run: ./docs/build-pdf.sh
@@ -96,15 +96,15 @@ jobs:
         env:
           VERSION: ${{ inputs.version }}
         run: |
-          PDF="openvwr-datamodel-${VERSION}.pdf"
-          cp docs/gegevensmodel-verwerkingen.pdf "$PDF"
-          echo "PDF=${PDF}" >> "$GITHUB_OUTPUT"
-          echo "NAME=${PDF%.pdf}" >> "$GITHUB_OUTPUT"
+          for LOCALE in nl en; do
+            cp "docs/datamodel-${LOCALE}.pdf" "openvwr-datamodel-${LOCALE}-${VERSION}.pdf"
+          done
+          echo "NAME=openvwr-datamodel-${VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: Upload documentation
         if: inputs.documentation
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.documentation.outputs.NAME }}
-          path: ${{ steps.documentation.outputs.PDF }}
+          path: openvwr-datamodel-*.pdf
           retention-days: 7

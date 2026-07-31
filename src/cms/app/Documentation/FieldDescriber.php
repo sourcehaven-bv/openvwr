@@ -21,41 +21,42 @@ use Filament\Forms\Components\Toggle;
 use Illuminate\Contracts\Support\Htmlable;
 use Throwable;
 
+use function __;
 use function class_basename;
 use function implode;
 use function is_array;
+use function is_string;
 use function preg_replace;
 use function str_contains;
 use function strip_tags;
 use function trim;
 
 /**
- * Beschrijft een formuliercomponent in gewone taal.
+ * Describes a form component in plain language.
  *
- * Alles wat een lezer van de documentatie over één veld te zien krijgt - het
- * label, het soort invoer en de toelichting - wordt hier bepaald. De teksten
- * komen uit het formulier zelf, zodat het document zegt wat de invuller ook
- * werkelijk in het scherm ziet.
+ * Everything a reader of the documentation sees about a single field - its
+ * label, the kind of input and the explanation - is decided here. The texts come
+ * from the form itself, so the document says what the person filling it in
+ * actually sees on screen.
  */
 class FieldDescriber
 {
     /**
-     * Vertaling van componentklasse naar de omschrijving in de kolom
-     * "Soort invoer". Bewust in gewone taal: het document is voor privacy
-     * officers, niet voor ontwikkelaars.
+     * Maps a component class to the wording used in the "kind of input" column.
+     * Deliberately plain: the document is for privacy officers, not developers.
      */
     private const INPUT_KINDS = [
-        Textarea::class => 'Toelichting',
-        TextInput::class => 'Tekst',
-        Toggle::class => 'Ja/nee',
-        Checkbox::class => 'Ja/nee',
-        DatePicker::class => 'Datum',
-        DateTimePicker::class => 'Datum',
-        Radio::class => 'Keuze',
-        Select::class => 'Keuze',
-        CheckboxList::class => 'Meerkeuze',
-        FileUpload::class => 'Bestand',
-        Repeater::class => 'Lijst',
+        Textarea::class => 'textarea',
+        TextInput::class => 'text',
+        Toggle::class => 'boolean',
+        Checkbox::class => 'boolean',
+        DatePicker::class => 'date',
+        DateTimePicker::class => 'date',
+        Radio::class => 'choice',
+        Select::class => 'choice',
+        CheckboxList::class => 'multiple_choice',
+        FileUpload::class => 'file',
+        Repeater::class => 'list',
     ];
 
     public function label(Component $component): ?string
@@ -89,8 +90,8 @@ class FieldDescriber
     }
 
     /**
-     * De beschrijving onder een sectiekop, bijvoorbeeld de uitleg bij de
-     * GEB-vragenlijst of bij de bijzondere gegevens.
+     * The description below a section heading, such as the explanation above the
+     * DPIA questionnaire or the special categories of data.
      */
     public function description(Component $component): string
     {
@@ -107,41 +108,50 @@ class FieldDescriber
 
     public function kind(Component $component): string
     {
-        // Labels zijn vrij te kiezen trefwoorden, geen vaste lijst; technisch
-        // is het een Select, maar dat zegt de lezer niets.
+        // Labels are free-form keywords rather than a fixed list; technically a
+        // Select, but that tells the reader nothing.
         if (class_basename($component) === 'TagsInput') {
-            return 'Meerkeuze (vrij)';
+            return $this->kindLabel('free_tags');
         }
 
-        // Eerst koppelingen: een verwijzing naar een andere registratie is voor
-        // de lezer iets anders dan een keuzelijst, ook al is het technisch een
-        // Select.
+        // Relations first: a reference to another record reads differently than a
+        // choice list, even though it is technically a Select.
         if ($this->isRelation($component)) {
-            return 'Koppeling';
+            return $this->kindLabel('relation');
         }
 
         foreach (self::INPUT_KINDS as $class => $kind) {
             if ($component instanceof $class) {
-                return $kind;
+                return $this->kindLabel($kind);
             }
         }
 
-        return 'Tekst';
+        return $this->kindLabel('text');
     }
 
     /**
-     * De hulptekst onder een veld. Dat is precies de uitleg die een invuller in
-     * het scherm ziet, en daarmee de meest betrouwbare omschrijving die er is.
+     * The translated wording for a kind of input.
+     */
+    private function kindLabel(string $kind): string
+    {
+        $label = __('documentation.kind.' . $kind);
+
+        return is_string($label) ? $label : $kind;
+    }
+
+    /**
+     * The helper text below a field: exactly the explanation someone filling in the
+     * form sees on screen, and therefore the most reliable description there is.
      *
-     * Bij een keuzelijst worden de opties eraan toegevoegd: juist die
-     * antwoordmogelijkheden laten zien wat het systeem kan vastleggen.
+     * For a choice list the options are appended, because those answers are what
+     * show which values the system can record.
      */
     public function help(Component $component): string
     {
         $parts = [];
 
-        // Alleen echte velden hebben een hulptekst; layoutcomponenten kennen de
-        // methode niet eens.
+        // Only real fields have helper text; layout components do not even have
+        // the method.
         if ($component instanceof Field) {
             try {
                 $helper = $this->toText($component->getHelperText());
@@ -149,25 +159,26 @@ class FieldDescriber
                     $parts[] = $helper;
                 }
             } catch (Throwable) {
-                // Een hulptekst die pas tijdens het invullen te bepalen is,
-                // slaan we over; de rest van de regel blijft bruikbaar.
+                // A helper text that can only be resolved while filling in the form is
+                // skipped; the rest of the row stays usable.
             }
         }
 
         $options = $this->options($component);
         if ($options !== []) {
-            $parts[] = 'Keuze uit: ' . implode('; ', $options) . '.';
+            $prefix = __('documentation.options_prefix', ['options' => implode('; ', $options)]);
+            $parts[] = is_string($prefix) ? $prefix : implode('; ', $options);
         }
 
         return implode(' ', $parts);
     }
 
     /**
-     * Herkent componenten die naar een andere registratie verwijzen.
+     * Recognises components that point at another record.
      *
-     * Deze zijn in dit project altijd van een eigen klasse (RelationTable,
-     * SelectSingleWithLookup, ChildrenRelationTable), dus de naam is een
-     * betrouwbaarder signaal dan de Filament-basisklasse.
+     * In this project those always have their own class (RelationTable,
+     * SelectSingleWithLookup, ChildrenRelationTable), so the name is a more
+     * reliable signal than the Filament base class.
      */
     public function isRelation(Component $component): bool
     {
@@ -184,7 +195,7 @@ class FieldDescriber
     }
 
     /**
-     * Maakt van meerregelige of ingesprongen tekst één nette regel.
+     * Turns multi-line or indented text into a single tidy line.
      */
     public function tidy(string $text): string
     {
@@ -202,8 +213,8 @@ class FieldDescriber
             return [];
         }
 
-        // Een lijst die uit de database komt hoort niet in het document: die
-        // verschilt per organisatie en zegt niets over wat het systeem kan.
+        // A list that comes from the database does not belong in the document: it
+        // differs per organisation and says nothing about what the system can do.
         if ($this->isRelation($component)) {
             return [];
         }
@@ -216,7 +227,7 @@ class FieldDescriber
 
         $labels = [];
         foreach ($options as $option) {
-            // Filament kent ook gegroepeerde opties; die komen als array binnen.
+            // Filament also supports grouped options; those arrive as an array.
             if (is_array($option)) {
                 continue;
             }
@@ -230,10 +241,10 @@ class FieldDescriber
     }
 
     /**
-     * Maakt platte tekst van wat Filament teruggeeft.
+     * Turns whatever Filament returns into plain text.
      *
-     * Labels en hulpteksten zijn een string of een Htmlable; in het laatste
-     * geval zit er opmaak in die in een tabel niets te zoeken heeft.
+     * Labels and helper texts are either a string or an Htmlable; the latter
+     * carries markup that has no place in a table.
      */
     private function toText(Htmlable|string|null $value): string
     {

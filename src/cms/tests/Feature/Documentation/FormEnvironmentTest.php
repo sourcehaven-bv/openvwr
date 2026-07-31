@@ -6,8 +6,8 @@ use App\Documentation\FormEnvironment;
 use App\Models\Organisation;
 use Filament\Facades\Filament;
 use Filament\Forms\Contracts\HasForms;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 afterEach(function (): void {
@@ -56,9 +56,9 @@ it('creates a missing table on the fly', function (): void {
     $this->environment = new FormEnvironment();
     $this->environment->boot();
 
-    // De tabel bestaat niet; run() hoort hem aan te maken en de query alsnog
-    // te laten slagen. Leeg is precies goed: het gaat om de structuur van het
-    // formulier, niet om de inhoud van een register.
+    // The table does not exist; run() should create it and let the query
+    // succeed. Empty is exactly right: this is about the structure of the
+    // form, not the contents of a register.
     $result = $this->environment->run(
         static fn (): mixed => DB::table('een_tabel_die_niet_bestaat')->get(),
     );
@@ -77,11 +77,26 @@ it('creates a missing column on the fly', function (): void {
     expect($result)->toHaveCount(0);
 });
 
+it('creates a column that the query names with its table', function (): void {
+    $this->environment = new FormEnvironment();
+    $this->environment->boot();
+
+    // Filament often builds "table"."column"; SQLite then reports the column
+    // qualified. Both forms must be recognised.
+    $result = $this->environment->run(
+        static fn (): mixed => DB::table('derde_tabel')
+            ->where('derde_tabel.gekwalificeerd', true)
+            ->get(),
+    );
+
+    expect($result)->toHaveCount(0);
+});
+
 it('passes on an error it cannot repair', function (): void {
     $this->environment = new FormEnvironment();
     $this->environment->boot();
 
-    // Een kapotte query is geen ontbrekende tabel; die hoort door te komen.
+    // A malformed query is not a missing table; it should propagate.
     expect(fn () => $this->environment->run(
         static fn (): mixed => DB::select('dit is geen sql'),
     ))->toThrow(QueryException::class);

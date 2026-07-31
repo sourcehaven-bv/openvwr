@@ -21,7 +21,7 @@ beforeEach(function (): void {
     $this->notes = new SectionNotes($this->environment, $describer);
     $this->renderer = new RegisterRenderer($describer, $this->notes);
 
-    // Bouwt een formulier met de meegegeven secties.
+    // Builds a form from the given sections.
     $this->form = function (array $sections): Form {
         return Form::make($this->environment->makeFormHost())->schema($sections);
     };
@@ -33,98 +33,98 @@ afterEach(function (): void {
 
 it('writes a chapter with a heading and a table', function (): void {
     $form = ($this->form)([
-        Section::make('Beveiliging')->schema([
-            TextInput::make('a')->label('Maatregel'),
+        Section::make('Security')->schema([
+            TextInput::make('a')->label('Measure'),
         ]),
     ]);
 
-    $markdown = $this->renderer->render($form, AvgResponsibleProcessingRecordResource::class, 'Mijn register');
+    $markdown = $this->renderer->render($form, AvgResponsibleProcessingRecordResource::class, 'My register');
 
     expect($markdown)
-        ->toContain('# Mijn register')
-        ->toContain('## Beveiliging')
+        ->toContain('# My register')
+        ->toContain('## Security')
         ->toContain('| Veld | Soort invoer | Toelichting |')
-        ->toContain('| Maatregel | Tekst |');
+        ->toContain('| Measure | Tekst |');
 });
 
 it('adds the register description', function (): void {
     $form = ($this->form)([
-        Section::make('Kop')->schema([TextInput::make('a')->label('Veld')]),
+        Section::make('Heading')->schema([TextInput::make('a')->label('Field')]),
     ]);
 
-    $markdown = $this->renderer->render($form, AvgResponsibleProcessingRecordResource::class, 'Titel');
+    $markdown = $this->renderer->render($form, AvgResponsibleProcessingRecordResource::class, 'Title');
 
     expect($markdown)->toContain(__('avg_responsible_processing_record.register_description'));
 });
 
 it('marks fields inside a list', function (): void {
     $form = ($this->form)([
-        Section::make('Doelen')->schema([
-            Repeater::make('doelen')->label('Doelen')->schema([
-                TextInput::make('doel')->label('Doel'),
+        Section::make('Purposes')->schema([
+            Repeater::make('purposes')->label('Purposes')->schema([
+                TextInput::make('purpose')->label('Purpose'),
             ]),
         ]),
     ]);
 
-    $markdown = $this->renderer->render($form, AvgResponsibleProcessingRecordResource::class, 'Titel');
+    $markdown = $this->renderer->render($form, AvgResponsibleProcessingRecordResource::class, 'Title');
 
     expect($markdown)
-        ->toContain('| Doelen | Lijst |')
-        ->toContain('| » Doel | Tekst |');
+        ->toContain('| Purposes | Lijst |')
+        ->toContain('| » Purpose | Tekst |');
 });
 
 it('writes a subheading for a nested section', function (): void {
     $form = ($this->form)([
-        Section::make('Betrokkenen')->schema([
-            Section::make('Bijzondere gegevens')
-                ->description('Welke bijzondere gegevens?')
+        Section::make('Data subjects')->schema([
+            Section::make('Special data')
+                ->description('Which special data?')
                 ->schema([TextInput::make('a')->label('Gegeven')]),
         ]),
     ]);
 
-    $markdown = $this->renderer->render($form, AvgResponsibleProcessingRecordResource::class, 'Titel');
+    $markdown = $this->renderer->render($form, AvgResponsibleProcessingRecordResource::class, 'Title');
 
-    expect($markdown)->toContain('| **Bijzondere gegevens** |  | Welke bijzondere gegevens? |');
+    expect($markdown)->toContain('| **Special data** |  | Which special data? |');
 });
 
 it('leaves out hidden fields', function (): void {
     $form = ($this->form)([
-        Section::make('Kop')->schema([
-            Hidden::make('verborgen'),
-            TextInput::make('a')->label('Zichtbaar'),
+        Section::make('Heading')->schema([
+            Hidden::make('hidden_field'),
+            TextInput::make('a')->label('Visible'),
         ]),
     ]);
 
-    $markdown = $this->renderer->render($form, AvgResponsibleProcessingRecordResource::class, 'Titel');
+    $markdown = $this->renderer->render($form, AvgResponsibleProcessingRecordResource::class, 'Title');
 
     expect($markdown)
-        ->toContain('Zichtbaar')
-        ->not->toContain('verborgen');
+        ->toContain('Visible')
+        ->not->toContain('hidden_field');
 });
 
 it('skips a section without fields', function (): void {
     $form = ($this->form)([
-        Section::make('Leeg')->schema([Hidden::make('verborgen')]),
-        Section::make('Gevuld')->schema([TextInput::make('a')->label('Veld')]),
+        Section::make('Empty')->schema([Hidden::make('hidden_field')]),
+        Section::make('Filled')->schema([TextInput::make('a')->label('Field')]),
     ]);
 
-    $markdown = $this->renderer->render($form, AvgResponsibleProcessingRecordResource::class, 'Titel');
+    $markdown = $this->renderer->render($form, AvgResponsibleProcessingRecordResource::class, 'Title');
 
     expect($markdown)
-        ->not->toContain('## Leeg')
-        ->toContain('## Gevuld');
+        ->not->toContain('## Empty')
+        ->toContain('## Filled');
 });
 
 it('escapes a pipe so the table stays intact', function (): void {
     $form = ($this->form)([
-        Section::make('Kop')->schema([
-            TextInput::make('a')->label('Een | met een pipe'),
+        Section::make('Heading')->schema([
+            TextInput::make('a')->label('One | with a pipe'),
         ]),
     ]);
 
-    $markdown = $this->renderer->render($form, AvgResponsibleProcessingRecordResource::class, 'Titel');
+    $markdown = $this->renderer->render($form, AvgResponsibleProcessingRecordResource::class, 'Title');
 
-    expect($markdown)->toContain('Een \\| met een pipe');
+    expect($markdown)->toContain('One \\| with a pipe');
 });
 
 it('fails when the form has no fields at all', function (): void {
@@ -133,14 +133,14 @@ it('fails when the form has no fields at all', function (): void {
     expect(fn () => $this->renderer->render(
         $form,
         AvgResponsibleProcessingRecordResource::class,
-        'Titel',
-    ))->toThrow(RuntimeException::class, 'geen velden gevonden');
+        'Title',
+    ))->toThrow(RuntimeException::class, 'no fields found');
 });
 
 it('fails when it is handed something that is not a form', function (): void {
     expect(fn () => $this->renderer->render(
-        'geen formulier',
+        'not a form',
         AvgResponsibleProcessingRecordResource::class,
-        'Titel',
+        'Title',
     ))->toThrow(RuntimeException::class);
 });

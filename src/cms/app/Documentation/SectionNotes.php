@@ -13,6 +13,7 @@ use ReflectionClass;
 use ReflectionMethod;
 use Throwable;
 
+use function __;
 use function array_values;
 use function basename;
 use function class_basename;
@@ -21,21 +22,22 @@ use function dirname;
 use function glob;
 use function is_array;
 use function is_dir;
+use function is_string;
 
 /**
- * Leest de #[DocNote]-toelichtingen die bij de secties van een register horen.
+ * Reads the #[DocNote] explanations belonging to a register's sections.
  *
- * De notities staan bij de schema-methodes (getStakeholder() en dergelijke).
- * Die klassen worden gevonden via de naam van de resource: naast FooResource
- * hoort FooResource\FooResourceFormSchemas.
+ * The notes sit on the schema methods (getStakeholder() and the like). Those
+ * classes are found through the resource name: next to FooResource lives
+ * FooResource\FooResourceFormSchemas.
  *
- * De koppeling met een sectie loopt niet via de methodenaam - die is Engels en
- * de sectiekop Nederlands - maar via het eerste veld dat de methode oplevert.
- * Dat veld komt terug in de sectie waar de methode bij hoort.
+ * A note is matched to a section through the first field the method produces,
+ * not through the method name: the method name is English while the section
+ * heading is translated, so those would never line up.
  */
 class SectionNotes
 {
-    /** @var array<string, string> notitie per naam van het eerste veld */
+    /** @var array<string, string> note keyed by the name of its first field */
     private array $notes = [];
 
     public function __construct(
@@ -64,14 +66,22 @@ class SectionNotes
                         continue;
                     }
 
-                    $this->notes[$fingerprint] = $this->describer->tidy($note->text);
+                    // The attribute holds a translation key; an untranslated
+                    // key would put a raw identifier in the document, so it is
+                    // skipped rather than shown.
+                    $translation = __($note->key);
+                    if (!is_string($translation) || $translation === $note->key) {
+                        continue;
+                    }
+
+                    $this->notes[$fingerprint] = $this->describer->tidy($translation);
                 }
             }
         }
     }
 
     /**
-     * De notitie bij een sectie, gevonden via het eerste veld dat erin staat.
+     * The note belonging to a section, found through the first field inside it.
      *
      * @param array<int, Component> $sectionComponents
      */
@@ -87,7 +97,7 @@ class SectionNotes
     }
 
     /**
-     * De naam van het eerste echte veld in een reeks componenten.
+     * The name of the first real field in a series of components.
      *
      * @param array<mixed> $components
      */
@@ -119,8 +129,8 @@ class SectionNotes
     }
 
     /**
-     * De kinderen van een component, of een lege lijst als die pas tijdens het
-     * invullen te bepalen zijn.
+     * A component's children, or an empty list when those can only be resolved
+     * while filling in the form.
      *
      * @return array<int, Component>
      */
@@ -141,10 +151,9 @@ class SectionNotes
     }
 
     /**
-     * De naam van het eerste veld dat een schema-methode oplevert.
+     * The name of the first field a schema method produces.
      *
-     * Het aanroepen van de methode is ongevaarlijk: er wordt alleen een
-     * formulierdefinitie opgebouwd.
+     * Calling the method is harmless: it only assembles a form definition.
      */
     private function fingerprintOf(ReflectionMethod $method): ?string
     {
@@ -166,7 +175,7 @@ class SectionNotes
     }
 
     /**
-     * De klassen met schema-methodes die bij een resource horen.
+     * The classes holding the schema methods that belong to a resource.
      *
      * @param class-string<Resource> $resourceClass
      *
@@ -176,18 +185,16 @@ class SectionNotes
     {
         $reflection = new ReflectionClass($resourceClass);
 
-        // FooResource staat in App\Filament\Resources; de bijbehorende schema's
-        // in de gelijknamige submap daaronder.
+        // FooResource lives in App\Filament\Resources; its schemas live in the
+        // subdirectory of the same name.
         $directory = dirname((string) $reflection->getFileName())
             . '/' . class_basename($resourceClass);
         if (!is_dir($directory)) {
             return [];
         }
 
-        $files = glob($directory . '/*Schemas.php');
-        if ($files === false) {
-            $files = [];
-        }
+        $found = glob($directory . '/*Schemas.php');
+        $files = $found === false ? [] : $found;
 
         $namespace = $reflection->getNamespaceName() . '\\' . class_basename($resourceClass);
 
@@ -196,11 +203,9 @@ class SectionNotes
             /** @var class-string $class */
             $class = $namespace . '\\' . basename($file, '.php');
 
-            if (!class_exists($class)) {
-                continue;
+            if (class_exists($class)) {
+                $classes[] = $class;
             }
-
-            $classes[] = $class;
         }
 
         return $classes;

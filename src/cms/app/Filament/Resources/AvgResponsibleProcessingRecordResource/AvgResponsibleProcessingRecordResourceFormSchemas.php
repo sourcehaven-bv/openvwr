@@ -193,9 +193,7 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
     /**
      * @return array<Component>
      */
-    #[DocNote('Het meest gedetailleerde onderdeel van de registratie. Per categorie '
-        . 'betrokkenen wordt vastgelegd welke gewone, bijzondere en gevoelige gegevens '
-        . 'worden verwerkt, en per gegeven het verzameldoel, de bewaartermijn en de bron.')]
+    #[DocNote('documentation.avg_responsible_processing_record.stakeholders')]
     public static function getStakeholder(): array
     {
         return [

@@ -13,6 +13,7 @@ use App\Models\Concerns\HasSystems;
 use App\Models\Concerns\HasTags;
 use Illuminate\Database\Eloquent\Model;
 
+use function __;
 use function array_merge;
 use function basename;
 use function class_uses_recursive;
@@ -28,24 +29,23 @@ use function sprintf;
 use function str_replace;
 
 /**
- * Voegt de gegenereerde registerhoofdstukken en de handgeschreven tekst samen
- * tot één markdownbestand.
+ * Joins the generated register chapters and the handwritten prose into a single
+ * markdown file.
  */
 class DocumentAssembler
 {
     /**
-     * Bestanden met een naam onder deze grens komen vóór de registers, de rest
-     * erna. Zo bepaalt de bestandsnaam de plek in het document.
+     * Files sorting below this name come before the registers, the rest after. That
+     * way the file name decides where a chapter lands in the document.
      */
     private const PROSE_PIVOT = '50-';
 
-    /** Plek waar de gegenereerde hergebruik-tabel terechtkomt. */
+    /** Where the generated shared-parts table is inserted. */
     private const SHARED_PARTS_PLACEHOLDER = '<!-- HERGEBRUIK-TABEL -->';
 
     /**
-     * De gedeelde onderdelen, en de trait waarmee een model aangeeft dat het ze
-     * gebruikt. Zo blijft de hergebruik-tabel kloppen zodra een register een
-     * koppeling krijgt of verliest.
+     * The shared parts, and the trait a model uses to declare it has them. That
+     * keeps the table correct as soon as a register gains or loses a relation.
      */
     private const SHARED_PARTS = [
         'Verwerkingsverantwoordelijken' => HasResponsibles::class,
@@ -59,7 +59,7 @@ class DocumentAssembler
 
     /**
      * @param array<int, string> $chapters
-     * @param array<string, class-string<Model>> $models registertitel => model
+     * @param array<string, class-string<Model>> $models register title => model
      */
     public function assemble(array $chapters, string $proseDir, array $models): string
     {
@@ -81,10 +81,8 @@ class DocumentAssembler
             return [[], []];
         }
 
-        $files = glob($proseDir . '/*.md');
-        if ($files === false) {
-            return [[], []];
-        }
+        $found = glob($proseDir . '/*.md');
+        $files = $found === false ? [] : $found;
         sort($files);
 
         $before = [];
@@ -96,8 +94,8 @@ class DocumentAssembler
                 continue;
             }
 
-            // De hergebruik-tabel volgt uit de modellen; de handgeschreven tekst
-            // geeft alleen aan waar hij komt te staan.
+            // The shared-parts table follows from the models; the handwritten text
+            // only marks where it goes.
             $contents = str_replace(
                 self::SHARED_PARTS_PLACEHOLDER,
                 $this->renderSharedParts($models),
@@ -117,7 +115,7 @@ class DocumentAssembler
     }
 
     /**
-     * Bouwt de tabel met gedeelde onderdelen uit de traits op de modellen.
+     * Builds the shared-parts table from the traits on the models.
      *
      * @param array<string, class-string<Model>> $models
      */
@@ -149,17 +147,25 @@ class DocumentAssembler
     }
 
     /**
-     * Waarschuwing vooraf: dit bestand wordt overschreven, de bron staat elders.
-     * Een HTML-commentaar valt weg in de PDF.
+     * A warning up front: this file gets overwritten, the source lives elsewhere.
+     * An HTML comment disappears in the PDF.
      */
     private function header(): string
     {
-        return "<!--\n"
-            . "  Dit bestand wordt gegenereerd door `just docs-datamodel`.\n"
-            . "  Wijzigingen hier gaan verloren.\n\n"
-            . "  De veldtabellen komen uit de Filament-formulieren; pas die aan\n"
-            . "  (labels en hulpteksten staan in resources/lang/nl/). De\n"
-            . "  omringende tekst staat in docs/handgeschreven/.\n"
-            . "-->\n\n";
+        $lines = [
+            __('documentation.generated_header.line_1'),
+            __('documentation.generated_header.line_2'),
+            '',
+            __('documentation.generated_header.line_3'),
+            __('documentation.generated_header.line_4'),
+            __('documentation.generated_header.line_5'),
+        ];
+
+        $body = '';
+        foreach ($lines as $line) {
+            $body .= $line === '' ? "\n" : '  ' . $line . "\n";
+        }
+
+        return "<!--\n" . $body . "-->\n\n";
     }
 }

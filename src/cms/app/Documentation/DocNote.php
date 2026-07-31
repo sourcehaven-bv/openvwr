@@ -7,30 +7,29 @@ namespace App\Documentation;
 use Attribute;
 
 /**
- * Toelichting bij een formuliersectie, bedoeld voor de gegenereerde
- * documentatie (`php artisan docs:datamodel`).
+ * An explanation of a form section, meant for the generated documentation
+ * (`php artisan docs:datamodel`).
  *
- * Dit is een ander soort tekst dan de InformationBlockSection in het formulier
- * zelf: die legt aan een invuller uit hoe hij het veld moet invullen, terwijl
- * deze notitie aan een lezer buiten de organisatie uitlegt wat het systeem op
- * dit punt kan vastleggen. Beide staan los van elkaar en hebben een eigen
- * publiek.
+ * This is a different kind of text than the InformationBlockSection in the form
+ * itself: that one tells someone filling in the form how to answer, while this
+ * note tells an outside reader what the system can record at this point. The
+ * two are independent and have their own audience.
  *
- * De notitie staat bij de schema-methode zodat hij in dezelfde wijziging
- * meegaat als de velden die hij beschrijft:
+ * The note sits on the schema method so it travels in the same change as the
+ * fields it describes. It holds a translation key, not the text itself, so the
+ * documentation can be generated in any locale the application supports:
  *
- *     #[DocNote('Per categorie betrokkenen wordt vastgelegd welke gegevens
- *                worden verwerkt.')]
+ *     #[DocNote('documentation.avg_responsible.stakeholders')]
  *     public static function getStakeholder(): array
  *
- * Heeft geen effect op de applicatie; alleen de documentatiegenerator leest
- * deze attributen.
+ * Has no effect on the application; only the documentation generator reads
+ * these attributes.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
 final class DocNote
 {
     public function __construct(
-        public string $text,
+        public string $key,
     ) {
     }
 }

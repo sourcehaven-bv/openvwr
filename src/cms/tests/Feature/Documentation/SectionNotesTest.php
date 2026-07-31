@@ -61,10 +61,10 @@ it('ignores values that are not components', function (): void {
 it('reads the note that belongs to a section', function (): void {
     $this->notes->load(AvgResponsibleProcessingRecordResource::class);
 
-    // De betrokkenen-sectie heeft een #[DocNote] bij getStakeholder().
+    // The data-subject section carries a #[DocNote] on getStakeholder().
     $note = $this->notes->forSection([TextInput::make('stakeholders')]);
 
-    expect($note)->toContain('Het meest gedetailleerde onderdeel');
+    expect($note)->toBe(__('documentation.avg_responsible_processing_record.stakeholders'));
 });
 
 it('has no note for a section without one', function (): void {
@@ -80,7 +80,7 @@ it('has no note when the section has no fields', function (): void {
 });
 
 it('works for a resource without schema classes', function (): void {
-    // DocumentResource heeft geen eigen map met *Schemas.php.
+    // DocumentResource has no directory of its own with *Schemas.php.
     $this->notes->load(DocumentResource::class);
 
     expect($this->notes->forSection([TextInput::make('name')]))->toBeNull();

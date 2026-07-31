@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use App\Documentation\DocumentAssembler;
-use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Algorithm\AlgorithmRecord;
+use App\Models\Avg\AvgResponsibleProcessingRecord;
 use Illuminate\Support\Facades\File;
 
 beforeEach(function (): void {
@@ -46,7 +46,7 @@ it('skips an empty handwritten file', function (): void {
 
     $markdown = $this->assembler->assemble(['# Register'], $this->prose, []);
 
-    // Een leeg bestand mag geen losse scheidingslijn opleveren.
+    // An empty file must not produce a stray separator.
     expect($markdown)->not->toContain("---\n\n\n");
 });
 
@@ -78,7 +78,7 @@ it('says "all registers" when every register shares a part', function (): void {
         'Algoritmes' => AlgorithmRecord::class,
     ]);
 
-    // Documenten hangen aan beide registers, verwerkers alleen aan de eerste.
+    // Documents attach to both registers, processors only to the first.
     expect($markdown)
         ->toContain('| Documenten | Alle registers |')
         ->toContain('| Verwerkers | AVG verantwoordelijke |');
@@ -92,6 +92,6 @@ it('leaves out a part that no register uses', function (): void {
         'Algoritmes' => AlgorithmRecord::class,
     ]);
 
-    // Een algoritme kent geen ontvangers; die regel hoort te ontbreken.
+    // An algorithm has no recipients; that row should be absent.
     expect($markdown)->not->toContain('| Ontvangers |');
 });

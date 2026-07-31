@@ -19,7 +19,7 @@ it('finds the registers from the navigation group', function (): void {
 it('leaves out resources from other navigation groups', function (): void {
     $registers = $this->finder->find('admin');
 
-    // Documenten staan onder Beheer, niet onder Registers.
+    // Documents sit under Management, not under Registers.
     expect($registers)->not->toContain(DocumentResource::class);
 });
 

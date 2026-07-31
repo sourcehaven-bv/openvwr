@@ -3,8 +3,8 @@
   Wijzigingen hier gaan verloren.
 
   De veldtabellen komen uit de Filament-formulieren; pas die aan
-  (labels en hulpteksten staan in resources/lang/nl/). De
-  omringende tekst staat in docs/handgeschreven/.
+  (labels en hulpteksten staan in resources/lang/). De omringende
+  tekst staat in docs/prose/.
 -->
 
 # Inleiding

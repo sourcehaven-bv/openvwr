@@ -18,11 +18,11 @@ use function usort;
 use const PHP_INT_MAX;
 
 /**
- * Zoekt op welke registers er in deze installatie zijn.
+ * Finds which registers exist in this installation.
  *
- * De bron is het menu: alles wat in de navigatiegroep "Registers" staat telt
- * mee. Daardoor hoeft de documentatiegenerator geen lijst met registers te
- * kennen - wat de gebruiker als register ziet, komt in het document.
+ * The menu is the source: everything in the "Registers" navigation group counts.
+ * That way the documentation generator needs no list of its own - whatever the
+ * user sees as a register ends up in the document.
  */
 class RegisterFinder
 {
@@ -51,7 +51,7 @@ class RegisterFinder
             $registers[] = $resourceClass;
         }
 
-        // Dezelfde volgorde als in het menu.
+        // The same order as the menu.
         usort($registers, static function (string $a, string $b): int {
             return ($a::getNavigationSort() ?? PHP_INT_MAX) <=> ($b::getNavigationSort() ?? PHP_INT_MAX);
         });
@@ -76,8 +76,8 @@ class RegisterFinder
     }
 
     /**
-     * Zonder eigen formulier valt er niets te documenteren; zo'n resource erft
-     * alleen de lege standaard van Filament.
+     * Without its own form there is nothing to document; such a resource only
+     * inherits Filament's empty default.
      *
      * @param class-string<Resource> $resourceClass
      */

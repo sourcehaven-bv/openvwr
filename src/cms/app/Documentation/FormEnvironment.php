@@ -27,25 +27,24 @@ use function in_array;
 use function preg_match;
 
 /**
- * Zet de omgeving klaar waarin een formulier zonder request en zonder database
- * opgebouwd kan worden.
+ * Sets up the context a form needs to be built outside a request and without a
+ * database.
  *
- * Filament-formulieren gaan uit van een ingelogde gebruiker binnen een
- * organisatie, en sommige velden doen tijdens het opbouwen al een query. Voor
- * het uitlezen van de structuur is geen van beide inhoudelijk van belang, dus
- * wordt hier een lege context neergezet. Er wordt niets opgeslagen.
+ * Filament forms assume a signed-in user within an organisation, and some fields
+ * already run a query while the schema is assembled. Neither matters for reading
+ * the structure, so a throwaway context is put in place. Nothing is persisted.
  */
 class FormEnvironment
 {
     private const CONNECTION = 'docs';
 
     /**
-     * Hoe vaak een ontbrekende tabel of kolom bijgemaakt mag worden voordat we
-     * concluderen dat er iets anders aan de hand is.
+     * How many missing tables or columns may be created before we conclude that
+     * something else is wrong.
      */
     private const MAX_REPAIRS = 60;
 
-    /** De verbinding die actief was voordat boot() werd aangeroepen. */
+    /** The connection that was active before boot() was called. */
     private ?string $previousConnection = null;
 
     public function boot(): void
@@ -55,10 +54,10 @@ class FormEnvironment
     }
 
     /**
-     * Zet de databaseverbinding terug zoals hij was.
+     * Restores the database connection to what it was.
      *
-     * In een testomgeving draait de rest van de suite gewoon door op de echte
-     * verbinding; die mag deze generator niet omzetten en laten staan.
+     * In a test run the rest of the suite keeps using the real connection; this
+     * generator must not switch it and leave it that way.
      */
     public function restore(): void
     {
@@ -72,13 +71,13 @@ class FormEnvironment
     }
 
     /**
-     * Voert iets uit dat een formulier opbouwt, en maakt onderweg de tabellen en
-     * kolommen aan waar dat formulier om vraagt.
+     * Runs something that builds a form, creating the tables and columns that form
+     * asks for along the way.
      *
-     * Welke dat zijn hangt af van de formulieren zelf; die lijst bijhouden zou
-     * een vorm van hardcoderen zijn. In plaats daarvan wordt de fout opgevangen
-     * en het ontbrekende stuk alsnog gemaakt, waarna het opnieuw gaat. Alles
-     * blijft leeg: het gaat om de structuur, niet om de inhoud van een register.
+     * Which ones those are depends on the forms themselves; keeping a list would
+     * be a form of hardcoding. Instead the error is caught, the missing piece is
+     * created, and the call is retried. Everything stays empty: this is about
+     * structure, not about the contents of anyone's register.
      */
     public function run(callable $callback): mixed
     {
@@ -92,11 +91,11 @@ class FormEnvironment
             }
         }
 
-        return $callback();
+        throw new RuntimeException('Too many missing tables or columns in a row.');
     }
 
     /**
-     * Een Livewire-component die alleen dient als houder voor het formulier.
+     * A Livewire component that only serves as a host for the form.
      */
     public function makeFormHost(): HasForms
     {
@@ -112,11 +111,10 @@ class FormEnvironment
     }
 
     /**
-     * Wijst de database naar een lege SQLite in het geheugen.
+     * Points the database at an empty in-memory SQLite.
      *
-     * De volledige migratie draaien lukt niet: die is op PostgreSQL geschreven.
-     * De tabellen worden daarom pas aangemaakt wanneer een formulier ze nodig
-     * heeft; zie run().
+     * Running the full migration is not an option: it is written for PostgreSQL.
+     * Tables are therefore created only once a form needs them; see run().
      */
     private function bootDatabase(): void
     {
@@ -134,13 +132,13 @@ class FormEnvironment
         DB::purge(self::CONNECTION);
         DB::setDefaultConnection(self::CONNECTION);
 
-        // Zonder de SQLite-driver mislukt elke query met "could not find
-        // driver", en dat is geen fout die run() kan verhelpen. Beter hier
-        // duidelijk maken wat er ontbreekt dan verderop stranden.
+        // Without the SQLite driver every query fails with "could not find
+        // driver", which run() cannot repair. Better to say what is missing here
+        // than to strand on a cryptic message later on.
         if (!in_array('sqlite', PDO::getAvailableDrivers(), true)) {
             throw new RuntimeException(
-                'De PHP-extensie pdo_sqlite ontbreekt. Die is nodig om de '
-                . 'formulieren op te bouwen zonder database (installeer php-sqlite3).',
+                'The pdo_sqlite PHP extension is missing. It is required to build the '
+                . 'forms without a database (install php-sqlite3).',
             );
         }
 
@@ -148,28 +146,28 @@ class FormEnvironment
     }
 
     /**
-     * Zet een tijdelijke organisatie en gebruiker neer.
+     * Puts a throwaway organisation and user in place.
      *
-     * De voorkeur staat op ONE_PAGE: dat is de indeling waarin alle secties
-     * onder elkaar staan en dus de volledige inhoud zichtbaar is.
+     * The preference is set to ONE_PAGE: that is the layout listing every section
+     * below the other, so the full contents are visible.
      */
     private function bootTenant(): void
     {
-        $organisation = new Organisation(['name' => 'Documentatie']);
+        $organisation = new Organisation(['name' => 'Documentation']);
         $organisation->id = Uuid::fromString(Str::uuid()->toString());
         Filament::setTenant($organisation, isQuiet: true);
 
-        $user = new User(['name' => 'Documentatie', 'email' => 'docs@example.org']);
+        $user = new User(['name' => 'Documentation', 'email' => 'docs@example.org']);
         $user->id = Uuid::fromString(Str::uuid()->toString());
         $user->register_layout = RegisterLayout::ONE_PAGE;
         Auth::setUser($user);
     }
 
     /**
-     * Maakt de ontbrekende tabel of kolom uit een SQLite-fout alsnog aan.
+     * Creates the table or column that a SQLite error reports as missing.
      *
-     * Geeft false terug als de fout ergens anders over gaat; die hoort dan
-     * gewoon door te komen.
+     * Returns false when the error is about something else; that one should
+     * simply propagate.
      */
     private function repairSchema(QueryException $exception): bool
     {
@@ -186,12 +184,18 @@ class FormEnvironment
             return true;
         }
 
+        // SQLite reports "table.column" when the query qualifies the column and just
+        // the column name otherwise; in the latter case the table comes from the
+        // query itself.
         if (preg_match('/no such column: (?:([A-Za-z0-9_]+)\.)?([A-Za-z0-9_]+)/', $message, $matches) !== 1) {
             return false;
         }
 
-        $table = $matches[1] !== '' ? $matches[1] : $this->tableFromQuery($exception);
-        if ($table === null || !Schema::connection(self::CONNECTION)->hasTable($table)) {
+        $table = $matches[1] !== ''
+            ? $matches[1]
+            : $this->tableFromQuery($exception);
+
+        if ($table === null) {
             return false;
         }
 
@@ -206,12 +210,12 @@ class FormEnvironment
     }
 
     /**
-     * De eerste tabelnaam uit de mislukte query, voor foutmeldingen die de tabel
-     * niet zelf noemen.
+     * The table name from the failed query, for errors that do not qualify the
+     * column.
      */
     private function tableFromQuery(QueryException $exception): ?string
     {
-        if (preg_match('/\bfrom\s+"([A-Za-z0-9_]+)"/i', $exception->getSql(), $matches) !== 1) {
+        if (preg_match('/\bfrom\s+"?([A-Za-z0-9_]+)"?/i', $exception->getSql(), $matches) !== 1) {
             return null;
         }
 

@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use App\Documentation\FieldDescriber;
+use App\Filament\Forms\Components\Section\InformationBlockSection;
+use App\Filament\Forms\Components\Select\SelectSingleWithLookup;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DatePicker;
@@ -40,12 +42,16 @@ it('falls back to text for an unknown component', function (): void {
     expect($this->describer->kind(Grid::make()))->toBe('Tekst');
 });
 
-it('calls a lookup a koppeling instead of a choice list', function (): void {
-    $component = new class ('a') extends Select {
-    };
+it('calls a relation component a koppeling', function (): void {
+    // The class name decides whether something points at another record; a
+    // plain Select reads differently than a lookup.
+    expect($this->describer->isRelation(TextInput::make('a')))->toBeFalse();
+    expect($this->describer->isRelation(SelectSingleWithLookup::make('a')))->toBeTrue();
+});
 
-    // De klassenaam bepaalt of iets een koppeling is; deze heet geen lookup.
-    expect($this->describer->kind($component))->toBe('Keuze');
+it('recognises an information block', function (): void {
+    expect($this->describer->isInformationBlock(TextInput::make('a')))->toBeFalse();
+    expect($this->describer->isInformationBlock(InformationBlockSection::make('Kop')))->toBeTrue();
 });
 
 it('reads the label of a field', function (): void {

@@ -19,20 +19,19 @@ use function __;
 use function array_values;
 use function class_basename;
 use function implode;
-use function is_string;
 use function sprintf;
 use function str_repeat;
 use function str_replace;
 
 /**
- * Schrijft één register als markdownhoofdstuk.
+ * Writes a single register as a markdown chapter.
  *
- * De indeling volgt de stappen van het formulier, zodat het document dezelfde
- * volgorde heeft als wat een invuller in het scherm ziet.
+ * The layout follows the steps of the form, so the document has the same order
+ * as what someone filling it in sees on screen.
  */
 class RegisterRenderer
 {
-    /** Markering voor een veld dat bij het onderdeel erboven hoort. */
+    /** Marker for a field that belongs to the item above it. */
     private const NESTING_MARKER = '» ';
 
     public function __construct(
@@ -75,11 +74,11 @@ class RegisterRenderer
             $sections++;
         }
 
-        // Een register zonder secties betekent dat het formulier niet goed is
-        // opgebouwd - bijvoorbeeld doordat een component onderweg afhaakte. Dan
-        // liever falen dan een hoofdstuk met alleen een kop opleveren.
+        // A register without sections means the form did not assemble properly -
+        // a component bailed out along the way, for instance. Better to fail
+        // than to emit a chapter that is nothing but a heading.
         if ($sections === 0) {
-            throw new RuntimeException('geen velden gevonden; is het formulier goed opgebouwd?');
+            throw new RuntimeException('no fields found; did the form assemble correctly?');
         }
 
         return implode("\n", $lines);
@@ -101,7 +100,12 @@ class RegisterRenderer
             $lines[] = '';
         }
 
-        $lines[] = '| Veld | Soort invoer | Toelichting |';
+        $lines[] = sprintf(
+            '| %s | %s | %s |',
+            __('documentation.column_field'),
+            __('documentation.column_kind'),
+            __('documentation.column_help'),
+        );
         $lines[] = '| --- | --- | --- |';
 
         foreach ($rows as $row) {
@@ -114,7 +118,7 @@ class RegisterRenderer
     }
 
     /**
-     * Loopt de componentboom af en maakt er tabelregels van.
+     * Walks the component tree and turns it into table rows.
      *
      * @param array<int, Component> $components
      * @param array<int, array{field: string, kind: string, help: string}> $rows
@@ -141,16 +145,16 @@ class RegisterRenderer
 
             $this->addSubheading($rows, $component);
 
-            // Layoutcomponenten (Grid, Group, Section, Fieldset) hebben zelf
-            // geen waarde; hun kinderen wel.
+            // Layout components (Grid, Group, Section, Fieldset) hold no value
+            // themselves; their children do.
             $this->collect($this->notes->childrenOf($component), $rows, $depth);
         }
     }
 
     /**
-     * Verborgen velden en informatieblokken horen niet in het overzicht: de
-     * eerste ziet een invuller nooit, de tweede is hulptekst voor de invuller en
-     * niet voor de lezer van dit document.
+     * Hidden fields and information blocks do not belong in the overview: the first
+     * is never seen, the second is guidance for whoever fills in the form rather
+     * than for the reader of this document.
      */
     private function isSkippable(Component $component): bool
     {
@@ -160,9 +164,9 @@ class RegisterRenderer
     }
 
     /**
-     * Een Section binnen een stap groepeert bij elkaar horende vragen ("Is een
-     * GEB (DPIA) verplicht?", "Bijzondere gegevens"). Die kop is inhoudelijk:
-     * zonder die context staan de vragen los in de lucht.
+     * A Section inside a step groups related questions ("Is a DPIA mandatory?",
+     * "Special categories of data"). That heading carries meaning: without it the
+     * questions stand on their own.
      *
      * @param array<int, array{field: string, kind: string, help: string}> $rows
      */
@@ -194,8 +198,8 @@ class RegisterRenderer
             return;
         }
 
-        // Eén markering per niveau: gegevens binnen een betrokkene binnen de
-        // registratie krijgen er dus twee.
+        // One marker per level, so data inside a data subject inside the record
+        // gets two.
         $prefix = str_repeat(self::NESTING_MARKER, $depth);
 
         $rows[] = [
@@ -218,7 +222,7 @@ class RegisterRenderer
     }
 
     /**
-     * De omschrijving van het register, uit het taalbestand van het model.
+     * The register's description, from the model's translation file.
      *
      * @param class-string<Resource> $resourceClass
      */
@@ -235,7 +239,7 @@ class RegisterRenderer
     }
 
     /**
-     * Tekens die een markdowntabel zouden breken onschadelijk maken.
+     * Escapes characters that would otherwise break a markdown table.
      */
     private function escape(string $text): string
     {

@@ -1,73 +1,105 @@
 #!/usr/bin/env bash
 #
-# Genereert gegevensmodel-verwerkingen.md uit de formulierdefinities en zet dat
-# om naar PDF met de OpenVWR-huisstijl.
+# Generates the data-model documentation from the form definitions and renders
+# it as a PDF in the OpenVWR house style, once per locale.
 #
-#   ./build-pdf.sh                 genereer de markdown opnieuw en bouw de PDF
-#   ./build-pdf.sh --geen-generatie  gebruik de bestaande markdown
-#   ./build-pdf.sh <bestand.md>    bouw een ander markdownbestand
+#   ./build-pdf.sh              generate and build every locale
+#   ./build-pdf.sh nl           only Dutch
+#   ./build-pdf.sh --no-generate  use the markdown that is already there
 #
-# Vereist: pandoc, xelatex (MacTeX/TeX Live) en rsvg-convert voor het logo.
-# Voor het genereren is daarnaast een werkende PHP-omgeving nodig (src/cms).
+# Requires: pandoc, xelatex (MacTeX/TeX Live) and rsvg-convert for the logo.
+# Generating additionally needs a working PHP environment (src/cms).
 
 set -euo pipefail
 
 cd "$(dirname "$0")"
 
+LOCALES=(nl en)
 GENERATE=true
-SRC="gegevensmodel-verwerkingen.md"
+REQUESTED=()
 
 for arg in "$@"; do
     case "$arg" in
-        --geen-generatie) GENERATE=false ;;
-        *.md) SRC="$arg"; GENERATE=false ;;
+        --no-generate) GENERATE=false ;;
+        nl | en) REQUESTED+=("$arg") ;;
+        *)
+            echo "Unknown argument: $arg" >&2
+            exit 1
+            ;;
     esac
 done
 
-OUT="${SRC%.md}.pdf"
-
-# De veldtabellen komen uit de Filament-formulieren, zodat het document niet
-# achterloopt op de applicatie. De handgeschreven hoofdstukken staan in
-# handgeschreven/ en blijven ongemoeid.
-if [[ "$GENERATE" == true ]]; then
-    echo "Markdown genereren uit de formulierdefinities..."
-    (cd ../src/cms && php artisan docs:datamodel)
+if [[ ${#REQUESTED[@]} -gt 0 ]]; then
+    LOCALES=("${REQUESTED[@]}")
 fi
 
 LOGO_SVG="assets/openvwr_logo.svg"
 LOGO_PDF="assets/openvwr_logo.pdf"
 
-# LaTeX kan geen SVG plaatsen; converteer als de PDF ontbreekt of verouderd is.
+# LaTeX cannot place an SVG; convert when the PDF is missing or out of date.
 if [[ ! -f "$LOGO_PDF" || "$LOGO_SVG" -nt "$LOGO_PDF" ]]; then
-    echo "Logo omzetten naar PDF..."
+    echo "Converting the logo to PDF..."
     rsvg-convert -f pdf -o "$LOGO_PDF" "$LOGO_SVG"
 fi
 
-# De standaardlettertypes zijn die van macOS, waar dit document doorgaans wordt
-# gemaakt. Op een buildserver bestaan die niet; daar zet DOC_MAINFONT en
-# DOC_MONOFONT een lettertype dat er wel is (zie build-release.yml).
+# The default fonts are the macOS ones, where this document is usually built. A
+# build server does not have them; there DOC_MAINFONT and DOC_MONOFONT point at
+# a font that does exist (see build-release.yml).
 MAINFONT="${DOC_MAINFONT:-Helvetica Neue}"
 MONOFONT="${DOC_MONOFONT:-Menlo}"
 
-# De datum met de hand in het Nederlands zetten. Op `date` met een nl_NL-locale
-# kunnen we niet bouwen: die locale ontbreekt op een kale buildserver, en dan
-# valt hij stilzwijgend terug op Engels.
-MAANDEN=(januari februari maart april mei juni juli
-         augustus september oktober november december)
-DATUM="$(date '+%-d') ${MAANDEN[$(( 10#$(date '+%m') - 1 ))]} $(date '+%Y')"
+# The date is assembled by hand. Relying on `date` with a locale is not an
+# option: those locales are absent on a bare build server, and it then falls
+# back to English without saying so.
+MONTHS_NL=(januari februari maart april mei juni juli
+           augustus september oktober november december)
+MONTHS_EN=(January February March April May June July
+           August September October November December)
+MONTH_INDEX=$(( 10#$(date '+%m') - 1 ))
 
-echo "PDF genereren: $OUT"
-pandoc "$SRC" \
-    --output="$OUT" \
-    --template=./openvwr.latex \
-    --pdf-engine=xelatex \
-    --toc \
-    --toc-depth=2 \
-    --variable=logo:"$LOGO_PDF" \
-    --variable=mainfont:"$MAINFONT" \
-    --variable=monofont:"$MONOFONT" \
-    --variable=title:"Wat legt OpenVWR vast?" \
-    --variable=subtitle:"Overzicht van de vast te leggen gegevens per register" \
-    --variable=date:"$DATUM"
+for LOCALE in "${LOCALES[@]}"; do
+    SRC="datamodel-${LOCALE}.md"
+    OUT="datamodel-${LOCALE}.pdf"
 
-echo "Klaar: $OUT"
+    # The field tables come from the Filament forms so the document cannot fall
+    # behind the application. The handwritten chapters live in prose/<locale>/
+    # and are left alone.
+    if [[ "$GENERATE" == true ]]; then
+        echo "Generating markdown (${LOCALE}) from the form definitions..."
+        (cd ../src/cms && php artisan docs:datamodel --locale="$LOCALE")
+    fi
+
+    if [[ ! -f "$SRC" ]]; then
+        echo "Skipping ${LOCALE}: ${SRC} does not exist." >&2
+        continue
+    fi
+
+    case "$LOCALE" in
+        nl)
+            TITLE="Wat legt OpenVWR vast?"
+            SUBTITLE="Overzicht van de vast te leggen gegevens per register"
+            DATE="$(date '+%-d') ${MONTHS_NL[$MONTH_INDEX]} $(date '+%Y')"
+            ;;
+        en)
+            TITLE="What does OpenVWR record?"
+            SUBTITLE="An overview of the data each register can hold"
+            DATE="${MONTHS_EN[$MONTH_INDEX]} $(date '+%-d, %Y')"
+            ;;
+    esac
+
+    echo "Building PDF: $OUT"
+    pandoc "$SRC" \
+        --output="$OUT" \
+        --template=./openvwr.latex \
+        --pdf-engine=xelatex \
+        --toc \
+        --toc-depth=2 \
+        --variable=logo:"$LOGO_PDF" \
+        --variable=mainfont:"$MAINFONT" \
+        --variable=monofont:"$MONOFONT" \
+        --variable=title:"$TITLE" \
+        --variable=subtitle:"$SUBTITLE" \
+        --variable=date:"$DATE"
+
+    echo "Done: $OUT"
+done

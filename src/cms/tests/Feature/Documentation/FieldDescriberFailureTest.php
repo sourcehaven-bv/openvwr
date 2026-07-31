@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * Some labels and helper texts are only resolved while the form is being filled
+ * in: they live in a closure that needs the current record. Outside a request
+ * that record does not exist and Filament throws.
+ *
+ * For an overview document that is fine - the field simply gets no description -
+ * but it must not derail the generator. These tests keep it that way.
+ */
+
 declare(strict_types=1);
 
 use App\Documentation\FieldDescriber;
@@ -7,26 +16,17 @@ use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 
-/**
- * Sommige labels en hulpteksten worden pas tijdens het invullen bepaald: ze
- * zitten in een closure die de huidige registratie nodig heeft. Buiten een
- * request bestaat die niet en werpt Filament een fout.
- *
- * Voor een overzichtsdocument is dat geen bezwaar - dat veld krijgt dan geen
- * omschrijving - maar het mag de generator niet laten struikelen. Deze tests
- * zorgen dat dat zo blijft.
- */
 beforeEach(function (): void {
     $this->describer = new FieldDescriber();
 });
 
 /**
- * Een closure die alleen buiten een formuliercontext werkt, faalt hier altijd.
+ * A closure that only works inside a form context always fails here.
  */
 function docsExplodingClosure(): Closure
 {
     return static function (): string {
-        throw new RuntimeException('alleen bekend tijdens het invullen');
+        throw new RuntimeException('only known while filling in the form');
     };
 }
 

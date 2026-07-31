@@ -13,6 +13,7 @@ use App\Documentation\SectionNotes;
 use Filament\Forms\Form;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\App;
 use Throwable;
 
 use function base_path;
@@ -24,36 +25,47 @@ use function is_subclass_of;
 use function mkdir;
 
 /**
- * Genereert de registerhoofdstukken van de datamodel-documentatie uit de
- * Filament-formulieren zelf.
+ * Generates the register chapters of the data-model documentation from the
+ * Filament forms themselves.
  *
- * De formulieren zijn de enige plek waar de velden, hun labels en hun
- * hulpteksten echt staan; die met de hand overschrijven levert een document op
- * dat stilletjes veroudert. Deze generator leest daarom de echte schema's uit
- * en schrijft daar markdowntabellen van.
+ * The forms are the only place where the fields, their labels and their helper
+ * texts actually live; copying those by hand produces a document that quietly
+ * goes stale. This generator therefore reads the real schemas and writes
+ * markdown tables from them.
  *
- * Welke registers erin komen wordt niet hier vastgelegd: RegisterFinder vraagt
- * het Filament-paneel welke resources in de navigatiegroep "Registers" staan.
- * Een nieuw register verschijnt dus vanzelf in de documentatie, en een register
- * dat in een bepaalde installatie ontbreekt (zoals de DPIA-module) valt vanzelf
- * weg.
+ * Which registers are included is not fixed here: RegisterFinder asks the
+ * Filament panel which resources sit in the "Registers" navigation group. A new
+ * register thus shows up on its own, and one that is absent in a particular
+ * installation (such as the DPIA module) drops out just as easily.
  *
- * Wat NIET uit de code komt is de redactionele omlijsting: de inleiding, de
- * leeswijzer en de slothoofdstukken. Die staan als losse markdownbestanden in
- * docs/handgeschreven/ en worden er alleen tussengevoegd. Zo blijft de tekst
- * die een lezer overtuigt handwerk, terwijl de feiten automatisch kloppen.
+ * What does NOT come from the code is the editorial framing: the introduction,
+ * the reading guide and the closing chapters. Those live as separate markdown
+ * files under the prose directory and are only slotted in. That keeps the text
+ * that persuades a reader handwritten, while the facts stay correct by
+ * construction.
+ *
+ * All texts are read in the active locale, so the same command produces a Dutch
+ * or an English document depending on --locale.
  */
 class DocsDatamodel extends Command
 {
     protected $signature = 'docs:datamodel
-        {--output= : Pad van het te schrijven markdownbestand}
-        {--prose= : Map met de handgeschreven hoofdstukken}
-        {--panel=admin : Het Filament-paneel waaruit de registers komen}';
+        {--output= : Path of the markdown file to write}
+        {--prose= : Directory holding the handwritten chapters}
+        {--panel=admin : The Filament panel to take the registers from}
+        {--locale= : Locale to render the documentation in (defaults to the app locale)}';
 
-    protected $description = 'Genereer de datamodel-documentatie uit de formulierdefinities';
+    protected $description = 'Generate the data-model documentation from the form definitions';
 
     public function handle(): int
     {
+        $locale = $this->option('locale');
+        $previousLocale = App::currentLocale();
+
+        if (is_string($locale) && $locale !== '') {
+            App::setLocale($locale);
+        }
+
         $environment = new FormEnvironment();
         $environment->boot();
 
@@ -61,6 +73,7 @@ class DocsDatamodel extends Command
             return $this->generate($environment);
         } finally {
             $environment->restore();
+            App::setLocale($previousLocale);
         }
     }
 
@@ -73,7 +86,7 @@ class DocsDatamodel extends Command
         $registers = (new RegisterFinder())->find($this->option('panel'));
 
         if ($registers === []) {
-            $this->error('Geen registers gevonden in de navigatiegroep "Registers".');
+            $this->error('No registers found in the "Registers" navigation group.');
 
             return self::FAILURE;
         }
@@ -93,7 +106,7 @@ class DocsDatamodel extends Command
 
                 $chapters[] = $renderer->render($form, $resourceClass, $title);
             } catch (Throwable $e) {
-                $this->error('Mislukt: ' . $title . ' - ' . $e->getMessage());
+                $this->error('Failed: ' . $title . ' - ' . $e->getMessage());
 
                 return self::FAILURE;
             }
@@ -103,16 +116,18 @@ class DocsDatamodel extends Command
                 $models[$title] = $model;
             }
 
-            $this->info('Gelezen: ' . $title);
+            $this->info('Read: ' . $title);
         }
 
-        $output = $this->pathOption('output', '../../docs/gegevensmodel-verwerkingen.md');
-        $proseDir = $this->pathOption('prose', '../../docs/handgeschreven');
+        $locale = App::currentLocale();
+
+        $output = $this->pathOption('output', '../../docs/datamodel-' . $locale . '.md');
+        $proseDir = $this->pathOption('prose', '../../docs/prose/' . $locale);
 
         $markdown = (new DocumentAssembler())->assemble($chapters, $proseDir, $models);
 
         $this->write($output, $markdown);
-        $this->info('Geschreven naar ' . $output);
+        $this->info('Written to ' . $output);
 
         return self::SUCCESS;
     }
