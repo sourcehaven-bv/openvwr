@@ -96,6 +96,24 @@ $endif$
 \titlespacing*{\subsection}{0pt}{1.8em}{0.6em}
 \titlespacing*{\subsubsection}{0pt}{1.4em}{0.4em}
 
+% --- Pagina-einden -----------------------------------------------------------
+% Vrijwel elke kop wordt hier gevolgd door een tabel. Zonder maatregel belandt
+% een kop onder aan de pagina met zijn tabel op de volgende, wat leest als een
+% lege sectie. needspace eist ruimte voor de kop plus de eerste paar regels van
+% de tabel; is die er niet, dan schuift de kop mee naar de volgende pagina.
+%
+% Lange tabellen mogen daarna gewoon doorlopen: die passen sowieso niet op één
+% pagina, en de kolomkoppen worden per pagina herhaald.
+\usepackage{needspace}
+
+\pretocmd{\section}{\Needspace*{6\baselineskip}}{}{}
+\pretocmd{\subsection}{\Needspace*{6\baselineskip}}{}{}
+\pretocmd{\subsubsection}{\Needspace*{5\baselineskip}}{}{}
+
+% Losse eerste of laatste regels van een alinea onder- of bovenaan een pagina.
+\widowpenalty=10000
+\clubpenalty=10000
+
 % --- Kop- en voettekst -------------------------------------------------------
 \pagestyle{fancy}
 \fancyhf{}
