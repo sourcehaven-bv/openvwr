@@ -34,15 +34,31 @@ it('ignores an empty panel name', function (): void {
 it('orders the registers the way the menu does', function (): void {
     $registers = $this->finder->find('admin');
 
-    $sorts = array_map(
-        static fn (string $resource): int => $resource::getNavigationSort() ?? PHP_INT_MAX,
+    // Group by group, and within a group by navigation sort. Sort numbers
+    // restart per group, so they only have to ascend inside a group.
+    $perGroup = [];
+    foreach ($registers as $resource) {
+        $perGroup[(string) $resource::getNavigationGroup()][] =
+            $resource::getNavigationSort() ?? PHP_INT_MAX;
+    }
+
+    foreach ($perGroup as $sorts) {
+        $sorted = $sorts;
+        sort($sorted);
+
+        expect($sorts)->toBe($sorted);
+    }
+
+    // And a group is never interrupted by another one.
+    $seen = array_map(
+        static fn (string $resource): string => (string) $resource::getNavigationGroup(),
         $registers,
     );
 
-    $sorted = $sorts;
-    sort($sorted);
-
-    expect($sorts)->toBe($sorted);
+    expect($seen)->toBe(array_merge(...array_map(
+        static fn (string $group): array => array_fill(0, count($perGroup[$group]), $group),
+        array_keys($perGroup),
+    )));
 });
 
 it('only returns resources that have their own form', function (): void {
