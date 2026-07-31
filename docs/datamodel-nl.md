@@ -170,7 +170,7 @@ Het meest gedetailleerde onderdeel van de registratie. Per categorie betrokkenen
 | GEB (DPIA) uitgevoerd | Ja/nee | Zet aan als er daadwerkelijk een GEB is uitgevoerd; de vragen hieronder bepalen of dat verplicht is. |
 | **Is een GEB (DPIA) verplicht?** |  | Beantwoord de vragen één voor één. Zodra u één vraag met "ja" beantwoordt, is een GEB (DPIA) verplicht en vervallen de overige vragen. |
 | Systematische en uitgebreide beoordeling van persoonlijke aspecten | Ja/nee |  |
-| Grootschalige verwerking van bijzondere categorieen | Ja/nee |  |
+| Grootschalige verwerking van bijzondere categorieën | Ja/nee |  |
 | Grootschalige monitoring | Ja/nee |  |
 | Autoriteit Persoonsgegevens gepubliceerde lijst | Ja/nee |  |
 | De negen criteria van WP248 | Ja/nee |  |
@@ -389,7 +389,7 @@ Verwerkingen van politiegegevens die onder de Wet politiegegevens vallen in plaa
 | Artikel 15a: Aan ontvangers belast met politietaken en EU-organisaties belast met opsporing binnen de EU maar anders dan Nederland | Ja/nee |  |
 | Toelichting | Toelichting | Aan welke ontvangers politiegegevens ter beschikking worden gesteld en waarom. |
 | **Politiegegevens verstrekt aan derden** |  |  |
-| Artikel 16: aan het Openbaar Ministerie, de burgermeester of de verwerkingsverantwoordelijke zelf voor specifieke taken zoals genoemdn in art. 16, lid 1 sub c Wpg | Ja/nee |  |
+| Artikel 16: aan het Openbaar Ministerie, de burgemeester of de verwerkingsverantwoordelijke zelf voor specifieke taken zoals genoemd in art. 16, lid 1 sub c Wpg | Ja/nee |  |
 | Artikel 17: aan de Nederlandse veiligheidsdiensten | Ja/nee |  |
 | Artikel 18: aan ontvangers genoemd in lagere regelgeving of op basis van een machtiging van de minister van J&V | Ja/nee |  |
 | Artikel 19: aan ontvangers van incidentele gevallen | Ja/nee | Eenmalige verstrekking die per geval wordt afgewogen, niet structureel geregeld. |
@@ -429,9 +429,9 @@ Verwerkingen van politiegegevens die onder de Wet politiegegevens vallen in plaa
 | Politiegegevens waaruit religieuze of levensbeschouwelijke overtuigingen blijken | Ja/nee |  |
 | Politiegegevens waaruit het lidmaatschap van een vakbond blijkt | Ja/nee |  |
 | Genetische politiegegevens | Ja/nee |  |
-| Biotmetrische politiegegevens met het oog op de unieke identificatie van een persoon | Ja/nee |  |
+| Biometrische politiegegevens met het oog op de unieke identificatie van een persoon | Ja/nee |  |
 | Politiegegevens over gezondheid | Ja/nee |  |
-| Politiegegevens net betrekking tot iemands seksueel gedrag of seksuele geaardheid | Ja/nee |  |
+| Politiegegevens met betrekking tot iemands seksueel gedrag of seksuele geaardheid | Ja/nee |  |
 
 ## Besluitvorming
 
