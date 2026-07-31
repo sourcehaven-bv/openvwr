@@ -96,8 +96,15 @@ jobs:
         env:
           VERSION: ${{ inputs.version }}
         run: |
+          # Both languages ship with a release. A missing file means the build
+          # silently skipped a locale, which must not pass unnoticed.
           for LOCALE in nl en; do
-            cp "docs/datamodel-${LOCALE}.pdf" "openvwr-datamodel-${LOCALE}-${VERSION}.pdf"
+            SRC="docs/datamodel-${LOCALE}.pdf"
+            if [ ! -f "$SRC" ]; then
+              echo "::error::${SRC} was not built" >&2
+              exit 1
+            fi
+            cp "$SRC" "openvwr-datamodel-${LOCALE}-${VERSION}.pdf"
           done
           echo "NAME=openvwr-datamodel-${VERSION}" >> "$GITHUB_OUTPUT"
 

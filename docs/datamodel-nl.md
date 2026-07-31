@@ -15,15 +15,15 @@ systeem aansluit bij hun registratiebehoefte. Er wordt geen technische kennis ve
 
 ## Leeswijzer
 
-OpenVWR bestaat uit een aantal **registers**. Elk register is een aparte lijst met registraties van
+OpenVWR bestaat uit een aantal registers. Elk register is een aparte lijst met registraties van
 een bepaald type. Welke registers beschikbaar zijn verschilt per installatie; de hoofdstukken
 hierna beschrijven de registers die in deze versie aanwezig zijn.
 
-Elke registratie wordt ingevuld via een formulier dat is opgedeeld in **stappen**. De tabellen
+Elke registratie wordt ingevuld via een formulier dat is opgedeeld in stappen. De tabellen
 hierna volgen die stappen, zodat de indeling van dit document overeenkomt met wat een invuller in
 het scherm ziet. De veldnamen en de toelichtingen zijn letterlijk overgenomen uit de applicatie.
 
-In de kolom **Soort invoer** staat hoe een veld wordt ingevuld:
+In de kolom "Soort invoer" staat hoe een veld wordt ingevuld:
 
 | Soort invoer | Betekenis |
 | --- | --- |
@@ -38,12 +38,12 @@ In de kolom **Soort invoer** staat hoe een veld wordt ingevuld:
 | Lijst | Een herhaalbaar blok: de invuller kan er zoveel toevoegen als nodig, elk met eigen velden. |
 | Bestand | Een te uploaden document. |
 
-Een veld dat begint met **»** hoort bij het onderdeel erboven: het wordt per item van die lijst of
-koppeling ingevuld. Een **vetgedrukte regel zonder soort invoer** is een tussenkop die bij elkaar
+Een veld dat begint met » hoort bij het onderdeel erboven: het wordt per item van die lijst of
+koppeling ingevuld. Een vetgedrukte regel zonder soort invoer is een tussenkop die bij elkaar
 horende vragen groepeert.
 
-Niet elk veld is altijd zichtbaar. Het formulier verbergt vragen die niet van toepassing zijn —
-staat "Heeft verwerkers" bijvoorbeeld uit, dan verschijnt de tabel met verwerkers niet. Dit
+Niet elk veld is altijd zichtbaar. Het formulier verbergt vragen die niet van toepassing zijn.
+Staat "Heeft verwerkers" bijvoorbeeld uit, dan verschijnt de tabel met verwerkers niet. Dit
 document toont alle velden die het systeem kent; in de praktijk krijgt een invuller er dus minder
 te zien.
 
@@ -56,7 +56,7 @@ Verwerkingen van persoonsgegevens waarbij uw organisatie zelf het doel en de mid
 ## Naam verwerking
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Nummer verwerking | Tekst |  |
 | Import nummer | Tekst |  |
 | Naam verwerking | Tekst | Geef een korte, herkenbare naam die de verwerking beschrijft, niet het systeem of de afdeling. Gebruik het doel of de activiteit, bijvoorbeeld "Salarisadministratie" of "Cameratoezicht kantoorpanden". |
@@ -70,27 +70,27 @@ Verwerkingen van persoonsgegevens waarbij uw organisatie zelf het doel en de mid
 ## Verwerkingsverantwoordelijke
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Verwerkingsverantwoordelijken | Koppeling | De organisatie(s) die het doel en de middelen van deze verwerking bepalen. Vul er meer in als de verantwoordelijkheid wordt gedeeld. |
 | Verdeling verantwoordelijkheid | Toelichting | Alleen invullen bij meerdere verantwoordelijken: wie is waarvoor verantwoordelijk? |
 
 ## Verwerker
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Heeft verwerkers | Ja/nee | Is er sprake van (een of meerdere) verwerkers? |
 | Verwerkers | Koppeling |  |
 
 ## Ontvanger
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Ontvangers | Koppeling | Aan wie de persoonsgegevens worden verstrekt, buiten uw eigen organisatie. Laat leeg als er geen ontvangers zijn. |
 
 ## Doel & grondslag
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | AVG doelen | Lijst |  |
 | » Doel | Toelichting |  |
 | » AVG rechtsgronden | Keuze | Keuze uit: Toestemming betrokkene; Uitvoering overeenkomst; Wettelijke verplichting; Vitaal belang betrokkene; Taak van algemeen belang; Gerechtvaardigd belang verantwoordelijke. |
@@ -101,7 +101,7 @@ Verwerkingen van persoonsgegevens waarbij uw organisatie zelf het doel en de mid
 Het meest gedetailleerde onderdeel van de registratie. Per categorie betrokkenen wordt vastgelegd welke gewone, bijzondere en gevoelige gegevens worden verwerkt, en per gegeven het verzameldoel, de bewaartermijn en de bron.
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Betrokkenen | Lijst |  |
 | » Beschrijving | Toelichting |  |
 | **Bijzondere gegevens** |  | Welke bijzondere gegevens die betrekking hebben op deze categorie van betrokkenen worden verwerkt? |
@@ -128,7 +128,7 @@ Het meest gedetailleerde onderdeel van de registratie. Per categorie betrokkenen
 ## Besluitvorming
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Geautomatiseerde besluitvorming | Ja/nee | Zet aan als besluiten (deels) automatisch worden genomen, zonder betekenisvolle menselijke tussenkomst. Vul dan de toelichting hieronder in. |
 | Toelichting besluitvorming | Toelichting | Welke gegevens tot welk besluit leiden, begrijpelijk beschreven en zonder technische details. |
 | Toelichting belang en gevolgen | Toelichting | Wat het besluit concreet voor de betrokkene betekent, bijvoorbeeld toekenning of afwijzing. |
@@ -136,14 +136,14 @@ Het meest gedetailleerde onderdeel van de registratie. Per categorie betrokkenen
 ## Systemen / Applicaties
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Heeft systemen / applicaties | Ja/nee | Is er sprake van (een of meerdere) applicaties / systemen? |
 | Systemen/Applicaties | Koppeling |  |
 
 ## Beveiliging
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Heeft beveiliging | Ja/nee | Beveiligt u de persoonsgegevens? |
 | **Maatregelen** |  |  |
 | Vastgesteld beveiligingsbeleid dat ook is geïmplementeerd | Ja/nee | Alleen aanvinken als het beleid formeel is vastgesteld én in de praktijk wordt toegepast. |
@@ -155,7 +155,7 @@ Het meest gedetailleerde onderdeel van de registratie. Per categorie betrokkenen
 ## Doorgifte
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Doorgifte buiten EER | Ja/nee | Geeft u bij uw gegevensverwerking persoonsgegevens door aan een of meer landen buiten de Europese Unie of aan een internationale organisatie? |
 | Landen | Keuze | De landen buiten de EER waarnaar persoonsgegevens worden doorgegeven. Keuze uit: Andorra; Argentinië; Canada (alleen commerciële bedrijven); Faeröer Eilanden; Guernsey; Isle of Man; Israël; Japan; Jersey; Nieuw-Zeeland; Uruguay; Verenigd Koninkrijk; Verenigde Staten (organisaties die meedoen aan het Data Privacy Framework); Zwitserland; Zuid-Korea; Anders, namelijk:. |
 | Anders, namelijk: | Tekst |  |
@@ -166,7 +166,7 @@ Het meest gedetailleerde onderdeel van de registratie. Per categorie betrokkenen
 ## GEB (DPIA)
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | GEB (DPIA) uitgevoerd | Ja/nee | Zet aan als er daadwerkelijk een GEB is uitgevoerd; de vragen hieronder bepalen of dat verplicht is. |
 | **Is een GEB (DPIA) verplicht?** |  | Beantwoord de vragen één voor één. Zodra u één vraag met "ja" beantwoordt, is een GEB (DPIA) verplicht en vervallen de overige vragen. |
 | Systematische en uitgebreide beoordeling van persoonlijke aspecten | Ja/nee |  |
@@ -179,27 +179,27 @@ Het meest gedetailleerde onderdeel van de registratie. Per categorie betrokkenen
 ## Contactpersoon
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Primair contact | Koppeling | Wie als eerste benaderd wordt bij vragen over deze registratie. |
 | Overige contactpersonen | Koppeling | Aanvullende contactpersonen, bijvoorbeeld de beheerder van het systeem. |
 
 ## Documenten & bijlagen
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Documenten | Koppeling |  |
 
 ## Opmerkingen
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Opmerkingen | Lijst |  |
 | » Opmerking | Toelichting |  |
 
 ## Publiceren
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Publiceer vanaf | Datum |  |
 | **Publieke beschikbaarheid** |  | Periodiek controleren we de publieke status van deze verwerking. In dit overzicht geven we de publieke beschikbaarheid weer. |
 
@@ -213,7 +213,7 @@ Verwerkingen van persoonsgegevens die uw organisatie in opdracht van een andere 
 ## Naam verwerking
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Nummer verwerking | Tekst |  |
 | Import nummer | Tekst |  |
 | Naam verwerking | Tekst | Geef een korte, herkenbare naam die de verwerking beschrijft, niet het systeem of de afdeling. Gebruik het doel of de activiteit, bijvoorbeeld "Salarisadministratie" of "Cameratoezicht kantoorpanden". |
@@ -227,26 +227,26 @@ Verwerkingen van persoonsgegevens die uw organisatie in opdracht van een andere 
 ## Verwerkingsverantwoordelijke
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Verwerkingsverantwoordelijken | Koppeling | De verantwoordelijke(n) in wiens opdracht u deze gegevens verwerkt. |
 
 ## Subverwerker
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Heeft subverwerkers | Ja/nee | Is er sprake van (een of meerdere) subverwerkers? |
 | Subverwerkers | Koppeling |  |
 
 ## Ontvanger
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Ontvangers | Koppeling | Aan wie de persoonsgegevens worden verstrekt, buiten uw eigen organisatie. Laat leeg als er geen ontvangers zijn. |
 
 ## Doel & grondslag
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Doel & Grondslag | Ja/nee | Is er een specifiek doel voor deze verwerking vastgelegd? |
 | AVG doelen | Lijst |  |
 | » Doel | Toelichting |  |
@@ -256,7 +256,7 @@ Verwerkingen van persoonsgegevens die uw organisatie in opdracht van een andere 
 ## Betrokkenen en gegevens
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Betrokkenen en gegevens | Ja/nee | Is er sprake van een (of meerdere) categorieën van betrokkenen? |
 | Betrokkenen | Lijst |  |
 | » Beschrijving | Toelichting |  |
@@ -284,7 +284,7 @@ Verwerkingen van persoonsgegevens die uw organisatie in opdracht van een andere 
 ## Besluitvorming
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Geautomatiseerde besluitvorming | Ja/nee | Is er sprake van geautomatiseerde besluitvorming? |
 | Toelichting besluitvorming | Toelichting | Welke gegevens tot welk besluit leiden, begrijpelijk beschreven en zonder technische details. |
 | Toelichting belang en gevolgen | Toelichting | Wat het besluit concreet voor de betrokkene betekent, bijvoorbeeld toekenning of afwijzing. |
@@ -292,14 +292,14 @@ Verwerkingen van persoonsgegevens die uw organisatie in opdracht van een andere 
 ## Systemen / Applicaties
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Heeft systemen / applicaties | Ja/nee | Is er sprake van (een of meerdere) applicaties / systemen? |
 | Systemen/Applicaties | Koppeling |  |
 
 ## Beveiliging
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Heeft beveiliging | Ja/nee | Beveiligt u de persoonsgegevens? |
 | **Maatregelen** |  |  |
 | Vastgesteld beveiligingsbeleid dat ook is geïmplementeerd | Ja/nee | Alleen aanvinken als het beleid formeel is vastgesteld én in de praktijk wordt toegepast. |
@@ -312,7 +312,7 @@ Verwerkingen van persoonsgegevens die uw organisatie in opdracht van een andere 
 ## Doorgifte
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Doorgifte buiten EER | Ja/nee | Geeft u bij uw gegevensverwerking persoonsgegevens door aan een of meer landen buiten de Europese Unie of aan een internationale organisatie? |
 | Landen | Keuze | De landen buiten de EER waarnaar persoonsgegevens worden doorgegeven. Keuze uit: Andorra; Argentinië; Canada (alleen commerciële bedrijven); Faeröer Eilanden; Guernsey; Isle of Man; Israël; Japan; Jersey; Nieuw-Zeeland; Uruguay; Verenigd Koninkrijk; Verenigde Staten (organisaties die meedoen aan het Data Privacy Framework); Zwitserland; Zuid-Korea; Anders, namelijk:. |
 | Anders, namelijk: | Tekst |  |
@@ -323,26 +323,26 @@ Verwerkingen van persoonsgegevens die uw organisatie in opdracht van een andere 
 ## GEB (DPIA)
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | GEB (DPIA) | Ja/nee | Is er een GEB (DPIA) door de verantwoordelijke uitgevoerd? |
 
 ## Contactpersoon
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Primair contact | Koppeling | Wie als eerste benaderd wordt bij vragen over deze registratie. |
 | Overige contactpersonen | Koppeling | Aanvullende contactpersonen, bijvoorbeeld de beheerder van het systeem. |
 
 ## Documenten & bijlagen
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Documenten | Koppeling |  |
 
 ## Opmerkingen
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Opmerkingen | Lijst |  |
 | » Opmerking | Toelichting |  |
 
@@ -356,7 +356,7 @@ Verwerkingen van politiegegevens die onder de Wet politiegegevens vallen in plaa
 ## Naam verwerking
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Nummer verwerking | Tekst |  |
 | Import nummer | Tekst |  |
 | Naam verwerking | Tekst | Geef een korte, herkenbare naam die de verwerking beschrijft, niet het systeem of de afdeling. Gebruik het doel of de activiteit, bijvoorbeeld "Salarisadministratie" of "Cameratoezicht kantoorpanden". |
@@ -370,20 +370,20 @@ Verwerkingen van politiegegevens die onder de Wet politiegegevens vallen in plaa
 ## Verwerkingsverantwoordelijke
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Verwerkingsverantwoordelijken | Koppeling | De organisatie(s) die het doel en de middelen van deze verwerking bepalen. |
 
 ## Verwerker
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Heeft verwerkers | Ja/nee | Is er sprake van verwerkers |
 | Verwerkers | Koppeling |  |
 
 ## Ontvanger
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | **Politiegegevens ter beschikking gesteld** |  |  |
 | Artikel 15: Aan ontvangers binnen het Wpg-domein in Nederland | Ja/nee |  |
 | Artikel 15a: Aan ontvangers belast met politietaken en EU-organisaties belast met opsporing binnen de EU maar anders dan Nederland | Ja/nee |  |
@@ -405,7 +405,7 @@ Verwerkingen van politiegegevens die onder de Wet politiegegevens vallen in plaa
 ## Doel & grondslag
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | WPG doelen | Lijst |  |
 | » Omschrijving | Toelichting | Welke politiegegevens voor welk doel worden verwerkt. |
 | » Art. 8: Uitvoering dagelijkse politietaak (signaalafhandeling) | Ja/nee | De dagelijkse politietaak: binnenkomende signalen en meldingen die worden afgehandeld. |
@@ -422,7 +422,7 @@ Verwerkingen van politiegegevens die onder de Wet politiegegevens vallen in plaa
 ## Bijzondere politiegegevens
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | **Bijzondere politiegegevens** |  |  |
 | Politiegegevens waaruit ras of etnische afkomst blijkt | Ja/nee |  |
 | Politiegegevens waaruit politieke opvatting blijken | Ja/nee |  |
@@ -436,7 +436,7 @@ Verwerkingen van politiegegevens die onder de Wet politiegegevens vallen in plaa
 ## Besluitvorming
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | **Besluitvorming** |  |  |
 | Geautomatiseerde besluitvorming | Ja/nee | Zet aan als besluiten (deels) automatisch worden genomen, zonder betekenisvolle menselijke tussenkomst. Vul dan de toelichting hieronder in. |
 | Toelichting | Toelichting |  |
@@ -445,14 +445,14 @@ Verwerkingen van politiegegevens die onder de Wet politiegegevens vallen in plaa
 ## Systemen / Applicaties
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Heeft systeem / applicatie | Ja/nee | Is er sprake van een (of meerdere) systemen/applicaties |
 | Systemen/Applicaties | Koppeling |  |
 
 ## Beveiliging
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Beveiliging | Ja/nee | Beveiligt u de politiegegevens? |
 | **Maatregelen** |  |  |
 | Vastgesteld beveiligingsbeleid dat ook is geïmplementeerd | Ja/nee | Alleen aanvinken als het beleid formeel is vastgesteld én in de praktijk wordt toegepast. |
@@ -464,33 +464,33 @@ Verwerkingen van politiegegevens die onder de Wet politiegegevens vallen in plaa
 ## GEB (DPIA)
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | GEB (DPIA) | Ja/nee | Is er sprake van een verwerking die een hoog risico voor de rechten van de vrijheden van personen oplevert? |
 
 ## Contactpersoon
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Primair contact | Koppeling | Wie als eerste benaderd wordt bij vragen over deze registratie. |
 | Overige contactpersonen | Koppeling | Aanvullende contactpersonen, bijvoorbeeld de beheerder van het systeem. |
 
 ## Documenten & bijlagen
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Documenten | Koppeling |  |
 
 ## Opmerkingen
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Opmerkingen | Lijst |  |
 | » Opmerking | Toelichting |  |
 
 ## Categorieën betrokkenen
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | **Categorieën betrokkenen** |  |  |
 | Verdachten | Ja/nee | Zet aan als er politiegegevens van verdachten worden verwerkt. |
 | Slachtoffers | Ja/nee | Zet aan als er politiegegevens van slachtoffers worden verwerkt. |
@@ -509,7 +509,7 @@ Algoritmes die uw organisatie inzet, met het oog op publicatie in het landelijke
 ## Naam algoritme
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Nummer | Tekst |  |
 | Naam | Tekst | Een korte, herkenbare naam voor het algoritme, zoals een burger het zou herkennen. |
 | Korte omschrijving | Toelichting | Eén alinea in begrijpelijke taal voor een burger; maximaal 400 tekens. |
@@ -525,7 +525,7 @@ Algoritmes die uw organisatie inzet, met het oog op publicatie in het landelijke
 ## Verantwoord gebruik
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Doel en impact | Toelichting |  |
 | Afwegingen | Toelichting |  |
 | Menselijke tussenkomst | Toelichting |  |
@@ -541,7 +541,7 @@ Algoritmes die uw organisatie inzet, met het oog op publicatie in het landelijke
 ## Werking
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Titel van gegevensbron | Tekst |  |
 | Gegevens | Toelichting |  |
 | Links naar gegevensbronnen | Toelichting |  |
@@ -552,7 +552,7 @@ Algoritmes die uw organisatie inzet, met het oog op publicatie in het landelijke
 ## Metadata
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Datum van ontwikkeling | Datum | De datum waarop de ontwikkeling is afgerond, niet de datum van ingebruikname. |
 | Eigenaar van het algoritme | Tekst | De organisatie of afdeling die verantwoordelijk is voor het algoritme. |
 | Product owner van het algoritme | Tekst | De persoon of rol die inhoudelijk beslist over het algoritme. |
@@ -563,7 +563,7 @@ Algoritmes die uw organisatie inzet, met het oog op publicatie in het landelijke
 ## Impactvol algoritme
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Is er sprake van een proces met directe gevolgen voor burgers of organisaties? | Keuze | Denk aan een besluit over een uitkering, vergunning of handhaving; interne rapportage telt niet mee. Keuze uit: Ja; Nee. |
 | Worden er in dit proces één of meerdere algoritmes toegepast? | Keuze | Ook eenvoudige beslisregels of rekenregels tellen mee als algoritme. Keuze uit: Ja; Nee. |
 | Heeft het algoritme een significant effect op de uitkomst van het proces? | Keuze | Significant betekent dat de uitkomst zonder het algoritme wezenlijk anders had kunnen zijn. Keuze uit: Ja; Nee. |
@@ -571,13 +571,13 @@ Algoritmes die uw organisatie inzet, met het oog op publicatie in het landelijke
 ## Validatie
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Antwoorden op de toetsvragen gecontroleerd door product owner | Keuze | Zet op Ja zodra de product owner de antwoorden op de impactvragen heeft bevestigd. Keuze uit: Ja; Nee. |
 
 ## Documenten & bijlagen
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Documenten | Koppeling |  |
 
 
@@ -590,7 +590,7 @@ Inbreuken op de beveiliging van persoonsgegevens, inclusief de melding aan de Au
 ## Naam datalek
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Nummer | Tekst |  |
 | Naam | Tekst | Een korte, herkenbare omschrijving van het datalek. |
 | Datum melding | Datum | De datum waarop het datalek intern is gemeld. |
@@ -600,13 +600,13 @@ Inbreuken op de beveiliging van persoonsgegevens, inclusief de melding aan de Au
 ## Verantwoordelijke
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Verwerkingsverantwoordelijken | Koppeling |  |
 
 ## Data
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Datum ontdekking datalek | Datum | Het moment waarop het datalek intern is ontdekt; dit is het startpunt voor de meldtermijn. |
 | (Vermoedelijke) startdatum inbreuk | Datum | Een schatting volstaat als de exacte datum niet bekend is. |
 | Einddatum inbreuk | Datum | De datum waarop het lek is gedicht. |
@@ -616,7 +616,7 @@ Inbreuken op de beveiliging van persoonsgegevens, inclusief de melding aan de Au
 ## Incident
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Aard van incident | Keuze | Wat er feitelijk is gebeurd, bijvoorbeeld verkeerd verzonden of kwijtgeraakte gegevens. Keuze uit: E-mail met persoonsgegevens verstuurd aan verkeerde ontvanger(s); E-mail verstuurd met persoonsgegevens met ontvangers in het aan-veld of in de cc, in plaats van bcc; Brief of postpakket met persoonsgegevens verstuurd of afgegeven aan de verkeerde ontvanger(s); Brief of postpakket met persoonsgegevens geopend retour ontvangen; Brief of postpakket met persoonsgegevens kwijtgeraakt; Autorisatie(s) van medewerker(s) verkeerd ingesteld.; Netwerkmappen of -locaties met persoonsgegevens zijn te breed toegankelijk ingesteld binnen de organisatie; Apparaat, gegevensdrager (bijv. USB-stick) en/of papier met persoonsgegevens kwijtgeraakt of gestolen; Persoonsgegevens per ongeluk gepubliceerd; Hacking, malware (bijv. ransomware) en/of phishing; Persoonsgegevens toegevoegd aan verkeer dossier; Overig. |
 | Namelijk | Toelichting |  |
 | Samenvatting incident | Toelichting | Wat er is gebeurd, wanneer het speelde en hoe het is ontdekt. |
@@ -634,7 +634,7 @@ Inbreuken op de beveiliging van persoonsgegevens, inclusief de melding aan de Au
 ## Verwerkingen
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Verwerkingen AVG verantwoordelijke | Keuze | Koppel de verwerkingen waarop dit datalek betrekking heeft, zodat het lek vindbaar is vanuit die registraties. |
 | Verwerkingen AVG verwerker | Keuze |  |
 | Verwerkingen WPG verantwoordelijke | Keuze |  |
@@ -642,7 +642,7 @@ Inbreuken op de beveiliging van persoonsgegevens, inclusief de melding aan de Au
 ## Documenten & bijlagen
 
 | Veld | Soort invoer | Toelichting |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Documenten | Koppeling |  |
 
 
@@ -655,13 +655,13 @@ de aantoonbaarheid van het register.
 
 | Onderdeel | Wat wordt vastgelegd |
 | --- | --- |
-| **Wijzigingshistorie** | Van elke registratie wordt bijgehouden wie wat wanneer heeft gewijzigd. Versies zijn onderling te vergelijken, inclusief wijzigingen in gekoppelde onderdelen zoals betrokkenen of systemen. |
-| **Versies en goedkeuring** | Registraties kunnen worden vastgelegd in een versie die ter goedkeuring wordt voorgelegd aan mandaathouders. Hun akkoord wordt met datum en persoon vastgelegd. |
-| **Organisatie** | Elke registratie hoort bij één organisatie. Gebruikers zien uitsluitend de registraties van de organisatie(s) waartoe zij toegang hebben. |
-| **Gebruikers en rollen** | Van gebruikers worden naam, e-mailadres en toegewezen rollen vastgelegd. Rollen bepalen wie mag lezen, invullen, goedkeuren of beheren. |
-| **Aanmaak- en wijzigingsdatum** | Van elke registratie en elk gekoppeld onderdeel. |
-| **Verwijderde registraties** | Verwijderde registraties blijven bewaard en zijn herstelbaar; ze verdwijnen uit de reguliere overzichten. |
-| **Import-herkomst** | Bij registraties die uit een eerder register zijn overgenomen, blijft de oorspronkelijke herkomst bewaard. |
+| Wijzigingshistorie | Van elke registratie wordt bijgehouden wie wat wanneer heeft gewijzigd. Versies zijn onderling te vergelijken, inclusief wijzigingen in gekoppelde onderdelen zoals betrokkenen of systemen. |
+| Versies en goedkeuring | Registraties kunnen worden vastgelegd in een versie die ter goedkeuring wordt voorgelegd aan mandaathouders. Hun akkoord wordt met datum en persoon vastgelegd. |
+| Organisatie | Elke registratie hoort bij één organisatie. Gebruikers zien uitsluitend de registraties van de organisatie(s) waartoe zij toegang hebben. |
+| Gebruikers en rollen | Van gebruikers worden naam, e-mailadres en toegewezen rollen vastgelegd. Rollen bepalen wie mag lezen, invullen, goedkeuren of beheren. |
+| Aanmaak- en wijzigingsdatum | Van elke registratie en elk gekoppeld onderdeel. |
+| Verwijderde registraties | Verwijderde registraties blijven bewaard en zijn herstelbaar; ze verdwijnen uit de reguliere overzichten. |
+| Import-herkomst | Bij registraties die uit een eerder register zijn overgenomen, blijft de oorspronkelijke herkomst bewaard. |
 
 # Hergebruik van gegevens
 

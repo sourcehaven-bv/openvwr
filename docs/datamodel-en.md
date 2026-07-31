@@ -15,17 +15,17 @@ system fits their registration needs. No technical knowledge is assumed.
 
 ## How to read this document
 
-OpenVWR consists of a number of **registers**. Each register is a separate list
+OpenVWR consists of a number of registers. Each register is a separate list
 of records of a particular type. Which registers are available differs per
 installation; the chapters that follow describe the registers present in this
 version.
 
-Every record is filled in through a form divided into **steps**. The tables
+Every record is filled in through a form divided into steps. The tables
 below follow those steps, so the structure of this document matches what someone
 filling in the form sees on screen. The field names and explanations are taken
 verbatim from the application.
 
-The **kind of input** column says how a field is filled in:
+The "kind of input" column says how a field is filled in:
 
 | Kind of input | Meaning |
 | --- | --- |
@@ -40,12 +40,12 @@ The **kind of input** column says how a field is filled in:
 | List | A repeatable block: as many can be added as needed, each with its own fields. |
 | File | A document that can be uploaded. |
 
-A field starting with **»** belongs to the item above it: it is filled in for
-each entry of that list or link. A **bold row without a kind of input** is a
+A field starting with » belongs to the item above it: it is filled in for
+each entry of that list or link. A bold row without a kind of input is a
 sub-heading grouping related questions.
 
-Not every field is always visible. The form hides questions that do not apply —
-if "has processors" is switched off, for instance, the processors table does not
+Not every field is always visible. The form hides questions that do not apply.
+If "has processors" is switched off, for instance, the processors table does not
 appear. This document lists every field the system knows; in practice someone
 filling in the form sees fewer.
 
@@ -58,7 +58,7 @@ Processing of personal data where your organisation itself determines the purpos
 ## Name of the processing activity
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Processing activity number | Text |  |
 | Import number | Text |  |
 | Name of the processing activity | Text | Give a short, recognisable name that describes the processing activity, not the system or the department. Use the purpose or the activity, for example "Payroll administration" or "Camera surveillance of office buildings". |
@@ -72,27 +72,27 @@ Processing of personal data where your organisation itself determines the purpos
 ## Controller
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Controllers | Link | The organisation(s) that determine the purposes and means of this processing activity. Enter more than one if responsibility is shared. |
 | Allocation of responsibility | Free text | Only fill in where there are several controllers: who is responsible for what? |
 
 ## Processor
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Has processors | Yes/no | Are one or more processors involved? |
 | Processors | Link |  |
 
 ## Recipient
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Recipients | Link | To whom the personal data is disclosed, outside your own organisation. Leave empty if there are no recipients. |
 
 ## Purpose & legal basis
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | GDPR purposes | List |  |
 | » Purpose | Free text |  |
 | » GDPR legal bases | Choice | Choose from: Consent of the data subject; Performance of a contract; Legal obligation; Vital interests of the data subject; Task carried out in the public interest; Legitimate interests of the controller. |
@@ -103,7 +103,7 @@ Processing of personal data where your organisation itself determines the purpos
 The most detailed part of the record. For each category of data subjects it captures which ordinary, special and sensitive data are processed, and for each item the collection purpose, the retention period and the source.
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Data subjects | List |  |
 | » Description | Free text |  |
 | **Special categories of personal data** |  | Which special categories of personal data relating to this category of data subjects are processed? |
@@ -130,7 +130,7 @@ The most detailed part of the record. For each category of data subjects it capt
 ## Decision-making
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Automated decision-making | Yes/no | Switch on if decisions are taken (partly) automatically, without meaningful human intervention. In that case fill in the explanation below. |
 | Explanation of the decision-making | Free text | Which data leads to which decision, described in understandable terms and without technical detail. |
 | Explanation of the significance and consequences | Free text | What the decision means in concrete terms for the data subject, for example approval or rejection. |
@@ -138,14 +138,14 @@ The most detailed part of the record. For each category of data subjects it capt
 ## Systems / Applications
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Has systems / applications | Yes/no | Are one or more applications / systems involved? |
 | Systems/Applications | Link |  |
 
 ## Security
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Has security | Yes/no | Do you secure the personal data? |
 | **Measures** |  |  |
 | Established security policy that has also been implemented | Yes/no | Only tick if the policy has been formally established and is applied in practice. |
@@ -157,7 +157,7 @@ The most detailed part of the record. For each category of data subjects it capt
 ## Transfer
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Transfer outside the EEA | Yes/no | Does your data processing transfer personal data to one or more countries outside the European Union or to an international organisation? |
 | Countries | Choice | The countries outside the EEA to which personal data is transferred. Choose from: Andorra; Argentina; Canada (commercial organisations only); Faroe Islands; Guernsey; Isle of Man; Israel; Japan; Jersey; New Zealand; Uruguay; United Kingdom; United States (organisations participating in the Data Privacy Framework); Switzerland; South Korea; Other, namely:. |
 | Other, namely: | Text |  |
@@ -168,7 +168,7 @@ The most detailed part of the record. For each category of data subjects it capt
 ## DPIA
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | DPIA carried out | Yes/no | Switch on if a DPIA has actually been carried out; the questions below determine whether one is mandatory. |
 | **Is a DPIA mandatory?** |  | Answer the questions one by one. As soon as you answer one question with "yes", a DPIA is mandatory and the remaining questions no longer apply. |
 | Systematic and extensive evaluation of personal aspects | Yes/no |  |
@@ -181,27 +181,27 @@ The most detailed part of the record. For each category of data subjects it capt
 ## Contact person
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Primary contact | Link | Who is approached first with questions about this record. |
 | Other contact persons | Link | Additional contact persons, for example the administrator of the system. |
 
 ## Documents & attachments
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Documents | Link |  |
 
 ## Remarks
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Remarks | List |  |
 | » Remark | Free text |  |
 
 ## Publish
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Publish from | Date |  |
 | **Public availability** |  | We periodically check the public status of this processing activity. This overview shows its public availability. |
 
@@ -215,7 +215,7 @@ Processing of personal data that your organisation carries out on behalf of anot
 ## Name of the processing activity
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Processing activity number | Text |  |
 | Import number | Text |  |
 | Name of the processing activity | Text | Give a short, recognisable name that describes the processing activity, not the system or the department. Use the purpose or the activity, for example "Payroll administration" or "Camera surveillance of office buildings". |
@@ -229,26 +229,26 @@ Processing of personal data that your organisation carries out on behalf of anot
 ## Controller
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Controllers | Link | The controller(s) on whose behalf you process this data. |
 
 ## Sub-processor
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Has sub-processors | Yes/no | Are one or more sub-processors involved? |
 | Sub-processors | Link |  |
 
 ## Recipient
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Recipients | Link | To whom the personal data is disclosed, outside your own organisation. Leave empty if there are no recipients. |
 
 ## Purpose & legal basis
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Purpose & legal basis | Yes/no | Has a specific purpose been recorded for this processing activity? |
 | GDPR purposes | List |  |
 | » Purpose | Free text |  |
@@ -258,7 +258,7 @@ Processing of personal data that your organisation carries out on behalf of anot
 ## Data subjects and data
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Data subjects and data | Yes/no | Are one or more categories of data subjects involved? |
 | Data subjects | List |  |
 | » Description | Free text |  |
@@ -286,7 +286,7 @@ Processing of personal data that your organisation carries out on behalf of anot
 ## Decision-making
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Automated decision-making | Yes/no | Is there automated decision-making? |
 | Explanation of the decision-making | Free text | Which data leads to which decision, described in understandable terms and without technical detail. |
 | Explanation of the significance and consequences | Free text | What the decision means in concrete terms for the data subject, for example approval or rejection. |
@@ -294,14 +294,14 @@ Processing of personal data that your organisation carries out on behalf of anot
 ## Systems / Applications
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Has systems / applications | Yes/no | Are one or more applications / systems involved? |
 | Systems/Applications | Link |  |
 
 ## Security
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Has security | Yes/no | Do you secure the personal data? |
 | **Measures** |  |  |
 | Established security policy that has also been implemented | Yes/no | Only tick if the policy has been formally established and is applied in practice. |
@@ -314,7 +314,7 @@ Processing of personal data that your organisation carries out on behalf of anot
 ## Transfer
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Transfer outside the EEA | Yes/no | Does your data processing transfer personal data to one or more countries outside the European Union or to an international organisation? |
 | Countries | Choice | The countries outside the EEA to which personal data is transferred. Choose from: Andorra; Argentina; Canada (commercial organisations only); Faroe Islands; Guernsey; Isle of Man; Israel; Japan; Jersey; New Zealand; Uruguay; United Kingdom; United States (organisations participating in the Data Privacy Framework); Switzerland; South Korea; Other, namely:. |
 | Other, namely: | Text |  |
@@ -325,26 +325,26 @@ Processing of personal data that your organisation carries out on behalf of anot
 ## DPIA
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | DPIA | Yes/no | Has a DPIA been carried out by the controller? |
 
 ## Contact person
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Primary contact | Link | Who is approached first with questions about this record. |
 | Other contact persons | Link | Additional contact persons, for example the administrator of the system. |
 
 ## Documents & attachments
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Documents | Link |  |
 
 ## Remarks
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Remarks | List |  |
 | » Remark | Free text |  |
 
@@ -358,7 +358,7 @@ Processing of police data that falls under the Wpg (Dutch Police Data Act) inste
 ## Name of the processing activity
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Processing activity number | Text |  |
 | Import number | Text |  |
 | Name of the processing activity | Text | Give a short, recognisable name that describes the processing activity, not the system or the department. Use the purpose or the activity, for example "Payroll administration" or "Camera surveillance of office buildings". |
@@ -372,20 +372,20 @@ Processing of police data that falls under the Wpg (Dutch Police Data Act) inste
 ## Controller
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Controllers | Link | The organisation(s) that determine the purposes and means of this processing activity. |
 
 ## Processor
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Has processors | Yes/no | Are processors involved |
 | Processors | Link |  |
 
 ## Recipient
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | **Police data made available** |  |  |
 | Article 15: To recipients within the Wpg domain in the Netherlands | Yes/no |  |
 | Article 15a: To recipients charged with police tasks and EU bodies charged with criminal investigation within the EU but other than the Netherlands | Yes/no |  |
@@ -407,7 +407,7 @@ Processing of police data that falls under the Wpg (Dutch Police Data Act) inste
 ## Purpose & legal basis
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Wpg purposes | List |  |
 | » Description | Free text | Which police data is processed for which purpose. |
 | » Art. 8: Performance of the day-to-day police task (handling reports) | Yes/no | The day-to-day police task: incoming signals and reports that are handled. |
@@ -424,7 +424,7 @@ Processing of police data that falls under the Wpg (Dutch Police Data Act) inste
 ## Special categories of police data
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | **Special categories of police data** |  |  |
 | Police data revealing racial or ethnic origin | Yes/no |  |
 | Police data revealing political opinions | Yes/no |  |
@@ -438,7 +438,7 @@ Processing of police data that falls under the Wpg (Dutch Police Data Act) inste
 ## Decision-making
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | **Decision-making** |  |  |
 | Automated decision-making | Yes/no | Switch on if decisions are taken (partly) automatically, without meaningful human intervention. In that case fill in the explanation below. |
 | Explanation | Free text |  |
@@ -447,14 +447,14 @@ Processing of police data that falls under the Wpg (Dutch Police Data Act) inste
 ## Systems / Applications
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Has system / application | Yes/no | Are one or more systems/applications involved |
 | Systems/Applications | Link |  |
 
 ## Security
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Security | Yes/no | Do you secure the police data? |
 | **Measures** |  |  |
 | Established security policy that has also been implemented | Yes/no | Only tick if the policy has been formally established and is applied in practice. |
@@ -466,33 +466,33 @@ Processing of police data that falls under the Wpg (Dutch Police Data Act) inste
 ## DPIA
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | DPIA | Yes/no | Is this a processing activity that presents a high risk to the rights and freedoms of natural persons? |
 
 ## Contact person
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Primary contact | Link | Who is approached first with questions about this record. |
 | Other contact persons | Link | Additional contact persons, for example the administrator of the system. |
 
 ## Documents & attachments
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Documents | Link |  |
 
 ## Remarks
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Remarks | List |  |
 | » Remark | Free text |  |
 
 ## Categories of data subjects
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | **Categories of data subjects** |  |  |
 | Suspects | Yes/no | Switch on if police data on suspects is processed. |
 | Victims | Yes/no | Switch on if police data on victims is processed. |
@@ -511,7 +511,7 @@ Algorithms your organisation deploys, with a view to publication in the Dutch na
 ## Algorithm name
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Number | Text |  |
 | Name | Text | A short, recognisable name for the algorithm, as a citizen would recognise it. |
 | Short description | Free text | One paragraph in language a citizen can understand; maximum 400 characters. |
@@ -527,7 +527,7 @@ Algorithms your organisation deploys, with a view to publication in the Dutch na
 ## Responsible use
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Purpose and impact | Free text |  |
 | Considerations | Free text |  |
 | Human intervention | Free text |  |
@@ -543,7 +543,7 @@ Algorithms your organisation deploys, with a view to publication in the Dutch na
 ## Operation
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Title of the data source | Text |  |
 | Data | Free text |  |
 | Links to data sources | Free text |  |
@@ -554,7 +554,7 @@ Algorithms your organisation deploys, with a view to publication in the Dutch na
 ## Metadata
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Date of development | Date | The date on which development was completed, not the date it was put into use. |
 | Owner of the algorithm | Text | The organisation or department responsible for the algorithm. |
 | Product owner of the algorithm | Text | The person or role that decides on the substance of the algorithm. |
@@ -565,7 +565,7 @@ Algorithms your organisation deploys, with a view to publication in the Dutch na
 ## High-impact algorithm
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Is this a process with direct consequences for citizens or organisations? | Choice | Think of a decision on a benefit, permit or enforcement; internal reporting does not count. Choose from: Yes; No. |
 | Are one or more algorithms applied in this process? | Choice | Simple decision rules or calculation rules also count as an algorithm. Choose from: Yes; No. |
 | Does the algorithm have a significant effect on the outcome of the process? | Choice | Significant means that the outcome could have been materially different without the algorithm. Choose from: Yes; No. |
@@ -573,13 +573,13 @@ Algorithms your organisation deploys, with a view to publication in the Dutch na
 ## Validation
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Answers to the assessment questions checked by the product owner | Choice | Set to Yes as soon as the product owner has confirmed the answers to the impact questions. Choose from: Yes; No. |
 
 ## Documents & attachments
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Documents | Link |  |
 
 
@@ -592,7 +592,7 @@ Breaches of the security of personal data, including the notification to the Dut
 ## Name of the personal data breach
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Number | Text |  |
 | Name | Text | A short, recognisable description of the personal data breach. |
 | Date of report | Date | The date on which the personal data breach was reported internally. |
@@ -602,13 +602,13 @@ Breaches of the security of personal data, including the notification to the Dut
 ## Controller
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Controllers | Link |  |
 
 ## Dates
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Date the personal data breach was discovered | Date | The moment the personal data breach was discovered internally; this is the starting point for the notification deadline. |
 | (Presumed) start date of the breach | Date | An estimate is sufficient if the exact date is not known. |
 | End date of the breach | Date | The date on which the breach was closed. |
@@ -618,7 +618,7 @@ Breaches of the security of personal data, including the notification to the Dut
 ## Incident
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Nature of the incident | Choice | What actually happened, for example data sent to the wrong address or lost data. Choose from: Email containing personal data sent to the wrong recipient(s); Email containing personal data sent with recipients in the to field or in cc, instead of bcc; Letter or postal package containing personal data sent or handed to the wrong recipient(s); Letter or postal package containing personal data received back opened; Letter or postal package containing personal data lost; Authorisation(s) of employee(s) configured incorrectly.; Network folders or locations containing personal data are accessible too widely within the organisation; Device, data carrier (e.g. USB stick) and/or paper containing personal data lost or stolen; Personal data published accidentally; Hacking, malware (e.g. ransomware) and/or phishing; Personal data added to the wrong file; Other. |
 | Namely | Free text |  |
 | Summary of the incident | Free text | What happened, when it occurred and how it was discovered. |
@@ -636,7 +636,7 @@ Breaches of the security of personal data, including the notification to the Dut
 ## Processing activities
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | GDPR controller processing activities | Choice | Link the processing activities this personal data breach relates to, so that the breach can be found from those records. |
 | GDPR processor processing activities | Choice |  |
 | Wpg controller processing activities | Choice |  |
@@ -644,7 +644,7 @@ Breaches of the security of personal data, including the notification to the Dut
 ## Documents & attachments
 
 | Field | Kind of input | Explanation |
-| --- | --- | --- |
+|----------------------------------|--------------|----------------------------------------------------|
 | Documents | Link |  |
 
 
@@ -657,13 +657,13 @@ automatically. These matter for demonstrating accountability.
 
 | Aspect | What is recorded |
 | --- | --- |
-| **Change history** | For every record, who changed what and when. Versions can be compared, including changes in linked items such as data subjects or systems. |
-| **Versions and approval** | Records can be captured in a version submitted for approval to mandate holders. Their sign-off is recorded with date and person. |
-| **Organisation** | Every record belongs to one organisation. Users only see the records of the organisation(s) they have access to. |
-| **Users and roles** | For users, the name, email address and assigned roles are recorded. Roles determine who may read, fill in, approve or administer. |
-| **Created and changed dates** | For every record and every linked item. |
-| **Deleted records** | Deleted records are retained and can be restored; they disappear from the regular overviews. |
-| **Import provenance** | For records taken over from an earlier register, the original provenance is retained. |
+| Change history | For every record, who changed what and when. Versions can be compared, including changes in linked items such as data subjects or systems. |
+| Versions and approval | Records can be captured in a version submitted for approval to mandate holders. Their sign-off is recorded with date and person. |
+| Organisation | Every record belongs to one organisation. Users only see the records of the organisation(s) they have access to. |
+| Users and roles | For users, the name, email address and assigned roles are recorded. Roles determine who may read, fill in, approve or administer. |
+| Created and changed dates | For every record and every linked item. |
+| Deleted records | Deleted records are retained and can be restored; they disappear from the regular overviews. |
+| Import provenance | For records taken over from an earlier register, the original provenance is retained. |
 
 # Reuse of data
 
