@@ -11,7 +11,7 @@ return [
 
     'create' => 'Versie aanmaken',
     'created' => 'Versie aangemaakt',
-    'unsaved_changes' => 'Versie niet aangemaakt, er zijn nog niet opgeslagen wijzingen',
+    'unsaved_changes' => 'Versie niet aangemaakt, er zijn nog niet opgeslagen wijzigingen',
 
     'compare' => 'Vergelijken',
     'compare_title' => 'Versies vergelijken: :name',

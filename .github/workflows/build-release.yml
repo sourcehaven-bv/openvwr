@@ -11,10 +11,18 @@ on:
         description: "Git ref to check out. Defaults to `version` for tag builds; the dev path passes a real SHA."
         required: false
         type: string
+      documentation:
+        description: "Build and attach the data-model PDF. Only worth the extra minutes on a real release; dev builds skip it."
+        required: false
+        default: false
+        type: boolean
     outputs:
       archive:
         description: "The release archive filename"
         value: ${{ jobs.build.outputs.archive }}
+      documentation:
+        description: "Artifact name holding the data-model documentation PDFs"
+        value: ${{ jobs.build.outputs.documentation }}
 
 jobs:
   build:
@@ -23,6 +31,7 @@ jobs:
       image: debian:13
     outputs:
       archive: ${{ steps.archive.outputs.ARCHIVE }}
+      documentation: ${{ steps.documentation.outputs.NAME }}
 
     steps:
       - name: Install dependencies
@@ -58,4 +67,44 @@ jobs:
         with:
           name: ${{ steps.archive.outputs.NAME }}
           path: ${{ steps.archive.outputs.ARCHIVE }}
+          retention-days: 7
+
+      # The data-model documentation is generated from the form definitions, so
+      # the PDFs shipped with a release always describe the real fields. The
+      # LaTeX toolchain costs a few minutes, so this only runs for an actual
+      # release and not for every dev build.
+      - name: Install documentation toolchain
+        if: inputs.documentation
+        run: |
+          # php-sqlite3: the generator builds the forms against an empty
+          # in-memory SQLite, so no database server is needed.
+          apt-get install -y --no-install-recommends \
+            pandoc texlive-xetex texlive-fonts-recommended \
+            librsvg2-bin fonts-dejavu php-sqlite3
+
+      - name: Build data-model documentation
+        if: inputs.documentation
+        env:
+          # DejaVu ships with the container; Helvetica Neue is macOS-only.
+          DOC_MAINFONT: DejaVu Sans
+          DOC_MONOFONT: DejaVu Sans Mono
+        run: ./docs/build-pdf.sh
+
+      - name: Name the documentation after the release
+        id: documentation
+        if: inputs.documentation
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          for LOCALE in nl en; do
+            cp "docs/datamodel-${LOCALE}.pdf" "openvwr-datamodel-${LOCALE}-${VERSION}.pdf"
+          done
+          echo "NAME=openvwr-datamodel-${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload documentation
+        if: inputs.documentation
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.documentation.outputs.NAME }}
+          path: openvwr-datamodel-*.pdf
           retention-days: 7

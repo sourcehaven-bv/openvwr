@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 
+use App\Documentation\DocNote;
 use App\Filament\Forms\Components\ChildrenRelationTable;
 use App\Filament\Forms\Components\DataLossToggle;
 use App\Filament\Forms\Components\Group\ProcessingRecordContactPersons;
@@ -192,6 +193,7 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
     /**
      * @return array<Component>
      */
+    #[DocNote('documentation.avg_responsible_processing_record.stakeholders')]
     public static function getStakeholder(): array
     {
         return [

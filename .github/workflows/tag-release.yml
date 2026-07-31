@@ -63,6 +63,7 @@ jobs:
     uses: ./.github/workflows/build-release.yml
     with:
       version: ${{ needs.tag.outputs.version }}
+      documentation: true
 
   publish:
     needs: [tag, build]
@@ -78,5 +79,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ needs.tag.outputs.version }}
-          files: "*.tar.gz"
+          files: |
+            *.tar.gz
+            *.pdf
           generate_release_notes: true

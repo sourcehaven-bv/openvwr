@@ -5,3 +5,6 @@
 *.gz
 .db_requirements
 RELEASE_INFO.txt
+
+# The data-model PDFs are built (just docs-pdf) and attached to a release.
+docs/datamodel-*.pdf

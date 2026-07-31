@@ -1,0 +1,195 @@
+% OpenVWR pandoc template.
+%
+% Bewust eenvoudig gehouden: huisstijlkleuren en logo van openvwr.nl, verder
+% zo min mogelijk opmaak. Bedoeld voor XeLaTeX (pandoc --pdf-engine=xelatex).
+%
+% Kleuren komen uit de CSS-variabelen van openvwr.nl:
+%   --color-primary    #164155   donkerblauw/petrol
+%   --color-secondary  #4772fb   blauw
+%   --color-tertiary   #f84f39   koraal (accent in het logo)
+%   --color-light      #6b7280   grijs
+%   --color-background #f3f2ef   warm gebroken wit
+
+\documentclass[$if(fontsize)$$fontsize$$else$11pt$endif$,a4paper]{article}
+
+\usepackage{fontspec}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{longtable,booktabs,array}
+\usepackage{colortbl}
+\newcounter{none}          % pandoc gebruikt deze voor ongenummerde tabellen
+\usepackage{calc}          % voor het berekenen van kolombreedtes
+\usepackage{etoolbox}
+% Zorgt dat tabellen na een \paragraph in de juiste volgorde komen.
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{ragged2e}
+\usepackage[bookmarks=true,hidelinks]{hyperref}
+
+% --- Huisstijlkleuren --------------------------------------------------------
+\definecolor{ovprimary}{HTML}{164155}
+\definecolor{ovsecondary}{HTML}{4772FB}
+\definecolor{ovtertiary}{HTML}{F84F39}
+\definecolor{ovlight}{HTML}{6B7280}
+\definecolor{ovbackground}{HTML}{F3F2EF}
+\definecolor{ovrule}{HTML}{D9D6D0}
+
+% --- Pagina ------------------------------------------------------------------
+\geometry{top=25mm,bottom=25mm,left=25mm,right=25mm,headheight=15pt,footskip=14mm}
+
+% --- Lettertype --------------------------------------------------------------
+% De site gebruikt de system-ui stack; Helvetica Neue is daarvan de macOS-
+% variant en is overal op dit systeem beschikbaar.
+\setmainfont{$if(mainfont)$$mainfont$$else$Helvetica Neue$endif$}
+\setmonofont[Scale=0.88]{$if(monofont)$$monofont$$else$Menlo$endif$}
+
+% Het teken » markeert in de tabellen een genest veld. Het zit zowel in de
+% macOS-fonts als in DejaVu (de buildserver), dus er is geen fallback nodig.
+
+\linespread{1.12}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.65em}
+\setlength{\emergencystretch}{3em}
+
+% --- Koppen ------------------------------------------------------------------
+% De markdown nummert de hoofdstukken zelf ("# 1. ...", "## 1.1 ...").
+% LaTeX telt daar niet overheen; anders zou er "1. 1. Verwerkingen" staan.
+\setcounter{secnumdepth}{0}
+
+\titleformat{\section}
+  {\color{ovprimary}\normalfont\Large\bfseries}
+  {}{0pt}{}
+\titleformat{\subsection}
+  {\color{ovprimary}\normalfont\large\bfseries}
+  {}{0pt}{}
+\titleformat{\subsubsection}
+  {\color{ovprimary}\normalfont\normalsize\bfseries}
+  {}{0pt}{}
+
+\titlespacing*{\section}{0pt}{2.4em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.8em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1.4em}{0.4em}
+
+% --- Kop- en voettekst -------------------------------------------------------
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+\renewcommand{\headrule}{\color{ovrule}\hrule width\headwidth height\headrulewidth}
+\fancyhead[L]{\footnotesize\color{ovlight}$if(title)$$title$$endif$}
+\fancyhead[R]{\footnotesize\color{ovlight}\thepage}
+
+\fancypagestyle{plain}{\fancyhf{}\renewcommand{\headrulewidth}{0pt}}
+
+% --- Tabellen ----------------------------------------------------------------
+% Pandoc zet tabellen om naar longtable; deze instellingen geven ze lucht en
+% een rustige lijnvoering die bij de huisstijl past.
+\setlength{\tabcolsep}{7pt}
+\renewcommand{\arraystretch}{1.35}
+\arrayrulecolor{ovrule}
+
+% Kopregels van tabellen in de primaire kleur.
+\let\oldtoprule\toprule
+\let\oldmidrule\midrule
+\let\oldbottomrule\bottomrule
+\renewcommand{\toprule}{\arrayrulecolor{ovprimary}\oldtoprule\arrayrulecolor{ovrule}}
+\renewcommand{\bottomrule}{\arrayrulecolor{ovprimary}\oldbottomrule\arrayrulecolor{ovrule}}
+
+% Pandoc-hulpmacro's die de template moet leveren.
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\providecommand{\pandocbounded}[1]{#1}
+
+% --- Lijsten -----------------------------------------------------------------
+\setlist[itemize]{leftmargin=1.2em,itemsep=0.25em,topsep=0.4em}
+\setlist[enumerate]{leftmargin=1.4em,itemsep=0.25em,topsep=0.4em}
+
+% --- Links -------------------------------------------------------------------
+\hypersetup{
+  colorlinks=true,
+  linkcolor=ovprimary,
+  urlcolor=ovsecondary,
+  citecolor=ovsecondary,
+$if(title)$
+  pdftitle={$title$},
+$endif$
+$if(author)$
+  pdfauthor={$author$},
+$endif$
+  pdfcreator={}
+}
+
+% --- Inhoudsopgave -----------------------------------------------------------
+\usepackage{tocloft}
+\renewcommand{\cfttoctitlefont}{\color{ovprimary}\Large\bfseries}
+\renewcommand{\cftsecfont}{\color{ovprimary}\bfseries}
+\renewcommand{\cftsecpagefont}{\color{ovprimary}\bfseries}
+\setlength{\cftbeforesecskip}{0.5em}
+
+% --- Horizontale lijn --------------------------------------------------------
+% Markdown "---" wordt een rustige scheidingslijn in plaats van een pagina-einde.
+\providecommand{\pandocrule}{}
+\renewcommand{\pandocrule}{%
+  \par\vspace{0.8em}{\color{ovrule}\hrule height 0.4pt}\vspace{0.8em}\par}
+
+$for(header-includes)$
+$header-includes$
+$endfor$
+
+\begin{document}
+
+$if(title)$
+% --- Titelpagina -------------------------------------------------------------
+\begin{titlepage}
+\thispagestyle{empty}
+\vspace*{1.5cm}
+
+$if(logo)$
+\includegraphics[height=15mm]{$logo$}
+
+\vspace{2.5cm}
+$endif$
+
+{\color{ovprimary}\fontsize{30}{36}\selectfont\bfseries $title$\par}
+
+$if(subtitle)$
+\vspace{0.8em}
+{\color{ovlight}\fontsize{15}{19}\selectfont $subtitle$\par}
+$endif$
+
+\vspace{1.2em}
+{\color{ovtertiary}\rule{60mm}{2.5pt}}
+
+\vfill
+
+$if(author)$
+{\color{ovprimary}\large $author$\par}
+\vspace{0.3em}
+$endif$
+$if(date)$
+{\color{ovlight}$date$\par}
+$endif$
+
+\end{titlepage}
+$endif$
+
+$if(toc)$
+% --- Inhoudsopgave -----------------------------------------------------------
+\thispagestyle{empty}
+\setcounter{tocdepth}{$if(toc-depth)$$toc-depth$$else$2$endif$}
+\tableofcontents
+\clearpage
+$endif$
+
+\setcounter{page}{1}
+
+$body$
+
+\end{document}

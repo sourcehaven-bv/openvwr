@@ -75,7 +75,7 @@ return [
     'geb_dpia_outcome_mandatory' => 'Op basis van uw antwoorden is een GEB (DPIA) verplicht.',
     'geb_dpia_outcome_not_mandatory' => 'Op basis van uw antwoorden is een GEB (DPIA) niet verplicht.',
     'geb_dpia_automated' => 'Systematische en uitgebreide beoordeling van persoonlijke aspecten',
-    'geb_dpia_large_scale_processing' => 'Grootschalige verwerking van bijzondere categorieen',
+    'geb_dpia_large_scale_processing' => 'Grootschalige verwerking van bijzondere categorieën',
     'geb_dpia_large_scale_monitoring' => 'Grootschalige monitoring',
     'geb_dpia_list_required' => 'Autoriteit Persoonsgegevens gepubliceerde lijst',
     'geb_dpia_criteria_wp248' => 'De negen criteria van WP248',
