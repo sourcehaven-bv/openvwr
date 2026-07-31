@@ -61,12 +61,29 @@ it('refuses to return an empty list', function (): void {
     // application inherits the same resources, so the group name is pointed at
     // something no resource returns.
     $finder = new class extends RegisterFinder {
-        protected function navigationGroup(): string
+        protected function navigationGroups(): array
         {
-            return 'A group nothing belongs to';
+            return ['A group nothing belongs to'];
         }
     };
 
     expect(fn () => $finder->find('admin'))
         ->toThrow(RuntimeException::class, 'No resources found');
+});
+
+it('accepts registers from more than one navigation group', function (): void {
+    // An installation may split its registers over several menu groups - the
+    // DPIA module has its own. Every listed group must be picked up.
+    $finder = new class extends RegisterFinder {
+        protected function navigationGroups(): array
+        {
+            return [__('navigation.registers'), __('navigation.management')];
+        }
+    };
+
+    $registers = $finder->find('admin');
+
+    expect($registers)
+        ->toContain(AvgResponsibleProcessingRecordResource::class)
+        ->toContain(DocumentResource::class);
 });

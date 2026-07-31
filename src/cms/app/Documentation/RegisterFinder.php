@@ -11,6 +11,8 @@ use ReflectionClass;
 use RuntimeException;
 
 use function __;
+use function array_filter;
+use function in_array;
 use function is_string;
 use function sprintf;
 use function usort;
@@ -41,7 +43,7 @@ class RegisterFinder
             throw new RuntimeException(sprintf('Unknown Filament panel "%s".', $panelId));
         }
 
-        $group = $this->navigationGroup();
+        $groups = $this->navigationGroups();
 
         /** @var array<int, class-string<Resource>> $resources */
         $resources = $panel->getResources();
@@ -49,7 +51,7 @@ class RegisterFinder
         $registers = [];
 
         foreach ($resources as $resourceClass) {
-            if (!$this->isRegister($resourceClass, $group)) {
+            if (!$this->isRegister($resourceClass, $groups)) {
                 continue;
             }
 
@@ -72,21 +74,40 @@ class RegisterFinder
     }
 
     /**
-     * The navigation group that marks a resource as a register.
+     * The navigation groups whose resources count as a register.
+     *
+     * An installation may split its registers over more than one menu group -
+     * the DPIA module has its own, for instance - so every group listed here
+     * ends up in the document.
+     *
+     * @return array<int, string>
      */
-    protected function navigationGroup(): string
+    protected function navigationGroups(): array
     {
-        $group = __(NavigationGroup::REGISTERS->value);
+        // The DPIA module is not present in every installation, so its group
+        // is looked up by name rather than referenced directly.
+        $cases = array_filter([
+            NavigationGroup::REGISTERS,
+            NavigationGroup::tryFrom('navigation.dpia'),
+        ]);
 
-        return is_string($group) ? $group : NavigationGroup::REGISTERS->value;
+        $groups = [];
+
+        foreach ($cases as $case) {
+            $label = __($case->value);
+            $groups[] = is_string($label) ? $label : $case->value;
+        }
+
+        return $groups;
     }
 
     /**
      * @param class-string<Resource> $resourceClass
+     * @param array<int, string> $groups
      */
-    private function isRegister(string $resourceClass, mixed $group): bool
+    private function isRegister(string $resourceClass, array $groups): bool
     {
-        if ($resourceClass::getNavigationGroup() !== $group) {
+        if (!in_array($resourceClass::getNavigationGroup(), $groups, true)) {
             return false;
         }
 
