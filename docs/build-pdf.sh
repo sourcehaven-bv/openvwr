@@ -6,6 +6,7 @@
 #   ./build-pdf.sh              generate and build every locale
 #   ./build-pdf.sh nl           only Dutch
 #   ./build-pdf.sh --no-generate  use the markdown that is already there
+#   ./build-pdf.sh --landscape  render on landscape A4 (wider tables)
 #
 # Requires: pandoc, xelatex (MacTeX/TeX Live) and rsvg-convert for the logo.
 # Generating additionally needs a working PHP environment (src/cms).
@@ -16,11 +17,14 @@ cd "$(dirname "$0")"
 
 LOCALES=(nl en)
 GENERATE=true
+LANDSCAPE=false
+SUFFIX=""
 REQUESTED=()
 
 for arg in "$@"; do
     case "$arg" in
         --no-generate) GENERATE=false ;;
+        --landscape) LANDSCAPE=true; SUFFIX="-liggend" ;;
         nl | en) REQUESTED+=("$arg") ;;
         *)
             echo "Unknown argument: $arg" >&2
@@ -59,7 +63,7 @@ MONTH_INDEX=$(( 10#$(date '+%m') - 1 ))
 
 for LOCALE in "${LOCALES[@]}"; do
     SRC="datamodel-${LOCALE}.md"
-    OUT="datamodel-${LOCALE}.pdf"
+    OUT="datamodel-${LOCALE}${SUFFIX}.pdf"
 
     # The field tables come from the Filament forms so the document cannot fall
     # behind the application. The handwritten chapters live in prose/<locale>/
@@ -100,6 +104,7 @@ for LOCALE in "${LOCALES[@]}"; do
         --variable=mainfont:"$MAINFONT" \
         --variable=monofont:"$MONOFONT" \
         --variable=lang:"$LANG_NAME" \
+        $( [ "$LANDSCAPE" = true ] && echo '--variable=landscape:true' ) \
         --variable=title:"$TITLE" \
         --variable=subtitle:"$SUBTITLE" \
         --variable=date:"$DATE"

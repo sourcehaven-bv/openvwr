@@ -10,7 +10,7 @@
 %   --color-light      #6b7280   grijs
 %   --color-background #f3f2ef   warm gebroken wit
 
-\documentclass[$if(fontsize)$$fontsize$$else$11pt$endif$,a4paper]{article}
+\documentclass[$if(fontsize)$$fontsize$$else$11pt$endif$,a4paper$if(landscape)$,landscape$endif$]{article}
 
 \usepackage{fontspec}
 
@@ -48,7 +48,13 @@
 \definecolor{ovrule}{HTML}{D9D6D0}
 
 % --- Pagina ------------------------------------------------------------------
+$if(landscape)$
+% Liggend geeft de driekoloms veldtabellen meer breedte; de marges zijn dan
+% smaller omdat een lange regel anders lastig leest.
+\geometry{landscape,top=20mm,bottom=20mm,left=20mm,right=20mm,headheight=15pt,footskip=12mm}
+$else$
 \geometry{top=25mm,bottom=25mm,left=25mm,right=25mm,headheight=15pt,footskip=14mm}
+$endif$
 
 % --- Lettertype --------------------------------------------------------------
 % De site gebruikt de system-ui stack; Helvetica Neue is daarvan de macOS-
