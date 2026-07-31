@@ -82,16 +82,6 @@ $endif$
 % LaTeX telt daar niet overheen; anders zou er "1. 1. Verwerkingen" staan.
 \setcounter{secnumdepth}{0}
 
-\titleformat{\section}
-  {\color{ovprimary}\normalfont\Large\bfseries}
-  {}{0pt}{}
-\titleformat{\subsection}
-  {\color{ovprimary}\normalfont\large\bfseries}
-  {}{0pt}{}
-\titleformat{\subsubsection}
-  {\color{ovprimary}\normalfont\normalsize\bfseries}
-  {}{0pt}{}
-
 \titlespacing*{\section}{0pt}{2.4em}{0.8em}
 \titlespacing*{\subsection}{0pt}{1.8em}{0.6em}
 \titlespacing*{\subsubsection}{0pt}{1.4em}{0.4em}
@@ -106,9 +96,19 @@ $endif$
 % pagina, en de kolomkoppen worden per pagina herhaald.
 \usepackage{needspace}
 
-\pretocmd{\section}{\Needspace*{6\baselineskip}}{}{}
-\pretocmd{\subsection}{\Needspace*{6\baselineskip}}{}{}
-\pretocmd{\subsubsection}{\Needspace*{5\baselineskip}}{}{}
+% titlesec biedt hier een betrouwbaarder haak dan \pretocmd: de ruimte wordt
+% opgeëist op het moment dat de kop wordt gezet, niet ervoor.
+\newcommand{\ovKeepWithTable}{\Needspace*{9\baselineskip}}
+
+\titleformat{\section}
+  {\ovKeepWithTable\color{ovprimary}\normalfont\Large\bfseries}
+  {}{0pt}{}
+\titleformat{\subsection}
+  {\ovKeepWithTable\color{ovprimary}\normalfont\large\bfseries}
+  {}{0pt}{}
+\titleformat{\subsubsection}
+  {\Needspace*{7\baselineskip}\color{ovprimary}\normalfont\normalsize\bfseries}
+  {}{0pt}{}
 
 % Losse eerste of laatste regels van een alinea onder- of bovenaan een pagina.
 \widowpenalty=10000
