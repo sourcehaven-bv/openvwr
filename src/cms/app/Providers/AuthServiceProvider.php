@@ -13,6 +13,8 @@ use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\ContactPerson;
 use App\Models\DataBreachRecord;
 use App\Models\Document;
+use App\Models\Dpia\DpiaPrescanRecord;
+use App\Models\Dpia\DpiaRecord;
 use App\Models\LookupListModel;
 use App\Models\Organisation;
 use App\Models\Processor;
@@ -57,6 +59,8 @@ class AuthServiceProvider extends IlluminateAuthServiceProvider
         AvgProcessorProcessingRecord::class => CoreEntityPolicy::class,
         AvgResponsibleProcessingRecord::class => CoreEntityPolicy::class,
         DataBreachRecord::class => DataBreachRecordPolicy::class,
+        DpiaPrescanRecord::class => CoreEntityPolicy::class,
+        DpiaRecord::class => CoreEntityPolicy::class,
         WpgProcessingRecord::class => CoreEntityPolicy::class,
 
         // lookup lists

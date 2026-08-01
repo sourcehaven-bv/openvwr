@@ -47,6 +47,8 @@ use App\Models\Concerns\HasDefaultMediaCollections;
 use App\Models\Concerns\HasSoftDeletes;
 use App\Models\Concerns\HasTimestamps;
 use App\Models\Concerns\HasUuidAsId;
+use App\Models\Dpia\DpiaPrescanRecord;
+use App\Models\Dpia\DpiaRecord;
 use App\Models\Wpg\WpgGoal;
 use App\Models\Wpg\WpgProcessingRecord;
 use App\Models\Wpg\WpgProcessingRecordService;
@@ -218,6 +220,22 @@ class Organisation extends Model implements HasMedia
     public function contactPersons(): HasMany
     {
         return $this->hasMany(ContactPerson::class);
+    }
+
+    /**
+     * @return HasMany<DpiaRecord, $this>
+     */
+    public function dpiaRecords(): HasMany
+    {
+        return $this->hasMany(DpiaRecord::class);
+    }
+
+    /**
+     * @return HasMany<DpiaPrescanRecord, $this>
+     */
+    public function dpiaPrescanRecords(): HasMany
+    {
+        return $this->hasMany(DpiaPrescanRecord::class);
     }
 
     /**

@@ -20,7 +20,7 @@ return [
             <p class="text-sm text-gray-500">Volgens de AVG is de verwerkingsverantwoordelijke: &ldquo;een natuurlijk persoon of rechtspersoon, een overheidsinstantie, een dienst of een ander orgaan die/dat, alleen of samen met anderen, het doel van en de middelen voor de verwerking van persoonsgegevens vaststelt&rdquo; (art. 4 (7) AVG).</p>',
         'step_responsible_extra_info' => '
             <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Kies de verwerkingsverantwoordelijke</h3>
-            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Zoek de verwerkinsverantwoordelijke door te beginnen met typen. Indien de verwerkinsverantwoordelijke nog niet in het systeem zit, druk op het &#39;+&#39; teken en voer de gegevens van de verwerkingsverantwoordelijke in. Vul de functie in en mogelijk contactdetails.</p>
+            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Zoek de verwerkingsverantwoordelijke door te beginnen met typen. Indien de verwerkingsverantwoordelijke nog niet in het systeem zit, druk op het &#39;+&#39; teken en voer de gegevens van de verwerkingsverantwoordelijke in. Vul de functie in en mogelijk contactdetails.</p>
             <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Voeg meerdere verwerkingsverantwoordelijken toe indien nodig, bijv. voor samenwerkingsverbanden. </p>
             <p class="text-sm text-gray-950 dark:text-gray-300 mb-4"><span class="font-bold">Let op:</span> Vul alleen verwerkingsverantwoordelijken in waarvoor u persoonsgegevens verwerkt.</p>
             <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Algemene informatie over de verwerkingsverantwoordelijke</h3>
@@ -43,7 +43,7 @@ return [
         'step_processor_title' => 'Informatie over Verwerker',
         'step_processor_info' => '
             <p class="text-sm text-gray-500 mb-4">Een verwerker is iemand of een organisatie die door een verwerkingsverantwoordelijke is ingeschakeld om namens de verwerkingsverantwoordelijke persoonsgegevens te verwerken. Volgens de AVG is een verwerker: &ldquo;een natuurlijke persoon of rechtspersoon, een overheidsinstantie, een dienst of een ander orgaan die/dat ten behoeve van de verwerkingsverantwoordelijke persoonsgegevens verwerkt&rdquo; (artikel 4(8) AVG). </p>
-            <p class="text-sm text-gray-500">Een voorbeeld hiervan kan zijn &quot;Dienst ICT Uitvoering (DICTU) van Min EZK&quot; of de Cloud leverantier.</p>',
+            <p class="text-sm text-gray-500">Een voorbeeld hiervan kan zijn &quot;Dienst ICT Uitvoering (DICTU) van Min EZK&quot; of de Cloud leverancier.</p>',
 
         'step_receiver_title' => 'Informatie over Ontvangers',
         'step_receiver_info' => '
@@ -105,7 +105,7 @@ return [
         'step_stakeholder_data_extra_info' => '
             <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Vul informatie over de betrokkenen en de gegevens in</h3>
             <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Geef aan welke categorie&euml;n betrokkenen en persoonsgegevens u verwerkt. Duid de categorie&euml;n betrokkenen aan (zoals werknemers, sollicitanten) en geef aan welke persoonsgegevens u verwerkt.</p>
-            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Per categorie betrokkenen specificeert u welke gegevens u verwerkt en waarom. Voeg doelen toe die u eerder in &quot;Doel &amp; Grondsldag&quot; hebt ingevuld.</p>
+            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Per categorie betrokkenen specificeert u welke gegevens u verwerkt en waarom. Voeg doelen toe die u eerder in &quot;Doel &amp; Grondslag&quot; hebt ingevuld.</p>
             <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Algemene informatie over persoonsgegevens</h3>
             <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">De AVG is all&eacute;&eacute;n van toepassing op persoonsgegevens. Persoonsgegevens zijn alle gegevens die:</p>
             <ul class="list-disc list-outside mb-4 ml-5">
@@ -146,7 +146,7 @@ return [
 
         'step_decision_making_title' => 'Informatie over Besluitvorming',
         'step_decision_making_info' => '
-            <p class="text-sm text-gray-500">Conform de AVG heeft de betrokkene &ldquo;het recht niet te worden onderworpen aan een uitsluitend op geautomatiseerde verwerking, waaronder profilering, gebaseerd besluit waaraan voor hem rechtsgevolgen zijn verbonden of dat hem anderszins in aanmerkelijke make treft&rdquo; (art. 22(1) AVG). Er is sprake van geautomatiseerde besluitvorming wanneer persoonsgegevens worden gebruikt om tot een bepaalde beslissing over de betrokkene te komen, en deze beslissing genomen wordt zonder noemenswaardige inbreng van een mens.</p>',
+            <p class="text-sm text-gray-500">Conform de AVG heeft de betrokkene &ldquo;het recht niet te worden onderworpen aan een uitsluitend op geautomatiseerde verwerking, waaronder profilering, gebaseerd besluit waaraan voor hem rechtsgevolgen zijn verbonden of dat hem anderszins in aanmerkelijke mate treft&rdquo; (art. 22(1) AVG). Er is sprake van geautomatiseerde besluitvorming wanneer persoonsgegevens worden gebruikt om tot een bepaalde beslissing over de betrokkene te komen, en deze beslissing genomen wordt zonder noemenswaardige inbreng van een mens.</p>',
         'step_decision_making_extra_info' => '
             <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Geautomatiseerde besluitvorming</h3>
             <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">In dit onderdeel dient u aan te geven of er wel/geen sprake is van geautomatiseerde besluitvorming. Er is sprake van geautomatiseerde besluitvorming wanneer u of uw organisatie besluiten neemt over betrokkenen (bijvoorbeeld wel/geen recht op een vergunning), op geautomatiseerde wijze (de computer maakt de beslissing, niet een mens), en waaraan rechtsgevolgen zijn verbonden, of die hen anderszins in aanmerkelijke mate treffen, zonder enige menselijke tussenkomst.</p>
@@ -249,7 +249,7 @@ return [
             <p class="text-sm text-gray-500">Volgens de AVG is de verwerkingsverantwoordelijke: &ldquo;een natuurlijk persoon of rechtspersoon, een overheidsinstantie, een dienst of een ander orgaan die/dat, alleen of samen met anderen, het doel van en de middelen voor de verwerking van persoonsgegevens vaststelt&rdquo; (art. 4 (7) AVG).</p>',
         'step_responsible_extra_info' => '
             <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Kies de verwerkingsverantwoordelijke</h3>
-            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Zoek de verwerkinsverantwoordelijke door te beginnen met typen. Indien de verwerkinsverantwoordelijke nog niet in het systeem zit, druk op het &#39;+&#39; teken en voer de gegevens van de verwerkingsverantwoordelijke in. Vul de functie in en mogelijk contactdetails.</p>
+            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Zoek de verwerkingsverantwoordelijke door te beginnen met typen. Indien de verwerkingsverantwoordelijke nog niet in het systeem zit, druk op het &#39;+&#39; teken en voer de gegevens van de verwerkingsverantwoordelijke in. Vul de functie in en mogelijk contactdetails.</p>
             <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Voeg meerdere verwerkingsverantwoordelijken toe indien nodig, bijv. voor samenwerkingsverbanden. </p>
             <p class="text-sm text-gray-950 dark:text-gray-300 mb-4"><span class="font-bold">Let op:</span> Vul alleen verwerkingsverantwoordelijken in waarvoor u persoonsgegevens verwerkt.</p>
             <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Algemene informatie over de verwerkingsverantwoordelijke</h3>
@@ -339,7 +339,7 @@ return [
         'step_stakeholder_data_extra_info' => '
             <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Vul informatie over de betrokkenen en de gegevens in</h3>
             <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Geef aan welke categorie&euml;n betrokkenen en persoonsgegevens u verwerkt. Duid de categorie&euml;n betrokkenen aan (zoals werknemers, sollicitanten) en geef aan welke persoonsgegevens u verwerkt.</p>
-            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Per categorie betrokkenen specificeert u welke gegevens u verwerkt en waarom. Voeg doelen toe die u eerder in &quot;Doel &amp; Grondsldag&quot; hebt ingevuld.</p>
+            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Per categorie betrokkenen specificeert u welke gegevens u verwerkt en waarom. Voeg doelen toe die u eerder in &quot;Doel &amp; Grondslag&quot; hebt ingevuld.</p>
             <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Algemene informatie over persoonsgegevens</h3>
             <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">De AVG is all&eacute;&eacute;n van toepassing op persoonsgegevens. Persoonsgegevens zijn alle gegevens die:</p>
             <ul class="list-disc list-outside mb-4 ml-5">
@@ -380,7 +380,7 @@ return [
 
         'step_decision_making_title' => 'Informatie over Besluitvorming',
         'step_decision_making_info' => '
-            <p class="text-sm text-gray-500">Conform de AVG heeft de betrokkene &ldquo;het recht niet te worden onderworpen aan een uitsluitend op geautomatiseerde verwerking, waaronder profilering, gebaseerd besluit waaraan voor hem rechtsgevolgen zijn verbonden of dat hem anderszins in aanmerkelijke make treft&rdquo; (art. 22(1) AVG). Er is sprake van geautomatiseerde besluitvorming wanneer persoonsgegevens worden gebruikt om tot een bepaalde beslissing over de betrokkene te komen, en deze beslissing genomen wordt zonder noemenswaardige inbreng van een mens.</p>',
+            <p class="text-sm text-gray-500">Conform de AVG heeft de betrokkene &ldquo;het recht niet te worden onderworpen aan een uitsluitend op geautomatiseerde verwerking, waaronder profilering, gebaseerd besluit waaraan voor hem rechtsgevolgen zijn verbonden of dat hem anderszins in aanmerkelijke mate treft&rdquo; (art. 22(1) AVG). Er is sprake van geautomatiseerde besluitvorming wanneer persoonsgegevens worden gebruikt om tot een bepaalde beslissing over de betrokkene te komen, en deze beslissing genomen wordt zonder noemenswaardige inbreng van een mens.</p>',
         'step_decision_making_extra_info' => '
             <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Geautomatiseerde besluitvorming</h3>
             <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">In dit onderdeel dient u aan te geven of er wel/geen sprake is van geautomatiseerde besluitvorming. Er is sprake van geautomatiseerde besluitvorming wanneer u of uw organisatie besluiten neemt over betrokkenen (bijvoorbeeld wel/geen recht op een vergunning), op geautomatiseerde wijze (de computer maakt de beslissing, niet een mens), en waaraan rechtsgevolgen zijn verbonden, of die hen anderszins in aanmerkelijke mate treffen, zonder enige menselijke tussenkomst.</p>
@@ -476,7 +476,7 @@ return [
             <p class="text-sm text-gray-500">Bij of krachtens de WPG wordt de verwerkingsverantwoordelijke aangewezen die formeel verantwoordelijk is voor goede uitvoering van de WPG.</p>',
         'step_responsible_extra_info' => '
             <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Kies de verwerkingsverantwoordelijke</h3>
-            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Zoek de verwerkinsverantwoordelijke door te beginnen met typen. Indien de verwerkinsverantwoordelijke nog niet in het systeem zit, druk op het &#39;+&#39; teken en voer de gegevens van de verwerkingsverantwoordelijke in. Vul de functie in en mogelijk contactdetails.</p>
+            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Zoek de verwerkingsverantwoordelijke door te beginnen met typen. Indien de verwerkingsverantwoordelijke nog niet in het systeem zit, druk op het &#39;+&#39; teken en voer de gegevens van de verwerkingsverantwoordelijke in. Vul de functie in en mogelijk contactdetails.</p>
             <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Voeg meerdere verwerkingsverantwoordelijken toe indien nodig, bijv. voor samenwerkingsverbanden.</p>
             <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Algemene informatie over de verwerkingsverantwoordelijke</h3>
             <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">De verwerkingsverantwoordelijke voor uitvoering van de WPG door de Koninklijke marechaussee is de Minister van Defensie. Bij de bijzondere opsporingsdiensten is dit de minister van het departement waaronder de bijzondere opsporingsdienst ressorteert. De verwerkingsverantwoordelijke voor de buitengewoon opsporingsambtenaar (Boa) is de werkgever van de desbetreffende Boa.</p>
@@ -547,7 +547,7 @@ return [
             <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Vul informatie over de beveiligingsmaatregelen in</h3>
             <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">De informatie die u invult onder ‘Beveiliging’ is bedoeld om een algemene beschrijving te geven van de technische en organisatorische beveiligingsmaatregelen die er zijn genomen om de politiegegevens op passende wijze zowel technisch (bijv. encryptie, wachtwoorden, versleutelde verbindingen etc.) als organisatorisch (bijv. autorisatiematrix, beleid en fysieke toegangscontrole) te beveiliging. In dit register hoeft enkel een algemene beschrijving van de beveiligingsmaatregelen te worden opgenomen. De informatie in dit register is niet bedoeld om bijvoorbeeld één op één overeen te komen met de inhoud van een ISMS-systeem, of om zo’n systeem te vervangen.</p>
             <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Pseudonimisering</h3>
-            <p class="text-sm text-gray-950 dark:text-gray-300">In de Wpg wordt pseudonomisering niet gedefinieerd, maar wel genoemd als een maatregel om de rechten van betrokken te waarborgen. Onder pseudonimisering wordt in artikel 3 aanhef en sub 5 van de Richtlijn gegevensbescherming opsporing en vervolging verstaan het verwerken van persoonsgegevens op zodanige wijze dat de persoonsgegevens niet meer aan een specifieke betrokkene kunnen worden gekoppeld zonder dat er aanvullende gegevens worden gebruikt, mits deze aanvullende gegevens apart worden bewaard en technische en organisatorische maatregelen worden genomen om ervoor te zorgen dat de persoonsgegevens niet aan een geïdentificeerde of identificeerbare natuurlijke persoon worden gekoppeld.</p>',
+            <p class="text-sm text-gray-950 dark:text-gray-300">In de Wpg wordt pseudonimisering niet gedefinieerd, maar wel genoemd als een maatregel om de rechten van betrokken te waarborgen. Onder pseudonimisering wordt in artikel 3 aanhef en sub 5 van de Richtlijn gegevensbescherming opsporing en vervolging verstaan het verwerken van persoonsgegevens op zodanige wijze dat de persoonsgegevens niet meer aan een specifieke betrokkene kunnen worden gekoppeld zonder dat er aanvullende gegevens worden gebruikt, mits deze aanvullende gegevens apart worden bewaard en technische en organisatorische maatregelen worden genomen om ervoor te zorgen dat de persoonsgegevens niet aan een geïdentificeerde of identificeerbare natuurlijke persoon worden gekoppeld.</p>',
 
         'step_geb_dpia_title' => 'Informatie over GEB (DPIA)',
         'step_geb_dpia_info' => '
@@ -556,7 +556,7 @@ return [
             <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Hoog Risico? Dan een GEB (DPIA)!</h3>
             <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">De verwerkingsverantwoordelijke is verplicht om een GEB (DPIA) uit te voeren voor verwerkingen die een hoog risico met zich meebrengen voor de betrokkenen. Als verwerker dient u de verwerkingsverantwoordelijke te ondersteunen bij het uitvoeren van een GEB (DPIA), als deze hierom verzoekt. Deze ondersteuning kan zich bijvoorbeeld uitten in het aanleveren van gevraagde informatie over verwerkingen die door de verwerker worden verricht. Specifieke afspraken over bijvoorbeeld de kostenverdeling bij het ondersteunen bij een GEB (DPIA) door de verwerker, kunnen in een verwerkersovereenkomst zijn gemaakt.</p>
             <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">U kunt hier aangeven of de verwerkingsverantwoordelijke een GEB (DPIA) heeft uitgevoerd t.a.v. de verwerkingen die door u worden verricht. Zo ja, dan kunt u deze GEB (DPIA) (indien beschikbaar) ook toevoegen aan uw AVG-register onder de tab ‘Documenten & Bijlagen’.</p>
-            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Raadpleeg onderstaande referentis voor een nadere uitleg van "hoog risico" en de criteria of een GEB (DPIA) voor een verwerkingsverantwoordelijke verplicht is.</p>
+            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Raadpleeg onderstaande referenties voor een nadere uitleg van "hoog risico" en de criteria of een GEB (DPIA) voor een verwerkingsverantwoordelijke verplicht is.</p>
             <ul class="list-disc list-outside mb-4 ml-5">
                 <li class="text-sm text-gray-950 dark:text-gray-300 mb-1">Staatscourant van het Koninkrijk der Nederlanden, Besluit inzake lijst van verwerkingen van persoonsgegevens waarvoor een gegevensbeschermingseffectbeoordeling ( GEB (DPIA)) verplicht is.</li>
                 <li class="text-sm text-gray-950 dark:text-gray-300 mb-1">Uitleg over de 9 criteria uit de WP248 artikel 29 richtsnoeren 9 criteria voor verwerkingen waarvoor een GEB (DPIA) moet worden uitgevoerd (pagina 10 tot en met 13).</li>
@@ -664,5 +664,76 @@ return [
         'step_attachments_title' => 'Informatie over Documenten & Bijlagen',
         'step_attachments_info' => '
             <p class="text-sm text-gray-500">Als u documenten toevoegt, mag het ook om conceptversies gaan. Geef duidelijk aan wat voor soort document het is en of het concept of definitief is. Toevoegen, wijzigen of verwijderen van documenten vereist geen nieuwe versie van de verwerking. Voeg opmerkingen toe voor verduidelijking.</p>',
+    ],
+
+    'dpia_record' => [
+        'step_general_title' => 'Over deze DPIA',
+        'step_general_info' => '
+            <p class="text-sm text-gray-500">Een DPIA brengt in beeld welke risico&#39;s een gegevensverwerking heeft voor de rechten en vrijheden van betrokkenen, en welke maatregelen die risico&#39;s beperken. Deze invulhulp volgt het Model DPIA Rijksdienst v3.0.</p>',
+        'step_general_extra_info' => '
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Doe dit vroeg in het proces</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Voer de DPIA uit in een vroeg stadium van de beleids- of projectontwikkeling. Dan is het nog mogelijk om het voorstel bij te stellen zonder grote nadelige consequenties. Bij een aanbesteding betekent dit: v&oacute;&oacute;r de aanbesteding. Bij regelgeving: v&oacute;&oacute;r de internetconsultatie.</p>
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Doe het niet alleen</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Bespreek de punten bij voorkeur in groepsverband, met expertise op het gebied van het beleidsterrein, regelgeving, (informatie)beveiliging en ICT. Betrek in ieder geval iemand met privacydeskundigheid.</p>
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Het is geen eenrichtingsverkeer</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300">Het maken van een DPIA is een dynamisch proces. Blijkt bij de risico&#39;s en maatregelen dat de verwerking moet wijzigen, pas dan ook de eerdere paragrafen aan zodat die de werkelijkheid blijven weergeven.</p>',
+
+        'part_a_title' => 'Onderdeel A: de feiten',
+        'part_a_info' => '
+            <p class="text-sm text-gray-500">Onderdeel A beschrijft de relevante feiten van de gegevensverwerkingen. Zijn de feiten onduidelijk, dan werkt dat door in de hele beoordeling die daarna volgt.</p>',
+
+        'part_b_title' => 'Onderdeel B: de rechtmatigheid',
+        'part_b_info' => '
+            <p class="text-sm text-gray-500">Onderdeel B beoordeelt of de verwerkingen die u in onderdeel A heeft beschreven rechtmatig zijn: is er een rechtsgrond, zijn ze noodzakelijk en evenredig, en kunnen betrokkenen hun rechten uitoefenen?</p>',
+
+        'part_c_title' => "Onderdeel C: de risico's",
+        'part_c_info' => '
+            <p class="text-sm text-gray-500">Beschrijf en beoordeel de risico&#39;s voor de rechten en vrijheden van betrokkenen. Houd rekening met de aard, omvang, context en doelen van de verwerkingen.</p>',
+        'part_c_extra_info' => '
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Breder dan privacy alleen</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Het gaat om alle rechten en vrijheden, niet alleen om het recht op privacy. Het model noemt het verbod op discriminatie expliciet als voorbeeld. Denk ook aan de vrijheid van meningsuiting, het recht op een eerlijk proces of de toegang tot voorzieningen.</p>
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Kans x impact</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300">Bepaal per risico de kans en de impact, en leid daaruit het risiconiveau af. De matrix is illustratief: u mag beargumenteerd afwijken. Zo kan de impact van ransomware hoog zijn, terwijl de kans door technische maatregelen zeer laag is.</p>',
+
+        'part_d_title' => 'Onderdeel D: de maatregelen',
+        'part_d_info' => '
+            <p class="text-sm text-gray-500">Beschrijf welke technische, organisatorische en juridische maatregelen de risico&#39;s voorkomen of verminderen, en welk risico er daarna nog overblijft.</p>',
+        'part_d_extra_info' => '
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Koppel maatregelen aan risico&#39;s</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Het model vraagt expliciet om te beschrijven welke maatregel welk risico aanpakt. Kies daarom per maatregel de risico&#39;s die u ermee adresseert.</p>
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Blijft er een hoog risico over?</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300">Lukt het niet om het restrisico tot een acceptabel niveau terug te brengen, dan moet de Autoriteit Persoonsgegevens vooraf worden geraadpleegd (artikel 36 AVG). Reken op acht weken, met een verlenging van maximaal zes weken.</p>',
+
+        'step_consultation_title' => 'Consultatie en advies',
+        'step_consultation_info' => '
+            <p class="text-sm text-gray-500">Leg vast wie is geraadpleegd en wat met hun advies is gedaan. Het advies van de functionaris voor gegevensbescherming is verplicht.</p>',
+        'step_consultation_extra_info' => '
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">De FG</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Op grond van artikel 35, tweede lid, AVG is het verplicht advies te vragen aan de FG. Betrek de FG zo vroeg mogelijk en wacht niet tot het rapport helemaal af is.</p>
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Betrokkenen</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300">Consulteer waar passend de betrokkenen of hun vertegenwoordigers. Gaat het om persoonsgegevens van eigen medewerkers, dan moet de ondernemingsraad worden betrokken. Vindt geen consultatie plaats, motiveer die beslissing dan in het rapport.</p>',
+
+        'step_review_title' => 'Vaststelling en herziening',
+        'step_review_info' => '
+            <p class="text-sm text-gray-500">Een DPIA is geen eenmalig document. Herzie de DPIA als de verwerking wijzigt, en in ieder geval iedere drie jaar.</p>',
+
+        'step_relations_title' => 'Verwerkingen en systemen',
+        'step_relations_info' => '
+            <p class="text-sm text-gray-500">Koppel de verwerkingen en systemen waarop deze DPIA betrekking heeft. E&eacute;n DPIA mag een reeks vergelijkbare verwerkingen bestrijken die vergelijkbare risico&#39;s inhouden.</p>',
+    ],
+
+    'dpia_prescan_record' => [
+        'step_general_title' => 'Over de pre-scan',
+        'step_general_info' => '
+            <p class="text-sm text-gray-500">Met de pre-scan bepaalt u of een DPIA nodig is, en of daarnaast een DTIA, KIA of IAMA in beeld komt. Het is een drempeltoets: het invullen kost weinig tijd en de uitkomst is te onderbouwen.</p>',
+        'step_general_extra_info' => '
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Bewaar ook een negatieve uitkomst</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Komt uit de pre-scan dat geen DPIA nodig is, dan moet die beoordeling met onderbouwing schriftelijk worden vastgelegd en gearchiveerd. Daarom blijft ook een pre-scan zonder vervolg als record bestaan.</p>
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Bij twijfel</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300">Raakt een verwerking aan grote politiek-bestuurlijke of maatschappelijke vraagstukken, dan is een DPIA altijd gewenst. Neem bij twijfel contact op met een privacy officer of de FG.</p>',
+
+        'step_outcome_title' => 'Uitkomst',
+        'step_outcome_info' => '
+            <p class="text-sm text-gray-500">De uitkomst volgt automatisch uit uw antwoorden. Per assessment ziet u niet alleen w&aacute;t eruit komt, maar ook waarom, zodat de conclusie navolgbaar blijft.</p>',
     ],
 ];

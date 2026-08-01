@@ -5,7 +5,7 @@ declare(strict_types=1);
 return [
     'model_singular' => 'Document',
     'model_plural' => 'Documenten',
-    'table_empty_heading' => 'Geen documtenten',
+    'table_empty_heading' => 'Geen documenten',
     'attach_processing_records' => 'Verwerkingen koppelen',
 
     'name' => 'Naam',

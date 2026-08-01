@@ -23,6 +23,7 @@ return [
 
     'all' => 'Alle',
     'add' => 'Toevoegen',
+    'and' => 'en',
     'cancel' => 'Annuleren',
     'close' => 'Sluiten',
     'delete' => 'Verwijderen',
