@@ -108,3 +108,118 @@ jobs:
         run: php artisan test --parallel --coverage --min=100 --log-junit=reports/report-phpunit.xml --coverage-clover=reports/coverage-phpunit.xml
         env:
           DB_PORT: ${{ job.services.postgres.ports[5432] }}
+
+  # The CI job above covers the default (local disk) configuration. This one runs
+  # the storage-sensitive suites against a real S3 backend, so the object-storage
+  # path cannot silently rot: Filesystem::path() returns a bare key on s3 rather
+  # than failing, which makes the breakage invisible to a local-disk-only run.
+  object-storage:
+    env:
+      DB_CONNECTION: pgsql
+      DB_HOST: localhost
+      DB_PASSWORD: postgres
+      DB_USERNAME: postgres
+      DB_DATABASE: postgres
+      FILESYSTEM_SHARED_DRIVER: s3
+      AWS_ENDPOINT: http://localhost:9000
+      AWS_ACCESS_KEY_ID: minioadmin
+      AWS_SECRET_ACCESS_KEY: minioadmin
+      AWS_DEFAULT_REGION: eu-central-1
+      AWS_USE_PATH_STYLE_ENDPOINT: true
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./src/cms
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # Run as a step rather than a service container: minio needs `server /data`
+      # as its command, and service containers cannot set one -- the entrypoint
+      # then just prints its help and exits. Same pinned tag as docker-compose.
+      - name: Start MinIO
+        run: |
+          docker run -d \
+            --name minio \
+            -p 9000:9000 \
+            -e "MINIO_ROOT_USER=minioadmin" \
+            -e "MINIO_ROOT_PASSWORD=minioadmin" \
+            minio/minio:RELEASE.2025-09-07T16-13-09Z \
+            server /data
+
+          echo "Waiting for MinIO to be ready..."
+          timeout 60s bash -c 'until curl -sf http://localhost:9000/minio/health/live >/dev/null 2>&1; do sleep 2; done'
+          echo "MinIO is ready!"
+
+      - name: Install Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "18"
+          cache: "npm"
+          registry-url: "https://npm.pkg.github.com"
+          cache-dependency-path: "**/package-lock.json"
+
+      - name: Install npm dependencies
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=$NODE_AUTH_TOKEN"  >> ~/.npmrc
+          npm ci --ignore-scripts
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.REPO_READ_ONLY_TOKEN }}
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          extensions: pgsql
+
+      - name: Install exiftool
+        run: sudo apt-get update && sudo apt-get install -y exiftool
+
+      - name: Copy env
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+
+      - name: Composer install
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Prepare application
+        run: php artisan key:generate
+
+      # Blade views resolve assets through the Vite manifest, so tests that render
+      # a page fail without it -- unrelated to storage, but they sit in the same
+      # suites as the storage-sensitive ones.
+      - name: Npm build
+        run: npm run build
+
+      - name: Clear Config
+        run: php artisan config:clear
+
+      - name: Run Migration
+        run: php artisan migrate:fresh
+
+      - name: Create buckets
+        run: php artisan storage:setup-buckets
+
+      - name: Phpunit (storage-sensitive suites against real object storage)
+        run: |
+          php artisan test \
+            tests/Feature/Transfer \
+            tests/Feature/Jobs \
+            tests/Feature/Http/Controllers \
+            tests/Feature/Filament/Pages \
+            tests/Feature/Console
+        env:
+          DB_PORT: ${{ job.services.postgres.ports[5432] }}
+
+      - name: Stop MinIO
+        if: always()
+        run: docker stop minio && docker rm minio || true

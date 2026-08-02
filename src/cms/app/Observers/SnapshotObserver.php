@@ -6,6 +6,7 @@ namespace App\Observers;
 
 use App\Config\Config;
 use App\Events\StaticWebsite\BuildEvent;
+use App\Models\Contracts\Publishable;
 use App\Models\Contracts\Reviewable;
 use App\Models\Snapshot;
 use App\Models\States\Snapshot\Established;
@@ -29,14 +30,30 @@ class SnapshotObserver
         if ($currentState instanceof Established) {
             // Publish whenever a snapshot becomes established, whether it went
             // through approval or was established straight from review.
-            $this->dispatchBuildEvent();
+            $this->dispatchBuildEventFor($snapshot);
 
             $this->setReviewAt($snapshot);
         }
 
         if ($originalState instanceof Established && $currentState instanceof Obsolete) {
-            $this->dispatchBuildEvent();
+            $this->dispatchBuildEventFor($snapshot);
         }
+    }
+
+    /**
+     * Rebuilds the static website, but only for sources that appear on it.
+     *
+     * A DPIA is versioned and established like the registers, yet is never
+     * published: it routinely contains security measures and residual risks.
+     * Rebuilding for one would be pure waste.
+     */
+    private function dispatchBuildEventFor(Snapshot $snapshot): void
+    {
+        if (!$snapshot->snapshotSource instanceof Publishable) {
+            return;
+        }
+
+        $this->dispatchBuildEvent();
     }
 
     private function dispatchBuildEvent(): void

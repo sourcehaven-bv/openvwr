@@ -7,6 +7,7 @@ namespace App\Models\Avg;
 use App\Collections\Avg\AvgResponsibleProcessingRecordCollection;
 use App\Collections\DataBreachRecordCollection;
 use App\Collections\DocumentCollection;
+use App\Collections\Dpia\DpiaRecordCollection;
 use App\Collections\ProcessorCollection;
 use App\Collections\ReceiverCollection;
 use App\Collections\ResponsibleCollection;
@@ -20,6 +21,7 @@ use App\Models\Concerns\HasChildren;
 use App\Models\Concerns\HasContactPersons;
 use App\Models\Concerns\HasDataBreachRecords;
 use App\Models\Concerns\HasDocuments;
+use App\Models\Concerns\HasDpiaRecords;
 use App\Models\Concerns\HasEntityNumber;
 use App\Models\Concerns\HasFgRemark;
 use App\Models\Concerns\HasOrganisation;
@@ -84,6 +86,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read AvgResponsibleProcessingRecordService|null $avgResponsibleProcessingRecordService
  * @property-read DataBreachRecordCollection $dataBreachRecords
  * @property-read DocumentCollection $documents
+ * @property-read DpiaRecordCollection $dpiaRecords
  * @property-read ProcessorCollection $processors
  * @property-read ReceiverCollection $receivers
  * @property-read ResponsibleCollection $responsibles
@@ -98,6 +101,7 @@ class AvgResponsibleProcessingRecord extends Model implements Cloneable, EntityN
     use HasContactPersons;
     use HasDataBreachRecords;
     use HasDocuments;
+    use HasDpiaRecords;
     use HasEntityNumber;
     /** @use HasFactory<AvgResponsibleProcessingRecordFactory> */
     use HasFactory;

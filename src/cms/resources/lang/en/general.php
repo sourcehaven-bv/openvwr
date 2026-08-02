@@ -23,6 +23,7 @@ return [
 
     'all' => 'All',
     'add' => 'Add',
+    'and' => 'and',
     'cancel' => 'Cancel',
     'close' => 'Close',
     'delete' => 'Delete',

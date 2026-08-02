@@ -12,6 +12,8 @@ use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\ContactPerson;
 use App\Models\DataBreachRecord;
 use App\Models\Document;
+use App\Models\Dpia\DpiaPrescanRecord;
+use App\Models\Dpia\DpiaRecord;
 use App\Models\Processor;
 use App\Models\Receiver;
 use App\Models\Responsible;
@@ -56,6 +58,8 @@ class RelationTableColumns
             WpgProcessingRecord::class => self::processingRecords(),
             AlgorithmRecord::class => self::algorithmRecords(),
             DataBreachRecord::class => self::dataBreachRecords(),
+            DpiaPrescanRecord::class,
+            DpiaRecord::class => self::processingRecords(),
             default => throw new InvalidArgumentException(sprintf('No RelationTable columns defined for model [%s]', $model)),
         };
     }

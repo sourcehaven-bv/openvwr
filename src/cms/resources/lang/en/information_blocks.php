@@ -665,4 +665,75 @@ return [
         'step_attachments_info' => '
             <p class="text-sm text-gray-500">If you add documents, they may also be draft versions. State clearly what kind of document it is and whether it is a draft or final. Adding, changing or deleting documents does not require a new version of the processing activity. Add remarks for clarification.</p>',
     ],
+
+    'dpia_record' => [
+        'step_general_title' => 'About this DPIA',
+        'step_general_info' => '
+            <p class="text-sm text-gray-500">A DPIA sets out which risks a processing activity poses to the rights and freedoms of data subjects, and which measures limit those risks. This guide follows the Model DPIA Rijksdienst v3.0 (the Dutch central government DPIA model).</p>',
+        'step_general_extra_info' => '
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Do this early in the process</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Carry out the DPIA at an early stage of the policy or project development. At that point it is still possible to adjust the proposal without major adverse consequences. In the case of a procurement this means: before the procurement. In the case of legislation: before the internet consultation.</p>
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Do not do it alone</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Preferably discuss the points as a group, with expertise in the policy area, legislation, (information) security and ICT. In any event involve someone with privacy expertise.</p>
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">It is not a one-way street</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300">Producing a DPIA is a dynamic process. If the risks and measures show that the processing must change, adjust the earlier sections as well so that they continue to reflect reality.</p>',
+
+        'part_a_title' => 'Part A: the facts',
+        'part_a_info' => '
+            <p class="text-sm text-gray-500">Part A describes the relevant facts of the processing activities. If the facts are unclear, this carries through into the whole assessment that follows.</p>',
+
+        'part_b_title' => 'Part B: lawfulness',
+        'part_b_info' => '
+            <p class="text-sm text-gray-500">Part B assesses whether the processing activities you described in part A are lawful: is there a legal basis, are they necessary and proportionate, and can data subjects exercise their rights?</p>',
+
+        'part_c_title' => "Part C: the risks",
+        'part_c_info' => '
+            <p class="text-sm text-gray-500">Describe and assess the risks to the rights and freedoms of data subjects. Take account of the nature, scope, context and purposes of the processing activities.</p>',
+        'part_c_extra_info' => '
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Broader than privacy alone</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">This concerns all rights and freedoms, not only the right to privacy. The model explicitly mentions the prohibition of discrimination as an example. Think also of freedom of expression, the right to a fair trial or access to services.</p>
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Likelihood x impact</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300">Determine the likelihood and the impact for each risk, and derive the risk level from them. The matrix is illustrative: you may deviate with reasons. For example, the impact of ransomware may be high, while the likelihood is very low because of technical measures.</p>',
+
+        'part_d_title' => 'Part D: the measures',
+        'part_d_info' => '
+            <p class="text-sm text-gray-500">Describe which technical, organisational and legal measures prevent or reduce the risks, and which risk remains afterwards.</p>',
+        'part_d_extra_info' => '
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Link measures to risks</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">The model explicitly requires a description of which measure addresses which risk. For each measure, therefore, choose the risks you address with it.</p>
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Does a high risk remain?</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300">If you cannot reduce the residual risk to an acceptable level, the Dutch Data Protection Authority (Autoriteit Persoonsgegevens) must be consulted in advance (Article 36 GDPR). Allow eight weeks, with an extension of up to six weeks.</p>',
+
+        'step_consultation_title' => 'Consultation and advice',
+        'step_consultation_info' => '
+            <p class="text-sm text-gray-500">Record who has been consulted and what has been done with their advice. The advice of the data protection officer is mandatory.</p>',
+        'step_consultation_extra_info' => '
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">The DPO</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Under Article 35(2) GDPR it is mandatory to seek advice from the DPO. Involve the DPO as early as possible and do not wait until the report is completely finished.</p>
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Data subjects</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300">Where appropriate, consult the data subjects or their representatives. Where it concerns personal data of your own staff, the works council must be involved. If no consultation takes place, motivate that decision in the report.</p>',
+
+        'step_review_title' => 'Adoption and review',
+        'step_review_info' => '
+            <p class="text-sm text-gray-500">A DPIA is not a one-off document. Review the DPIA if the processing changes, and in any event every three years.</p>',
+
+        'step_relations_title' => 'Processing activities and systems',
+        'step_relations_info' => '
+            <p class="text-sm text-gray-500">Link the processing activities and systems to which this DPIA relates. A single DPIA may cover a series of similar processing activities that present similar risks.</p>',
+    ],
+
+    'dpia_prescan_record' => [
+        'step_general_title' => 'About the pre-scan',
+        'step_general_info' => '
+            <p class="text-sm text-gray-500">With the pre-scan you determine whether a DPIA is needed, and whether a DTIA, KIA or IAMA also comes into play. It is a threshold assessment: filling it in takes little time and the outcome can be substantiated.</p>',
+        'step_general_extra_info' => '
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Keep a negative outcome as well</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">If the pre-scan shows that no DPIA is needed, that assessment must be recorded in writing with its substantiation and archived. That is why a pre-scan without a follow-up also remains as a record.</p>
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">In case of doubt</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300">If a processing activity touches on major political, administrative or societal issues, a DPIA is always desirable. If in doubt, contact a privacy officer or the DPO.</p>',
+
+        'step_outcome_title' => 'Outcome',
+        'step_outcome_info' => '
+            <p class="text-sm text-gray-500">The outcome follows automatically from your answers. For each assessment you see not only what the outcome is, but also why, so that the conclusion remains traceable.</p>',
+    ],
 ];

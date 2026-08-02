@@ -17,9 +17,9 @@ use Illuminate\Support\Facades\Storage;
  */
 function writeImporterZip(array $entities): string
 {
-    Storage::fake('filament');
+    Storage::fake('transfer');
     $relativePath = sprintf('transfer/imports/%s.zip', fake()->uuid());
-    $disk = Storage::disk('filament');
+    $disk = Storage::disk('transfer');
     $disk->put($relativePath, '');
 
     $zip = new ZipArchive();

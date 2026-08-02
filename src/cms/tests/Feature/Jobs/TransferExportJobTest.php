@@ -13,7 +13,7 @@ use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Support\Facades\Storage;
 
 it('exports the records and notifies the user with a download link', function (): void {
-    Storage::fake('filament');
+    Storage::fake('transfer');
 
     $organisation = Organisation::factory()->create();
     $user = User::factory()->create();
@@ -37,7 +37,7 @@ it('exports the records and notifies the user with a download link', function ()
 });
 
 it('does nothing more than exporting when the user no longer exists', function (): void {
-    Storage::fake('filament');
+    Storage::fake('transfer');
 
     $organisation = Organisation::factory()->create();
     $record = AvgResponsibleProcessingRecord::factory()->for($organisation)->create(['name' => 'Verwerking']);

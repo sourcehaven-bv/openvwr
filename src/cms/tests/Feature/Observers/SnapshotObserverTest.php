@@ -29,7 +29,10 @@ it('does not dispatch the build-event when snapshot is created', function (): vo
 it(
     'dispatches the build-event when needed if snapshot is updated',
     function (string $oldState, string $newState, bool $expectedEvent): void {
+        // Pin a publishable source: the factory otherwise picks at random and
+        // only some of its choices reach the static website.
         $snapshot = Snapshot::factory()
+            ->for(AvgResponsibleProcessingRecord::factory(), 'snapshotSource')
             ->createQuietly([
                 'state' => $oldState,
             ]);

@@ -6,8 +6,9 @@ met name handig voor het genereren van screenshots voor de handleiding.
 
 De services die niet native beschikbaar zijn, hebben allebei een ingebouwde
 uitweg: de virusscanner en de OTP-verificatie kennen een `fake` driver. Voor
-bestandsopslag is helemaal geen vervanging nodig — de uploads- en exports-disks
-zijn sinds het verwijderen van MinIO gewoon lokale schijven.
+bestandsopslag is standaard geen vervanging nodig — de uploads-, exports- en
+transfer-disks staan gewoon op de lokale schijf. Wil je de objectopslag-variant
+lokaal draaien, zie [object_storage.md](object_storage.md).
 
 ## Vereisten
 
@@ -47,11 +48,13 @@ Verdere commando's:
 | Commando | Doet |
 |---|---|
 | `just setup-native` | Volledige setup vanaf niets |
+| `just setup-native-object-storage` | Idem, plus minio en een `.env` op objectopslag |
 | `just doctor-native` | Controleert de omgeving en meldt wat ontbreekt |
 | `just dev-native [port]` | Start de applicatie (standaard poort 8000) |
 | `just dev-native-login [email]` | Magic link (standaard `admin@example.com`) |
 | `just dev-native-reset` | Database opnieuw opbouwen en seeden |
 | `just test-native [args]` | Testsuite draaien met PHP 8.4 |
+| `just minio-native-up` / `-down` | Start of stopt minio als brew-service |
 
 Werkt er iets niet, draai dan `just doctor-native`: die controleert PHP-versie
 en -extensies, de tools, beide databases, `.env`, `APP_KEY`, dependencies en de

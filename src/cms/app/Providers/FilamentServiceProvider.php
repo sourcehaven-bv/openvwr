@@ -114,6 +114,9 @@ class FilamentServiceProvider extends PanelProvider
                     ->label(__(NavigationGroup::REGISTERS->value))
                     ->collapsible(false),
                 FilamentNavigationGroup::make()
+                    ->label(__(NavigationGroup::DPIA->value))
+                    ->collapsible(false),
+                FilamentNavigationGroup::make()
                     ->label(__(NavigationGroup::MANAGEMENT->value))
                     ->collapsible(false),
                 FilamentNavigationGroup::make()

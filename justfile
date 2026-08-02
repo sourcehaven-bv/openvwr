@@ -124,6 +124,30 @@ dev-down:
 dev-shell:
     cd src/cms && ./vendor/bin/sail shell
 
+# Object Storage (opt-in)
+# =======================
+# Set FILESYSTEM_SHARED_DRIVER=s3 in src/cms/.env to actually use these disks.
+
+# Start minio alongside the Docker environment and create its buckets
+minio-up:
+    cd src/cms && docker compose --profile object-storage up -d minio minio-setup
+
+# Stop minio (leaves its volume intact)
+minio-down:
+    cd src/cms && docker compose --profile object-storage stop minio
+
+# Start minio for the native (Docker-less) setup
+minio-native-up:
+    brew services start minio
+
+# Stop minio for the native setup
+minio-native-down:
+    brew services stop minio
+
+# Create the buckets for whichever object storage is configured
+minio-buckets:
+    cd src/cms && "$(brew --prefix php@8.4)/bin/php" artisan storage:setup-buckets
+
 # Reset the development environment
 dev-reset:
     cd src/cms && composer run reset
@@ -139,6 +163,10 @@ login-link email="admin@example.com":
 # Install dependencies, create the database, and seed test data
 setup-native:
     ./scripts/setup-local-dev.sh
+
+# Same, plus minio and an .env switched to object storage (see docs/object_storage.md)
+setup-native-object-storage:
+    ./scripts/setup-local-dev.sh --with-object-storage
 
 # Check the native environment and report what is missing
 doctor-native:

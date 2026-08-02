@@ -650,6 +650,285 @@ Breaches of the security of personal data, including the notification to the Dut
 
 ---
 
+# Pre-scans DPIA
+
+Assess whether a DPIA, DTIA, KIA or IAMA is needed for a proposal or processing activity.
+
+## General
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| Processing activity number | Text |  |
+| Name of the pre-scan | Text | Use the name of the project, the regulation or the processing activity you are assessing. |
+| Short description | Free text | Briefly describe what is being proposed and which personal data play a role in it. |
+| Date of the pre-scan | Date | Defaults to today. Adjust this if the pre-scan was carried out on an earlier date. |
+| Labels | Multiple choice (free) |  |
+
+## Grounds
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| **Is there a direct ground for a DPIA?** |  | These three cases make a DPIA mandatory in any event, regardless of the criteria lists below. |
+| It concerns new legislation or regulations from which processing of personal data follows | Yes/no |  |
+| An obligation applies on the basis of departmental policy | Yes/no |  |
+| A public cloud service is used | Yes/no | See the central government cloud policy for the circumstances in which a DPIA is mandatory. |
+
+## AP criteria
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| Criteria of the Dutch Data Protection Authority (Autoriteit Persoonsgegevens) | Multiple choice | Choose from: Covert investigation; Blacklists; Combating fraud; Financial situation; Partnerships; Camera surveillance; Monitoring of employees; Location data; Communications data; Profiling; Observation and influencing of behaviour; Biometric data; Genetic personal data; Health data; Credit scores; Flexible camera surveillance; Internet of things. |
+
+## EDPB criteria
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| Criteria of the European Data Protection Board | Multiple choice | Choose from: Evaluation of personal aspects; Automated decision-making; Systematic monitoring; Special categories or sensitive data; Large-scale processing; Vulnerable persons; New or innovative technology; Denial of a right or service; Matched datasets. |
+
+## Transfer
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| Personal data is transferred to another country | Yes/no |  |
+| The transfer goes to a country outside the European Economic Area | Yes/no |  |
+| Transfer mechanism | Choice | Choose from: Adequacy decision; Standard contractual clauses on data protection (SCC); Binding corporate rules (BCR); Other mechanism. |
+
+## Children and algorithms
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| A digital service is offered | Yes/no |  |
+| The service is (also) aimed at minors | Yes/no |  |
+| An algorithm is used | Yes/no |  |
+| Does the algorithm fall under one of these categories? | Multiple choice | These are the high-risk categories from Annex III to the AI Act, to which Article 27 refers. If you do not recognise any of them, leave everything blank. Choose from: Biometrics; Critical infrastructure; Education and vocational training; Employment and workforce management; Essential services and benefits; Law enforcement; Migration, asylum and border control; Administration of justice and democratic processes. |
+
+## Outcome
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| **Outcome of the pre-scan** |  | The outcome follows from the answers above and is recorded when saving. |
+| Substantiation | Free text | Even where no DPIA is needed, that consideration must be recorded in writing and archived. |
+
+## Processing activities and systems
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| Processing activities (GDPR controller) | Link |  |
+
+## Documents and attachments
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| Documents | Link |  |
+
+
+---
+
+# DPIAs
+
+Data protection impact assessments according to the Model DPIA Rijksdienst v3.0.
+
+## General
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| Processing activity number | Text |  |
+| Name of the DPIA | Text | Use a name that is recognisable within the organisation, for example the name of the project, the regulation or the system. |
+| What does this DPIA concern? | Choice | The model distinguishes between a DPIA on legislation (acts, orders in council and ministerial regulations) and a DPIA on processing activities by or on behalf of the government. Choose from: Processing activity (product, service, process or system); Legislation (act, order in council or ministerial regulation). |
+| Associated pre-scan | Choice | The pre-scan showing that this DPIA is needed. This keeps the reason for the DPIA traceable. |
+| Labels | Multiple choice (free) |  |
+
+## 1. Proposal
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| Description of the proposal | Free text | Describe in broad terms what the DPIA covers. Keep it understandable for someone who does not know the project. |
+| Origin and reasons | Free text | State how the proposal came about and what the reasons behind it are. |
+
+## 2. Personal data
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| Personal data | List |  |
+| » Which personal data item is processed? | Free text | For example "name and address", "citizen service number" or "camera images". |
+| » Type of personal data | Choice | Special categories of personal data and criminal law data may in principle not be processed, and a national identification number only where the law provides for it. For those choices you will be asked for the exemption ground below. Choose from: Ordinary; Sensitive; Special category (Article 9 GDPR); Criminal law data (Article 10 GDPR); National identification number. |
+| » Category of data subjects | Text | Whose data is this? For example citizens, staff or visitors. |
+| » Source | Text | Where does this data item come from? For example the data subject themselves, a base registry or a third party. |
+| » Retention period | Text | How long is this data item retained? The substantiation belongs in section 10. |
+| » Exemption ground | Free text | On what basis may this data item nevertheless be processed? Refer to the statutory exemption (Article 9 or 10 GDPR, or the UAVG (Dutch GDPR Implementation Act)) and substantiate it. |
+| Additional information about the personal data | Free text | Optional text field for explanations that do not belong to an individual data item. |
+
+## 3. Processing activities
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| Description of the processing activities | Free text | Set out all processing activities and indicate for each activity which categories of personal data are processed in it. A flow chart may be added as an attachment. |
+
+## 4. Techniques and methods
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| Manner, means and methods | Free text | Describe in what manner and with which (technical) means and methods the personal data is processed. |
+| There is (semi-)automated decision-making | Yes/no |  |
+| There is profiling | Yes/no |  |
+| A cloud solution is used | Yes/no |  |
+| There are big data processing activities | Yes/no |  |
+| Explanation of the ticked techniques | Free text | Describe what the ticked techniques consist of. In the case of automated decision-making: also describe the underlying logic and the consequences for the data subject. |
+
+## 5. Processing purposes
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| Purposes of the processing activities | Free text | Describe the purposes of all processing activities. A purpose must be specified, explicit and legitimate. |
+
+## 6. Parties involved
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| Parties involved and their role | Free text | Name all parties involved per processing activity and classify them under the roles: controller, joint controller, processor, sub-processor, supplier, recipient, data subject and third party. |
+| Who gets access to which data? | Free text | State, where known, which officers or departments within these parties get access to which categories of personal data. |
+
+## 7. Interests
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| Interests of the parties involved | Free text | Describe all interests that the parties involved have in the processing activities. |
+| Views of the data subjects | Free text | Ask data subjects or their representatives for their views on the processing where relevant, and explain those views here. |
+
+## 8. Processing locations
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| In which countries do the processing activities take place? | Free text | Name the countries where the processing activities take place, including the locations of processors and sub-processors. |
+| Processing activities take place outside the European Economic Area | Yes/no |  |
+| Transfer mechanism | Free text | Describe which transfer mechanism applies, for example an adequacy decision, standard contractual clauses on data protection (SCC) or binding corporate rules. |
+| Additional measures for transfers | Free text | State whether and which additional measures apply. Also consider whether a DTIA is needed. |
+
+## 9. Legal and policy framework
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| Legislation, regulations and policy | Free text | Name all legislation, regulations and policy with possible consequences for the processing activities. The GDPR and the Directive need not be mentioned. |
+
+## 10. Retention periods
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| Retention periods | Free text | Determine the retention periods on the basis of the processing activities and the processing purposes. Also take the Dutch Public Records Act into account. |
+| Motivation of the retention periods | Free text | Motivate why these retention periods are no longer than strictly necessary in relation to the processing purposes. |
+| Who monitors the retention period? | Free text | Describe who monitors the retention period and the destruction or archiving at the end of it. |
+
+## 11. Legal basis
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| Legal bases | Free text | Determine on which legal bases the processing activities are based (Article 6 GDPR). For processing by the government these are usually a legal obligation or a task carried out in the public interest. |
+| How are the conditions met? | Free text | Each legal basis sets its own conditions. Explain for each legal basis how these are met. |
+
+## 12. Special categories of personal data
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| Additional explanation of the exemption grounds | Free text | Optional. Use this field for a joint substantiation or for context that does not belong to an individual data item. |
+
+## 13. Purpose limitation
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| The data is also processed for a purpose other than the one for which it was collected | Yes/no | Further processing for another purpose is only permitted if there is a statutory basis for it or if the new purpose is compatible with the original one. |
+| Assessment of the purpose limitation | Free text | Assess whether the further processing is permissible under Union or Member State law, or is compatible with the purpose for which the data was originally collected. |
+
+## 14. Necessity and proportionality
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| Proportionality | Free text | Is the interference with private life and the protection of personal data proportionate to the processing purposes? |
+| Subsidiarity | Free text | Can the processing purposes reasonably not be achieved in another way that is less detrimental to the data subjects? |
+
+## 15. Rights of data subjects
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| Procedure for the rights of data subjects | Free text | Describe how effect is given to the rights of data subjects: information, access, rectification, erasure, restriction, portability, objection and the right not to be subject to automated decision-making. |
+| The rights of data subjects are restricted | Yes/no |  |
+| Basis for the restriction | Free text | Describe under which statutory exemption the restriction is permitted. |
+
+## 16. Risks to data subjects
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| Risks | List |  |
+| » Name of the risk | Text | A short, recognisable name. It appears in section 17 when linking measures, for example "Incorrect identification of visitors". |
+| » Description of the risk | Free text | What negative consequences can the processing activities have for the rights and freedoms of the data subjects? Think not only of privacy, but also for example of discrimination or the denial of a service. |
+| » Origin | Free text | What can cause this risk to arise? Name the source or event, for example human error, a malfunction or misuse, an unauthorised person inside or outside the organisation, a processor that does not comply with the agreements, or a system that produces incorrect results. |
+| » Likelihood | Choice | How likely is it that this consequence will occur? Choose from: Low; Medium; High. |
+| » Motivation of the likelihood | Free text |  |
+| » Impact | Choice | How serious is this consequence for the data subjects when it occurs? Choose from: Low; Medium; High. |
+| » Motivation of the impact | Free text |  |
+| » Risk level | Choice | Filled in as soon as likelihood and impact are known. You may deviate from this, for example where a risk cannot be mitigated further; explain this in the motivation alongside. Choose from: Low; Medium; High. |
+| » Motivation of the risk assessment | Free text |  |
+| Additional information about the risks | Free text | Optional text field for further explanation. |
+
+## 17. Measures
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| Measures | List |  |
+| » Description of the measure | Free text |  |
+| » Which risks does this measure address? | Multiple choice | Choose one or more risks from section 16. Enter the risks first; they will appear here automatically. |
+| » Type of measure | Choice | The model asks for technical, organisational and legal measures. Choose from: Technical; Organisational; Legal. |
+| » Owner of the measure | Text | Who is responsible for carrying out and monitoring this measure? |
+| » Remaining risk after this measure | Choice | Which risk remains after this measure has been carried out or implemented? Choose from: Low; Medium; High. |
+| » Origin of the measure | Free text | Where does this measure come from? For example from existing policy, the BIO, a processor agreement, advice from the DPO or an earlier DPIA. |
+| » Advice of the Dutch Data Protection Authority (Autoriteit Persoonsgegevens) | Free text | Add a reference to or a description of the advice of the AP. |
+| » Country of monitoring and evaluation | Text | In which country does the monitoring and evaluation of the measures take place? |
+| Additional information about the measures | Free text |  |
+| Substantiation of the acceptance of remaining risks | Free text | Give a conclusion on the residual risks. Are these acceptable? And is prior consultation with the Dutch Data Protection Authority (Autoriteit Persoonsgegevens) needed? |
+
+## Consultation and advice
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| Data subjects or their representatives have been consulted | Yes/no | Article 35(9) GDPR requires the views of data subjects to be sought where appropriate. Where it concerns your own staff, involve the works council. |
+| Outcome of the consultation | Free text | Record what those consulted advised and what has been done with it. If no consultation takes place, motivate that decision here. |
+| Advice of the data protection officer | Free text | Seeking advice from the DPO is mandatory (Article 35(2) GDPR). Involve the DPO as early as possible and not only when the report is finished. |
+| What has been done with the advice of the DPO? | Free text |  |
+| Date of DPO advice | Date |  |
+| Prior consultation of the AP is needed | Yes/no | Needed where the DPIA shows a high residual risk that you cannot reduce to an acceptable level (Article 36 GDPR). For a DPIA on legislation, the proposal must always be submitted to the AP. |
+| Advice of the AP and the follow-up to it | Free text | A period of eight weeks applies to the written advice of the AP, with a maximum extension of six weeks. |
+| Date of consultation of the AP | Date |  |
+
+## Adoption and review
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| Management summary | Free text | A short summary of the outcomes for directors and decision-makers. |
+| Date of completion | Date | The date on which this DPIA was carried out or last substantively reviewed. |
+| Date of next review | Date | A DPIA must be reviewed if the processing changes, and in any event every three years. |
+
+## Processing activities and systems
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| Processing activities (GDPR controller) | Link | Link the processing activities from the register to which this DPIA relates. A DPIA may cover a series of similar processing activities. |
+| Systems and applications | Link |  |
+
+## Documents and attachments
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| Documents | Link |  |
+
+## Remarks
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| Remarks | List |  |
+| » Remark | Free text |  |
+
+
+---
+
 # What the system records by itself
 
 Besides the fields that are filled in, OpenVWR captures a number of things
@@ -673,13 +952,13 @@ spellings and makes it possible to see from one place where something is used.
 
 | Onderdeel | Hergebruikt over |
 | --- | --- |
-| Verwerkingsverantwoordelijken | GDPR controller processing activities, GDPR processor processing activities, Wpg controller processing activities, Personal data breaches |
-| Verwerkers | GDPR controller processing activities, GDPR processor processing activities, Wpg controller processing activities |
+| Verwerkingsverantwoordelijken | GDPR controller processing activities, GDPR processor processing activities, Wpg controller processing activities, Personal data breaches, DPIAs |
+| Verwerkers | GDPR controller processing activities, GDPR processor processing activities, Wpg controller processing activities, DPIAs |
 | Ontvangers | GDPR controller processing activities, GDPR processor processing activities |
-| Systemen / applicaties | GDPR controller processing activities, GDPR processor processing activities, Wpg controller processing activities |
-| Contactpersonen | GDPR controller processing activities, GDPR processor processing activities, Wpg controller processing activities |
+| Systemen / applicaties | GDPR controller processing activities, GDPR processor processing activities, Wpg controller processing activities, DPIAs |
+| Contactpersonen | GDPR controller processing activities, GDPR processor processing activities, Wpg controller processing activities, Pre-scans DPIA, DPIAs |
 | Documenten | Alle registers |
-| Labels | GDPR controller processing activities, GDPR processor processing activities, Wpg controller processing activities |
+| Labels | GDPR controller processing activities, GDPR processor processing activities, Wpg controller processing activities, Pre-scans DPIA, DPIAs |
 
 So for a single supplier it is immediately visible which processing activities
 it is involved in, and for a single system which activities take place in it.

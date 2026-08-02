@@ -648,6 +648,285 @@ Inbreuken op de beveiliging van persoonsgegevens, inclusief de melding aan de Au
 
 ---
 
+# Pre-scans DPIA
+
+Toets of een DPIA, DTIA, KIA of IAMA nodig is voor een voorstel of verwerking.
+
+## Algemeen
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| Nummer verwerking | Tekst |  |
+| Naam van de pre-scan | Tekst | Gebruik de naam van het project, de regeling of de verwerking die u toetst. |
+| Korte omschrijving | Toelichting | Beschrijf kort wat er wordt voorgesteld en welke persoonsgegevens daarbij een rol spelen. |
+| Datum van de pre-scan | Datum | Staat standaard op vandaag. Pas dit aan als de pre-scan op een eerdere datum is uitgevoerd. |
+| Labels | Meerkeuze (vrij) |  |
+
+## Aanleiding
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| **Is er een directe aanleiding voor een DPIA?** |  | Deze drie gevallen maken een DPIA sowieso verplicht, ongeacht de criterialijsten hieronder. |
+| Het gaat om nieuwe wet- of regelgeving waaruit verwerkingen van persoonsgegevens voortvloeien | Ja/nee |  |
+| Er geldt een verplichting op basis van departementaal beleid | Ja/nee |  |
+| Er wordt gebruikgemaakt van een publieke cloudvoorziening | Ja/nee | Zie het Rijksbrede cloudbeleid voor de omstandigheden waarin een DPIA verplicht is. |
+
+## AP-criteria
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| Criteria van de Autoriteit Persoonsgegevens | Meerkeuze | Keuze uit: Heimelijk onderzoek; Zwarte lijsten; Fraudebestrijding; Financiële situatie; Samenwerkingsverbanden; Cameratoezicht; Controle van werknemers; Locatiegegevens; Communicatiegegevens; Profilering; Observatie en beïnvloeding van gedrag; Biometrische gegevens; Genetische persoonsgegevens; Gezondheidsgegevens; Creditscores; Flexibel cameratoezicht; Internet of things. |
+
+## EDPB-criteria
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| Criteria van de European Data Protection Board | Meerkeuze | Keuze uit: Beoordelen van persoonskenmerken; Geautomatiseerde besluitvorming; Stelselmatige monitoring; Bijzondere of gevoelige gegevens; Grootschalige verwerking; Kwetsbare personen; Nieuwe of innovatieve technologie; Onthouden van een recht of dienst; Gekoppelde datasets. |
+
+## Doorgifte
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| Er worden persoonsgegevens doorgegeven aan een ander land | Ja/nee |  |
+| De doorgifte gaat naar een land buiten de Europese Economische Ruimte | Ja/nee |  |
+| Doorgiftemechanisme | Keuze | Keuze uit: Adequaatheidsbesluit; Standaardbepalingen inzake gegevensbescherming (SCC); Bindende bedrijfsvoorschriften (BCR); Overig mechanisme. |
+
+## Kinderen en algoritmes
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| Er wordt een digitale dienst aangeboden | Ja/nee |  |
+| De dienst richt zich (mede) op minderjarigen | Ja/nee |  |
+| Er wordt een algoritme ingezet | Ja/nee |  |
+| Valt het algoritme onder een van deze categorieën? | Meerkeuze | Dit zijn de hoog-risico categorieën uit bijlage III bij de AI-verordening, waar artikel 27 naar verwijst. Herkent u er geen, laat dan alles leeg. Keuze uit: Biometrie; Kritieke infrastructuur; Onderwijs en beroepsopleiding; Werkgelegenheid en personeelsbeheer; Essentiele diensten en uitkeringen; Rechtshandhaving; Migratie, asiel en grenstoezicht; Rechtsbedeling en democratische processen. |
+
+## Uitkomst
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| **Uitkomst van de pre-scan** |  | De uitkomst volgt uit de antwoorden hierboven en wordt bij het opslaan vastgelegd. |
+| Onderbouwing | Toelichting | Ook wanneer geen DPIA nodig is, moet die afweging schriftelijk worden vastgelegd en gearchiveerd. |
+
+## Verwerkingen en systemen
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| Verwerkingen (AVG verantwoordelijke) | Koppeling |  |
+
+## Documenten en bijlagen
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| Documenten | Koppeling |  |
+
+
+---
+
+# DPIA's
+
+Gegevensbeschermingseffectbeoordelingen volgens het Model DPIA Rijksdienst v3.0.
+
+## Algemeen
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| Nummer verwerking | Tekst |  |
+| Naam van de DPIA | Tekst | Gebruik een naam die herkenbaar is binnen de organisatie, bijvoorbeeld de naam van het project, de regeling of het systeem. |
+| Waar gaat deze DPIA over? | Keuze | Het model maakt onderscheid tussen een DPIA op regelgeving (wetten, algemene maatregelen van bestuur en ministeriële regelingen) en een DPIA op verwerkingen door of in opdracht van de overheid. Keuze uit: Verwerking (product, dienst, proces of systeem); Regelgeving (wet, AMvB of ministeriële regeling). |
+| Bijbehorende pre-scan | Keuze | De pre-scan waaruit blijkt dat deze DPIA nodig is. Zo blijft de aanleiding voor de DPIA traceerbaar. |
+| Labels | Meerkeuze (vrij) |  |
+
+## 1. Voorstel
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| Beschrijving van het voorstel | Toelichting | Beschrijf op hoofdlijnen waar de DPIA op toeziet. Houd het begrijpelijk voor iemand die het project niet kent. |
+| Totstandkoming en beweegredenen | Toelichting | Benoem hoe het voorstel tot stand is gekomen en wat de beweegredenen erachter zijn. |
+
+## 2. Persoonsgegevens
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| Persoonsgegevens | Lijst |  |
+| » Welk persoonsgegeven wordt verwerkt? | Toelichting | Bijvoorbeeld "naam en adres", "burgerservicenummer" of "camerabeelden". |
+| » Type persoonsgegeven | Keuze | Bijzondere en strafrechtelijke persoonsgegevens mogen in beginsel niet worden verwerkt, en een wettelijk identificatienummer alleen als de wet dat bepaalt. Bij die keuzes wordt hieronder om de uitzonderingsgrond gevraagd. Keuze uit: Gewoon; Gevoelig; Bijzonder (artikel 9 AVG); Strafrechtelijk (artikel 10 AVG); Wettelijk identificatienummer. |
+| » Categorie betrokkenen | Tekst | Van wie zijn deze gegevens? Bijvoorbeeld burgers, medewerkers of bezoekers. |
+| » Bron | Tekst | Waar komt dit gegeven vandaan? Bijvoorbeeld de betrokkene zelf, een basisregistratie of een derde partij. |
+| » Bewaartermijn | Tekst | Hoe lang wordt dit gegeven bewaard? De onderbouwing hoort bij paragraaf 10. |
+| » Uitzonderingsgrond | Toelichting | Op grond waarvan mag dit gegeven toch worden verwerkt? Verwijs naar de wettelijke uitzondering (artikel 9 of 10 AVG, of de Uitvoeringswet AVG) en onderbouw die. |
+| Aanvullende informatie over de persoonsgegevens | Toelichting | Optioneel tekstveld voor toelichting die niet bij een afzonderlijk gegeven hoort. |
+
+## 3. Gegevensverwerkingen
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| Beschrijving van de gegevensverwerkingen | Toelichting | Geef alle gegevensverwerkingen weer en geef per verwerking aan welke categorieën persoonsgegevens daarin worden verwerkt. Een stroomschema mag als bijlage worden toegevoegd. |
+
+## 4. Technieken en methoden
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| Wijze, middelen en methoden | Toelichting | Beschrijf op welke wijze en met welke (technische) middelen en methoden de persoonsgegevens worden verwerkt. |
+| Er is sprake van (semi-)geautomatiseerde besluitvorming | Ja/nee |  |
+| Er is sprake van profilering | Ja/nee |  |
+| Er wordt gebruikgemaakt van een cloudoplossing | Ja/nee |  |
+| Er is sprake van big data-verwerkingen | Ja/nee |  |
+| Toelichting op de aangevinkte technieken | Toelichting | Beschrijf waaruit de aangevinkte technieken bestaan. Bij geautomatiseerde besluitvorming: beschrijf ook de onderliggende logica en de gevolgen voor de betrokkene. |
+
+## 5. Verwerkingsdoeleinden
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| Doeleinden van de gegevensverwerkingen | Toelichting | Beschrijf de doeleinden van alle gegevensverwerkingen. Een doel moet welbepaald, uitdrukkelijk omschreven en gerechtvaardigd zijn. |
+
+## 6. Betrokken partijen
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| Betrokken partijen en hun rol | Toelichting | Benoem alle betrokken partijen per gegevensverwerking en deel ze in onder de rollen: verwerkingsverantwoordelijke, gezamenlijke verwerkingsverantwoordelijke, verwerker, sub-verwerker, verstrekker, ontvanger, betrokkene en derde. |
+| Wie krijgt toegang tot welke gegevens? | Toelichting | Benoem, wanneer bekend, welke functionarissen of afdelingen binnen deze partijen toegang krijgen tot welke categorieën persoonsgegevens. |
+
+## 7. Belangen
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| Belangen van de betrokken partijen | Toelichting | Beschrijf alle belangen die de betrokken partijen hebben bij de gegevensverwerkingen. |
+| Mening van de betrokkenen | Toelichting | Vraag betrokkenen of hun vertegenwoordigers naar hun mening over de verwerking indien relevant, en licht die mening hier toe. |
+
+## 8. Verwerkingslocaties
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| In welke landen vinden de verwerkingen plaats? | Toelichting | Benoem de landen waar de gegevensverwerkingen plaatsvinden, inclusief de locaties van verwerkers en sub-verwerkers. |
+| Er vinden verwerkingen plaats buiten de Europese Economische Ruimte | Ja/nee |  |
+| Doorgiftemechanisme | Toelichting | Beschrijf welk doorgiftemechanisme van toepassing is, bijvoorbeeld een adequaatheidsbesluit, standaardbepalingen inzake gegevensbescherming (SCC) of bindende bedrijfsvoorschriften. |
+| Aanvullende maatregelen bij doorgifte | Toelichting | Noem of en welke aanvullende maatregelen van toepassing zijn. Overweeg ook of een DTIA nodig is. |
+
+## 9. Juridisch en beleidsmatig kader
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| Wet- en regelgeving en beleid | Toelichting | Benoem alle wet- en regelgeving en beleid met mogelijke gevolgen voor de gegevensverwerkingen. De AVG en de Richtlijn hoeven niet genoemd te worden. |
+
+## 10. Bewaartermijnen
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| Bewaartermijnen | Toelichting | Bepaal de bewaartermijnen aan de hand van de gegevensverwerkingen en de verwerkingsdoeleinden. Betrek hierbij ook de Archiefwet. |
+| Motivering van de bewaartermijnen | Toelichting | Motiveer waarom deze bewaartermijnen niet langer zijn dan strikt noodzakelijk ten opzichte van de verwerkingsdoeleinden. |
+| Wie ziet toe op de bewaartermijn? | Toelichting | Beschrijf wie toeziet op de bewaartermijn en op de vernietiging of archivering aan het einde daarvan. |
+
+## 11. Rechtsgrond
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| Rechtsgronden | Toelichting | Bepaal op welke rechtsgronden de gegevensverwerkingen worden gebaseerd (artikel 6 AVG). Bij verwerkingen door de overheid zijn dat meestal een wettelijke verplichting of een taak van algemeen belang. |
+| Hoe wordt aan de voorwaarden voldaan? | Toelichting | Iedere rechtsgrond stelt eigen voorwaarden. Licht per rechtsgrond toe hoe daaraan wordt voldaan. |
+
+## 12. Bijzondere persoonsgegevens
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| Aanvullende toelichting op de uitzonderingsgronden | Toelichting | Optioneel. Gebruik dit veld voor een gezamenlijke onderbouwing of voor context die niet bij een afzonderlijk gegeven hoort. |
+
+## 13. Doelbinding
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| De gegevens worden ook voor een ander doel verwerkt dan waarvoor ze zijn verzameld | Ja/nee | Verdere verwerking voor een ander doeleinde is alleen toegestaan als daarvoor een wettelijke basis bestaat of als het nieuwe doel verenigbaar is met het oorspronkelijke. |
+| Beoordeling van de doelbinding | Toelichting | Beoordeel of de verdere verwerking toelaatbaar is op grond van Unie- of lidstaatrechtelijk recht, dan wel verenigbaar is met het doel waarvoor de gegevens oorspronkelijk zijn verzameld. |
+
+## 14. Noodzaak en evenredigheid
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| Proportionaliteit | Toelichting | Staat de inbreuk op de persoonlijke levenssfeer en de bescherming van de persoonsgegevens in evenredige verhouding tot de verwerkingsdoeleinden? |
+| Subsidiariteit | Toelichting | Kunnen de verwerkingsdoeleinden in redelijkheid niet op een andere, voor de betrokkenen minder nadelige wijze worden verwezenlijkt? |
+
+## 15. Rechten van de betrokkenen
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| Procedure voor de rechten van betrokkenen | Toelichting | Beschrijf hoe invulling wordt gegeven aan de rechten van betrokkenen: informatie, inzage, rectificatie, wissing, beperking, overdraagbaarheid, bezwaar en het recht niet onderworpen te worden aan geautomatiseerde besluitvorming. |
+| De rechten van betrokkenen worden beperkt | Ja/nee |  |
+| Grondslag voor de beperking | Toelichting | Beschrijf op grond van welke wettelijke uitzondering de beperking is toegestaan. |
+
+## 16. Risico's voor betrokkenen
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| Risico's | Lijst |  |
+| » Naam van het risico | Tekst | Een korte, herkenbare naam. Deze verschijnt in paragraaf 17 bij het koppelen van maatregelen, bijvoorbeeld "Onterechte identificatie van bezoekers". |
+| » Beschrijving van het risico | Toelichting | Welke negatieve gevolgen kunnen de gegevensverwerkingen hebben voor de rechten en vrijheden van de betrokkenen? Denk niet alleen aan privacy, maar bijvoorbeeld ook aan discriminatie of het onthouden van een voorziening. |
+| » Oorsprong | Toelichting | Waardoor kan dit risico ontstaan? Benoem de bron of gebeurtenis, bijvoorbeeld een menselijke fout, een storing of misbruik, een onbevoegde binnen of buiten de organisatie, een verwerker die zich niet aan de afspraken houdt, of een systeem dat onjuiste uitkomsten geeft. |
+| » Kans | Keuze | Hoe waarschijnlijk is het dat dit gevolg intreedt? Keuze uit: Laag; Gemiddeld; Hoog. |
+| » Motivatie van de kans | Toelichting |  |
+| » Impact | Keuze | Hoe ernstig is dit gevolg voor de betrokkenen wanneer het intreedt? Keuze uit: Laag; Gemiddeld; Hoog. |
+| » Motivatie van de impact | Toelichting |  |
+| » Risiconiveau | Keuze | Wordt ingevuld zodra kans en impact bekend zijn. U mag daarvan afwijken, bijvoorbeeld wanneer een risico niet verder te mitigeren is; licht dat dan toe in de motivatie hiernaast. Keuze uit: Laag; Gemiddeld; Hoog. |
+| » Motivatie van de risico-inschatting | Toelichting |  |
+| Aanvullende informatie over de risico's | Toelichting | Optioneel tekstveld voor extra toelichting. |
+
+## 17. Maatregelen
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| Maatregelen | Lijst |  |
+| » Beschrijving van de maatregel | Toelichting |  |
+| » Welke risico's pakt deze maatregel aan? | Meerkeuze | Kies een of meer risico's uit paragraaf 16. Vul eerst de risico's in; ze verschijnen hier automatisch. |
+| » Soort maatregel | Keuze | Het model vraagt om technische, organisatorische en juridische maatregelen. Keuze uit: Technisch; Organisatorisch; Juridisch. |
+| » Beheerder van de maatregel | Tekst | Wie is verantwoordelijk voor het uitvoeren en bewaken van deze maatregel? |
+| » Resterend risico na deze maatregel | Keuze | Welk risico blijft over nadat deze maatregel is uitgevoerd of geimplementeerd? Keuze uit: Laag; Gemiddeld; Hoog. |
+| » Herkomst van de maatregel | Toelichting | Waar komt deze maatregel vandaan? Bijvoorbeeld uit bestaand beleid, de BIO, een verwerkersovereenkomst, een advies van de FG of een eerdere DPIA. |
+| » Advies van de Autoriteit Persoonsgegevens | Toelichting | Voeg een verwijzing naar of een beschrijving van het advies van de AP toe. |
+| » Land van monitoring en evaluatie | Tekst | In welk land vindt de monitoring en evaluatie van de maatregelen plaats? |
+| Aanvullende informatie over de maatregelen | Toelichting |  |
+| Onderbouwing acceptatie resterende risico's | Toelichting | Geef een conclusie over de restrisico's. Zijn deze acceptabel? En is een voorafgaande raadpleging bij de Autoriteit Persoonsgegevens nodig? |
+
+## Consultatie en advies
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| Betrokkenen of hun vertegenwoordigers zijn geconsulteerd | Ja/nee | Artikel 35, negende lid, AVG vraagt waar passend om het advies van betrokkenen. Gaat het om eigen medewerkers, betrek dan de ondernemingsraad. |
+| Uitkomst van de consultatie | Toelichting | Neem op wat de geconsulteerden hebben geadviseerd en wat daarmee is gedaan. Vindt geen consultatie plaats, motiveer die beslissing dan hier. |
+| Advies van de functionaris voor gegevensbescherming | Toelichting | Het inwinnen van advies bij de FG is verplicht (artikel 35, tweede lid, AVG). Betrek de FG zo vroeg mogelijk en niet pas als het rapport af is. |
+| Wat is met het advies van de FG gedaan? | Toelichting |  |
+| Datum advies FG | Datum |  |
+| Voorafgaande raadpleging van de AP is nodig | Ja/nee | Nodig wanneer uit de DPIA een hoog restrisico blijkt dat u niet tot een acceptabel niveau kunt terugbrengen (artikel 36 AVG). Bij een DPIA op regelgeving moet het voorstel altijd aan de AP worden voorgelegd. |
+| Advies van de AP en de opvolging daarvan | Toelichting | Voor het schriftelijke advies van de AP geldt een termijn van acht weken, met een maximale verlenging van zes weken. |
+| Datum raadpleging AP | Datum |  |
+
+## Vaststelling en herziening
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| Managementsamenvatting | Toelichting | Een korte samenvatting van de uitkomsten voor bestuurders en besluitvormers. |
+| Datum van uitvoering | Datum | De datum waarop deze DPIA is uitgevoerd of voor het laatst inhoudelijk is beoordeeld. |
+| Datum volgende herziening | Datum | Een DPIA moet worden herzien als de verwerking wijzigt, en in ieder geval iedere drie jaar. |
+
+## Verwerkingen en systemen
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| Verwerkingen (AVG verantwoordelijke) | Koppeling | Koppel de verwerkingen uit het register waarop deze DPIA betrekking heeft. Een DPIA mag een reeks vergelijkbare verwerkingen bestrijken. |
+| Systemen en applicaties | Koppeling |  |
+
+## Documenten en bijlagen
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| Documenten | Koppeling |  |
+
+## Opmerkingen
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| Opmerkingen | Lijst |  |
+| » Opmerking | Toelichting |  |
+
+
+---
+
 # Gegevens die het systeem zelf bijhoudt
 
 Naast de ingevulde velden legt OpenVWR een aantal zaken automatisch vast. Deze zijn van belang voor
@@ -671,13 +950,13 @@ mogelijk om vanuit één punt te overzien waar iets wordt gebruikt.
 
 | Onderdeel | Hergebruikt over |
 | --- | --- |
-| Verwerkingsverantwoordelijken | Verwerkingen AVG verantwoordelijke, Verwerkingen AVG verwerker, Verwerkingen WPG verantwoordelijke, Datalekken |
-| Verwerkers | Verwerkingen AVG verantwoordelijke, Verwerkingen AVG verwerker, Verwerkingen WPG verantwoordelijke |
+| Verwerkingsverantwoordelijken | Verwerkingen AVG verantwoordelijke, Verwerkingen AVG verwerker, Verwerkingen WPG verantwoordelijke, Datalekken, DPIA's |
+| Verwerkers | Verwerkingen AVG verantwoordelijke, Verwerkingen AVG verwerker, Verwerkingen WPG verantwoordelijke, DPIA's |
 | Ontvangers | Verwerkingen AVG verantwoordelijke, Verwerkingen AVG verwerker |
-| Systemen / applicaties | Verwerkingen AVG verantwoordelijke, Verwerkingen AVG verwerker, Verwerkingen WPG verantwoordelijke |
-| Contactpersonen | Verwerkingen AVG verantwoordelijke, Verwerkingen AVG verwerker, Verwerkingen WPG verantwoordelijke |
+| Systemen / applicaties | Verwerkingen AVG verantwoordelijke, Verwerkingen AVG verwerker, Verwerkingen WPG verantwoordelijke, DPIA's |
+| Contactpersonen | Verwerkingen AVG verantwoordelijke, Verwerkingen AVG verwerker, Verwerkingen WPG verantwoordelijke, Pre-scans DPIA, DPIA's |
 | Documenten | Alle registers |
-| Labels | Verwerkingen AVG verantwoordelijke, Verwerkingen AVG verwerker, Verwerkingen WPG verantwoordelijke |
+| Labels | Verwerkingen AVG verantwoordelijke, Verwerkingen AVG verwerker, Verwerkingen WPG verantwoordelijke, Pre-scans DPIA, DPIA's |
 
 Zo is bijvoorbeeld van één leverancier in één oogopslag te zien bij welke verwerkingen die
 betrokken is, en van één systeem welke verwerkingen erin plaatsvinden.

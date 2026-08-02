@@ -15,6 +15,8 @@ use App\Models\ContactPerson;
 use App\Models\ContactPersonPosition;
 use App\Models\DataBreachRecord;
 use App\Models\Document;
+use App\Models\Dpia\DpiaPrescanRecord;
+use App\Models\Dpia\DpiaRecord;
 use App\Models\Organisation;
 use App\Models\Processor;
 use App\Models\Receiver;
@@ -195,6 +197,32 @@ it('has documents', function (): void {
         ->for($organisation)
         ->create();
     expect($organisation->documents()->count())
+        ->toBe(1);
+});
+
+it('has dpiaPrescanRecords', function (): void {
+    $organisation = Organisation::factory()->create();
+    expect($organisation->dpiaPrescanRecords()->count())
+        ->toBe(0);
+
+    DpiaPrescanRecord::factory()
+        ->for($organisation)
+        ->create();
+
+    expect($organisation->dpiaPrescanRecords()->count())
+        ->toBe(1);
+});
+
+it('has dpiaRecords', function (): void {
+    $organisation = Organisation::factory()->create();
+    expect($organisation->dpiaRecords()->count())
+        ->toBe(0);
+
+    DpiaRecord::factory()
+        ->for($organisation)
+        ->create();
+
+    expect($organisation->dpiaRecords()->count())
         ->toBe(1);
 });
 

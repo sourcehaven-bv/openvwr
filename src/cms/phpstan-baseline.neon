@@ -263,3 +263,15 @@ parameters:
 			identifier: staticMethod.dynamicCall
 			count: 2
 			path: app/Services/Snapshot/SnapshotService.php
+
+		-
+			message: '#^Dynamic call to static method App\\Models\\Builders\\SnapshotBuilder\:\:orderBy\(\)\.$#'
+			identifier: staticMethod.dynamicCall
+			count: 1
+			path: app/Models/Dpia/DpiaRecord.php
+
+		-
+			message: '#^Dynamic call to static method App\\Models\\Builders\\SnapshotBuilder\:\:whereIn\(\)\.$#'
+			identifier: staticMethod.dynamicCall
+			count: 1
+			path: app/Models/Dpia/DpiaRecord.php

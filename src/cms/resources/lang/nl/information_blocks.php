@@ -665,4 +665,75 @@ return [
         'step_attachments_info' => '
             <p class="text-sm text-gray-500">Als u documenten toevoegt, mag het ook om conceptversies gaan. Geef duidelijk aan wat voor soort document het is en of het concept of definitief is. Toevoegen, wijzigen of verwijderen van documenten vereist geen nieuwe versie van de verwerking. Voeg opmerkingen toe voor verduidelijking.</p>',
     ],
+
+    'dpia_record' => [
+        'step_general_title' => 'Over deze DPIA',
+        'step_general_info' => '
+            <p class="text-sm text-gray-500">Een DPIA brengt in beeld welke risico&#39;s een gegevensverwerking heeft voor de rechten en vrijheden van betrokkenen, en welke maatregelen die risico&#39;s beperken. Deze invulhulp volgt het Model DPIA Rijksdienst v3.0.</p>',
+        'step_general_extra_info' => '
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Doe dit vroeg in het proces</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Voer de DPIA uit in een vroeg stadium van de beleids- of projectontwikkeling. Dan is het nog mogelijk om het voorstel bij te stellen zonder grote nadelige consequenties. Bij een aanbesteding betekent dit: v&oacute;&oacute;r de aanbesteding. Bij regelgeving: v&oacute;&oacute;r de internetconsultatie.</p>
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Doe het niet alleen</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Bespreek de punten bij voorkeur in groepsverband, met expertise op het gebied van het beleidsterrein, regelgeving, (informatie)beveiliging en ICT. Betrek in ieder geval iemand met privacydeskundigheid.</p>
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Het is geen eenrichtingsverkeer</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300">Het maken van een DPIA is een dynamisch proces. Blijkt bij de risico&#39;s en maatregelen dat de verwerking moet wijzigen, pas dan ook de eerdere paragrafen aan zodat die de werkelijkheid blijven weergeven.</p>',
+
+        'part_a_title' => 'Onderdeel A: de feiten',
+        'part_a_info' => '
+            <p class="text-sm text-gray-500">Onderdeel A beschrijft de relevante feiten van de gegevensverwerkingen. Zijn de feiten onduidelijk, dan werkt dat door in de hele beoordeling die daarna volgt.</p>',
+
+        'part_b_title' => 'Onderdeel B: de rechtmatigheid',
+        'part_b_info' => '
+            <p class="text-sm text-gray-500">Onderdeel B beoordeelt of de verwerkingen die u in onderdeel A heeft beschreven rechtmatig zijn: is er een rechtsgrond, zijn ze noodzakelijk en evenredig, en kunnen betrokkenen hun rechten uitoefenen?</p>',
+
+        'part_c_title' => "Onderdeel C: de risico's",
+        'part_c_info' => '
+            <p class="text-sm text-gray-500">Beschrijf en beoordeel de risico&#39;s voor de rechten en vrijheden van betrokkenen. Houd rekening met de aard, omvang, context en doelen van de verwerkingen.</p>',
+        'part_c_extra_info' => '
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Breder dan privacy alleen</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Het gaat om alle rechten en vrijheden, niet alleen om het recht op privacy. Het model noemt het verbod op discriminatie expliciet als voorbeeld. Denk ook aan de vrijheid van meningsuiting, het recht op een eerlijk proces of de toegang tot voorzieningen.</p>
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Kans x impact</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300">Bepaal per risico de kans en de impact, en leid daaruit het risiconiveau af. De matrix is illustratief: u mag beargumenteerd afwijken. Zo kan de impact van ransomware hoog zijn, terwijl de kans door technische maatregelen zeer laag is.</p>',
+
+        'part_d_title' => 'Onderdeel D: de maatregelen',
+        'part_d_info' => '
+            <p class="text-sm text-gray-500">Beschrijf welke technische, organisatorische en juridische maatregelen de risico&#39;s voorkomen of verminderen, en welk risico er daarna nog overblijft.</p>',
+        'part_d_extra_info' => '
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Koppel maatregelen aan risico&#39;s</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Het model vraagt expliciet om te beschrijven welke maatregel welk risico aanpakt. Kies daarom per maatregel de risico&#39;s die u ermee adresseert.</p>
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Blijft er een hoog risico over?</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300">Lukt het niet om het restrisico tot een acceptabel niveau terug te brengen, dan moet de Autoriteit Persoonsgegevens vooraf worden geraadpleegd (artikel 36 AVG). Reken op acht weken, met een verlenging van maximaal zes weken.</p>',
+
+        'step_consultation_title' => 'Consultatie en advies',
+        'step_consultation_info' => '
+            <p class="text-sm text-gray-500">Leg vast wie is geraadpleegd en wat met hun advies is gedaan. Het advies van de functionaris voor gegevensbescherming is verplicht.</p>',
+        'step_consultation_extra_info' => '
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">De FG</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Op grond van artikel 35, tweede lid, AVG is het verplicht advies te vragen aan de FG. Betrek de FG zo vroeg mogelijk en wacht niet tot het rapport helemaal af is.</p>
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Betrokkenen</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300">Consulteer waar passend de betrokkenen of hun vertegenwoordigers. Gaat het om persoonsgegevens van eigen medewerkers, dan moet de ondernemingsraad worden betrokken. Vindt geen consultatie plaats, motiveer die beslissing dan in het rapport.</p>',
+
+        'step_review_title' => 'Vaststelling en herziening',
+        'step_review_info' => '
+            <p class="text-sm text-gray-500">Een DPIA is geen eenmalig document. Herzie de DPIA als de verwerking wijzigt, en in ieder geval iedere drie jaar.</p>',
+
+        'step_relations_title' => 'Verwerkingen en systemen',
+        'step_relations_info' => '
+            <p class="text-sm text-gray-500">Koppel de verwerkingen en systemen waarop deze DPIA betrekking heeft. E&eacute;n DPIA mag een reeks vergelijkbare verwerkingen bestrijken die vergelijkbare risico&#39;s inhouden.</p>',
+    ],
+
+    'dpia_prescan_record' => [
+        'step_general_title' => 'Over de pre-scan',
+        'step_general_info' => '
+            <p class="text-sm text-gray-500">Met de pre-scan bepaalt u of een DPIA nodig is, en of daarnaast een DTIA, KIA of IAMA in beeld komt. Het is een drempeltoets: het invullen kost weinig tijd en de uitkomst is te onderbouwen.</p>',
+        'step_general_extra_info' => '
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Bewaar ook een negatieve uitkomst</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">Komt uit de pre-scan dat geen DPIA nodig is, dan moet die beoordeling met onderbouwing schriftelijk worden vastgelegd en gearchiveerd. Daarom blijft ook een pre-scan zonder vervolg als record bestaan.</p>
+            <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Bij twijfel</h3>
+            <p class="text-sm text-gray-950 dark:text-gray-300">Raakt een verwerking aan grote politiek-bestuurlijke of maatschappelijke vraagstukken, dan is een DPIA altijd gewenst. Neem bij twijfel contact op met een privacy officer of de FG.</p>',
+
+        'step_outcome_title' => 'Uitkomst',
+        'step_outcome_info' => '
+            <p class="text-sm text-gray-500">De uitkomst volgt automatisch uit uw antwoorden. Per assessment ziet u niet alleen w&aacute;t eruit komt, maar ook waarom, zodat de conclusie navolgbaar blijft.</p>',
+    ],
 ];
