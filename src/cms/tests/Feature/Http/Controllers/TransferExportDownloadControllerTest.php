@@ -26,7 +26,7 @@ function signedTransferDownloadUrl(string $filename, string $userId): string
 }
 
 it('downloads the export when the signed-in user matches', function (): void {
-    Storage::fake('filament');
+    Storage::fake('transfer');
 
     $organisation = OrganisationTestHelper::create();
     $user = UserTestHelper::createForOrganisation($organisation);
@@ -42,7 +42,7 @@ it('downloads the export when the signed-in user matches', function (): void {
 });
 
 it('forbids downloading an export that belongs to another user', function (): void {
-    Storage::fake('filament');
+    Storage::fake('transfer');
 
     $organisation = OrganisationTestHelper::create();
     $user = UserTestHelper::createForOrganisation($organisation);
@@ -59,7 +59,7 @@ it('forbids downloading an export that belongs to another user', function (): vo
 });
 
 it('returns not found when the export file no longer exists', function (): void {
-    Storage::fake('filament');
+    Storage::fake('transfer');
 
     $organisation = OrganisationTestHelper::create();
     $user = UserTestHelper::createForOrganisation($organisation);
@@ -70,7 +70,7 @@ it('returns not found when the export file no longer exists', function (): void 
 });
 
 it('redirects to login when no user is signed in', function (): void {
-    Storage::fake('filament');
+    Storage::fake('transfer');
 
     $user = UserTestHelper::create();
 

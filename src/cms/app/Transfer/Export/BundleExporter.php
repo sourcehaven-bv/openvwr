@@ -6,10 +6,10 @@ namespace App\Transfer\Export;
 
 use App\Models\Document;
 use App\Models\Organisation;
+use App\Transfer\TransferBundleStorage;
 use App\Transfer\TransferEntityType;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Webmozart\Assert\Assert;
 use ZipArchive;
@@ -27,12 +27,13 @@ class BundleExporter
 {
     public const int FORMAT_VERSION = 1;
     public const string FORMAT_NAME = 'openvwr-transfer';
-    public const string DISK = 'filament';
+    public const string DISK = TransferBundleStorage::DISK;
     public const string EXPORT_DIRECTORY = 'transfer/exports';
 
     public function __construct(
         private readonly EntityGraphCollector $entityGraphCollector,
         private readonly EntitySerializer $entitySerializer,
+        private readonly TransferBundleStorage $bundleStorage,
     ) {
     }
 
@@ -63,17 +64,33 @@ class BundleExporter
      */
     private function writeZip(array $entities, Organisation $organisation): string
     {
-        $disk = Storage::disk(self::DISK);
         $relativePath = sprintf(
             '%s/openvwr-export-%s.zip',
             self::EXPORT_DIRECTORY,
             CarbonImmutable::now()->format('Ymd-His-v'),
         );
 
-        File::ensureDirectoryExists($disk->path(self::EXPORT_DIRECTORY));
+        $this->bundleStorage->writeFromLocal(
+            $relativePath,
+            function (string $localPath) use ($entities, $organisation, $relativePath): void {
+                $this->buildZip($localPath, $entities, $organisation, $relativePath);
+            },
+        );
 
+        return $relativePath;
+    }
+
+    /**
+     * @param array<string, Model> $entities
+     */
+    private function buildZip(
+        string $localPath,
+        array $entities,
+        Organisation $organisation,
+        string $relativePath,
+    ): void {
         $zip = new ZipArchive();
-        $openResult = $zip->open($disk->path($relativePath), ZipArchive::CREATE | ZipArchive::OVERWRITE);
+        $openResult = $zip->open($localPath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
         Assert::same($openResult, true, sprintf('could not create zip at %s', $relativePath));
 
         $manifestEntities = [];
@@ -89,7 +106,18 @@ class BundleExporter
 
             if ($model instanceof Document) {
                 foreach ($model->media as $mediaItem) {
-                    $zip->addFile($mediaItem->getPath(), sprintf('media/%s/%s', $mediaItem->uuid, $mediaItem->file_name));
+                    // Read through the disk rather than getPath(): the media-library
+                    // disk may itself be object storage, where there is no local file.
+                    $contents = Storage::disk($mediaItem->disk)->get($mediaItem->getPathRelativeToRoot());
+
+                    if ($contents === null) {
+                        continue;
+                    }
+
+                    $zip->addFromString(
+                        sprintf('media/%s/%s', $mediaItem->uuid, $mediaItem->file_name),
+                        $contents,
+                    );
                 }
             }
 
@@ -114,8 +142,6 @@ class BundleExporter
 
         $zip->addFromString('manifest.json', $this->toJson($manifest));
         $zip->close();
-
-        return $relativePath;
     }
 
     /**

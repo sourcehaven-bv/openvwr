@@ -34,7 +34,7 @@ function stageTransferUpload(Organisation $organisation): File
         $organisation,
     );
 
-    $bytes = Storage::disk('filament')->get($path);
+    $bytes = Storage::disk('transfer')->get($path);
 
     return TemporaryUploadedFile::fake()->createWithContent('bundle.zip', $bytes);
 }
@@ -89,7 +89,7 @@ it('does not import when no bundle has been analysed', function (): void {
 });
 
 it('analyses a valid bundle, imports it and resets the form', function (): void {
-    Storage::fake('filament');
+    Storage::fake('transfer');
     Bus::fake();
     $this->app->bind(Virusscanner::class, FakeVirusscanner::class);
 
@@ -116,7 +116,7 @@ it('analyses a valid bundle, imports it and resets the form', function (): void 
 });
 
 it('rejects an invalid bundle and cleans up the uploaded file', function (): void {
-    Storage::fake('filament');
+    Storage::fake('transfer');
     $this->app->bind(Virusscanner::class, FakeVirusscanner::class);
 
     $organisation = OrganisationTestHelper::create();
@@ -135,7 +135,7 @@ it('rejects an invalid bundle and cleans up the uploaded file', function (): voi
 });
 
 it('analyses a bundle whose manifest has no exported at timestamp', function (): void {
-    Storage::fake('filament');
+    Storage::fake('transfer');
     $this->app->bind(Virusscanner::class, FakeVirusscanner::class);
 
     $organisation = OrganisationTestHelper::create();
@@ -173,7 +173,7 @@ it('analyses a bundle whose manifest has no exported at timestamp', function ():
 });
 
 it('cancels an analysed bundle and deletes the uploaded file', function (): void {
-    Storage::fake('filament');
+    Storage::fake('transfer');
     $this->app->bind(Virusscanner::class, FakeVirusscanner::class);
 
     $organisation = OrganisationTestHelper::create();

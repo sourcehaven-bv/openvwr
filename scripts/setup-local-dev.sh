@@ -11,6 +11,17 @@ TEST_DB_NAME="${TEST_DB_NAME:-testing}"
 DB_USER="${DB_USER:-sail}"
 DB_PASSWORD="${DB_PASSWORD:-password}"
 DB_PORT="${DB_PORT:-5432}"
+MINIO_PORT="${MINIO_PORT:-9000}"
+
+# Object storage is opt-in: without this flag the shared disks stay on the local
+# filesystem, which is what most local work wants. See docs/object_storage.md.
+WITH_OBJECT_STORAGE=0
+for arg in "$@"; do
+    case "$arg" in
+        --with-object-storage) WITH_OBJECT_STORAGE=1 ;;
+        *) printf 'Unknown option: %s\n' "$arg" >&2; exit 1 ;;
+    esac
+done
 
 if [[ -t 1 ]]; then
     C_BLUE=$'\033[0;34m'; C_GREEN=$'\033[0;32m'; C_YELLOW=$'\033[0;33m'
@@ -55,6 +66,25 @@ else
     done
     pg_isready -h 127.0.0.1 -p "$DB_PORT" >/dev/null 2>&1 \
         || fail "PostgreSQL did not become reachable on port $DB_PORT."
+fi
+
+if [[ "$WITH_OBJECT_STORAGE" -eq 1 ]]; then
+    # The formula is deprecated upstream (disabled 2027-02-17) but still installs,
+    # and it matches the minio used in Docker and CI. If it ever disappears, run
+    # any S3-compatible server on $MINIO_PORT instead -- nothing here is minio-specific.
+    if curl -sf "http://127.0.0.1:${MINIO_PORT}/minio/health/live" >/dev/null 2>&1; then
+        ok "Object storage already reachable on port $MINIO_PORT"
+    else
+        install_formula minio
+        info "Starting minio on port $MINIO_PORT..."
+        brew services start minio >/dev/null
+        for _ in $(seq 1 30); do
+            curl -sf "http://127.0.0.1:${MINIO_PORT}/minio/health/live" >/dev/null 2>&1 && break
+            sleep 1
+        done
+        curl -sf "http://127.0.0.1:${MINIO_PORT}/minio/health/live" >/dev/null 2>&1 \
+            || fail "minio did not become reachable on port $MINIO_PORT."
+    fi
 fi
 
 PHP_BIN="$(brew --prefix "$PHP_FORMULA")/bin/php"
@@ -125,6 +155,22 @@ else
     cp .env.nodocker.example .env
 fi
 
+# The .env is left untouched when it already exists, so append the object-storage
+# settings only when they are absent -- re-running must not duplicate them.
+if [[ "$WITH_OBJECT_STORAGE" -eq 1 ]] && ! grep -q '^FILESYSTEM_SHARED_DRIVER=' .env; then
+    info "Adding object-storage settings to .env..."
+    cat >> .env <<EOF
+
+# Object storage (added by setup-local-dev.sh --with-object-storage)
+FILESYSTEM_SHARED_DRIVER=s3
+AWS_ENDPOINT=http://127.0.0.1:${MINIO_PORT}
+AWS_ACCESS_KEY_ID=minioadmin
+AWS_SECRET_ACCESS_KEY=minioadmin
+AWS_DEFAULT_REGION=eu-central-1
+AWS_USE_PATH_STYLE_ENDPOINT=true
+EOF
+fi
+
 info "Installing composer dependencies..."
 "$PHP_BIN" "$COMPOSER_BIN" install --no-interaction
 
@@ -140,6 +186,11 @@ fi
 info "Installing npm dependencies and building assets..."
 npm install --silent
 npm run build
+
+if [[ "$WITH_OBJECT_STORAGE" -eq 1 ]]; then
+    info "Creating object-storage buckets..."
+    "$PHP_BIN" artisan storage:setup-buckets
+fi
 
 info "Running migrations..."
 "$PHP_BIN" artisan migrate --force
