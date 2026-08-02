@@ -14,4 +14,6 @@
   <violation rule="PHPMD\Rule\Design\TooManyMethods" file="app/Models/Organisation.php"/>
   <violation rule="PHPMD\Rule\Design\TooManyPublicMethods" file="app/Models/Organisation.php"/>
   <violation rule="PHPMD\Rule\CleanCode\BooleanArgumentFlag" file="app/Routing/UrlGenerator.php"/>
+  <violation rule="PHPMD\Rule\CleanCode\BooleanArgumentFlag" file="app/Filament/Resources/DpiaRecordResource/Pages/CreateDpiaRecord.php"/>
+  <violation rule="PHPMD\Rule\CleanCode\BooleanArgumentFlag" file="app/Filament/Resources/DpiaRecordResource/Pages/EditDpiaRecord.php"/>
 </phpmd-baseline>

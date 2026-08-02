@@ -11,6 +11,8 @@ use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\ContactPerson;
 use App\Models\DataBreachRecord;
 use App\Models\Document;
+use App\Models\Dpia\DpiaPrescanRecord;
+use App\Models\Dpia\DpiaRecord;
 use App\Models\EntityNumber;
 use App\Models\Processor;
 use App\Models\Receiver;
@@ -87,6 +89,8 @@ it('links the first column of every supported model to the record', function (st
     ContactPerson::class,
     DataBreachRecord::class,
     Document::class,
+    DpiaPrescanRecord::class,
+    DpiaRecord::class,
     Processor::class,
     Receiver::class,
     Responsible::class,

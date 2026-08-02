@@ -10,6 +10,8 @@ use App\Filament\Resources\AlgorithmRecordResource;
 use App\Filament\Resources\AvgProcessorProcessingRecordResource;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 use App\Filament\Resources\DataBreachRecordResource;
+use App\Filament\Resources\DpiaPrescanRecordResource;
+use App\Filament\Resources\DpiaRecordResource;
 use App\Filament\Resources\WpgProcessingRecordResource;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Resources\Pages\EditRecord;
@@ -41,6 +43,8 @@ class OnePageLayoutRenderHooks
         AvgProcessorProcessingRecordResource::class,
         AvgResponsibleProcessingRecordResource::class,
         DataBreachRecordResource::class,
+        DpiaPrescanRecordResource::class,
+        DpiaRecordResource::class,
         WpgProcessingRecordResource::class,
     ];
 

@@ -11,6 +11,7 @@ use App\Listeners\StaticWebsite\BuildHandler;
 use App\Listeners\User\Import\UserCreatedHandler;
 use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
+use App\Models\Dpia\DpiaPrescanRecord;
 use App\Models\Organisation;
 use App\Models\OrganisationUser;
 use App\Models\OrganisationUserRole;
@@ -23,6 +24,7 @@ use App\Models\User;
 use App\Models\Wpg\WpgProcessingRecord;
 use App\Observers\AvgProcessorProcessingRecordObserver;
 use App\Observers\AvgResponsibleProcessingRecordObserver;
+use App\Observers\DpiaPrescanRecordObserver;
 use App\Observers\MediaObserver;
 use App\Observers\OrganisationObserver;
 use App\Observers\OrganisationUserObserver;
@@ -56,6 +58,7 @@ class EventServiceProvider extends ServiceProvider
     {
         AvgProcessorProcessingRecord::observe(AvgProcessorProcessingRecordObserver::class);
         AvgResponsibleProcessingRecord::observe(AvgResponsibleProcessingRecordObserver::class);
+        DpiaPrescanRecord::observe(DpiaPrescanRecordObserver::class);
         Media::observe(MediaObserver::class);
         Organisation::observe(OrganisationObserver::class);
         OrganisationUser::observe(OrganisationUserObserver::class);

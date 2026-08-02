@@ -35,6 +35,7 @@ class SnapshotDataFactory
             Models\Algorithm\AlgorithmRecord::class => SnapshotSource\AlgorithmRecordDataFactory::class,
             Models\Avg\AvgProcessorProcessingRecord::class => SnapshotSource\AvgProcessorProcessingRecordDataFactory::class,
             Models\Avg\AvgResponsibleProcessingRecord::class => SnapshotSource\AvgResponsibleProcessingRecordDataFactory::class,
+            Models\Dpia\DpiaRecord::class => SnapshotSource\DpiaRecordDataFactory::class,
             Models\Wpg\WpgProcessingRecord::class => SnapshotSource\WpgProcessingRecordDataFactory::class,
 
             Models\ContactPerson::class => SnapshotSource\ContactPersonDataFactory::class,
