@@ -9,6 +9,37 @@ default:
 release version="dev":
     ./scripts/create-release.sh {{version}}
 
+# Documentation
+# =============
+
+# Generate the data-model documentation (markdown) from the form definitions
+docs-datamodel locale="nl":
+    @echo "📝 Generating data-model documentation ({{locale}})..."
+    cd src/cms && php artisan docs:datamodel --locale={{locale}}
+    @echo "✅ docs/datamodel-{{locale}}.md updated"
+
+# Generate the documentation and build the branded PDF for every locale
+docs-pdf *locales:
+    @echo "📄 Building data-model PDFs..."
+    ./docs/build-pdf.sh {{locales}}
+
+# Fail if the committed documentation is out of date with the code
+docs-check:
+    @echo "🔍 Checking whether the documentation matches the code..."
+    @for locale in nl en; do \
+        src="docs/datamodel-$locale.md"; \
+        [ -f "$src" ] || continue; \
+        cp "$src" "/tmp/docs-committed-$locale.md"; \
+        (cd src/cms && php artisan docs:datamodel --locale="$locale" >/dev/null); \
+        if ! diff -q "/tmp/docs-committed-$locale.md" "$src" >/dev/null; then \
+            echo "❌ $src is out of date. Run 'just docs-datamodel $locale' and commit the result."; \
+            diff -u "/tmp/docs-committed-$locale.md" "$src" || true; \
+            cp "/tmp/docs-committed-$locale.md" "$src"; \
+            exit 1; \
+        fi; \
+    done
+    @echo "✅ Documentation is up to date"
+
 # Extract and test a release archive
 test-release archive:
     ./scripts/test-release.sh {{archive}}

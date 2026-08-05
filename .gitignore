@@ -5,3 +5,9 @@
 *.gz
 .db_requirements
 RELEASE_INFO.txt
+
+# The data-model PDFs are built (just docs-pdf) and attached to a release.
+docs/datamodel-*.pdf
+
+# Generated from the SVG by build-pdf.sh; LaTeX cannot place an SVG directly.
+docs/assets/openvwr_logo.pdf
