@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Config\Config;
 use App\Facades\Authentication;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\OnePageLayoutRenderHooks;
+use App\Filament\Pages\DevLogin;
 use App\Filament\Pages\Login;
 use App\Filament\Pages\Profile;
 use App\Filament\SimpleAvatarProvider;
@@ -14,6 +16,7 @@ use App\Http\Controllers\HealthController;
 use App\Http\Middleware\EnforceOneTimePassword;
 use App\Http\Middleware\IPAllowFilter;
 use App\Models\Organisation;
+use App\Services\Authentication\AuthenticationStrategyFactory;
 use Exception;
 use Filament\Facades\Filament;
 use Filament\FontProviders\LocalFontProvider;
@@ -89,6 +92,45 @@ class FilamentServiceProvider extends PanelProvider
     }
 
     /**
+     * The login page for the active auth driver. Under `dev` this is the
+     * credential-free user picker, which is why it is selected here rather than
+     * registered unconditionally — a page that bypasses authentication should not
+     * exist on the panel at all unless that driver is deliberately in use.
+     *
+     * @return class-string
+     */
+    private function loginPage(): string
+    {
+        return $this->authDriver() === AuthenticationStrategyFactory::DRIVER_DEV
+            ? DevLogin::class
+            : Login::class;
+    }
+
+    /**
+     * Auth middleware for the active driver. The dev driver skips the OTP gate:
+     * it is a credential-free login, so a second factor on top would be theatre,
+     * and enrolling one would block every local login behind an authenticator app.
+     *
+     * @return array<int, class-string>
+     */
+    private function authMiddleware(): array
+    {
+        if ($this->authDriver() === AuthenticationStrategyFactory::DRIVER_DEV) {
+            return [Authenticate::class];
+        }
+
+        return [
+            Authenticate::class,
+            EnforceOneTimePassword::class,
+        ];
+    }
+
+    private function authDriver(): string
+    {
+        return Config::string('auth.driver', AuthenticationStrategyFactory::DRIVER_BUILTIN);
+    }
+
+    /**
      * @throws Exception
      */
     public function panel(Panel $panel): Panel
@@ -98,7 +140,7 @@ class FilamentServiceProvider extends PanelProvider
             ->id('admin')
             ->path('/')
             ->font('Inter', asset('fonts/inter.css'), LocalFontProvider::class)
-            ->login(Login::class)
+            ->login($this->loginPage())
             ->profile(Profile::class)
             ->routes(static function (): void {
                 RouteFacade::get('/health', HealthController::class);
@@ -151,10 +193,7 @@ class FilamentServiceProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
                 AddCspHeaders::class,
             ])
-            ->authMiddleware([
-                Authenticate::class,
-                EnforceOneTimePassword::class,
-            ])
+            ->authMiddleware($this->authMiddleware())
             ->tenantMiddleware([
                 IPAllowFilter::class,
             ], isPersistent: true)

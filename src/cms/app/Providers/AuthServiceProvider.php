@@ -41,6 +41,8 @@ use App\Policies\ResponsibleLegalEntityPolicy;
 use App\Policies\ResponsiblePolicy;
 use App\Policies\TagPolicy;
 use App\Policies\UserPolicy;
+use App\Services\Authentication\AuthenticationStrategy;
+use App\Services\Authentication\AuthenticationStrategyFactory;
 use App\Services\AuthorizationService;
 use App\Services\CrossOrgAuthorization;
 use App\Services\OneTimePassword\OneTimePassword;
@@ -106,6 +108,17 @@ class AuthServiceProvider extends IlluminateAuthServiceProvider
     public function register(): void
     {
         parent::register();
+
+        // Resolve the auth driver once, at boot: an unknown driver (or `dev`
+        // outside local/testing) must fail startup rather than silently
+        // authenticate requests some other way.
+        $this->app->singleton(
+            AuthenticationStrategy::class,
+            fn (): AuthenticationStrategy => AuthenticationStrategyFactory::make(
+                Config::string('auth.driver', AuthenticationStrategyFactory::DRIVER_BUILTIN),
+                $this->app->environment(),
+            ),
+        );
 
         $this->app->when(AuthorizationService::class)
             ->needs('$rolesAndPermissions')

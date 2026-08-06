@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use App\Config\Config;
 use App\Livewire\User\Profile\OneTimePassword;
 use App\Livewire\User\Profile\PersonalInfo;
 use App\Livewire\User\Profile\Settings;
+use App\Services\Authentication\AuthenticationStrategyFactory;
 use App\Services\AuthenticationService;
 use Filament\Pages\Page;
 use Illuminate\Contracts\View\View;
@@ -56,11 +58,19 @@ class Profile extends Page
      */
     public function getRegisteredMyProfileComponents(): array
     {
-        return [
+        $components = [
             'personal_info' => PersonalInfo::class,
             'settings' => Settings::class,
-            'one_time_password' => OneTimePassword::class,
         ];
+
+        // OTP enrolment belongs to the builtin strategy. Under the dev driver the
+        // OTP gate is not in the middleware stack, so offering enrolment here
+        // would let a developer set up a factor that is never challenged.
+        if (Config::string('auth.driver', AuthenticationStrategyFactory::DRIVER_BUILTIN) !== AuthenticationStrategyFactory::DRIVER_DEV) {
+            $components['one_time_password'] = OneTimePassword::class;
+        }
+
+        return $components;
     }
 
     public function render(): View
