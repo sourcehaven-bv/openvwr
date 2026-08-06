@@ -71,3 +71,24 @@ it('requires a user to be selected', function (): void {
 
     expect(Auth::check())->toBeFalse();
 });
+
+/*
+ * The page's own environment guard, independent of the factory's. If dev login
+ * is ever reachable in a deployed environment it must refuse to authenticate
+ * anyone — so this is the single most important assertion in this file.
+ */
+it('refuses to authenticate anyone outside local and testing', function (): void {
+    $organisation = Organisation::factory()->create();
+    $user = User::factory()->create();
+    $user->organisations()->attach($organisation);
+
+    $component = livewire(DevLogin::class)
+        ->fillForm(['userId' => $user->id->toString()]);
+
+    app()->detectEnvironment(static fn (): string => 'production');
+
+    expect(static fn () => $component->call('authenticate'))
+        ->toThrow(RuntimeException::class, 'Dev login is not available');
+
+    expect(Auth::check())->toBeFalse();
+});

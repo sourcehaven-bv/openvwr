@@ -87,6 +87,39 @@ it('resolves the same roles under every strategy', function (): void {
 });
 
 /*
+ * With no authenticated user, role lookup must degrade to "no roles" rather than
+ * blowing up — every policy then denies, which is the safe direction. Both role
+ * sources (global and per-organisation) have to fail that way independently.
+ */
+it('yields no roles when there is no authenticated user', function (): void {
+    foreach (strategies() as $name => $strategy) {
+        expect($strategy->principal()->roles)
+            ->toBe([], sprintf('strategy "%s" leaked roles without an authenticated user', $name));
+    }
+});
+
+it('yields no organisation roles when authenticated without a tenant', function (): void {
+    $organisation = Organisation::factory()->create();
+    $user = User::factory()->create();
+    $user->organisations()->attach($organisation);
+    $user->assignOrganisationRole(Role::PRIVACY_OFFICER, $organisation);
+    $user->assignGlobalRole(Role::FUNCTIONAL_MANAGER);
+
+    $this->be($user);
+    Filament::setTenant(null);
+
+    // Global roles still resolve; organisation roles cannot, because there is no
+    // active tenant to scope them to.
+    foreach (strategies() as $strategy) {
+        $roles = array_map(static fn (Role $role): string => $role->value, $strategy->principal()->roles);
+
+        expect($roles)
+            ->toContain(Role::FUNCTIONAL_MANAGER->value)
+            ->not->toContain(Role::PRIVACY_OFFICER->value);
+    }
+});
+
+/*
  * The facade is the contract ~50 files depend on. It must keep answering through
  * whichever strategy is bound, without those callers knowing which one.
  */
