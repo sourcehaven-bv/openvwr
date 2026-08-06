@@ -10,6 +10,15 @@ use Illuminate\Support\Facades\Auth;
 
 use function Pest\Livewire\livewire;
 
+/*
+ * detectEnvironment() mutates the application for the rest of the process, so
+ * anything that pretends to be production has to put it back — otherwise every
+ * later test in the same worker silently runs in the wrong environment.
+ */
+afterEach(function (): void {
+    app()->detectEnvironment(static fn (): string => 'testing');
+});
+
 it('logs in the selected user without any credential', function (): void {
     $organisation = Organisation::factory()->create();
     $user = User::factory()->create();
