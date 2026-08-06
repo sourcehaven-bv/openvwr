@@ -13,6 +13,8 @@ use Filament\Facades\Filament;
 use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException;
 
+use function array_key_exists;
+
 /**
  * The application's own auth: passwordless magic link + TOTP, on Laravel's
  * session guard, with the active tenant resolved from the URL by Filament.
@@ -22,7 +24,19 @@ use Webmozart\Assert\InvalidArgumentException;
  */
 class BuiltinAuthenticationStrategy implements AuthenticationStrategy
 {
-    private ?Principal $principal = null;
+    /**
+     * Memoised roles, keyed by "<user>:<organisation>".
+     *
+     * Roles are scoped to the ACTIVE organisation, and both the user and that
+     * organisation can change within a single request (a tenant switch, or the
+     * test helper re-authenticating). This object is a container singleton, so an
+     * unkeyed cache would let a role held in one organisation apply in another —
+     * a privilege escalation, not just a stale read. The key makes that
+     * impossible while keeping the per-question caching the roles lookup needs.
+     *
+     * @var array<string, Principal>
+     */
+    private array $principals = [];
 
     /**
      * @throws InvalidArgumentException
@@ -37,7 +51,9 @@ class BuiltinAuthenticationStrategy implements AuthenticationStrategy
 
     public function principal(): Principal
     {
-        if ($this->principal === null) {
+        $key = $this->principalCacheKey();
+
+        if (!array_key_exists($key, $this->principals)) {
             $roles = [];
 
             foreach ($this->getGlobalRoles() as $globalRole) {
@@ -48,10 +64,32 @@ class BuiltinAuthenticationStrategy implements AuthenticationStrategy
                 $roles[] = $organisationRole->role;
             }
 
-            $this->principal = new Principal($roles);
+            $this->principals[$key] = new Principal($roles);
         }
 
-        return $this->principal;
+        return $this->principals[$key];
+    }
+
+    /**
+     * Identifies whose roles, in which organisation, a cached Principal describes.
+     * Either side being absent is its own distinct key, so an unauthenticated or
+     * tenant-less lookup can never read a populated entry.
+     */
+    private function principalCacheKey(): string
+    {
+        try {
+            $userKey = $this->user()->id->toString();
+        } catch (InvalidArgumentException) {
+            $userKey = 'no-user';
+        }
+
+        try {
+            $organisationKey = $this->organisation()->id->toString();
+        } catch (InvalidArgumentException) {
+            $organisationKey = 'no-organisation';
+        }
+
+        return $userKey . ':' . $organisationKey;
     }
 
     /**

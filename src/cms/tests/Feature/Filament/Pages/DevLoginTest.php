@@ -30,11 +30,6 @@ it('logs in the selected user without any credential', function (): void {
 });
 
 /*
- * The picker mirrors the builtin strategy's rule that a user without an
- * organisation cannot reach the panel, so it must not offer an account that
- * would 403 immediately on arrival.
- */
-/*
  * A user without an organisation cannot reach the panel (the builtin strategy
  * enforces that at login, and canAccessTenant would reject them anyway), so the
  * picker must not offer an account that would 403 on arrival.
@@ -70,6 +65,41 @@ it('requires a user to be selected', function (): void {
         ->assertHasFormErrors(['userId' => 'required']);
 
     expect(Auth::check())->toBeFalse();
+});
+
+/*
+ * Filament registers every class under app/Filament/Pages as a Livewire
+ * component, whichever login page the panel actually uses — so this component is
+ * addressable in production even though nothing links to it. Mounting must be
+ * refused before the form is built, because building it queries every user and
+ * renders their name and email. Guarding only authenticate() would leave the
+ * whole user directory readable by an unauthenticated caller.
+ */
+it('refuses to render outside local and testing', function (): void {
+    $organisation = Organisation::factory()->create();
+    $user = User::factory()->create();
+    $user->organisations()->attach($organisation);
+
+    app()->detectEnvironment(static fn (): string => 'production');
+
+    // Livewire wraps a mount-time throw, so walk the chain: what matters is that
+    // the guard fired before the form was built and no user data was rendered.
+    $thrown = null;
+
+    try {
+        livewire(DevLogin::class);
+    } catch (Throwable $exception) {
+        $thrown = $exception;
+    }
+
+    expect($thrown)->not->toBeNull('mounting dev login in production should fail');
+
+    $messages = [];
+    for ($e = $thrown; $e !== null; $e = $e->getPrevious()) {
+        $messages[] = $e->getMessage();
+    }
+
+    expect(implode(' | ', $messages))->toContain('Dev login is not available');
 });
 
 /*

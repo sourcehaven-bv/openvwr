@@ -35,6 +35,21 @@ use function sprintf;
  */
 class DevLogin extends FilamentLogin
 {
+    /**
+     * Filament discovers every class under app/Filament/Pages and registers it as
+     * a Livewire component, regardless of which login page the panel is using. So
+     * this component is addressable in production even though the panel never
+     * links to it — which means mounting it must be refused before anything else
+     * runs, not just before it authenticates. Without this, rendering the form
+     * would list every user's name and email to an unauthenticated caller.
+     */
+    public function mount(): void
+    {
+        $this->assertDevLoginAllowed();
+
+        parent::mount();
+    }
+
     public function form(Form $form): Form
     {
         return $form->schema([
