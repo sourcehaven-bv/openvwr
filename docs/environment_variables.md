@@ -156,6 +156,11 @@ The following environment variables are used to configure the application in `sr
 - `SESSION_DOMAIN`
 - `SESSION_SECURE_COOKIE` (default: `true`)
 
+**CLEANUP (permanently deleting soft-deleted records):**
+
+- `CLEANUP_RETENTION_DAYS` (default: `90`, days a deleted item stays recoverable)
+- `CLEANUP_BATCH_SIZE` (default: `500`, max records per model per scheduled run; `0` is unlimited)
+
 **TRANSFER (import/export between organisations):**
 
 - `TRANSFER_MAX_ZIPPED_NUMBER_OF_FILES` (default: `5000`)

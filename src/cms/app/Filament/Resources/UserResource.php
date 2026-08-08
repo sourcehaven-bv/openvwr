@@ -17,6 +17,8 @@ use App\Models\User;
 use Filament\Forms\Form;
 use Filament\Infolists\Infolist;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 use function __;
 
@@ -52,6 +54,21 @@ class UserResource extends Resource
         return [
             OrganisationRelationManager::class,
         ];
+    }
+
+    /**
+     * Verwijdert de soft-delete-scope, zodat TrashedFilter in de tabel kan
+     * schakelen tussen actieve en verwijderde gebruikers. Zonder deze override
+     * filtert het basisquery verwijderde rijen er al uit en heeft het filter
+     * geen effect. Standaard toont de tabel nog steeds alleen actieve
+     * gebruikers; TrashedFilter bepaalt de rest.
+     *
+     * @return Builder<User>
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([SoftDeletingScope::class]);
     }
 
     public static function getPages(): array

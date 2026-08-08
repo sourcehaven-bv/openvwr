@@ -6,12 +6,15 @@ namespace App\Filament\Resources\UserResource;
 
 use App\Enums\Authorization\Permission;
 use App\Facades\Authorization;
+use App\Filament\Tables\Actions\ForceDeleteAction;
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
 use Filament\Tables\Actions\DetachBulkAction;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
 use function __;
@@ -44,6 +47,10 @@ class UserResourceTable
                 EditAction::make()
                     ->hiddenLabel()
                     ->tooltip(static fn (EditAction $action) => $action->getLabel()),
+                RestoreAction::make()
+                    ->hiddenLabel()
+                    ->tooltip(static fn (RestoreAction $action) => $action->getLabel()),
+                ForceDeleteAction::make(),
             ])
             ->bulkActions([
                 DetachBulkAction::make(),
@@ -52,6 +59,10 @@ class UserResourceTable
                 SelectFilter::make('organisation')
                     ->label(__('organisation.model_plural'))
                     ->relationship('organisations', 'name'),
+                // Zonder dit filter zijn verwijderde gebruikers nergens in de
+                // beheeromgeving zichtbaar, en dus ook niet te herstellen of
+                // definitief te verwijderen binnen de bewaartermijn.
+                TrashedFilter::make(),
             ]);
     }
 }
