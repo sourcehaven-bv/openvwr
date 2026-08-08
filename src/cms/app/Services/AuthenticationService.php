@@ -4,47 +4,38 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Collections\OrganisationUserRoleCollection;
-use App\Collections\UserGlobalRoleCollection;
 use App\Models\Organisation;
 use App\Models\Principal;
 use App\Models\User;
-use Filament\Facades\Filament;
-use Webmozart\Assert\Assert;
+use App\Services\Authentication\AuthenticationStrategy;
 use Webmozart\Assert\InvalidArgumentException;
 
+/**
+ * Answers "who is acting, and where" by delegating to the configured
+ * AuthenticationStrategy.
+ *
+ * The public surface here is unchanged from when this class held the logic
+ * directly — the Authentication facade and its ~50 callers are deliberately
+ * untouched by the strategy extraction.
+ */
 class AuthenticationService
 {
-    private ?Principal $principal = null;
+    public function __construct(
+        private readonly AuthenticationStrategy $strategy,
+    ) {
+    }
 
     /**
      * @throws InvalidArgumentException
      */
     public function organisation(): Organisation
     {
-        $organisation = Filament::getTenant();
-        Assert::isInstanceOf($organisation, Organisation::class);
-
-        return $organisation;
+        return $this->strategy->organisation();
     }
 
     public function principal(): Principal
     {
-        if ($this->principal === null) {
-            $roles = [];
-
-            foreach ($this->getGlobalRoles() as $globalRole) {
-                $roles[] = $globalRole->role;
-            }
-
-            foreach ($this->getOrganisationRoles() as $organisationRole) {
-                $roles[] = $organisationRole->role;
-            }
-
-            $this->principal = new Principal($roles);
-        }
-
-        return $this->principal;
+        return $this->strategy->principal();
     }
 
     /**
@@ -52,33 +43,6 @@ class AuthenticationService
      */
     public function user(): User
     {
-        $user = Filament::auth()->user();
-        Assert::isInstanceOf($user, User::class);
-
-        return $user;
-    }
-
-    private function getGlobalRoles(): UserGlobalRoleCollection
-    {
-        try {
-            return $this->user()->globalRoles;
-        } catch (InvalidArgumentException) {
-            return new UserGlobalRoleCollection();
-        }
-    }
-
-    private function getOrganisationRoles(): OrganisationUserRoleCollection
-    {
-        try {
-            $organisationUserRoles = $this->user()
-                ->organisationRoles()
-                ->where(['organisation_id' => $this->organisation()->id])
-                ->get();
-            Assert::isInstanceOf($organisationUserRoles, OrganisationUserRoleCollection::class);
-        } catch (InvalidArgumentException) {
-            $organisationUserRoles = new OrganisationUserRoleCollection();
-        }
-
-        return $organisationUserRoles;
+        return $this->strategy->user();
     }
 }

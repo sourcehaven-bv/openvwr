@@ -20,4 +20,8 @@ return [
     'snapshot_sign_confirm_message' => 'Hallo :userName, klik hieronder om het authenticatieproces te starten',
     'snapshot_sign_confirm_login' => 'Stuur login email',
     'snapshot_sign_confirm_help_text' => 'De login email is om te bepalen of u op dit moment werkelijk toegang heeft tot het email adres dat bij ons bekend is.',
+
+    // Ontwikkelomgeving: inloggen zonder wachtwoord of tweede factor.
+    'dev_login_heading' => 'Inloggen (ontwikkelomgeving)',
+    'dev_login_user' => 'Gebruiker',
 ];

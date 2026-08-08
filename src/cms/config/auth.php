@@ -24,6 +24,23 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Authentication Driver (strategy)
+    |--------------------------------------------------------------------------
+    |
+    | Selects how identity is established:
+    |
+    |   builtin  passwordless magic link + TOTP on the session guard (default)
+    |   dev      pick a user from a dropdown, no credentials — local/testing ONLY
+    |
+    | An unknown value is a startup error, and "dev" refuses to boot outside the
+    | local and testing environments: it is a deliberate authentication bypass.
+    |
+    */
+
+    'driver' => env('AUTH_DRIVER', 'builtin'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Authentication Guards
     |--------------------------------------------------------------------------
     |
