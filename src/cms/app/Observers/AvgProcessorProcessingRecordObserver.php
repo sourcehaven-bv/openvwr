@@ -19,6 +19,7 @@ class AvgProcessorProcessingRecordObserver
         $this->resetInvolvedData($avgProcessorProcessingRecord);
         $this->resetDecisionMaking($avgProcessorProcessingRecord);
         $this->resetSystem($avgProcessorProcessingRecord);
+        $this->resetAlgorithms($avgProcessorProcessingRecord);
         $this->resetSecurity($avgProcessorProcessingRecord);
         $this->resetPassthrough($avgProcessorProcessingRecord);
     }
@@ -53,6 +54,17 @@ class AvgProcessorProcessingRecordObserver
         if ($avgProcessorProcessingRecord->decision_making === false) {
             $avgProcessorProcessingRecord->logic = '';
             $avgProcessorProcessingRecord->importance_consequences = '';
+        }
+    }
+
+    /**
+     * Detach only the pivot rows: the algorithm records themselves are
+     * shared registrations that outlive any single processing.
+     */
+    private function resetAlgorithms(AvgProcessorProcessingRecord $avgProcessorProcessingRecord): void
+    {
+        if ($avgProcessorProcessingRecord->has_algorithms === false) {
+            $avgProcessorProcessingRecord->algorithmRecords()->detach();
         }
     }
 

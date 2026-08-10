@@ -6,6 +6,7 @@ namespace Database\Factories\Wpg;
 
 use App\Enums\CoreEntityDataCollectionSource;
 use App\Enums\EntityNumberType;
+use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\ContactPerson;
 use App\Models\DataBreachRecord;
 use App\Models\Document;
@@ -203,6 +204,17 @@ class WpgProcessingRecordFactory extends Factory
                 ->recycle($wpgProcessingRecord->organisation)
                 ->withSnapshotTransitions()
                 ->withSnapshotData()
+                ->count($count ?? $this->faker->randomDigitNotNull())
+                ->create();
+        });
+    }
+
+    public function withAlgorithmRecords(?int $count = null): self
+    {
+        return $this->afterCreating(function (WpgProcessingRecord $wpgProcessingRecord) use ($count): void {
+            AlgorithmRecord::factory()
+                ->hasAttached($wpgProcessingRecord)
+                ->recycle($wpgProcessingRecord->organisation)
                 ->count($count ?? $this->faker->randomDigitNotNull())
                 ->create();
         });

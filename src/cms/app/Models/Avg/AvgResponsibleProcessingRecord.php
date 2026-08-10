@@ -16,6 +16,7 @@ use App\Collections\TagCollection;
 use App\Components\Uuid\UuidInterface;
 use App\Enums\CoreEntityDataCollectionSource;
 use App\Models\Casts\UuidCast;
+use App\Models\Concerns\HasAlgorithmRecords;
 use App\Models\Concerns\HasAvgGoals;
 use App\Models\Concerns\HasChildren;
 use App\Models\Concerns\HasContactPersons;
@@ -59,6 +60,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property bool $has_processors
  * @property bool $has_security
  * @property bool $has_systems
+ * @property bool $has_algorithms
  * @property string|null $responsibility_distribution
  * @property string|null $pseudonymization
  * @property bool $measures_implemented
@@ -95,6 +97,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class AvgResponsibleProcessingRecord extends Model implements Cloneable, EntityNumerable, Publishable, Reviewable, TenantAware
 {
+    use HasAlgorithmRecords;
     use HasAvgGoals;
     /** @use HasChildren<AvgResponsibleProcessingRecord, AvgResponsibleProcessingRecordCollection> */
     use HasChildren;
@@ -149,6 +152,7 @@ class AvgResponsibleProcessingRecord extends Model implements Cloneable, EntityN
         'has_processors',
         'has_security',
         'has_systems',
+        'has_algorithms',
         'geb_dpia_executed',
         'geb_dpia_automated',
         'geb_dpia_large_scale_processing',
@@ -167,6 +171,7 @@ class AvgResponsibleProcessingRecord extends Model implements Cloneable, EntityN
             'has_processors' => 'bool',
             'has_security' => 'bool',
             'has_systems' => 'bool',
+            'has_algorithms' => 'bool',
             'measures' => 'bool',
             'other_measures' => 'bool',
             'outside_eu' => 'bool',

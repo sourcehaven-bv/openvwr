@@ -113,6 +113,11 @@ class WpgProcessingRecordExporter extends Exporter
             ExportColumn::make('systems.name')
                 ->label(__('system.model_plural')),
 
+            ExportColumn::make('has_algorithms')
+                ->label(__('wpg_processing_record.has_algorithms')),
+            ExportColumn::make('algorithmRecords.name')
+                ->label(__('algorithm_record.model_plural')),
+
             // beveiliging
             ExportColumn::make('has_security')
                 ->label(__('wpg_processing_record.has_security')),

@@ -229,6 +229,11 @@ class WpgProcessingRecordResourceInfolistSchemas
             SelectMultipleEntry::make('systems.description')
                 ->label(__('system.model_plural'))
                 ->visible(InfolistHelper::isFieldEnabled('has_systems')),
+            ToggleEntry::make('has_algorithms')
+                ->label(__('wpg_processing_record.has_algorithms')),
+            SelectMultipleEntry::make('algorithmRecords.name')
+                ->label(__('algorithm_record.model_plural'))
+                ->visible(InfolistHelper::isFieldEnabled('has_algorithms')),
             InformationBlockSection::makeCollapsible(
                 __('information_blocks.wpg_processing_record.step_system_application_title'),
                 __('information_blocks.wpg_processing_record.step_system_application_info'),

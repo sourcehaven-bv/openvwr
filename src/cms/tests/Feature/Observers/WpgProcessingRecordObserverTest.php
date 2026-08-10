@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Observers;
 
+use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Wpg\WpgProcessingRecord;
 
 use function expect;
@@ -107,4 +108,19 @@ it('resets categories involved data on save', function (): void {
     $wpgProcessingRecord->refresh();
 
     expect($wpgProcessingRecord->third_party_explanation)->toBeNull();
+});
+
+it('resets algorithm links on save but keeps the algorithms themselves', function (): void {
+    $wpgProcessingRecord = WpgProcessingRecord::factory()
+        ->withAlgorithmRecords(2)
+        ->create([
+            'has_algorithms' => true,
+        ]);
+
+    $wpgProcessingRecord->has_algorithms = false;
+    $wpgProcessingRecord->save();
+    $wpgProcessingRecord->refresh();
+
+    expect($wpgProcessingRecord->algorithmRecords)->toHaveCount(0)
+        ->and(AlgorithmRecord::count())->toBe(2);
 });

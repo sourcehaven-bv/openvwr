@@ -13,6 +13,7 @@ return [
             'App\Models\Receiver' => 'snapshot-data-render.receiver.private-markdown-list',
             'App\Models\Responsible' => 'snapshot-data-render.responsible.private-markdown-list',
             'App\Models\System' => 'snapshot-data-render.system.private-markdown-list',
+            'App\Models\Algorithm\AlgorithmRecord' => 'snapshot-data-render.algorithm-record.private-markdown-list',
         ],
         SnapshotDataSection::PUBLIC->value => [
             'App\Models\ContactPerson' => 'snapshot-data-render.contact-person.private-markdown-list',

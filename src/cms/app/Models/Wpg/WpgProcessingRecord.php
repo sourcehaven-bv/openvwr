@@ -14,6 +14,7 @@ use App\Collections\Wpg\WpgProcessingRecordCollection;
 use App\Components\Uuid\UuidInterface;
 use App\Enums\CoreEntityDataCollectionSource;
 use App\Models\Casts\UuidCast;
+use App\Models\Concerns\HasAlgorithmRecords;
 use App\Models\Concerns\HasChildren;
 use App\Models\Concerns\HasContactPersons;
 use App\Models\Concerns\HasDataBreachRecords;
@@ -91,6 +92,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property bool $police_sexual_life
  * @property CoreEntityDataCollectionSource $data_collection_source
  * @property bool $has_systems
+ * @property bool $has_algorithms
  * @property bool $has_pseudonymization
  *
  * @property-read DataBreachRecordCollection $dataBreachRecords
@@ -103,6 +105,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class WpgProcessingRecord extends Model implements Cloneable, EntityNumerable, Reviewable, SnapshotSource, TenantAware
 {
+    use HasAlgorithmRecords;
     /** @use HasChildren<WpgProcessingRecord, WpgProcessingRecordCollection> */
     use HasChildren;
     use HasContactPersons;
@@ -172,6 +175,7 @@ class WpgProcessingRecord extends Model implements Cloneable, EntityNumerable, R
         'public_from',
         'has_processors',
         'has_systems',
+        'has_algorithms',
         'police_race_or_ethnicity',
         'police_political_attitude',
         'police_faith_or_belief',
@@ -208,6 +212,7 @@ class WpgProcessingRecord extends Model implements Cloneable, EntityNumerable, R
             'public_from' => 'datetime',
             'has_processors' => 'bool',
             'has_systems' => 'bool',
+            'has_algorithms' => 'bool',
             'police_race_or_ethnicity' => 'bool',
             'police_political_attitude' => 'bool',
             'police_faith_or_belief' => 'bool',

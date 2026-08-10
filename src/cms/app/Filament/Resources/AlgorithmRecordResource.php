@@ -10,7 +10,10 @@ use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\RelationManagers\AlgorithmPublicationCategoryRelationManager;
 use App\Filament\RelationManagers\AlgorithmStatusRelationManager;
 use App\Filament\RelationManagers\AlgorithmThemeRelationManager;
+use App\Filament\RelationManagers\AvgProcessorProcessingRecordRelationManager;
+use App\Filament\RelationManagers\AvgResponsibleProcessingRecordRelationManager;
 use App\Filament\RelationManagers\SnapshotsRelationManager;
+use App\Filament\RelationManagers\WpgProcessingRecordRelationManager;
 use App\Filament\Resources\AlgorithmRecordResource\AlgorithmRecordResourceForm;
 use App\Filament\Resources\AlgorithmRecordResource\AlgorithmRecordResourceInfolist;
 use App\Filament\Resources\AlgorithmRecordResource\AlgorithmRecordResourceTable;
@@ -62,6 +65,9 @@ class AlgorithmRecordResource extends Resource
             AlgorithmThemeRelationManager::class,
             AlgorithmStatusRelationManager::class,
             AlgorithmPublicationCategoryRelationManager::class,
+            AvgResponsibleProcessingRecordRelationManager::class,
+            AvgProcessorProcessingRecordRelationManager::class,
+            WpgProcessingRecordRelationManager::class,
         ];
     }
 

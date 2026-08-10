@@ -133,12 +133,14 @@ Het meest gedetailleerde onderdeel van de registratie. Per categorie betrokkenen
 | Toelichting besluitvorming | Toelichting | Welke gegevens tot welk besluit leiden, begrijpelijk beschreven en zonder technische details. |
 | Toelichting belang en gevolgen | Toelichting | Wat het besluit concreet voor de betrokkene betekent, bijvoorbeeld toekenning of afwijzing. |
 
-## Systemen / Applicaties
+## Systemen en algoritmes
 
 | Veld | Soort invoer | Toelichting |
 |----------------------------------|--------------|----------------------------------------------------|
 | Heeft systemen / applicaties | Ja/nee | Is er sprake van (een of meerdere) applicaties / systemen? |
 | Systemen/Applicaties | Koppeling |  |
+| Heeft algoritmes | Ja/nee | Worden er bij deze verwerking (een of meerdere) algoritmes ingezet? |
+| Algoritmes | Koppeling |  |
 
 ## Beveiliging
 
@@ -289,12 +291,14 @@ Verwerkingen van persoonsgegevens die uw organisatie in opdracht van een andere 
 | Toelichting besluitvorming | Toelichting | Welke gegevens tot welk besluit leiden, begrijpelijk beschreven en zonder technische details. |
 | Toelichting belang en gevolgen | Toelichting | Wat het besluit concreet voor de betrokkene betekent, bijvoorbeeld toekenning of afwijzing. |
 
-## Systemen / Applicaties
+## Systemen en algoritmes
 
 | Veld | Soort invoer | Toelichting |
 |----------------------------------|--------------|----------------------------------------------------|
 | Heeft systemen / applicaties | Ja/nee | Is er sprake van (een of meerdere) applicaties / systemen? |
 | Systemen/Applicaties | Koppeling |  |
+| Heeft algoritmes | Ja/nee | Worden er bij deze verwerking (een of meerdere) algoritmes ingezet? |
+| Algoritmes | Koppeling |  |
 
 ## Beveiliging
 
@@ -442,12 +446,14 @@ Verwerkingen van politiegegevens die onder de Wet politiegegevens vallen in plaa
 | Toelichting | Toelichting |  |
 | Consequenties | Toelichting | Wat het besluit concreet voor de betrokkene betekent. |
 
-## Systemen / Applicaties
+## Systemen en algoritmes
 
 | Veld | Soort invoer | Toelichting |
 |----------------------------------|--------------|----------------------------------------------------|
 | Heeft systeem / applicatie | Ja/nee | Is er sprake van een (of meerdere) systemen/applicaties |
 | Systemen/Applicaties | Koppeling |  |
+| Heeft algoritmes | Ja/nee | Worden er bij deze verwerking (een of meerdere) algoritmes ingezet? |
+| Algoritmes | Koppeling |  |
 
 ## Beveiliging
 

@@ -39,9 +39,13 @@
 - **Toelichting besluitvorming**: Voluptatem voluptatem quis unde accusamus iusto corporis\.
 - **Toelichting belang en gevolgen**: Ab dicta deleniti pariatur perferendis sed fugit magnam qui\.
 
-## Systemen / Applicaties
+## Systemen en algoritmes
 
 <!--- #App\Models\System# --->
+
+- **Heeft algoritmes**: nee
+
+<!--- #App\Models\Algorithm\AlgorithmRecord# --->
 
 ## Beveiliging
 

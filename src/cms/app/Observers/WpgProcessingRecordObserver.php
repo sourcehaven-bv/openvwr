@@ -14,6 +14,7 @@ class WpgProcessingRecordObserver
         $this->resetReceivers($wpgProcessingRecord);
         $this->resetDecisionMaking($wpgProcessingRecord);
         $this->resetSystems($wpgProcessingRecord);
+        $this->resetAlgorithms($wpgProcessingRecord);
         $this->resetSecurity($wpgProcessingRecord);
         $this->resetCategoriesInvolved($wpgProcessingRecord);
     }
@@ -37,6 +38,17 @@ class WpgProcessingRecordObserver
         if ($wpgProcessingRecord->decision_making === false) {
             $wpgProcessingRecord->logic = null;
             $wpgProcessingRecord->consequences = null;
+        }
+    }
+
+    /**
+     * Detach only the pivot rows: the algorithm records themselves are
+     * shared registrations that outlive any single processing.
+     */
+    private function resetAlgorithms(WpgProcessingRecord $wpgProcessingRecord): void
+    {
+        if ($wpgProcessingRecord->has_algorithms === false) {
+            $wpgProcessingRecord->algorithmRecords()->detach();
         }
     }
 

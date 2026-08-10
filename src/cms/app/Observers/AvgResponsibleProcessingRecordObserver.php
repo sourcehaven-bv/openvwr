@@ -16,6 +16,7 @@ class AvgResponsibleProcessingRecordObserver
         $this->resetProcessors($avgResponsibleProcessingRecord);
         $this->resetDecisionMaking($avgResponsibleProcessingRecord);
         $this->resetSystems($avgResponsibleProcessingRecord);
+        $this->resetAlgorithms($avgResponsibleProcessingRecord);
         $this->resetSecurity($avgResponsibleProcessingRecord);
         $this->resetPassthrough($avgResponsibleProcessingRecord);
         $this->resetGebDpia($avgResponsibleProcessingRecord);
@@ -53,6 +54,17 @@ class AvgResponsibleProcessingRecordObserver
         if ($avgResponsibleProcessingRecord->decision_making === false) {
             $avgResponsibleProcessingRecord->logic = null;
             $avgResponsibleProcessingRecord->importance_consequences = null;
+        }
+    }
+
+    /**
+     * Detach only the pivot rows: the algorithm records themselves are
+     * shared registrations that outlive any single processing.
+     */
+    private function resetAlgorithms(AvgResponsibleProcessingRecord $avgResponsibleProcessingRecord): void
+    {
+        if ($avgResponsibleProcessingRecord->has_algorithms === false) {
+            $avgResponsibleProcessingRecord->algorithmRecords()->detach();
         }
     }
 
