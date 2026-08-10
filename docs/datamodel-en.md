@@ -142,7 +142,7 @@ The most detailed part of the record. For each category of data subjects it capt
 | Has systems / applications | Yes/no | Are one or more applications / systems involved? |
 | Systems/Applications | Link |  |
 | Has algorithms | Yes/no | Are one or more algorithms used in this processing? |
-| Algorithms | Link |  |
+| Algorithms | Link | Link the algorithms used in this processing. Not listed yet? Register it in the Algorithm register first. |
 
 ## Security
 
@@ -300,7 +300,7 @@ Processing of personal data that your organisation carries out on behalf of anot
 | Has systems / applications | Yes/no | Are one or more applications / systems involved? |
 | Systems/Applications | Link |  |
 | Has algorithms | Yes/no | Are one or more algorithms used in this processing? |
-| Algorithms | Link |  |
+| Algorithms | Link | Link the algorithms used in this processing. Not listed yet? Register it in the Algorithm register first. |
 
 ## Security
 
@@ -455,7 +455,7 @@ Processing of police data that falls under the Wpg (Dutch Police Data Act) inste
 | Has system / application | Yes/no | Are one or more systems/applications involved |
 | Systems/Applications | Link |  |
 | Has algorithms | Yes/no | Are one or more algorithms used in this processing? |
-| Algorithms | Link |  |
+| Algorithms | Link | Link the algorithms used in this processing. Not listed yet? Register it in the Algorithm register first. |
 
 ## Security
 

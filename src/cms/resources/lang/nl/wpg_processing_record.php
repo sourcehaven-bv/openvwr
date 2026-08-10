@@ -95,6 +95,8 @@ return [
     'has_algorithms' => 'Heeft algoritmes',
     'help_has_systems' => 'Is er sprake van een (of meerdere) systemen/applicaties',
     'help_has_algorithms' => 'Worden er bij deze verwerking (een of meerdere) algoritmes ingezet?',
+    'help_algorithm_records' => 'Koppel de algoritmes die bij deze verwerking worden ingezet. Staat het algoritme er nog niet bij? Registreer het eerst in het Algoritmeregister.',
+    'help_algorithm_records_link' => 'Naar het Algoritmeregister',
     'has_pseudonymization' => 'Gebruikt u pseudonimisering?',
     'number' => 'Nummer',
     'security' => 'Beveiliging',

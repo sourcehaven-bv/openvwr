@@ -35,6 +35,8 @@ return [
     'help_has_security' => 'Do you secure the personal data?',
     'help_has_systems' => 'Are one or more applications / systems involved?',
     'help_has_algorithms' => 'Are one or more algorithms used in this processing?',
+    'help_algorithm_records' => 'Link the algorithms used in this processing. Not listed yet? Register it in the Algorithm register first.',
+    'help_algorithm_records_link' => 'Go to the Algorithm register',
     'help_has_involved' => 'Are one or more categories of data subjects involved?',
     'help_decision_making' => 'Is there automated decision-making?',
     'help_geb_pia' => 'Has a DPIA been carried out by the controller?',

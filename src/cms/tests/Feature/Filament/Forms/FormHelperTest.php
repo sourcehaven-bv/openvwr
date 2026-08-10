@@ -12,6 +12,7 @@ use Tests\Helpers\Model\UserTestHelper;
 use function expect;
 use function fake;
 use function it;
+use RuntimeException;
 
 it('returns get correct state on fieldValuesContainValue', function (array $fieldValues, string $value, bool $expectedResult): void {
     $fieldName = fake()->word();
@@ -176,3 +177,31 @@ it('returns correct value if any field is enabled', function (bool $fieldA, bool
     [false, true, true],
     [false, false, false],
 ]);
+
+it('renders helper text with a link to the target register', function (): void {
+    $helperText = FormHelper::helperTextWithLink(
+        'Koppel de algoritmes.',
+        'Naar het Algoritmeregister',
+        static fn (): string => 'https://example.test/nipg/algorithm-records',
+    );
+
+    expect($helperText()->toHtml())
+        ->toContain('Koppel de algoritmes.')
+        ->toContain('href="https://example.test/nipg/algorithm-records"')
+        ->toContain('Naar het Algoritmeregister')
+        ->toContain('target="_blank"');
+});
+
+it('falls back to plain helper text when the url cannot be resolved', function (): void {
+    $helperText = FormHelper::helperTextWithLink(
+        'Koppel de algoritmes.',
+        'Naar het Algoritmeregister',
+        static function (): string {
+            throw new RuntimeException('no tenant in this context');
+        },
+    );
+
+    expect($helperText()->toHtml())
+        ->toBe('Koppel de algoritmes.')
+        ->not->toContain('<a href');
+});

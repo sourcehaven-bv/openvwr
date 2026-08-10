@@ -29,6 +29,8 @@ return [
     'warn_has_processors_data_loss' => 'De verwerkers die aan deze verwerking gekoppeld zijn, worden verwijderd zodra u opslaat. Deze actie kan niet ongedaan worden gemaakt.',
     'help_has_systems' => 'Is er sprake van (een of meerdere) applicaties / systemen?',
     'help_has_algorithms' => 'Worden er bij deze verwerking (een of meerdere) algoritmes ingezet?',
+    'help_algorithm_records' => 'Koppel de algoritmes die bij deze verwerking worden ingezet. Staat het algoritme er nog niet bij? Registreer het eerst in het Algoritmeregister.',
+    'help_algorithm_records_link' => 'Naar het Algoritmeregister',
     'help_has_security' => 'Beveiligt u de persoonsgegevens?',
     'help_outside_eu' => 'Geeft u bij uw gegevensverwerking persoonsgegevens door aan een of meer landen buiten de Europese Unie of aan een internationale organisatie?',
 

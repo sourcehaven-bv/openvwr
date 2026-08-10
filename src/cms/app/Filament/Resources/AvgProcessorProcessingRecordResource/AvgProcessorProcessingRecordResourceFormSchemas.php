@@ -21,6 +21,7 @@ use App\Filament\Forms\Components\TagsInput;
 use App\Filament\Forms\Components\TextInput\EntityNumber;
 use App\Filament\Forms\Components\TextInput\ImportNumber;
 use App\Filament\Forms\FormHelper;
+use App\Filament\Resources\AlgorithmRecordResource;
 use App\Filament\Resources\DocumentResource\DocumentResourceForm;
 use App\Filament\Resources\ProcessorResource\ProcessorResourceForm;
 use App\Filament\Resources\ReceiverResource\ReceiverResourceForm;
@@ -283,7 +284,11 @@ class AvgProcessorProcessingRecordResourceFormSchemas
                 RelationTableColumns::for(AlgorithmRecord::class),
             )
                 ->label(__('algorithm_record.model_plural'))
-                ->required()
+                ->helperText(FormHelper::helperTextWithLink(
+                    __('avg_processor_processing_record.help_algorithm_records'),
+                    __('avg_processor_processing_record.help_algorithm_records_link'),
+                    static fn (): string => AlgorithmRecordResource::getUrl(),
+                ))
                 ->visible(FormHelper::isFieldEnabled('has_algorithms')),
         ];
     }

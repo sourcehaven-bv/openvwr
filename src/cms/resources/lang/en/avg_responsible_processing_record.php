@@ -29,6 +29,8 @@ return [
     'warn_has_processors_data_loss' => 'The processors linked to this processing activity will be deleted as soon as you save. This action cannot be undone.',
     'help_has_systems' => 'Are one or more applications / systems involved?',
     'help_has_algorithms' => 'Are one or more algorithms used in this processing?',
+    'help_algorithm_records' => 'Link the algorithms used in this processing. Not listed yet? Register it in the Algorithm register first.',
+    'help_algorithm_records_link' => 'Go to the Algorithm register',
     'help_has_security' => 'Do you secure the personal data?',
     'help_outside_eu' => 'Does your data processing transfer personal data to one or more countries outside the European Union or to an international organisation?',
 

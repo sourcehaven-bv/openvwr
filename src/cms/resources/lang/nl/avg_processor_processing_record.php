@@ -35,6 +35,8 @@ return [
     'help_has_security' => 'Beveiligt u de persoonsgegevens?',
     'help_has_systems' => 'Is er sprake van (een of meerdere) applicaties / systemen?',
     'help_has_algorithms' => 'Worden er bij deze verwerking (een of meerdere) algoritmes ingezet?',
+    'help_algorithm_records' => 'Koppel de algoritmes die bij deze verwerking worden ingezet. Staat het algoritme er nog niet bij? Registreer het eerst in het Algoritmeregister.',
+    'help_algorithm_records_link' => 'Naar het Algoritmeregister',
     'help_has_involved' => 'Is er sprake van een (of meerdere) categorieën van betrokkenen?',
     'help_decision_making' => 'Is er sprake van geautomatiseerde besluitvorming?',
     'help_geb_pia' => 'Is er een GEB (DPIA) door de verantwoordelijke uitgevoerd?',

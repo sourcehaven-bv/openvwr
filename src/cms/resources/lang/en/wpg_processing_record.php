@@ -95,6 +95,8 @@ return [
     'has_algorithms' => 'Has algorithms',
     'help_has_systems' => 'Are one or more systems/applications involved',
     'help_has_algorithms' => 'Are one or more algorithms used in this processing?',
+    'help_algorithm_records' => 'Link the algorithms used in this processing. Not listed yet? Register it in the Algorithm register first.',
+    'help_algorithm_records_link' => 'Go to the Algorithm register',
     'has_pseudonymization' => 'Do you use pseudonymisation?',
     'number' => 'Number',
     'security' => 'Security',

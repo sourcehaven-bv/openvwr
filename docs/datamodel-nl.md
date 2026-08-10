@@ -140,7 +140,7 @@ Het meest gedetailleerde onderdeel van de registratie. Per categorie betrokkenen
 | Heeft systemen / applicaties | Ja/nee | Is er sprake van (een of meerdere) applicaties / systemen? |
 | Systemen/Applicaties | Koppeling |  |
 | Heeft algoritmes | Ja/nee | Worden er bij deze verwerking (een of meerdere) algoritmes ingezet? |
-| Algoritmes | Koppeling |  |
+| Algoritmes | Koppeling | Koppel de algoritmes die bij deze verwerking worden ingezet. Staat het algoritme er nog niet bij? Registreer het eerst in het Algoritmeregister. |
 
 ## Beveiliging
 
@@ -298,7 +298,7 @@ Verwerkingen van persoonsgegevens die uw organisatie in opdracht van een andere 
 | Heeft systemen / applicaties | Ja/nee | Is er sprake van (een of meerdere) applicaties / systemen? |
 | Systemen/Applicaties | Koppeling |  |
 | Heeft algoritmes | Ja/nee | Worden er bij deze verwerking (een of meerdere) algoritmes ingezet? |
-| Algoritmes | Koppeling |  |
+| Algoritmes | Koppeling | Koppel de algoritmes die bij deze verwerking worden ingezet. Staat het algoritme er nog niet bij? Registreer het eerst in het Algoritmeregister. |
 
 ## Beveiliging
 
@@ -453,7 +453,7 @@ Verwerkingen van politiegegevens die onder de Wet politiegegevens vallen in plaa
 | Heeft systeem / applicatie | Ja/nee | Is er sprake van een (of meerdere) systemen/applicaties |
 | Systemen/Applicaties | Koppeling |  |
 | Heeft algoritmes | Ja/nee | Worden er bij deze verwerking (een of meerdere) algoritmes ingezet? |
-| Algoritmes | Koppeling |  |
+| Algoritmes | Koppeling | Koppel de algoritmes die bij deze verwerking worden ingezet. Staat het algoritme er nog niet bij? Registreer het eerst in het Algoritmeregister. |
 
 ## Beveiliging
 

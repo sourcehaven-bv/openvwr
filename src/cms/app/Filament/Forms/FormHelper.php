@@ -8,7 +8,10 @@ use App\Facades\Authentication;
 use Closure;
 use Filament\Forms\Get;
 use Illuminate\Support\Collection;
+use Illuminate\Support\HtmlString;
+use Throwable;
 
+use function e;
 use function in_array;
 use function is_array;
 use function is_bool;
@@ -119,5 +122,32 @@ class FormHelper
         $options = $optionsCollection->toArray();
 
         return $options;
+    }
+
+    /**
+     * Helper text that ends in a link to another register. Used where a record can
+     * only be linked, not created inline, so the user still has a way to get there.
+     *
+     * @param Closure(): string $url
+     */
+    public static function helperTextWithLink(string $text, string $linkLabel, Closure $url): Closure
+    {
+        return static function () use ($text, $linkLabel, $url): HtmlString {
+            // Resolved lazily: the target route is tenant-scoped, so building the
+            // URL outside a request (e.g. the docs generator) would fail.
+            try {
+                $href = $url();
+            } catch (Throwable) {
+                return new HtmlString(e($text));
+            }
+
+            return new HtmlString(
+                e($text)
+                . ' <a href="' . e($href) . '" target="_blank" rel="noopener noreferrer" '
+                . 'class="fi-link text-primary-600 hover:underline dark:text-primary-400">'
+                . e($linkLabel)
+                . '</a>',
+            );
+        };
     }
 }
