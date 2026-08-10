@@ -30,6 +30,8 @@ not set.
 - `VIRUSSCANNER_DEFAULT` default virus-scanner (default: `clamav`)
 - `VIRUSSCANNER_SOCKET` socket for the virus-scanner (default: `unix:///var/run/clamav/clamd.ctl`)
 - `CLAMAV_SOCKET_READ_TIMEOUT` read timeout for the clamav socket (default: `30`)
+- `APP_BANNER_MESSAGE` message shown in a banner at the top of every page, including the login page (default is not set, which hides the banner)
+- `APP_BANNER_LEVEL` banner colour, one of `info`, `warning` or `danger` (default: `warning`)
 
 ### Complete list
 
@@ -44,6 +46,8 @@ The following environment variables are used to configure the application in `sr
 - `ASSET_URL`
 - `DISPLAY_TIMEZONE` (default: `Europe/Amsterdam`)
 - `APP_KEY`
+- `APP_BANNER_MESSAGE` (default is not set)
+- `APP_BANNER_LEVEL` (default: `warning`)
 
 **AUTH:**
 

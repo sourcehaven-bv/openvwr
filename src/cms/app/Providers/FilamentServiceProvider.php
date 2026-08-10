@@ -67,6 +67,16 @@ class FilamentServiceProvider extends PanelProvider
             Css::make('app', base_path('resources/css/app.css')),
         ]);
 
+        // BODY_START rather than a topbar hook: the banner spans the full width
+        // above the panel chrome, and renders on the login page too, where an
+        // "this is a demo environment" notice matters most.
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::BODY_START,
+            static function (): View {
+                return view('filament.banner');
+            },
+        );
+
         FilamentView::registerRenderHook(
             PanelsRenderHook::TOPBAR_START,
             static function (): View {
