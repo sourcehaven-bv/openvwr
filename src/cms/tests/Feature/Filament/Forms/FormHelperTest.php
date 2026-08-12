@@ -6,13 +6,13 @@ namespace Tests\Feature\Filament\Resources\AvgProcessorProcessingRecordResource;
 
 use App\Filament\Forms\FormHelper;
 use Filament\Forms\Get;
+use RuntimeException;
 use Tests\Helpers\Model\OrganisationTestHelper;
 use Tests\Helpers\Model\UserTestHelper;
 
 use function expect;
 use function fake;
 use function it;
-use RuntimeException;
 
 it('returns get correct state on fieldValuesContainValue', function (array $fieldValues, string $value, bool $expectedResult): void {
     $fieldName = fake()->word();
