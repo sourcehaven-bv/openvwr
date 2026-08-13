@@ -167,18 +167,6 @@ class AlgorithmRecordExporter extends Exporter
     /**
      * @return array<ExportColumn>
      */
-    private static function getDocumentColumns(): array
-    {
-        return [
-            ExportColumn::make('document_count')
-                ->label(__('document.model_plural'))
-                ->counts('documents'),
-        ];
-    }
-
-    /**
-     * @return array<ExportColumn>
-     */
     private static function getOtherColumns(): array
     {
         return [

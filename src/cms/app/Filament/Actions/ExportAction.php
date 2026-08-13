@@ -6,6 +6,7 @@ namespace App\Filament\Actions;
 
 use App\Config\Config;
 use App\Enums\Authorization\Permission;
+use App\Facades\Authentication;
 use App\Facades\Authorization;
 use App\Services\DateFormatService;
 use Carbon\CarbonImmutable;
@@ -23,6 +24,13 @@ class ExportAction extends FilamentExportAction
             ->label(__('general.export'))
             ->visible(Authorization::hasPermission(Permission::EXPORT))
             ->columnMapping(false)
+            // Records which organisation is being exported, so the queued job can
+            // restore the tenant and rebuild the same per-document-type columns it
+            // wrote into the header. Resolved here because this closure still runs
+            // in the request, where there is a tenant; the job has none.
+            ->options(static fn (): array => [
+                'organisation_id' => Authentication::organisation()->getKey()->toString(),
+            ])
             ->fileName(static function (): string {
                 return sprintf(
                     '%s-%s-export',

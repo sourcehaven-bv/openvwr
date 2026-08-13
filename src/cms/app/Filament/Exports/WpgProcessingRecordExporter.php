@@ -158,9 +158,7 @@ class WpgProcessingRecordExporter extends Exporter
                 ->label(__('wpg_processing_record.third_party_explanation')),
 
             // documenten
-            ExportColumn::make('document_count')
-                ->label(__('document.model_plural'))
-                ->counts('documents'),
+            ...self::getDocumentColumns(),
 
             // overig
             ExportColumn::make('created_at')

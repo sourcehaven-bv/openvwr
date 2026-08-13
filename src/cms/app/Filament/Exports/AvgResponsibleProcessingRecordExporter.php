@@ -128,9 +128,7 @@ class AvgResponsibleProcessingRecordExporter extends Exporter
                 ->label(__('contact_person.form_title_contact_persons')),
 
             // documenten
-            ExportColumn::make('document_count')
-                ->label(__('document.model_plural'))
-                ->counts('documents'),
+            ...self::getDocumentColumns(),
 
             // opmerkingen
             ExportColumn::make('remarks')
