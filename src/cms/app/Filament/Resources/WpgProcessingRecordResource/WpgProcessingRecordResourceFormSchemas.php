@@ -19,10 +19,12 @@ use App\Filament\Forms\Components\TextInput\EntityNumber;
 use App\Filament\Forms\Components\TextInput\ImportNumber;
 use App\Filament\Forms\Components\WpgGoalsRepeater;
 use App\Filament\Forms\FormHelper;
+use App\Filament\Resources\AlgorithmRecordResource;
 use App\Filament\Resources\DocumentResource\DocumentResourceForm;
 use App\Filament\Resources\ProcessorResource\ProcessorResourceForm;
 use App\Filament\Resources\ResponsibleResource\ResponsibleResourceForm;
 use App\Filament\Resources\SystemResource\SystemResourceForm;
+use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Document;
 use App\Models\Processor;
 use App\Models\Responsible;
@@ -306,6 +308,27 @@ class WpgProcessingRecordResourceFormSchemas
                 ->label(__('system.model_plural'))
                 ->required()
                 ->visible(FormHelper::isFieldEnabled('has_systems')),
+
+            Toggle::make('has_algorithms')
+                ->helperText(__('wpg_processing_record.help_has_algorithms'))
+                ->label(__('wpg_processing_record.has_algorithms'))
+                ->default(false)
+                ->live(),
+
+            RelationTable::makeForRelationship(
+                'algorithmRecords',
+                'algorithmRecords',
+                AlgorithmRecord::class,
+                'name',
+                RelationTableColumns::for(AlgorithmRecord::class),
+            )
+                ->label(__('algorithm_record.model_plural'))
+                ->helperText(FormHelper::helperTextWithLink(
+                    __('wpg_processing_record.help_algorithm_records'),
+                    __('wpg_processing_record.help_algorithm_records_link'),
+                    static fn (): string => AlgorithmRecordResource::getUrl(),
+                ))
+                ->visible(FormHelper::isFieldEnabled('has_algorithms')),
         ];
     }
 

@@ -179,6 +179,11 @@ class AvgProcessorProcessingRecordResourceInfolistSchemas
                 ->label(__('avg_processor_processing_record.has_systems')),
             SelectMultipleEntry::make('systems.description')
                 ->visible(InfolistHelper::isFieldEnabled('has_systems')),
+            ToggleEntry::make('has_algorithms')
+                ->label(__('avg_processor_processing_record.has_algorithms')),
+            SelectMultipleEntry::make('algorithmRecords.name')
+                ->label(__('algorithm_record.model_plural'))
+                ->visible(InfolistHelper::isFieldEnabled('has_algorithms')),
             InformationBlockSection::makeCollapsible(
                 __('information_blocks.avg_processor_processing_record.step_system_title'),
                 __('information_blocks.avg_processor_processing_record.step_system_info'),

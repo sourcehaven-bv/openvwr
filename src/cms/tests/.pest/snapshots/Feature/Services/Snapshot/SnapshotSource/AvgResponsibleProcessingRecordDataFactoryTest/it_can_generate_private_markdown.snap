@@ -37,9 +37,13 @@
 - **Toelichting besluitvorming**: -
 - **Toelichting belang en gevolgen**: -
 
-## Systemen / Applicaties
+## Systemen en algoritmes
 
 <!--- #App\Models\System# --->
+
+- **Heeft algoritmes**: nee
+
+<!--- #App\Models\Algorithm\AlgorithmRecord# --->
 
 ## Beveiliging
 

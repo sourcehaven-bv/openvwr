@@ -34,9 +34,13 @@
 - **Toelichting besluitvorming**: Et dicta illo suscipit sint sunt accusamus\.
 - **Toelichting belang en gevolgen**: Et dicta illo suscipit sint sunt accusamus\.
 
-## Systemen / Applicaties
+## Systemen en algoritmes
 
 <!--- #App\Models\System# --->
+
+- **Heeft algoritmes**: nee
+
+<!--- #App\Models\Algorithm\AlgorithmRecord# --->
 
 ## Beveiliging
 

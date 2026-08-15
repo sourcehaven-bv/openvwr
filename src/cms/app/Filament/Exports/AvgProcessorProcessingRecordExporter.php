@@ -85,6 +85,11 @@ class AvgProcessorProcessingRecordExporter extends Exporter
             ExportColumn::make('systems.description')
                 ->label(__('system.model_plural')),
 
+            ExportColumn::make('has_algorithms')
+                ->label(__('avg_processor_processing_record.has_algorithms')),
+            ExportColumn::make('algorithmRecords.name')
+                ->label(__('algorithm_record.model_plural')),
+
             // beveiliging
             ExportColumn::make('has_security')
                 ->label(__('avg_processor_processing_record.has_security')),

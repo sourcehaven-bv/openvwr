@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\ContactPerson;
 use App\Models\Organisation;
@@ -20,6 +21,7 @@ it('can load the related snapshot sources', function (): void {
     $relatedSnapshotSources = $avgResponsibleProcessingRecord->getRelatedSnapshotSources();
     expect($relatedSnapshotSources->keys()->toArray())
         ->toBe([
+            AlgorithmRecord::class,
             ContactPerson::class,
             Processor::class,
             Receiver::class,

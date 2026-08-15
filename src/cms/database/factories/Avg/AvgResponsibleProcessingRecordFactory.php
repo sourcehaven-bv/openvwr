@@ -6,6 +6,7 @@ namespace Database\Factories\Avg;
 
 use App\Enums\CoreEntityDataCollectionSource;
 use App\Enums\EntityNumberType;
+use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Avg\AvgGoal;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecordService;
@@ -242,6 +243,17 @@ class AvgResponsibleProcessingRecordFactory extends Factory
         return $this->afterCreating(function (AvgResponsibleProcessingRecord $avgResponsibleProcessingRecord) use ($count): void {
             Stakeholder::factory()
                 ->withStakeholderDataItems()
+                ->hasAttached($avgResponsibleProcessingRecord)
+                ->recycle($avgResponsibleProcessingRecord->organisation)
+                ->count($count ?? $this->faker->randomDigitNotNull())
+                ->create();
+        });
+    }
+
+    public function withAlgorithmRecords(?int $count = null): self
+    {
+        return $this->afterCreating(function (AvgResponsibleProcessingRecord $avgResponsibleProcessingRecord) use ($count): void {
+            AlgorithmRecord::factory()
                 ->hasAttached($avgResponsibleProcessingRecord)
                 ->recycle($avgResponsibleProcessingRecord->organisation)
                 ->count($count ?? $this->faker->randomDigitNotNull())

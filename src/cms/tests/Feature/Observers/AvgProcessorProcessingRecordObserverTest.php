@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Observers;
 
+use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Avg\AvgProcessorProcessingRecord;
 
 use function __;
@@ -145,4 +146,19 @@ it('resets passthrough data on save', function (): void {
         ->and($avgProcessorProcessingRecord->outside_eu_protection_level)->toBeFalse()
         ->and($avgProcessorProcessingRecord->outside_eu_description)->toBeNull()
         ->and($avgProcessorProcessingRecord->outside_eu_protection_level_description)->toBeEmpty();
+});
+
+it('resets algorithm links on save but keeps the algorithms themselves', function (): void {
+    $avgProcessorProcessingRecord = AvgProcessorProcessingRecord::factory()
+        ->withAlgorithmRecords(2)
+        ->create([
+            'has_algorithms' => true,
+        ]);
+
+    $avgProcessorProcessingRecord->has_algorithms = false;
+    $avgProcessorProcessingRecord->save();
+    $avgProcessorProcessingRecord->refresh();
+
+    expect($avgProcessorProcessingRecord->algorithmRecords)->toHaveCount(0)
+        ->and(AlgorithmRecord::count())->toBe(2);
 });

@@ -135,12 +135,14 @@ The most detailed part of the record. For each category of data subjects it capt
 | Explanation of the decision-making | Free text | Which data leads to which decision, described in understandable terms and without technical detail. |
 | Explanation of the significance and consequences | Free text | What the decision means in concrete terms for the data subject, for example approval or rejection. |
 
-## Systems / Applications
+## Systems and algorithms
 
 | Field | Kind of input | Explanation |
 |----------------------------------|--------------|----------------------------------------------------|
 | Has systems / applications | Yes/no | Are one or more applications / systems involved? |
 | Systems/Applications | Link |  |
+| Has algorithms | Yes/no | Are one or more algorithms used in this processing? |
+| Algorithms | Link | Link the algorithms used in this processing. Not listed yet? Register it in the Algorithm register first. |
 
 ## Security
 
@@ -291,12 +293,14 @@ Processing of personal data that your organisation carries out on behalf of anot
 | Explanation of the decision-making | Free text | Which data leads to which decision, described in understandable terms and without technical detail. |
 | Explanation of the significance and consequences | Free text | What the decision means in concrete terms for the data subject, for example approval or rejection. |
 
-## Systems / Applications
+## Systems and algorithms
 
 | Field | Kind of input | Explanation |
 |----------------------------------|--------------|----------------------------------------------------|
 | Has systems / applications | Yes/no | Are one or more applications / systems involved? |
 | Systems/Applications | Link |  |
+| Has algorithms | Yes/no | Are one or more algorithms used in this processing? |
+| Algorithms | Link | Link the algorithms used in this processing. Not listed yet? Register it in the Algorithm register first. |
 
 ## Security
 
@@ -444,12 +448,14 @@ Processing of police data that falls under the Wpg (Dutch Police Data Act) inste
 | Explanation | Free text |  |
 | Consequences | Free text | What the decision means in concrete terms for the data subject. |
 
-## Systems / Applications
+## Systems and algorithms
 
 | Field | Kind of input | Explanation |
 |----------------------------------|--------------|----------------------------------------------------|
 | Has system / application | Yes/no | Are one or more systems/applications involved |
 | Systems/Applications | Link |  |
+| Has algorithms | Yes/no | Are one or more algorithms used in this processing? |
+| Algorithms | Link | Link the algorithms used in this processing. Not listed yet? Register it in the Algorithm register first. |
 
 ## Security
 

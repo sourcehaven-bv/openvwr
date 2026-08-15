@@ -6,6 +6,7 @@ namespace Database\Factories\Avg;
 
 use App\Enums\CoreEntityDataCollectionSource;
 use App\Enums\EntityNumberType;
+use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Avg\AvgGoal;
 use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgProcessorProcessingRecordService;
@@ -230,6 +231,17 @@ class AvgProcessorProcessingRecordFactory extends Factory
     {
         return $this->afterCreating(function (AvgProcessorProcessingRecord $avgProcessorProcessingRecord) use ($count): void {
             Stakeholder::factory()
+                ->hasAttached($avgProcessorProcessingRecord)
+                ->recycle($avgProcessorProcessingRecord->organisation)
+                ->count($count ?? $this->faker->randomDigitNotNull())
+                ->create();
+        });
+    }
+
+    public function withAlgorithmRecords(?int $count = null): self
+    {
+        return $this->afterCreating(function (AvgProcessorProcessingRecord $avgProcessorProcessingRecord) use ($count): void {
+            AlgorithmRecord::factory()
                 ->hasAttached($avgProcessorProcessingRecord)
                 ->recycle($avgProcessorProcessingRecord->organisation)
                 ->count($count ?? $this->faker->randomDigitNotNull())

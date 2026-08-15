@@ -117,6 +117,7 @@ enum TransferEntityType: string
         'receivers' => self::RECEIVER,
         'responsibles' => self::RESPONSIBLE,
         'systems' => self::SYSTEM,
+        'algorithmRecords' => self::ALGORITHM_RECORD,
         'contactPersons' => self::CONTACT_PERSON,
         'documents' => self::DOCUMENT,
         'stakeholders' => self::STAKEHOLDER,

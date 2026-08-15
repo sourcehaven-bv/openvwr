@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Observers;
 
+use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 
 use function __;
@@ -224,4 +225,19 @@ it('keeps all GEB criteria when every answer is "nee"', function (): void {
 
     expect($avgResponsibleProcessingRecord->geb_dpia_executed)->toBeFalse()
         ->and($avgResponsibleProcessingRecord->geb_dpia_high_risk_freedoms)->toBeFalse();
+});
+
+it('resets algorithm links on save but keeps the algorithms themselves', function (): void {
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->withAlgorithmRecords(2)
+        ->create([
+            'has_algorithms' => true,
+        ]);
+
+    $avgResponsibleProcessingRecord->has_algorithms = false;
+    $avgResponsibleProcessingRecord->save();
+    $avgResponsibleProcessingRecord->refresh();
+
+    expect($avgResponsibleProcessingRecord->algorithmRecords)->toHaveCount(0)
+        ->and(AlgorithmRecord::count())->toBe(2);
 });

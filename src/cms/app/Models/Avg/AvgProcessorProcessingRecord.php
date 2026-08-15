@@ -14,6 +14,7 @@ use App\Collections\SystemCollection;
 use App\Components\Uuid\UuidInterface;
 use App\Enums\CoreEntityDataCollectionSource;
 use App\Models\Casts\UuidCast;
+use App\Models\Concerns\HasAlgorithmRecords;
 use App\Models\Concerns\HasAvgGoals;
 use App\Models\Concerns\HasChildren;
 use App\Models\Concerns\HasContactPersons;
@@ -82,6 +83,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property CarbonImmutable|null $public_from
  * @property CoreEntityDataCollectionSource $data_collection_source
  * @property bool $has_systems
+ * @property bool $has_algorithms
  *
  * @property-read AvgProcessorProcessingRecordService|null $avgProcessorProcessingRecordService
  * @property-read DataBreachRecordCollection $dataBreachRecords
@@ -93,6 +95,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class AvgProcessorProcessingRecord extends Model implements Cloneable, EntityNumerable, Reviewable, SnapshotSource, TenantAware
 {
+    use HasAlgorithmRecords;
     use HasAvgGoals;
     /** @use HasChildren<AvgProcessorProcessingRecord, AvgProcessorProcessingRecordCollection> */
     use HasChildren;
@@ -154,6 +157,7 @@ class AvgProcessorProcessingRecord extends Model implements Cloneable, EntityNum
         'convicts',
         'public_from',
         'has_systems',
+        'has_algorithms',
     ];
 
     public function casts(): array
@@ -177,6 +181,7 @@ class AvgProcessorProcessingRecord extends Model implements Cloneable, EntityNum
             'geb_pia' => 'bool',
             'public_from' => 'datetime',
             'has_systems' => 'bool',
+            'has_algorithms' => 'bool',
             'data_collection_source' => CoreEntityDataCollectionSource::class,
         ];
     }

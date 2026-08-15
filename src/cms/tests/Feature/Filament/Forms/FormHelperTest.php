@@ -6,6 +6,7 @@ namespace Tests\Feature\Filament\Resources\AvgProcessorProcessingRecordResource;
 
 use App\Filament\Forms\FormHelper;
 use Filament\Forms\Get;
+use RuntimeException;
 use Tests\Helpers\Model\OrganisationTestHelper;
 use Tests\Helpers\Model\UserTestHelper;
 
@@ -176,3 +177,31 @@ it('returns correct value if any field is enabled', function (bool $fieldA, bool
     [false, true, true],
     [false, false, false],
 ]);
+
+it('renders helper text with a link to the target register', function (): void {
+    $helperText = FormHelper::helperTextWithLink(
+        'Koppel de algoritmes.',
+        'Naar het Algoritmeregister',
+        static fn (): string => 'https://example.test/nipg/algorithm-records',
+    );
+
+    expect($helperText()->toHtml())
+        ->toContain('Koppel de algoritmes.')
+        ->toContain('href="https://example.test/nipg/algorithm-records"')
+        ->toContain('Naar het Algoritmeregister')
+        ->toContain('target="_blank"');
+});
+
+it('falls back to plain helper text when the url cannot be resolved', function (): void {
+    $helperText = FormHelper::helperTextWithLink(
+        'Koppel de algoritmes.',
+        'Naar het Algoritmeregister',
+        static function (): string {
+            throw new RuntimeException('no tenant in this context');
+        },
+    );
+
+    expect($helperText()->toHtml())
+        ->toBe('Koppel de algoritmes.')
+        ->not->toContain('<a href');
+});

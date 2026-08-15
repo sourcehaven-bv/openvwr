@@ -7,6 +7,8 @@ namespace App\Models\Algorithm;
 use App\Collections\Algorithm\AlgorithmRecordCollection;
 use App\Collections\DocumentCollection;
 use App\Components\Uuid\UuidInterface;
+use App\Models\Avg\AvgProcessorProcessingRecord;
+use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Casts\UuidCast;
 use App\Models\Concerns\HasDocuments;
 use App\Models\Concerns\HasEntityNumber;
@@ -21,11 +23,14 @@ use App\Models\Contracts\Cloneable;
 use App\Models\Contracts\EntityNumerable;
 use App\Models\Contracts\SnapshotSource;
 use App\Models\Contracts\TenantAware;
+use App\Models\Wpg\WpgProcessingRecord;
 use Carbon\CarbonImmutable;
 use Database\Factories\Algorithm\AlgorithmRecordFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 /**
  * @property ?UuidInterface $algorithm_theme_id
@@ -72,6 +77,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read AlgorithmStatus|null $algorithmStatus
  * @property-read AlgorithmTheme|null $algorithmTheme
  * @property-read DocumentCollection $documents
+ * @property-read Collection<int, AvgResponsibleProcessingRecord> $avgResponsibleProcessingRecords
+ * @property-read Collection<int, AvgProcessorProcessingRecord> $avgProcessorProcessingRecords
+ * @property-read Collection<int, WpgProcessingRecord> $wpgProcessingRecords
  */
 class AlgorithmRecord extends Model implements Cloneable, EntityNumerable, SnapshotSource, TenantAware
 {
@@ -173,5 +181,32 @@ class AlgorithmRecord extends Model implements Cloneable, EntityNumerable, Snaps
     public function algorithmPublicationCategory(): BelongsTo
     {
         return $this->belongsTo(AlgorithmPublicationCategory::class, 'algorithm_publication_category_id');
+    }
+
+    /**
+     * @return MorphToMany<AvgResponsibleProcessingRecord, $this>
+     */
+    public function avgResponsibleProcessingRecords(): MorphToMany
+    {
+        return $this->morphedByMany(AvgResponsibleProcessingRecord::class, 'algorithm_record_relatable')
+            ->withTimestamps();
+    }
+
+    /**
+     * @return MorphToMany<AvgProcessorProcessingRecord, $this>
+     */
+    public function avgProcessorProcessingRecords(): MorphToMany
+    {
+        return $this->morphedByMany(AvgProcessorProcessingRecord::class, 'algorithm_record_relatable')
+            ->withTimestamps();
+    }
+
+    /**
+     * @return MorphToMany<WpgProcessingRecord, $this>
+     */
+    public function wpgProcessingRecords(): MorphToMany
+    {
+        return $this->morphedByMany(WpgProcessingRecord::class, 'algorithm_record_relatable')
+            ->withTimestamps();
     }
 }

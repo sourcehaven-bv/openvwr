@@ -74,6 +74,10 @@
 
 <!--- #App\Models\System# --->
 
+- **{{ __('avg_processor_processing_record.has_algorithms') }}**: {{ $record->has_algorithms ? 'ja' : 'nee' }}
+
+<!--- #App\Models\Algorithm\AlgorithmRecord# --->
+
 ## {{ __('avg_processor_processing_record.step_security') }}
 
 - **{{ __('avg_processor_processing_record.has_security') }}**: {{ $record->has_security ? 'ja' : 'nee' }}
