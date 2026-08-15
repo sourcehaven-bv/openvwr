@@ -53,8 +53,12 @@ it('can compare equal dates', function (): void {
 });
 
 it('can compare equal dates of not equal', function (): void {
-    $date1 = CalendarDate::createFromFormat('Y-m-d', fake()->date());
-    $date2 = CalendarDate::createFromFormat('Y-m-d', fake()->unique()->date());
+    // Vaste, gegarandeerd verschillende datums. Eerder stond hier
+    // fake()->date() naast fake()->unique()->date(); unique() ontdubbelt alleen
+    // binnen zijn eigen reeks en kent de waarde van de eerste generator niet, dus
+    // die twee konden dezelfde datum opleveren en de test viel willekeurig om.
+    $date1 = CalendarDate::createFromFormat('Y-m-d', '2020-01-01');
+    $date2 = CalendarDate::createFromFormat('Y-m-d', '2021-06-15');
 
     $this->assertFalse($date1->equalTo($date2));
 });
