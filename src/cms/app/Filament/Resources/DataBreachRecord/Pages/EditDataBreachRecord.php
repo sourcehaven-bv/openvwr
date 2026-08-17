@@ -11,10 +11,12 @@ use App\Filament\Resources\DataBreachRecord\Pages\Contracts\RefreshesDataBreachR
 use App\Filament\Resources\DataBreachRecordResource;
 use App\Models\DataBreachRecord;
 use App\Services\Notification\DataBreachNotificationService;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Illuminate\Support\Facades\App;
 use Webmozart\Assert\Assert;
 
+use function __;
 use function sprintf;
 
 class EditDataBreachRecord extends ProcessingRecordEditRecord implements RefreshesDataBreachRecordWorkflow
@@ -27,6 +29,18 @@ class EditDataBreachRecord extends ProcessingRecordEditRecord implements Refresh
     {
         return [
             ...$this->getDataBreachRecordWorkflowActions(),
+            Action::make('ap_report')
+                ->label(__('ap_report.action_label'))
+                ->icon('heroicon-o-clipboard-document-list')
+                ->url(function (): string {
+                    $dataBreachRecord = $this->getRecord();
+                    Assert::isInstanceOf($dataBreachRecord, DataBreachRecord::class);
+
+                    return ApReportDataBreachRecord::getUrl([
+                        'record' => $dataBreachRecord,
+                        'tenant' => $dataBreachRecord->organisation,
+                    ]);
+                }),
             ToggleRegisterLayoutAction::make(),
             DeleteAction::make(),
         ];

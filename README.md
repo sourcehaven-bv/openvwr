@@ -28,6 +28,7 @@ Directory: `/src/static-website/`
 - See [docs/roles_and_permissions.md](docs/roles_and_permissions.md) for an overview of all roles and permissions and the location where they are configured.
 - See [docs/static_website_hugo.md](docs/static_website_hugo.md) for detailed information about the Hugo static website publishing system.
 - See [docs/import_export.md](docs/import_export.md) for the zip-based import/export of register content between organisations.
+- See [docs/ap_melding.md](docs/ap_melding.md) for the preparation of a data breach notification to the Autoriteit Persoonsgegevens.
 
 ## Getting started
 > All `artisan` commands must be run via Sail (`sail artisan ...` or inside `sail shell`).
