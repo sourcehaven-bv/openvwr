@@ -7,10 +7,9 @@ namespace App\FixedLists\Audit;
 use App\FixedLists\FixedListColumn;
 use App\FixedLists\FixedListRegistry;
 use Illuminate\Database\Eloquent\Model;
+use Webmozart\Assert\Assert;
 
 use function array_key_exists;
-use function is_numeric;
-use function is_string;
 
 class FixedListAuditor
 {
@@ -108,13 +107,15 @@ class FixedListAuditor
             ->groupBy($column)
             ->select($column)
             ->selectRaw('count(*) as total')
-            ->pluck('total', $column);
+            ->get();
 
         $counts = [];
-        foreach ($rows as $value => $total) {
-            if (!is_string($value) || !is_numeric($total)) {
-                continue;
-            }
+        foreach ($rows as $row) {
+            $value = $row->getAttribute($column);
+            Assert::string($value);
+
+            $total = $row->getAttribute('total');
+            Assert::integerish($total);
 
             $counts[$value] = (int) $total;
         }
