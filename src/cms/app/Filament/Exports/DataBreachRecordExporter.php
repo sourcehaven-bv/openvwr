@@ -29,8 +29,6 @@ class DataBreachRecordExporter extends Exporter
                 ->label(__('data_breach_record.reported_at')),
             ExportColumn::make('type')
                 ->label(__('data_breach_record.type')),
-            ExportColumn::make('reported_at')
-                ->label(__('data_breach_record.reported_at')),
             ExportColumn::make('ap_reported')
                 ->label(__('data_breach_record.ap_reported')),
 
@@ -79,7 +77,7 @@ class DataBreachRecordExporter extends Exporter
             // verwerkingen
             ExportColumn::make('avgResponsibleProcessingRecords.name')
                 ->label(__('avg_responsible_processing_record.model_plural')),
-            ExportColumn::make('responsibles.name')
+            ExportColumn::make('avgProcessorProcessingRecords.name')
                 ->label(__('avg_processor_processing_record.model_plural')),
             ExportColumn::make('wpgProcessingRecords.name')
                 ->label(__('wpg_processing_record.model_plural')),

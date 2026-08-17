@@ -99,7 +99,7 @@ return [
         'Credit card details',
         'Data on (problematic) debts',
         'Data on benefits and/or debts',
-        'Other financial data, namely:[open field]',
+        'Other financial data',
         '(Copies of) passports or other identity documents',
         'Location data',
         'Personal data relating to criminal convictions and offences or related security measures',
