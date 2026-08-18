@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\Filament\Forms\Components\RetentionPeriodInput;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\EditAvgResponsibleProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
-use App\Models\Responsible;
 use App\Models\RetentionPeriod;
 use App\Models\Stakeholder;
 use App\Models\StakeholderDataItem;
@@ -29,17 +28,13 @@ function editRecordWithRetentionPeriod(string $stored, ?string $listedTerm = nul
             ->create(['name' => $listedTerm, 'enabled' => true]);
     }
 
-    // The toggles are pinned off and a responsible is attached so that saving
-    // fails only on the bewaartermijn, never on an unrelated required field.
+    // withValidState() so the form submits without errors on fields that have
+    // nothing to do with the bewaartermijn: the factory randomises several
+    // toggles that each make another field required.
     $record = AvgResponsibleProcessingRecord::factory()
         ->recycle($organisation)
-        ->create([
-            'has_processors' => false,
-            'has_systems' => false,
-            'has_algorithms' => false,
-        ]);
-
-    $record->responsibles()->attach(Responsible::factory()->recycle($organisation)->create());
+        ->withValidState()
+        ->create();
 
     $stakeholder = Stakeholder::factory()->recycle($organisation)->create();
 
