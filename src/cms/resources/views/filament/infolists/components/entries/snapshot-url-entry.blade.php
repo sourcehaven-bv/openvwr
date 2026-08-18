@@ -17,6 +17,7 @@
                                     <a class="text-gray-500 dark:text-gray-400 text-sm"
                                        href="{{ $getRecord()->snapshotSource->getLatestStaticWebsiteSnapshotEntry()?->url }}"
                                        target="_blank"
+                                       rel="noopener noreferrer"
                                     >
                                         {{ $getRecord()->snapshotSource->getLatestStaticWebsiteSnapshotEntry()?->url }}
                                     </a>
