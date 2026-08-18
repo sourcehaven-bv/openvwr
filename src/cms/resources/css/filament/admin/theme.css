@@ -223,3 +223,27 @@
         grid-template-columns: minmax(0, 1fr);
     }
 }
+
+/*
+ * Operator-configured banner (see config/banner.php), injected at BODY_START so
+ * it spans the full width above the panel chrome and the login card alike.
+ *
+ * The colours live here rather than as utility classes on the element: Tailwind
+ * scans app/Filament and the Blade views, so classes returned from a PHP enum in
+ * app/Enums would never be compiled.
+ */
+.fi-banner {
+    @apply px-6 py-3 text-center text-sm font-medium;
+}
+
+.fi-banner--info {
+    @apply bg-info-100 text-info-900 dark:bg-info-950 dark:text-info-100;
+}
+
+.fi-banner--warning {
+    @apply bg-warning-100 text-warning-900 dark:bg-warning-950 dark:text-warning-100;
+}
+
+.fi-banner--danger {
+    @apply bg-danger-100 text-danger-900 dark:bg-danger-950 dark:text-danger-100;
+}
