@@ -2,8 +2,14 @@
 
 declare(strict_types=1);
 
+use App\Models\Address;
+use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\DataBreachRecord;
+use App\Models\Document;
+use App\Models\Processor;
+use App\Models\Receiver;
+use App\Models\Responsible;
 use App\Models\Stakeholder;
 use App\Models\Wpg\WpgProcessingRecord;
 use App\Services\ApReport\AnswerSource;
@@ -169,4 +175,173 @@ it('counts what still has to be collected and what has to be confirmed', functio
     expect($report->missingCount())->toBeGreaterThan(0)
         ->and($report->needsConfirmationCount())->toBeGreaterThan(0)
         ->and($report->answersNeedingConfirmation())->each->needsConfirmation();
+});
+
+it('spells out an "other" choice with the text that was typed in', function (): void {
+    // The AP form asks for the free-text explanation next to the "other" option;
+    // presenting them apart would make the officer hunt for the pair.
+    $organisation = OrganisationTestHelper::create();
+    $dataBreachRecord = DataBreachRecord::factory()->recycle($organisation)->create([
+        'nature_of_incident' => 'Overig',
+        'nature_of_incident_other' => 'Papieren dossier in de trein laten liggen',
+        'personal_data_categories' => ['Naam'],
+        'personal_data_categories_other' => 'Personeelsnummer',
+        'reported_to_involved' => true,
+        'reported_to_involved_communication' => ['Per brief'],
+        'reported_to_involved_communication_other' => 'Via de huisarts',
+    ]);
+
+    $report = buildApReport($dataBreachRecord);
+
+    expect(apAnswer($report, '5.2')->values)
+        ->toBe(['Overig, namelijk: Papieren dossier in de trein laten liggen'])
+        ->and(apAnswer($report, '6.1')->values)
+        ->toBe(['Naam', 'Anders, namelijk: Personeelsnummer'])
+        ->and(apAnswer($report, '10.1.7')->values)
+        ->toBe(['Per brief', 'Anders, namelijk: Via de huisarts']);
+});
+
+it('derives the AVG as legal basis from a linked AVG processing record', function (): void {
+    $organisation = OrganisationTestHelper::create();
+
+    $responsibleRecord = AvgResponsibleProcessingRecord::factory()->recycle($organisation)->create();
+    $processorRecord = AvgProcessorProcessingRecord::factory()->recycle($organisation)->create();
+
+    $dataBreachRecord = DataBreachRecord::factory()->recycle($organisation)->create();
+    $dataBreachRecord->avgResponsibleProcessingRecords()->attach($responsibleRecord);
+    $dataBreachRecord->avgProcessorProcessingRecords()->attach($processorRecord);
+
+    $answer = apAnswer(buildApReport($dataBreachRecord->fresh()), '1.2');
+
+    // Both registers point at the same statute, so it is listed once.
+    expect($answer->values)->toBe(['Algemene verordening gegevensbescherming (AVG)'])
+        ->and($answer->origins)->toContain($responsibleRecord->name)
+        ->and($answer->origins)->toContain($processorRecord->name);
+});
+
+it('lists the responsible and its address as recorded on the breach', function (): void {
+    $organisation = OrganisationTestHelper::create();
+
+    $responsible = Responsible::factory()->recycle($organisation)->create(['name' => 'Afdeling Zorg']);
+    Address::factory()->create([
+        'addressable_id' => $responsible->id,
+        'addressable_type' => Responsible::class,
+        'address' => 'Stationsplein 1',
+        'postal_code' => '1012 AB',
+        'city' => 'Amsterdam',
+    ]);
+
+    $dataBreachRecord = DataBreachRecord::factory()->recycle($organisation)->create();
+    $dataBreachRecord->responsibles()->attach($responsible);
+
+    $report = buildApReport($dataBreachRecord->fresh());
+
+    expect(apAnswer($report, '3.1.1b')->values)->toBe(['Afdeling Zorg'])
+        ->and(apAnswer($report, '3.1.1c')->values)->toBe(['Stationsplein 1, 1012 AB Amsterdam']);
+});
+
+it('leaves the address empty when the responsible has none', function (): void {
+    $organisation = OrganisationTestHelper::create();
+
+    $responsible = Responsible::factory()->recycle($organisation)->create();
+    $dataBreachRecord = DataBreachRecord::factory()->recycle($organisation)->create();
+    $dataBreachRecord->responsibles()->attach($responsible);
+
+    $report = buildApReport($dataBreachRecord->fresh());
+
+    expect(apAnswer($report, '3.1.1b')->source)->toBe(AnswerSource::RECORDED)
+        ->and(apAnswer($report, '3.1.1c')->source)->toBe(AnswerSource::MISSING);
+});
+
+it('lists the linked documents as supporting documentation', function (): void {
+    $organisation = OrganisationTestHelper::create();
+
+    $document = Document::factory()->recycle($organisation)->create(['name' => 'Onderzoeksrapport']);
+    $dataBreachRecord = DataBreachRecord::factory()->recycle($organisation)->create();
+    $dataBreachRecord->documents()->attach($document);
+
+    expect(apAnswer(buildApReport($dataBreachRecord->fresh()), '5.4')->values)
+        ->toBe(['Onderzoeksrapport']);
+});
+
+it('names the processors and receivers of the linked processing as involved organisations', function (): void {
+    $organisation = OrganisationTestHelper::create();
+
+    $processor = Processor::factory()->recycle($organisation)->create(['name' => 'Drukkerij Van Dijk']);
+    $receiver = Receiver::factory()->recycle($organisation)->create(['description' => 'Zorgverzekeraar']);
+
+    $processingRecord = AvgResponsibleProcessingRecord::factory()->recycle($organisation)->create();
+    $processingRecord->processors()->attach($processor);
+    $processingRecord->receivers()->attach($receiver);
+
+    $dataBreachRecord = DataBreachRecord::factory()->recycle($organisation)->create();
+    $dataBreachRecord->avgResponsibleProcessingRecords()->attach($processingRecord);
+
+    expect(apAnswer(buildApReport($dataBreachRecord->fresh()), '3.3')->values)
+        ->toBe(['Drukkerij Van Dijk (verwerker)', 'Zorgverzekeraar (ontvanger)']);
+});
+
+it('skips a receiver without a description', function (): void {
+    $organisation = OrganisationTestHelper::create();
+
+    $receiver = Receiver::factory()->recycle($organisation)->create(['description' => null]);
+    $processingRecord = AvgResponsibleProcessingRecord::factory()->recycle($organisation)->create();
+    $processingRecord->receivers()->attach($receiver);
+
+    $dataBreachRecord = DataBreachRecord::factory()->recycle($organisation)->create();
+    $dataBreachRecord->avgResponsibleProcessingRecords()->attach($processingRecord);
+
+    expect(apAnswer(buildApReport($dataBreachRecord->fresh()), '3.3')->source)
+        ->toBe(AnswerSource::MISSING);
+});
+
+it('offers the pseudonymisation of the linked processing as context', function (): void {
+    $organisation = OrganisationTestHelper::create();
+
+    // A processing without security measures is forced to have no pseudonymisation
+    // either, and the observer then clears the description, so all three go together.
+    $processingRecord = AvgResponsibleProcessingRecord::factory()->recycle($organisation)->create([
+        'has_security' => true,
+        'has_pseudonymization' => true,
+        'pseudonymization' => 'Klantnummers zijn vervangen door een hash.',
+    ]);
+
+    $dataBreachRecord = DataBreachRecord::factory()->recycle($organisation)->create();
+    $dataBreachRecord->avgResponsibleProcessingRecords()->attach($processingRecord);
+
+    $report = buildApReport($dataBreachRecord->fresh());
+
+    // 8.1 itself asks whether the data were unreadable, which the register does
+    // not record; the pseudonymisation is offered alongside it, not as the answer.
+    expect(apAnswer($report, '8.1')->source)->toBe(AnswerSource::MISSING)
+        ->and(apAnswer($report, '8.1b')->values)->toBe(['Klantnummers zijn vervangen door een hash.'])
+        ->and(apAnswer($report, '8.1b')->source)->toBe(AnswerSource::DERIVED);
+});
+
+it('skips a stakeholder and a processing record that describe nothing', function (): void {
+    $organisation = OrganisationTestHelper::create();
+
+    $stakeholder = Stakeholder::factory()->recycle($organisation)->create(['description' => null]);
+    $processingRecord = AvgResponsibleProcessingRecord::factory()->recycle($organisation)->create([
+        'has_pseudonymization' => false,
+    ]);
+    $processingRecord->stakeholders()->attach($stakeholder);
+
+    $dataBreachRecord = DataBreachRecord::factory()->recycle($organisation)->create();
+    $dataBreachRecord->avgResponsibleProcessingRecords()->attach($processingRecord);
+
+    $report = buildApReport($dataBreachRecord->fresh());
+
+    expect(apAnswer($report, '7.2b')->source)->toBe(AnswerSource::MISSING)
+        ->and(apAnswer($report, '8.1b')->source)->toBe(AnswerSource::MISSING);
+});
+
+it('treats a field holding only whitespace as missing', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $dataBreachRecord = DataBreachRecord::factory()->recycle($organisation)->create([
+        'summary' => '   ',
+    ]);
+
+    expect(apAnswer(buildApReport($dataBreachRecord), '5.3')->source)
+        ->toBe(AnswerSource::MISSING);
 });
