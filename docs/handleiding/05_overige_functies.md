@@ -36,4 +36,4 @@ Met de tabs boven de tabel wisselt u tussen ingeschakelde en uitgeschakelde waar
 
 > **Let op:** Het verwijderen van een optie verwijdert deze compleet uit het systeem! Dit betekent dat overal waar de optie geselecteerd was, nu niets meer geselecteerd is. Als dit niet de bedoeling is, wilt u de optie waarschijnlijk uitschakelen: de optie is dan niet meer te selecteren, maar entiteiten waar deze optie eerder geselecteerd was, blijven ongewijzigd.
 
-De lijst *Bewaartermijnen* vormt hierop een uitzondering: een gekozen bewaartermijn wordt als tekst vastgelegd bij de verwerking. Het wijzigen of verwijderen van een waarde in die lijst laat bestaande verwerkingen dan ook ongemoeid. Zie Hoofdstuk \ref{Beheer}, "Bewaartermijnen".
+De lijst *Bewaartermijnen* is hierop een uitzondering: wijzigingen daarin laten bestaande verwerkingen ongemoeid. Zie Hoofdstuk \ref{Beheer}, "Bewaartermijnen", voor de reden.

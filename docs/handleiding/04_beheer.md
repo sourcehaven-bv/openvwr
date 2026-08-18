@@ -24,9 +24,11 @@ Klik op een gebruiker in de tabel om een gebruiker te wijzigen (Figuur \ref{fig:
 
 Bij de gegevens van een categorie betrokkenen, en bij de persoonsgegevens in een DPIA, vult u per gegeven een bewaartermijn in. De termijnen waaruit u kunt kiezen beheert u als opzoeklijst *Bewaartermijnen*; zie Hoofdstuk \ref{OverigeFuncties}, "Opzoeklijsten", voor het toevoegen, in- en uitschakelen van waarden.
 
-Anders dan bij de meeste velden slaat OpenVWR de gekozen bewaartermijn op als tekst, en niet als verwijzing naar de lijst. Dat heeft één belangrijk gevolg:
+Een bewaartermijn legt vast hoe lang u gegevens bewaart en op grond waarvan. Dat is een verantwoording over een verwerking zoals die op dat moment gold, en niet louter een etiket dat u er later anders op kunt plakken. Werkt u de lijst bij omdat het beleid verandert, dan verandert daarmee niet met terugwerkende kracht wat u eerder heeft vastgelegd, en al helemaal niet in een register dat al is vastgesteld.
 
-> **Let op**: Het aanpassen of verwijderen van een waarde in de lijst *Bewaartermijnen* verandert niets aan verwerkingen waarin die termijn al is ingevuld. Een vastgelegde bewaartermijn blijft staan zoals deze bij het invullen gold. Bij de andere opzoeklijsten werkt een wijziging wel door in de gekoppelde gegevens.
+OpenVWR slaat de gekozen bewaartermijn daarom op als tekst bij het gegeven zelf, en niet als verwijzing naar de lijst. De lijst levert alleen de keuzemogelijkheden.
+
+> **Let op**: Het aanpassen of verwijderen van een waarde in de lijst *Bewaartermijnen* verandert niets aan verwerkingen waarin die termijn al is ingevuld. Wilt u een eerder vastgelegde termijn wijzigen, dan doet u dat bij de verwerking zelf. Bij de andere opzoeklijsten werkt een wijziging wel door in de gekoppelde gegevens; die leggen een verwijzing vast in plaats van een tekst.
 
 ### Een bewaartermijn kiezen
 
@@ -41,5 +43,3 @@ Past geen van de termijnen, kies dan *Overig (zelf invullen)*. Er verschijnt een
 Is de lijst *Bewaartermijnen* nog leeg, dan wordt de keuzelijst niet getoond en vult u de termijn altijd zelf in. Termijnen die al eerder als vrije tekst zijn ingevuld blijven gewoon staan en zijn te wijzigen.
 
 > **Hint**: Vult u vaak dezelfde termijn in, laat de (Chief) Privacy Officer deze dan toevoegen aan de lijst *Bewaartermijnen*. Bij een volgende verwerking is de termijn dan met één klik te kiezen.
-
-> **Let op**: OpenVWR verwijdert zelf geen gegevens als een bewaartermijn verstrijkt. De termijn wordt alleen vastgelegd in het register.
