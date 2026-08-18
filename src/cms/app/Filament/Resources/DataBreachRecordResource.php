@@ -63,6 +63,7 @@ class DataBreachRecordResource extends Resource
             'index' => Pages\ListDataBreachRecords::route('/'),
             'create' => Pages\CreateDataBreachRecord::route('/create'),
             'edit' => Pages\EditDataBreachRecord::route('/{record}/edit'),
+            'ap-report' => Pages\ApReportDataBreachRecord::route('/{record}/ap-melding'),
         ];
     }
 
