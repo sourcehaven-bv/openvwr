@@ -13,50 +13,31 @@ use function uses;
 
 uses(TestCase::class);
 
-it('links an http(s) location and opens it in a new tab', function (): void {
-    $entry = ExternalLinkEntry::make('location')
-        ->state('https://12345.afasinsite.nl/dossier?id=43543');
+it('exposes the linkable check and the configured view to the blade', function (): void {
+    $entry = ExternalLinkEntry::make('location');
 
-    expect($entry->getUrl())->toBe('https://12345.afasinsite.nl/dossier?id=43543')
-        ->and($entry->shouldOpenUrlInNewTab())->toBeTrue();
+    $isLinkable = $entry->getViewData()['isLinkable'];
+
+    expect($entry->getView())->toBe('filament.infolists.components.entries.external-link-entry')
+        ->and($isLinkable('https://12345.afasinsite.nl/dossier?id=43543'))->toBeTrue()
+        ->and($isLinkable('  https://12345.afasinsite.nl/dossier  '))->toBeTrue();
 });
 
-it('trims surrounding whitespace from the generated href', function (): void {
-    $entry = ExternalLinkEntry::make('location')
-        ->state('  https://12345.afasinsite.nl/dossier  ');
+it('reports non-url locations as not linkable', function (?string $state): void {
+    $isLinkable = ExternalLinkEntry::make('location')->getViewData()['isLinkable'];
 
-    expect($entry->getUrl())->toBe('https://12345.afasinsite.nl/dossier');
-});
-
-it('renders a non-url location as plain text', function (?string $state): void {
-    $entry = ExternalLinkEntry::make('location')->state($state);
-
-    expect($entry->getUrl())->toBeNull()
-        ->and($entry->shouldOpenUrlInNewTab())->toBeFalse();
+    expect($isLinkable($state))->toBeFalse();
 })->with([
+    'null' => null,
     'empty' => '',
     'dms reference' => 'DMS-2024-00184',
     'network path' => '\\\\fileserver\\privacy\\verwerkersovereenkomsten',
 ]);
 
-/*
- * A record with an empty location resolves its state through a closure rather
- * than ->state(), because ->state(null) makes Filament fall back to the
- * component container, which does not exist for a standalone component.
- */
-it('renders an unset location as plain text', function (): void {
-    $entry = ExternalLinkEntry::make('location')
-        ->getStateUsing(static fn (): ?string => null);
+it('reports unsafe schemes as not linkable', function (string $state): void {
+    $isLinkable = ExternalLinkEntry::make('location')->getViewData()['isLinkable'];
 
-    expect($entry->getUrl())->toBeNull()
-        ->and($entry->shouldOpenUrlInNewTab())->toBeFalse();
-});
-
-it('never turns an unsafe scheme into an href', function (string $state): void {
-    $entry = ExternalLinkEntry::make('location')->state($state);
-
-    expect($entry->getUrl())->toBeNull()
-        ->and($entry->shouldOpenUrlInNewTab())->toBeFalse();
+    expect($isLinkable($state))->toBeFalse();
 })->with([
     'javascript' => 'javascript:alert(document.cookie)',
     'data' => 'data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==',
