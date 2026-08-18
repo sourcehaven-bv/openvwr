@@ -21,6 +21,9 @@ return [
         . ' gekoppeld is. Ze beschrijven die verwerking en niet per se dit datalek: controleer per antwoord'
         . ' of het werkelijk gelekt is voordat u het overneemt in het meldformulier.',
 
+    'hint_prefix' => 'De gekoppelde verwerking noemt',
+    'hint_explanation' => 'Leg in het datalek vast wat er werkelijk gelekt is.',
+
     'source_recorded' => 'Uit het datalekregister',
     'source_derived' => 'Overname uit gekoppelde inhoud - controleren',
     'source_missing' => 'Niet in het register - zelf invullen',
@@ -65,12 +68,10 @@ return [
         'summary' => 'Beschrijving van het incident',
         'attachments' => 'Ondersteunende documentatie',
         'personal_data_categories' => 'Persoonsgegevens in het algemeen',
-        'personal_data_categories_from_processing' => 'Aanvullend uit de gekoppelde verwerking(en)',
         'special_categories' => 'Bijzondere categorieën van persoonsgegevens',
         'record_count' => 'Hoeveel gegevensrecords zijn getroffen?',
         'affected_groups' => 'Welke groep(en) betrokkenen zijn getroffen?',
         'affected_description' => 'Nadere omschrijving van de groep(en) betrokkenen',
-        'stakeholders_from_processing' => 'Betrokkenen volgens de gekoppelde verwerking(en)',
         'affected_count' => 'Aantal betrokkenen (exact, of minimum en maximum)',
         'encrypted_beforehand' => 'Waren de persoonsgegevens vooraf versleuteld, gehasht of anderszins ontoegankelijk?',
         'pseudonymisation_from_processing' => 'Pseudonimisering volgens de gekoppelde verwerking(en)',

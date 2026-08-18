@@ -51,7 +51,7 @@ it('shows the question numbers of the AP form so the online form can be followed
         ->assertSee(__('ap_report.question.record_count'));
 });
 
-it('names the processing record a derived answer came from', function (): void {
+it('shows what the linked processing mentions as a pointer, naming its source', function (): void {
     $organisation = OrganisationTestHelper::create();
 
     $stakeholder = Stakeholder::factory()->recycle($organisation)->create(['health' => true]);
@@ -66,7 +66,8 @@ it('names the processing record a derived answer came from', function (): void {
     $this->asFilamentOrganisationUser($organisation)
         ->get(DataBreachRecordResource::getUrl('ap-report', ['record' => $dataBreachRecord]))
         ->assertSee($processingRecord->name)
-        ->assertSee(__('ap_report.source_derived'));
+        ->assertSee(__('ap_report.hint_prefix'))
+        ->assertSee(__('ap_report.hint_explanation'));
 });
 
 it('downloads the preparation as a PDF', function (): void {

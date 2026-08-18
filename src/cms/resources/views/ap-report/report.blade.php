@@ -40,6 +40,16 @@
 
             @if ($answer->isMissing())
                 <p class="answer__value answer__value--missing">{{ __('ap_report.not_recorded') }}</p>
+
+                @if ($answer->hints !== [])
+                    <p class="answer__hint">
+                        {{ __('ap_report.hint_prefix') }}: {{ implode(', ', $answer->hints) }}.
+                        {{ __('ap_report.hint_explanation') }}
+                        @if ($answer->origins !== [])
+                            ({{ __('ap_report.origin_prefix') }}: {{ implode(', ', $answer->origins) }})
+                        @endif
+                    </p>
+                @endif
             @elseif ($answer->isMultiValued())
                 <ul class="answer__value">
                     @foreach ($answer->values as $value)

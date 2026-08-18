@@ -21,6 +21,9 @@ return [
         . ' is linked to. They describe that processing and not necessarily this breach: check for each answer'
         . ' whether it was actually part of the leak before entering it in the notification form.',
 
+    'hint_prefix' => 'The linked processing record mentions',
+    'hint_explanation' => 'Record on the data breach what was actually leaked.',
+
     'source_recorded' => 'From the data breach register',
     'source_derived' => 'Derived from linked content - verify',
     'source_missing' => 'Not in the register - fill in yourself',
@@ -65,12 +68,10 @@ return [
         'summary' => 'Description of the incident',
         'attachments' => 'Supporting documentation',
         'personal_data_categories' => 'Personal data in general',
-        'personal_data_categories_from_processing' => 'Additionally from the linked processing record(s)',
         'special_categories' => 'Special categories of personal data',
         'record_count' => 'How many data records were affected?',
         'affected_groups' => 'Which group(s) of data subjects were affected?',
         'affected_description' => 'Further description of the group(s) of data subjects',
-        'stakeholders_from_processing' => 'Data subjects according to the linked processing record(s)',
         'affected_count' => 'Number of data subjects (exact, or minimum and maximum)',
         'encrypted_beforehand' => 'Were the personal data encrypted, hashed or otherwise made inaccessible beforehand?',
         'pseudonymisation_from_processing' => 'Pseudonymisation according to the linked processing record(s)',

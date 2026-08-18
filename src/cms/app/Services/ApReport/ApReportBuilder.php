@@ -201,23 +201,26 @@ class ApReportBuilder
         $derivedSpecial = $this->stakeholderCategories($dataBreachRecord, self::SPECIAL_CATEGORY_QUESTIONS);
         $origins = $this->processingOrigins($dataBreachRecord);
 
-        // What the breach itself states about special categories outranks what the
-        // linked processing suggests: the register describes this incident, the
-        // processing only describes what it may involve.
+        // Both questions have a field on the breach record itself. What the linked
+        // processing mentions is offered as a pointer, not as the answer: only the
+        // register can state which data this incident actually touched.
         $recordedSpecial = $dataBreachRecord->personal_data_special_categories ?? [];
-        $specialCategories = $recordedSpecial === []
-            ? ApAnswer::derived('6.2', __('ap_report.question.special_categories'), $derivedSpecial, $origins)
-            : ApAnswer::recorded('6.2', __('ap_report.question.special_categories'), array_values($recordedSpecial));
 
         return new ApChapter('6', __('ap_report.chapter.personal_data'), [
-            ApAnswer::recorded('6.1', __('ap_report.question.personal_data_categories'), array_values($categories)),
-            ApAnswer::derived(
-                '6.1b',
-                __('ap_report.question.personal_data_categories_from_processing'),
+            ApAnswer::recordedWithHints(
+                '6.1',
+                __('ap_report.question.personal_data_categories'),
+                array_values($categories),
                 $derivedGeneral,
                 $origins,
             ),
-            $specialCategories,
+            ApAnswer::recordedWithHints(
+                '6.2',
+                __('ap_report.question.special_categories'),
+                array_values($recordedSpecial),
+                $derivedSpecial,
+                $origins,
+            ),
             ApAnswer::missing('6.3.1', __('ap_report.question.record_count')),
         ]);
     }
@@ -235,10 +238,10 @@ class ApReportBuilder
 
         return new ApChapter('7', __('ap_report.chapter.affected_people'), [
             ApAnswer::missing('7.1', __('ap_report.question.affected_groups')),
-            ApAnswer::recorded('7.2', __('ap_report.question.affected_description'), $dataBreachRecord->involved_people),
-            ApAnswer::derived(
-                '7.2b',
-                __('ap_report.question.stakeholders_from_processing'),
+            ApAnswer::recordedWithHints(
+                '7.2',
+                __('ap_report.question.affected_description'),
+                $dataBreachRecord->involved_people,
                 $descriptions,
                 $this->processingOrigins($dataBreachRecord),
             ),

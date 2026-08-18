@@ -80,7 +80,7 @@ it('treats an empty field as missing rather than as an answered question', funct
     expect(apAnswer($report, '4.1.1')->source)->toBe(AnswerSource::MISSING);
 });
 
-it('derives the special categories from the stakeholders of a linked processing record', function (): void {
+it('points at the special categories of the linked processing without answering for the breach', function (): void {
     $organisation = OrganisationTestHelper::create();
 
     $stakeholder = Stakeholder::factory()->recycle($organisation)->create([
@@ -105,15 +105,18 @@ it('derives the special categories from the stakeholders of a linked processing 
     $report = buildApReport($dataBreachRecord->fresh());
     $answer = apAnswer($report, '6.2');
 
-    expect($answer->source)->toBe(AnswerSource::DERIVED)
-        ->and($answer->values)->toBe(['Gegevens over iemands gezondheid'])
+    // The breach record has a field for this, so the processing only supplies a
+    // pointer: the officer records what actually leaked instead of inheriting
+    // everything the processing might involve.
+    expect($answer->source)->toBe(AnswerSource::MISSING)
+        ->and($answer->values)->toBe([])
+        ->and($answer->hints)->toBe(['Gegevens over iemands gezondheid'])
         ->and($answer->origins)->toContain($processingRecord->name);
 });
 
-it('keeps what was recorded on the breach over what the linked processing suggests', function (): void {
-    // The register states what actually leaked; the processing only says what
-    // that processing may involve. Over-reporting to the AP is a real cost, so
-    // the recorded answer wins.
+it('keeps what was recorded on the breach and drops the pointer', function (): void {
+    // Once the officer has recorded what leaked, the processing has nothing left
+    // to add: the recorded value stands on its own.
     $organisation = OrganisationTestHelper::create();
 
     $stakeholder = Stakeholder::factory()->recycle($organisation)->create(['health' => true]);
@@ -129,7 +132,8 @@ it('keeps what was recorded on the breach over what the linked processing sugges
     $answer = apAnswer($report, '6.2');
 
     expect($answer->source)->toBe(AnswerSource::RECORDED)
-        ->and($answer->values)->toBe(['Genetische gegevens']);
+        ->and($answer->values)->toBe(['Genetische gegevens'])
+        ->and($answer->hints)->toBe([]);
 });
 
 it('derives the legal basis from the register the linked processing sits in', function (): void {
@@ -332,7 +336,7 @@ it('skips a stakeholder and a processing record that describe nothing', function
 
     $report = buildApReport($dataBreachRecord->fresh());
 
-    expect(apAnswer($report, '7.2b')->source)->toBe(AnswerSource::MISSING)
+    expect(apAnswer($report, '7.2')->hints)->toBe([])
         ->and(apAnswer($report, '8.1b')->source)->toBe(AnswerSource::MISSING);
 });
 
@@ -344,4 +348,46 @@ it('treats a field holding only whitespace as missing', function (): void {
 
     expect(apAnswer(buildApReport($dataBreachRecord), '5.3')->source)
         ->toBe(AnswerSource::MISSING);
+});
+
+it('points at the data subjects of the linked processing when the breach says nothing', function (): void {
+    $organisation = OrganisationTestHelper::create();
+
+    $stakeholder = Stakeholder::factory()->recycle($organisation)->create([
+        'description' => 'Patiënten van de poliklinieken',
+    ]);
+    $processingRecord = AvgResponsibleProcessingRecord::factory()->recycle($organisation)->create();
+    $processingRecord->stakeholders()->attach($stakeholder);
+
+    $dataBreachRecord = DataBreachRecord::factory()->recycle($organisation)->create([
+        'involved_people' => null,
+    ]);
+    $dataBreachRecord->avgResponsibleProcessingRecords()->attach($processingRecord);
+
+    $answer = apAnswer(buildApReport($dataBreachRecord->fresh()), '7.2');
+
+    expect($answer->source)->toBe(AnswerSource::MISSING)
+        ->and($answer->hints)->toBe(['Patiënten van de poliklinieken']);
+});
+
+it('points at the BSN of the linked processing without filling in 6.1', function (): void {
+    $organisation = OrganisationTestHelper::create();
+
+    $stakeholder = Stakeholder::factory()->recycle($organisation)->create([
+        'citizen_service_numbers' => true,
+        'criminal_law' => false,
+    ]);
+    $processingRecord = AvgResponsibleProcessingRecord::factory()->recycle($organisation)->create();
+    $processingRecord->stakeholders()->attach($stakeholder);
+
+    $dataBreachRecord = DataBreachRecord::factory()->recycle($organisation)->create([
+        'personal_data_categories' => null,
+        'personal_data_categories_other' => null,
+    ]);
+    $dataBreachRecord->avgResponsibleProcessingRecords()->attach($processingRecord);
+
+    $answer = apAnswer(buildApReport($dataBreachRecord->fresh()), '6.1');
+
+    expect($answer->source)->toBe(AnswerSource::MISSING)
+        ->and($answer->hints)->toBe(['Burgerservicenummer (BSN)']);
 });

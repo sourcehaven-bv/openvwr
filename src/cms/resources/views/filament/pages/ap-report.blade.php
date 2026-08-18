@@ -72,6 +72,18 @@
                                 <p class="italic text-danger-700 dark:text-danger-400">
                                     {{ __('ap_report.not_recorded') }}
                                 </p>
+
+                                @if ($answer->hints !== [])
+                                    <p class="mt-0.5 text-xs text-warning-700 dark:text-warning-400">
+                                        {{ __('ap_report.hint_prefix') }}:
+                                        {{ implode(', ', $answer->hints) }}.
+                                        {{ __('ap_report.hint_explanation') }}
+                                        @if ($answer->origins !== [])
+                                            ({{ __('ap_report.origin_prefix') }}:
+                                            {{ implode(', ', $answer->origins) }})
+                                        @endif
+                                    </p>
+                                @endif
                             @elseif ($answer->isMultiValued())
                                 <ul class="list-disc space-y-0.5 pl-5">
                                     @foreach ($answer->values as $value)

@@ -13,21 +13,6 @@ e-mail- of postkanaal. De AP schrijft dat zelf in de
 Het [NCSC](https://www.ncsc.nl/wet-en-regelgeving/melden-van-een-datalek) noemt naast het formulier
 alleen een telefoonnummer als terugvaloptie.
 
-Verder onderzocht en afgevallen:
-
-- **Bulkmelding.** Het formulier kent een bulkmelding (vraag 1.1), maar die is beperkt tot een
-  pilot voor pensioenfondsen, verzekeraars en banken, vereist uitdrukkelijke schriftelijke
-  toestemming van de AP, en die toestemming is volgens de vragenlijst op dit moment niet te
-  verkrijgen. Bovendien gaat het specifiek om grootschalige postverzending.
-- **Het formulier scripten.** Het meldformulier is een Berkeley Bridge-beslisboom (model
-  `datalekkenmeldformulier`) achter een F5-gateway, zonder login. Een melding is een wettelijke
-  handeling met een termijn van 72 uur; een script dat stilzwijgend breekt of verkeerd invult is
-  een te groot risico, en er is geen enkele toezegging waarop we kunnen bouwen.
-- **`.cas`-sessiebestand.** Het formulier kan een sessie opslaan en terugladen als `.cas`-bestand.
-  Als dat formaat te schrijven zou zijn, zou het formulier vooringevuld kunnen worden. Het formaat
-  is echter ongedocumenteerd, ongeversioneerd en leveranciergebonden. De moeite waard om een keer
-  bij de AP of de leverancier na te vragen, maar niets om nu op te bouwen.
-
 ## Wat OpenVWR wel doet
 
 Per datalek is er een **AP-meldformulier voorbereiding** (knop op het datalek, of
@@ -46,32 +31,22 @@ Elk antwoord heeft een herkomst (`App\Services\ApReport\AnswerSource`):
 Bovenaan staan twee lijsten: wat nog verzameld moet worden, en welke afgeleide antwoorden
 gecontroleerd moeten worden.
 
-### Waarom afgeleide antwoorden niet als feit gelden
+### Wat het register zelf hoort vast te leggen
 
-Een gekoppelde verwerking beschrijft wat díe verwerking kan bevatten, niet wat er bij dít datalek
-werkelijk gelekt is. Als een datalek alleen de adresgegevens uit een zorgverwerking raakt, zou het
-klakkeloos overnemen van "gegevens over iemands gezondheid" een onjuiste melding aan de
-toezichthouder opleveren. Afgeleide antwoorden worden daarom altijd getoond mét de bron waaruit ze
-komen, ter bevestiging door de privacy officer. Staat er een waarde op het datalek zelf, dan wint
-die van de afleiding.
+Een datalek raakt meestal maar een deel van een verwerking. Uit de gekoppelde verwerking is dus
+wel af te leiden welke gegevens er in het spel *kunnen* zijn, maar niet welke er werkelijk gelekt
+zijn.
 
-### Wat wordt afgeleid
+Een voorbeeld. Aan een zorgverwerking hangen gezondheidsgegevens. Raakt een datalek alleen de
+adresgegevens uit die verwerking, dan zou "gegevens over iemands gezondheid" onterecht in de
+melding belanden.
 
-| Vraag | Herkomst |
-|-------|----------|
-| 1.2 Wettelijke grondslag | Het register waarin de gekoppelde verwerking staat (WPG-koppeling ⇒ Wpg) |
-| 3.1 Verantwoordelijke en adres | `responsibles` en hun `address` |
-| 3.3 Andere organisaties | `processors` en `receivers` van de gekoppelde verwerkingen |
-| 6.1 BSN / strafrechtelijke gegevens | `stakeholders.citizen_service_numbers` en `criminal_law` |
-| 6.2 Bijzondere categorieën | De Art. 9-booleans op `stakeholders` |
-| 7.2 Betrokkenen | `stakeholders.description` |
-| 8.1 Maatregelen vooraf | `pseudonymization` van de verwerking (als context, niet als antwoord) |
+Voor de vragen waar het datalek zelf een veld voor heeft — welke persoonsgegevens (6.1), welke
+bijzondere categorieën (6.2) en welke betrokkenen (7.2) — vult OpenVWR daarom niets in. Is het veld
+leeg, dan blijft de vraag op "nog invullen" staan, met daarbij wat de gekoppelde verwerking noemt
+als aanwijzing. Zo legt de privacy officer in het datalek vast wat er werkelijk gelekt is, wat
+artikel 33 lid 5 sowieso van het register vraagt.
 
-WPG-verwerkingen kennen geen betrokkenen (`stakeholders`) en leveren daar dus niets aan.
-
-## Bekende gaten
-
-Deze vragen kan het register nog niet beantwoorden en verschijnen als "nog invullen": aantal
-gegevensrecords (6.3), aantal betrokkenen (7.3), hoe het lek ontdekt is (4.3), reden van melding na
-72 uur (4.5), gevolgen (9.1/9.2), ernstinschatting in de vier niveaus van de AP (9.3), KvK-nummer,
-sector en FG-registratienummer (3.1/3.2), en de vervolgacties (10.x).
+Antwoorden die over de verwerking zelf gaan en niet op het datalek thuishoren — de wettelijke
+grondslag (1.2), de betrokken verwerkers en ontvangers (3.3) en de pseudonimisering (8.1) — worden
+wel overgenomen, met vermelding van de verwerking waaruit ze komen.

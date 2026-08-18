@@ -48,6 +48,11 @@
         .answer__question { font-weight: bold; }
         .answer__value--missing { color: #c23b22; font-style: italic; }
 
+        .answer__hint {
+            font-size: 0.8rem;
+            color: #7a5c1e;
+        }
+
         .answer__source {
             font-size: 0.75rem;
             color: #666;

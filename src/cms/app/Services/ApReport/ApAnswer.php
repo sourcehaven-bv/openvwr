@@ -20,6 +20,8 @@ class ApAnswer
      * @param array<int, string> $values
      * @param array<int, string> $origins human-readable sources, e.g. the name of
      *                                    the processing record a value was derived from
+     * @param array<int, string> $hints what the linked content mentions, as a pointer
+     *                                  for a question the officer has to answer themselves
      */
     private function __construct(
         public readonly string $number,
@@ -27,6 +29,7 @@ class ApAnswer
         public readonly array $values,
         public readonly AnswerSource $source,
         public readonly array $origins = [],
+        public readonly array $hints = [],
     ) {
     }
 
@@ -59,6 +62,32 @@ class ApAnswer
         }
 
         return new self($number, $label, $values, AnswerSource::DERIVED, $origins);
+    }
+
+    /**
+     * A question the register holds a field for, left empty. What the linked
+     * processing records mention is passed along as a hint: it says what may be
+     * relevant, so the officer can record on the breach what actually leaked
+     * rather than have the preparation guess it for them.
+     *
+     * @param array<int, string>|string|null $value
+     * @param array<int, string> $hints
+     * @param array<int, string> $origins
+     */
+    public static function recordedWithHints(
+        string $number,
+        string $label,
+        array|string|null $value,
+        array $hints,
+        array $origins,
+    ): self {
+        $values = self::normalise($value);
+
+        if ($values !== []) {
+            return new self($number, $label, $values, AnswerSource::RECORDED);
+        }
+
+        return new self($number, $label, [], AnswerSource::MISSING, $origins, self::normalise($hints));
     }
 
     public static function missing(string $number, string $label): self
