@@ -81,7 +81,7 @@ return [
         'Apparaat, gegevensdrager (bijv. USB-stick) en/of papier met persoonsgegevens kwijtgeraakt of gestolen',
         'Persoonsgegevens per ongeluk gepubliceerd',
         'Hacking, malware (bijv. ransomware) en/of phishing',
-        'Persoonsgegevens toegevoegd aan verkeer dossier',
+        'Persoonsgegevens toegevoegd aan het verkeerde dossier',
         'Overig',
     ],
     'personal_data_categories_options' => [
@@ -99,7 +99,7 @@ return [
         'Creditcardgegevens',
         'Gegevens over (problematische) schulden',
         'Gegevens over uitkering en/of schulden',
-        'Andere financiële gegevens, namelijk:[open veld]',
+        'Andere financiële gegevens',
         '(Kopieën van) paspoorten of andere legitimatiebewijzen',
         'Locatiegegevens',
         'Persoonsgegevens betreffende strafrechtelijke veroordelingen en strafbare feiten of daarmee verband houdende veiligheidsmaatregelen',
