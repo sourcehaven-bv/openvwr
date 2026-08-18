@@ -122,7 +122,7 @@ The most detailed part of the record. For each category of data subjects it capt
 | » Data | List |  |
 | » » Description | Free text |  |
 | » » Collection purpose | Free text | Why precisely this data is needed within the processing activity. |
-| » » Retention period | Free text | How long the data is retained and on what basis; nothing is deleted automatically. |
+| » » Retention period | Choice | How long the data is retained and on what basis; nothing is deleted automatically. |
 | » » Who/what is the source of the data? | Free text | From whom or from where the data originates, for example the data subject themselves or a base registry. |
 | » » Is the data subject obliged to provide the requested data? | Yes/no |  |
 | » » Describe the consequences for the data subject if the data is not provided | Free text | What happens if the data subject does not provide the data, for example that the application cannot be processed. |
@@ -280,7 +280,7 @@ Processing of personal data that your organisation carries out on behalf of anot
 | » Data | List |  |
 | » » Description | Free text |  |
 | » » Collection purpose | Free text | Why precisely this data is needed within the processing activity. |
-| » » Retention period | Free text | How long the data is retained and on what basis; nothing is deleted automatically. |
+| » » Retention period | Choice | How long the data is retained and on what basis; nothing is deleted automatically. |
 | » » Who/what is the source of the data? | Free text | From whom or from where the data originates, for example the data subject themselves or a base registry. |
 | » » Is the data subject obliged to provide the requested data? | Yes/no |  |
 | » » Describe the consequences for the data subject if the data is not provided | Free text | What happens if the data subject does not provide the data, for example that the application cannot be processed. |
@@ -760,7 +760,7 @@ Data protection impact assessments according to the Model DPIA Rijksdienst v3.0.
 | » Type of personal data | Choice | Special categories of personal data and criminal law data may in principle not be processed, and a national identification number only where the law provides for it. For those choices you will be asked for the exemption ground below. Choose from: Ordinary; Sensitive; Special category (Article 9 GDPR); Criminal law data (Article 10 GDPR); National identification number. |
 | » Category of data subjects | Text | Whose data is this? For example citizens, staff or visitors. |
 | » Source | Text | Where does this data item come from? For example the data subject themselves, a base registry or a third party. |
-| » Retention period | Text | How long is this data item retained? The substantiation belongs in section 10. |
+| » Retention period | Choice | How long is this data item retained? The substantiation belongs in section 10. |
 | » Exemption ground | Free text | On what basis may this data item nevertheless be processed? Refer to the statutory exemption (Article 9 or 10 GDPR, or the UAVG (Dutch GDPR Implementation Act)) and substantiate it. |
 | Additional information about the personal data | Free text | Optional text field for explanations that do not belong to an individual data item. |
 

@@ -120,7 +120,7 @@ Het meest gedetailleerde onderdeel van de registratie. Per categorie betrokkenen
 | » Gegevens | Lijst |  |
 | » » Beschrijving | Toelichting |  |
 | » » Verzameldoel | Toelichting | Waarvoor juist deze gegevens nodig zijn binnen de verwerking. |
-| » » Bewaartermijn | Toelichting | Hoe lang de gegevens bewaard worden en op welke grond; er wordt niet automatisch verwijderd. |
+| » » Bewaartermijn | Keuze | Hoe lang de gegevens bewaard worden en op welke grond; er wordt niet automatisch verwijderd. |
 | » » Wie/wat is de bron van gegevens? | Toelichting | Van wie of waaruit de gegevens afkomstig zijn, bijvoorbeeld de betrokkene zelf of een basisregistratie. |
 | » » Is betrokkene verplicht de gevraagde gegevens aan te leveren? | Ja/nee |  |
 | » » Omschrijf de gevolgen voor de betrokkene als de gegevens niet worden aangeleverd | Toelichting | Wat er gebeurt als de betrokkene de gegevens niet verstrekt, bijvoorbeeld dat de aanvraag niet in behandeling kan worden genomen. |
@@ -278,7 +278,7 @@ Verwerkingen van persoonsgegevens die uw organisatie in opdracht van een andere 
 | » Gegevens | Lijst |  |
 | » » Beschrijving | Toelichting |  |
 | » » Verzameldoel | Toelichting | Waarvoor juist deze gegevens nodig zijn binnen de verwerking. |
-| » » Bewaartermijn | Toelichting | Hoe lang de gegevens bewaard worden en op welke grond; er wordt niet automatisch verwijderd. |
+| » » Bewaartermijn | Keuze | Hoe lang de gegevens bewaard worden en op welke grond; er wordt niet automatisch verwijderd. |
 | » » Wie/wat is de bron van gegevens? | Toelichting | Van wie of waaruit de gegevens afkomstig zijn, bijvoorbeeld de betrokkene zelf of een basisregistratie. |
 | » » Is betrokkene verplicht de gevraagde gegevens aan te leveren? | Ja/nee |  |
 | » » Omschrijf de gevolgen voor de betrokkene als de gegevens niet worden aangeleverd | Toelichting | Wat er gebeurt als de betrokkene de gegevens niet verstrekt, bijvoorbeeld dat de aanvraag niet in behandeling kan worden genomen. |
@@ -758,7 +758,7 @@ Gegevensbeschermingseffectbeoordelingen volgens het Model DPIA Rijksdienst v3.0.
 | » Type persoonsgegeven | Keuze | Bijzondere en strafrechtelijke persoonsgegevens mogen in beginsel niet worden verwerkt, en een wettelijk identificatienummer alleen als de wet dat bepaalt. Bij die keuzes wordt hieronder om de uitzonderingsgrond gevraagd. Keuze uit: Gewoon; Gevoelig; Bijzonder (artikel 9 AVG); Strafrechtelijk (artikel 10 AVG); Wettelijk identificatienummer. |
 | » Categorie betrokkenen | Tekst | Van wie zijn deze gegevens? Bijvoorbeeld burgers, medewerkers of bezoekers. |
 | » Bron | Tekst | Waar komt dit gegeven vandaan? Bijvoorbeeld de betrokkene zelf, een basisregistratie of een derde partij. |
-| » Bewaartermijn | Tekst | Hoe lang wordt dit gegeven bewaard? De onderbouwing hoort bij paragraaf 10. |
+| » Bewaartermijn | Keuze | Hoe lang wordt dit gegeven bewaard? De onderbouwing hoort bij paragraaf 10. |
 | » Uitzonderingsgrond | Toelichting | Op grond waarvan mag dit gegeven toch worden verwerkt? Verwijs naar de wettelijke uitzondering (artikel 9 of 10 AVG, of de Uitvoeringswet AVG) en onderbouw die. |
 | Aanvullende informatie over de persoonsgegevens | Toelichting | Optioneel tekstveld voor toelichting die niet bij een afzonderlijk gegeven hoort. |
 

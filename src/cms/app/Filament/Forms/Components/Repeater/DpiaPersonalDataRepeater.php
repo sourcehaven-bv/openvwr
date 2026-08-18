@@ -6,6 +6,7 @@ namespace App\Filament\Forms\Components\Repeater;
 
 use App\Enums\Dpia\PersonalDataType;
 use App\Facades\Authentication;
+use App\Filament\Forms\Components\RetentionPeriodInput;
 use App\Filament\TenantScoped;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Component;
@@ -83,10 +84,12 @@ class DpiaPersonalDataRepeater extends Repeater
                     TextInput::make('source')
                         ->label(__('dpia_record.personal_data_source'))
                         ->helperText(__('dpia_record.help_personal_data_source')),
-                    TextInput::make('retention_period')
-                        ->label(__('dpia_record.personal_data_retention_period'))
-                        ->helperText(__('dpia_record.help_personal_data_retention_period')),
                 ]),
+            ...RetentionPeriodInput::make(
+                'retention_period',
+                __('dpia_record.personal_data_retention_period'),
+                __('dpia_record.help_personal_data_retention_period'),
+            ),
             // The paragraaf 12 question, asked only where it applies.
             Placeholder::make('exception_notice')
                 ->hiddenLabel()

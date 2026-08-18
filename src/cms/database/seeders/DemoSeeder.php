@@ -22,6 +22,7 @@ use App\Models\PublicWebsiteTree;
 use App\Models\Receiver;
 use App\Models\Responsible;
 use App\Models\ResponsibleLegalEntity;
+use App\Models\RetentionPeriod;
 use App\Models\System;
 use App\Models\Tag;
 use App\Models\User;
@@ -205,6 +206,13 @@ class DemoSeeder extends Seeder
 
         foreach (DemoContent::CONTACT_POSITIONS as $name) {
             $positions[] = ContactPersonPosition::factory()->for($organisation)->create([
+                'name' => $name,
+                'enabled' => true,
+            ]);
+        }
+
+        foreach (DemoContent::RETENTION_PERIODS as $name) {
+            RetentionPeriod::factory()->for($organisation)->create([
                 'name' => $name,
                 'enabled' => true,
             ]);

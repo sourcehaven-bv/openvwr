@@ -16,4 +16,5 @@
   <violation rule="PHPMD\Rule\CleanCode\BooleanArgumentFlag" file="app/Routing/UrlGenerator.php"/>
   <violation rule="PHPMD\Rule\CleanCode\BooleanArgumentFlag" file="app/Filament/Resources/DpiaRecordResource/Pages/CreateDpiaRecord.php"/>
   <violation rule="PHPMD\Rule\CleanCode\BooleanArgumentFlag" file="app/Filament/Resources/DpiaRecordResource/Pages/EditDpiaRecord.php"/>
+  <violation rule="PHPMD\Rule\CleanCode\BooleanArgumentFlag" file="app/Filament/Forms/Components/RetentionPeriodInput.php"/>
 </phpmd-baseline>

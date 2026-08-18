@@ -105,6 +105,32 @@ final class DemoContent
         'Auditrapport',
     ];
 
+    /**
+     * Starter list of bewaartermijnen an organisation can pick from.
+     *
+     * The wording carries the legal ground, because that is what a register has
+     * to be able to show. Terms marked with an article are statutory; the ones
+     * referring to the Selectielijst gemeenten 2020 are binding for gemeenten
+     * via the Archiefwet, where they are a minimum as well as a maximum --
+     * destroying earlier than the selectielijst prescribes is not allowed.
+     * Each organisation edits this list to fit its own selectielijst.
+     */
+    public const RETENTION_PERIODS = [
+        '7 jaar (fiscale bewaarplicht, art. 52 lid 4 AWR)',
+        '7 jaar (subsidieadministratie, art. 4:69 Awb)',
+        '5 jaar na einde kalenderjaar dienstverband (kopie identiteitsbewijs, art. 7.5 URLB 2011)',
+        '5 jaar na einde kalenderjaar dienstverband (gegevens voor loonheffingen, art. 7.9 URLB 2011)',
+        '10 jaar na einde dienstverband (personeelsdossier, Selectielijst gemeenten 17.5)',
+        '4 weken na einde sollicitatieprocedure',
+        '1 jaar na einde sollicitatieprocedure (met toestemming van de kandidaat)',
+        '4 weken (camerabeelden; langer bij een incident tot de afhandeling daarvan)',
+        '6 maanden (logging; 3 jaar bij een beveiligingsincident)',
+        '3 jaar na gunning (aanbestedingsdossier, art. 2.56 Aanbestedingswet 2012)',
+        '52 weken (arbeids- en rusttijdenregistratie, Arbeidstijdenbesluit)',
+        '40 jaar na einde blootstelling (arbeidsgezondheidskundig onderzoek, art. 4.10c Arbobesluit)',
+        'Blijvend te bewaren (Archiefwet 1995 / Selectielijst)',
+    ];
+
     /** Positions for contact persons. */
     public const CONTACT_POSITIONS = [
         'Privacy Officer',

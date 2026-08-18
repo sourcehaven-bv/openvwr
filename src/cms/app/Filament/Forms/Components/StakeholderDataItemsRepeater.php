@@ -59,13 +59,12 @@ class StakeholderDataItemsRepeater extends Repeater
                 ->rows(3)
                 ->columnSpanFull()
                 ->maxLength(512),
-            Textarea::make('retention_period')
-                ->label(__('stakeholder_data_item.retention_period'))
-                ->helperText(__('stakeholder_data_item.help_retention_period'))
-                ->required()
-                ->rows(3)
-                ->columnSpanFull()
-                ->maxLength(512),
+            ...RetentionPeriodInput::make(
+                'retention_period',
+                __('stakeholder_data_item.retention_period'),
+                __('stakeholder_data_item.help_retention_period'),
+                required: true,
+            ),
             Textarea::make('source_description')
                 ->label(__('stakeholder_data_item.source_description'))
                 ->helperText(__('stakeholder_data_item.help_source_description'))
