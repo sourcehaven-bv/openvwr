@@ -27,6 +27,7 @@ class GoToStaticWebsiteAction extends Action
                 return $staticWebsiteCheck->url;
             })
             ->openUrlInNewTab()
+            ->extraAttributes(['rel' => 'noopener noreferrer'])
             ->visible(static function (Publishable $record): bool {
                 return $record->isPublished();
             });

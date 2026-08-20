@@ -1,6 +1,7 @@
 <span @class(['hidden' => !$getRecord()->isPublished()])>
     <a href="{{ $getRecord()->getLatestStaticWebsiteSnapshotEntry()?->url }}"
        target="_blank"
+       rel="noopener noreferrer"
        title="{{ __('general.published_at') }}"
     >
         <x-filament::icon
