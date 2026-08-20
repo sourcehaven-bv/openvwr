@@ -22,6 +22,7 @@ use App\Collections\OrganisationCollection;
 use App\Collections\ProcessorCollection;
 use App\Collections\ReceiverCollection;
 use App\Collections\ResponsibleCollection;
+use App\Collections\RetentionPeriodCollection;
 use App\Collections\SnapshotCollection;
 use App\Collections\StakeholderCollection;
 use App\Collections\StakeholderDataItemCollection;
@@ -97,6 +98,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property-read EntityNumberCounter $registerEntityNumberCounter
  * @property-read ResponsibleLegalEntity $responsibleLegalEntity
  * @property-read ResponsibleCollection $responsibles
+ * @property-read RetentionPeriodCollection $retentionPeriods
  * @property-read StakeholderDataItemCollection $stakeholderDataItems
  * @property-read SnapshotCollection $snapshots
  * @property-read StakeholderCollection $stakeholders
@@ -324,6 +326,14 @@ class Organisation extends Model implements HasMedia
     public function responsibleLegalEntity(): BelongsTo
     {
         return $this->belongsTo(ResponsibleLegalEntity::class);
+    }
+
+    /**
+     * @return HasMany<RetentionPeriod, $this>
+     */
+    public function retentionPeriods(): HasMany
+    {
+        return $this->hasMany(RetentionPeriod::class);
     }
 
     /**

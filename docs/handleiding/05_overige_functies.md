@@ -24,8 +24,16 @@ Is de export voltooid, dan zal er een notificatie getoond worden in het scherm r
 
 **Beschikbaar voor**: (Chief) Privacy Officer
 
-In het systeem zijn er meerdere velden waar er slechts een keuze mogelijk is uit een beperkte set opties. Onder "Opzoeklijsten" zijn deze velden te vinden en zijn hun opties aan te passen.
+In het systeem zijn er meerdere velden waar er slechts een keuze mogelijk is uit een beperkte set opties. Onder "Opzoeklijsten" zijn deze velden te vinden en zijn hun opties aan te passen (Figuur \ref{fig:opzoeklijst_overzicht}).
 
-In deze opzoeklijsten zijn nieuwe waardes aan te maken, opties in of uit te schakelen en opties te verwijderen. Op de detailpagina van een optie is een tabel te vinden van alle entiteiten waar deze optie is geselecteerd.
+![Overzicht van een opzoeklijst\label{fig:opzoeklijst_overzicht}](./imgs/05_overige_functies/03_lookup_list_overview.png)
+
+In deze opzoeklijsten zijn nieuwe waardes aan te maken, opties in of uit te schakelen en opties te verwijderen (Figuur \ref{fig:opzoeklijst_bewerken}). Op de detailpagina van een optie is een tabel te vinden van alle entiteiten waar deze optie is geselecteerd.
+
+![Een waarde in een opzoeklijst bewerken\label{fig:opzoeklijst_bewerken}](./imgs/05_overige_functies/04_lookup_list_edit.png)
+
+Met de tabs boven de tabel wisselt u tussen ingeschakelde en uitgeschakelde waarden. Alleen ingeschakelde waarden verschijnen in de keuzelijsten bij het invoeren.
 
 > **Let op:** Het verwijderen van een optie verwijdert deze compleet uit het systeem! Dit betekent dat overal waar de optie geselecteerd was, nu niets meer geselecteerd is. Als dit niet de bedoeling is, wilt u de optie waarschijnlijk uitschakelen: de optie is dan niet meer te selecteren, maar entiteiten waar deze optie eerder geselecteerd was, blijven ongewijzigd.
+
+De lijst *Bewaartermijnen* is hierop een uitzondering: wijzigingen daarin laten bestaande verwerkingen ongemoeid. Zie Hoofdstuk \ref{Beheer}, "Bewaartermijnen", voor de reden.
