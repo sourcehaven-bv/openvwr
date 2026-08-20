@@ -16,6 +16,7 @@ use App\Providers\EventServiceProvider;
 use App\Providers\FakerServiceProvider;
 use App\Providers\FilamentServiceProvider;
 use App\Providers\FilesystemServiceProvider;
+use App\Providers\FixedListServiceProvider;
 use App\Providers\ImportServiceProvider;
 use App\Providers\RepositoryServiceProvider;
 use App\Providers\RouteServiceProvider;
@@ -206,6 +207,7 @@ return [
         FakerServiceProvider::class,
         FilamentServiceProvider::class,
         FilesystemServiceProvider::class,
+        FixedListServiceProvider::class,
         ImportServiceProvider::class,
         SnapshotDataServiceProvider::class,
         StaticWebsiteServiceProvider::class,

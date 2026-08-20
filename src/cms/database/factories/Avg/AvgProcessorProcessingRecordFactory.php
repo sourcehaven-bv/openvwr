@@ -6,6 +6,7 @@ namespace Database\Factories\Avg;
 
 use App\Enums\CoreEntityDataCollectionSource;
 use App\Enums\EntityNumberType;
+use App\FixedLists\Lists\AdequacyDecisionCountryList;
 use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Avg\AvgGoal;
 use App\Models\Avg\AvgProcessorProcessingRecord;
@@ -24,8 +25,7 @@ use App\Models\Snapshot;
 use App\Models\Stakeholder;
 use App\Models\System;
 use Illuminate\Database\Eloquent\Factories\Factory;
-
-use function __;
+use Illuminate\Support\Facades\App;
 
 /**
  * @extends Factory<AvgProcessorProcessingRecord>
@@ -52,7 +52,9 @@ class AvgProcessorProcessingRecordFactory extends Factory
             'pseudonymization' => $this->faker->text(),
 
             'outside_eu' => $this->faker->boolean(),
-            'country' => $this->faker->optional()->randomElement(__('general.country_options')),
+            'country' => $this->faker->optional()->randomElement(
+                App::make(AdequacyDecisionCountryList::class)->currentValues(),
+            ),
             'outside_eu_protection_level' => $this->faker->boolean(),
             'outside_eu_protection_level_description' => $this->faker->text(),
             'decision_making' => $this->faker->boolean(),

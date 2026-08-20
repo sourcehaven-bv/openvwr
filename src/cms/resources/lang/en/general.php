@@ -75,21 +75,4 @@ return [
 
     'country' => 'Countries',
     'country_other' => 'Other, namely:',
-    'country_options' => [
-        'Andorra',
-        'Argentina',
-        'Canada (commercial organisations only)',
-        'Faroe Islands',
-        'Guernsey',
-        'Isle of Man',
-        'Israel',
-        'Japan',
-        'Jersey',
-        'New Zealand',
-        'Uruguay',
-        'United Kingdom',
-        'United States (organisations participating in the Data Privacy Framework)',
-        'Switzerland',
-        'South Korea',
-    ],
 ];

@@ -29,6 +29,7 @@ Directory: `/src/static-website/`
 - See [docs/static_website_hugo.md](docs/static_website_hugo.md) for detailed information about the Hugo static website publishing system.
 - See [docs/import_export.md](docs/import_export.md) for the zip-based import/export of register content between organisations.
 - See [docs/ap_melding.md](docs/ap_melding.md) for the preparation of a data breach notification to the Autoriteit Persoonsgegevens.
+- See [docs/fixed_lists.md](docs/fixed_lists.md) for the choice lists that follow from law or policy (such as the adequacy-decision countries), how to retire a value, and the `fixed-lists:audit` command.
 
 ## Getting started
 > All `artisan` commands must be run via Sail (`sail artisan ...` or inside `sail shell`).

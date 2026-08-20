@@ -75,21 +75,4 @@ return [
 
     'country' => 'Landen',
     'country_other' => 'Anders, namelijk:',
-    'country_options' => [
-        'Andorra',
-        'Argentinië',
-        'Canada (alleen commerciële bedrijven)',
-        'Faeröer Eilanden',
-        'Guernsey',
-        'Isle of Man',
-        'Israël',
-        'Japan',
-        'Jersey',
-        'Nieuw-Zeeland',
-        'Uruguay',
-        'Verenigd Koninkrijk',
-        'Verenigde Staten (organisaties die meedoen aan het Data Privacy Framework)',
-        'Zwitserland',
-        'Zuid-Korea',
-    ],
 ];
