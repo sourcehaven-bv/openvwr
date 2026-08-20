@@ -101,7 +101,8 @@ class DocumentResourceForm
                             }),
                     ),
                 Textarea::make('location')
-                    ->label(__('document.location')),
+                    ->label(__('document.location'))
+                    ->helperText(__('document.help_location')),
                 AttachmentFileField::make('Attachments'),
             ]);
     }

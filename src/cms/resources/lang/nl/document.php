@@ -18,7 +18,7 @@ return [
     'help_expires_at' => 'De datum waarop het document opnieuw beoordeeld moet worden.',
     'help_notify_at' => 'Op deze datum ontvangen de Privacy Officers een herinnering per e-mail; bij een datum in het verleden wordt niets verstuurd.',
     'help_type' => 'Het soort document, bijvoorbeeld een verwerkersovereenkomst, DPIA of beveiligingsbeleid.',
-    'help_location' => 'Waar het originele document te vinden is, bijvoorbeeld een DMS-verwijzing of netwerklocatie.',
+    'help_location' => 'Waar het originele document te vinden is, bijvoorbeeld een DMS-verwijzing of netwerklocatie. Een volledig webadres (http of https), zoals een link naar het dossieritem in AFAS, wordt klikbaar getoond.',
     'help_processing_records' => 'De verwerkingen waarop dit document betrekking heeft.',
 
     'notification_options' => [

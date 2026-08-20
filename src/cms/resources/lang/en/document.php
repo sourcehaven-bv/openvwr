@@ -18,7 +18,7 @@ return [
     'help_expires_at' => 'The date on which the document must be reassessed.',
     'help_notify_at' => 'On this date the Privacy Officers receive a reminder by email; nothing is sent for a date in the past.',
     'help_type' => 'The kind of document, for example a processor agreement, DPIA or security policy.',
-    'help_location' => 'Where the original document can be found, for example a DMS reference or network location.',
+    'help_location' => 'Where the original document can be found, for example a DMS reference or network location. A full web address (http or https), such as a link to the dossier item in AFAS, is shown as a clickable link.',
     'help_processing_records' => 'The processing activities this document relates to.',
 
     'notification_options' => [
