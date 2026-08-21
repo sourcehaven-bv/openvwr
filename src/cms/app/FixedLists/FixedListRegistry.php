@@ -9,9 +9,9 @@ use App\FixedLists\Lists\TransferMechanismList;
 use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Dpia\DpiaPrescanRecord;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Lang;
 use Webmozart\Assert\Assert;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * Declares which columns are governed by which fixed list.
