@@ -44,6 +44,14 @@ class FixedListAuditor
 
         $findings = [];
         foreach ($counts as $value => $count) {
+            // PHP coerces integer-like array keys to int, so a stored value such as "2024" would arrive here
+            // as an int and fail the string type declarations under strict_types.
+            $value = (string) $value;
+
+            if ($fixedListColumn->ignores($value)) {
+                continue;
+            }
+
             $entry = $fixedListColumn->list->find($value);
             if ($entry === null) {
                 $findings[] = new FixedListFinding(
@@ -88,7 +96,10 @@ class FixedListAuditor
      *
      * @param FixedListColumn<covariant Model> $fixedListColumn
      *
-     * @return array<string, int>
+     * PHP coerces integer-like array keys to int, so the keys are not guaranteed to stay strings even though
+     * they come from a string column.
+     *
+     * @return array<array-key, int>
      */
     private function countStoredValues(FixedListColumn $fixedListColumn): array
     {
