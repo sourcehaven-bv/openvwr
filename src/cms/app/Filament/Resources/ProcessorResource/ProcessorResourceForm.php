@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ProcessorResource;
 
 use App\Filament\Forms\Components\Repeater\AddressRepeater;
+use App\Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -39,6 +40,7 @@ class ProcessorResourceForm
                 ->tel()
                 ->required()
                 ->maxLength(255),
+            TagsInput::make(),
             AddressRepeater::make()
                 ->columnSpan(2),
         ];

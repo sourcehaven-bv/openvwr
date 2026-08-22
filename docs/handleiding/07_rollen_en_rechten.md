@@ -24,7 +24,7 @@ Een Chief Privacy Officer kan:
 - documenten en verantwoordelijken beheren;
 - versies aanmaken en het goedkeuringsproces begeleiden (goedkeuren, vaststellen en vervallen);
 - registers importeren en exporteren;
-- opzoeklijsten en tags beheren;
+- opzoeklijsten en labels beheren;
 - gebruikers uitnodigen en rollen toekennen
 
 
@@ -38,7 +38,7 @@ Verder kan een Privacy Officer:
 - documenten en verantwoordelijken beheren;
 - versies aanmaken en het goedkeuringsproces begeleiden (goedkeuren, vaststellen en vervallen);
 - registers importeren en exporteren;
-- opzoeklijsten en tags beheren;
+- opzoeklijsten en labels beheren;
 - gebruikers uitnodigen en rollen toekennen, met uitzondering van Chief Privacy Officer en Mandaathouder.
 
 ## Invoerder

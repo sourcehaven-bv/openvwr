@@ -17,6 +17,7 @@ use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Concerns\HasDefaultMediaCollections;
 use App\Models\Concerns\HasOrganisation;
 use App\Models\Concerns\HasSoftDeletes;
+use App\Models\Concerns\HasTags;
 use App\Models\Concerns\HasTimestamps;
 use App\Models\Concerns\HasUuidAsId;
 use App\Models\Contracts\TenantAware;
@@ -49,6 +50,7 @@ class Document extends Model implements HasMedia, TenantAware
     use HasFactory;
     use HasOrganisation;
     use HasSoftDeletes;
+    use HasTags;
     use HasTimestamps;
     use HasUuidAsId;
 

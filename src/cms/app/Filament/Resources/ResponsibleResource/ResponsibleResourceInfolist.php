@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ResponsibleResource;
 
 use App\Filament\Infolists\Components\AddressRepeatableEntry;
+use App\Filament\Infolists\Components\SelectMultipleEntry;
 use Filament\Infolists\Components\Component;
 use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\Section;
@@ -36,6 +37,8 @@ class ResponsibleResourceInfolist
                     TextEntry::make('name')
                         ->label(__('responsible.name')),
                 ]),
+            SelectMultipleEntry::make('tags.name')
+                ->label(__('tag.model_plural')),
             AddressRepeatableEntry::make(),
         ];
     }

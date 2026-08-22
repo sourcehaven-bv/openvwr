@@ -18,6 +18,7 @@ use App\Models\Snapshot;
 use App\Models\SnapshotApproval;
 use App\Models\States\Snapshot\Established;
 use App\Models\States\Snapshot\InReview;
+use App\Models\System;
 use App\Models\Tag;
 use App\Models\User;
 use App\Models\Wpg\WpgProcessingRecord;
@@ -25,7 +26,9 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
 
+use function array_keys;
 use function count;
 use function intdiv;
 use function is_string;
@@ -76,17 +79,27 @@ class ScreenshotSeeder extends Seeder
     ];
 
     /** Plausible Dutch labels, in place of faker words. */
+    /**
+     * Labels illustrate the indeling the handleiding explains: afdeling,
+     * locatie and domein. Names from all three run together here, because a
+     * record carries one of each and the label overview lists them side by
+     * side.
+     */
     private const TAG_NAMES = [
-        'Bijzondere persoonsgegevens',
-        'Cameratoezicht',
-        'Extern gedeeld',
-        'Financieel',
-        'Gezondheidsgegevens',
-        'Hoog risico',
-        'Medewerkers',
+        // afdeling
+        'HR',
+        'Facilitair',
+        'Infectiebestrijding',
+        'Klantcontact',
+        'Milieu & Veiligheid',
+        // locatie
+        'Hoofdkantoor',
+        'Terminal Noord',
+        'Locatie Bilthoven',
+        // domein
+        'Administratie',
         'Onderzoek',
-        'Publiek toegankelijk',
-        'Wettelijke verplichting',
+        'Beveiliging',
     ];
 
     /** Plausible Dutch recipients of personal data. */
@@ -113,6 +126,35 @@ class ScreenshotSeeder extends Seeder
         'Vaststellen van de identiteit van betrokkenen',
     ];
 
+    /**
+     * One label of each kind per record, so the figures show the afdeling /
+     * locatie / domein combination the handleiding describes. DemoAvgRegisterSeeder
+     * attaches tags at random, which leaves one record carrying nine labels and
+     * others none - unusable in a screenshot.
+     */
+    private const RECORD_TAGS = [
+        'Afhandelen burgervragen en klachten' => ['Klantcontact', 'Hoofdkantoor', 'Administratie'],
+        'Cameratoezicht toegangsbeveiliging' => ['Facilitair', 'Terminal Noord', 'Beveiliging'],
+        'Declaratieverwerking medewerkers' => ['HR', 'Hoofdkantoor', 'Administratie'],
+        'Inkoop- en leveranciersadministratie' => ['Facilitair', 'Hoofdkantoor', 'Administratie'],
+        'Klantcontact en dienstverlening' => ['Klantcontact', 'Terminal Noord', 'Administratie'],
+        'Onderzoek vaccinatiegraad' => ['Infectiebestrijding', 'Locatie Bilthoven', 'Onderzoek'],
+    ];
+
+    /**
+     * Labels are not limited to the verwerkingsregisters; the handleiding shows
+     * the same field on Systemen/Applicaties. Those need readable descriptions
+     * too - the factory generates lorem sentences.
+     */
+    private const SYSTEM_TAGS = [
+        'Personeelsinformatiesysteem' => ['HR', 'Hoofdkantoor', 'Administratie'],
+        'Salarispakket' => ['HR', 'Hoofdkantoor', 'Administratie'],
+        'Cameratoezichtsysteem' => ['Facilitair', 'Terminal Noord', 'Beveiliging'],
+        'Toegangscontrolesysteem' => ['Facilitair', 'Hoofdkantoor', 'Beveiliging'],
+        'Onderzoeksdatabase vaccinaties' => ['Infectiebestrijding', 'Locatie Bilthoven', 'Onderzoek'],
+        'Klantcontactsysteem' => ['Klantcontact', 'Hoofdkantoor', 'Administratie'],
+    ];
+
     public function run(): void
     {
         $organisation = Organisation::query()->where('slug', 'nipg')->firstOrFail();
@@ -121,6 +163,7 @@ class ScreenshotSeeder extends Seeder
         $this->renameRecords($organisation);
         $this->renameRelatedEntities($organisation);
         $this->createVersionHistory($organisation);
+        $this->applyTags($organisation);
     }
 
     /**
@@ -342,5 +385,85 @@ class ScreenshotSeeder extends Seeder
             'status' => SnapshotApprovalStatus::UNKNOWN,
             'notified_at' => null,
         ]);
+    }
+
+    /**
+     * Give the named records and systems a predictable set of labels.
+     *
+     * Runs last: renameRelatedEntities() owns the label names themselves, and
+     * renameRecords() the record names these keys match on.
+     */
+    private function applyTags(Organisation $organisation): void
+    {
+        // renameByOrganisation() can only rename as many labels as the demo
+        // seeder happened to create, so the tail of TAG_NAMES may not exist
+        // yet. Create what is missing rather than silently skipping it.
+        $tags = Tag::query()
+            ->where('organisation_id', $organisation->id)
+            ->get()
+            ->keyBy('name');
+
+        foreach (self::TAG_NAMES as $name) {
+            if ($tags->has($name)) {
+                continue;
+            }
+
+            $tags->put($name, Tag::create([
+                'name' => $name,
+                'organisation_id' => $organisation->id,
+            ]));
+        }
+
+        $records = AvgResponsibleProcessingRecord::query()
+            ->where('organisation_id', $organisation->id)
+            ->whereIn('name', array_keys(self::RECORD_TAGS))
+            ->get();
+
+        foreach ($records as $record) {
+            $record->tags()->sync(self::tagIds($tags, self::RECORD_TAGS[$record->name]));
+        }
+
+        $systems = System::query()
+            ->where('organisation_id', $organisation->id)
+            ->orderBy('id')
+            ->take(count(self::SYSTEM_TAGS))
+            ->get();
+
+        $systemNames = array_keys(self::SYSTEM_TAGS);
+
+        foreach ($systems as $index => $system) {
+            $name = $systemNames[$index] ?? null;
+
+            if ($name === null) {
+                continue;
+            }
+
+            $system->description = $name;
+            $system->save();
+            $system->tags()->sync(self::tagIds($tags, self::SYSTEM_TAGS[$name]));
+        }
+    }
+
+    /**
+     * Resolve label names to their ids, skipping any the seeder did not create.
+     *
+     * @param Collection<int|string, Tag> $tags
+     * @param array<string> $names
+     *
+     * @return array<string>
+     */
+    private static function tagIds(Collection $tags, array $names): array
+    {
+        $ids = [];
+
+        foreach ($names as $name) {
+            $tag = $tags->get($name);
+
+            if ($tag instanceof Tag) {
+                $ids[] = $tag->id->toString();
+            }
+        }
+
+        return $ids;
     }
 }

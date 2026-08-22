@@ -27,6 +27,8 @@ class DataBreachRecordExporter extends Exporter
                 ->label(__('data_breach_record.name')),
             ExportColumn::make('reported_at')
                 ->label(__('data_breach_record.reported_at')),
+            ExportColumn::make('tags.name')
+                ->label(__('tag.model_plural')),
             ExportColumn::make('type')
                 ->label(__('data_breach_record.type')),
             ExportColumn::make('ap_reported')

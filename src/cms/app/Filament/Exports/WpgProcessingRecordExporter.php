@@ -30,6 +30,8 @@ class WpgProcessingRecordExporter extends Exporter
                 ->label(__('wpg_processing_record_service.model_singular')),
             ExportColumn::make('name')
                 ->label(__('processing_record.name')),
+            ExportColumn::make('tags.name')
+                ->label(__('tag.model_plural')),
             ExportColumn::make('data_collection_source')
                 ->label(__('general.data_collection_source')),
             ExportColumn::make('review_at')

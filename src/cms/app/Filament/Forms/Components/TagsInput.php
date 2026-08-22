@@ -25,6 +25,11 @@ class TagsInput extends Select
         return parent::make($name)
             ->label(__('tag.model_plural'))
             ->hintIcon('heroicon-o-information-circle', __('tag.hint_icon_text'))
+            // Labels hold a variable number of chips and wrap onto several
+            // lines; half a row squeezes them next to an unrelated field. Set
+            // here rather than per form, so the field looks the same on every
+            // entity that has it.
+            ->columnSpanFull()
             ->multiple()
             ->relationship('tags', 'name', TenantScoped::getAsClosure())
             ->rules([CurrentOrganisation::forModel(Tag::class)])
