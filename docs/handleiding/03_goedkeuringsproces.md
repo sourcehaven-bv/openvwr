@@ -44,7 +44,7 @@ De knop "Mandaathouders toevoegen" toont een lijst met Mandaathouders: deze zijn
 
 **Beschikbaar voor**: (Chief) Privacy Officer
 
-Het goedkeuren van een versie kan op de detailpagina van de desbetreffende versie. Het goedkeuren van een versie wil
+Het goedkeuren van een versie kan op de detailpagina van de desbetreffende versie. Een Privacy Officer keurt een versie goed als deze correct is opgesteld, er op korte termijn geen nieuwe versies verwacht worden en de versie in die context aangeboden mag worden aan Mandaathouders voor een akkoord.
 
 Er is een overicht van alle versies te vinden in het navigatiemenu links (Figuur \ref{fig:versie_overzicht}). Deze tabel geeft een overzicht van alle versies en is te sorteren en filteren op *Entiteit-type*, *Naam versie*, *Versienummer* en *Status*.
 
