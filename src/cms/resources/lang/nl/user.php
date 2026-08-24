@@ -93,18 +93,18 @@ return [
             'submit' => 'Opslaan',
             'notify' => 'Instellingen bijgewerkt!',
 
-            'mandateholder' => 'Mandaathouder',
-            'mandateholder_notify_batch' => 'Samenvatting',
+            'mandateholder' => 'Notificaties Mandaathouder',
+            'mandateholder_notify_batch' => 'Periodiek overzicht openstaande verzoeken',
             'mandateholder_notify_batch_options' => [
                 MandateholderNotifyBatch::NONE->value => 'Geen',
                 MandateholderNotifyBatch::WEEKLY->value => 'Wekelijks',
             ],
 
-            'mandateholder_notify_directly' => 'Bij elke uitnodiging',
+            'mandateholder_notify_directly' => 'Notificatie bij een verzoek tot akkoord',
             'mandateholder_notify_directly_options' => [
-                MandateholderNotifyDirectly::NONE->value => 'Geen',
-                MandateholderNotifyDirectly::BATCH->value => 'Samenvatting',
-                MandateholderNotifyDirectly::SINGLE->value => 'Apart bericht',
+                MandateholderNotifyDirectly::NONE->value => 'Geen notificatie',
+                MandateholderNotifyDirectly::BATCH->value => 'Overzicht alle openstaande verzoeken',
+                MandateholderNotifyDirectly::SINGLE->value => 'Directe link naar verzoek',
             ],
 
             'layout' => 'Layout',
