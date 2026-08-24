@@ -9,7 +9,9 @@ use App\FixedLists\Audit\FixedListFinding;
 use App\FixedLists\Audit\FixedListFindingType;
 use App\FixedLists\Lists\AdequacyDecisionCountryList;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
+use Illuminate\Support\Facades\Lang;
 use Tests\Doubles\FixedLists\CountryListWithRetiredEntry;
+use Webmozart\Assert\Assert;
 
 use function app;
 use function array_filter;
@@ -98,6 +100,45 @@ it('reports list values that no record uses', function (): void {
 it('ignores records without a value', function (): void {
     AvgResponsibleProcessingRecord::factory()->create(['outside_eu' => true, 'country' => null]);
     AvgResponsibleProcessingRecord::factory()->create(['outside_eu' => true, 'country' => '']);
+
+    expect(countryFindings(FixedListFindingType::UNKNOWN))->toBeEmpty();
+});
+
+it('does not crash on a value that looks like a number', function (): void {
+    // PHP turns integer-like array keys into ints, which used to break the string type declarations.
+    AvgResponsibleProcessingRecord::factory()->create([
+        'outside_eu' => true,
+        'country' => '2024',
+    ]);
+
+    $findings = countryFindings(FixedListFindingType::UNKNOWN);
+
+    expect($findings)->toHaveCount(1)
+        ->and($findings[0]->value)->toBe('2024');
+});
+
+it('does not report the "anders, namelijk" sentinel as unknown', function (): void {
+    $sentinel = Lang::get('general.country_other', [], 'nl');
+    Assert::string($sentinel);
+
+    AvgResponsibleProcessingRecord::factory()->create([
+        'outside_eu' => true,
+        'country' => $sentinel,
+        'country_other' => 'India',
+    ]);
+
+    expect(countryFindings(FixedListFindingType::UNKNOWN))->toBeEmpty();
+});
+
+it('does not report the sentinel stored under another locale as unknown', function (): void {
+    $englishSentinel = Lang::get('general.country_other', [], 'en');
+    Assert::string($englishSentinel);
+
+    AvgResponsibleProcessingRecord::factory()->create([
+        'outside_eu' => true,
+        'country' => $englishSentinel,
+        'country_other' => 'India',
+    ]);
 
     expect(countryFindings(FixedListFindingType::UNKNOWN))->toBeEmpty();
 });

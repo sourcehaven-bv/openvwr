@@ -62,3 +62,8 @@ hersteld kunnen worden.
 
 Registreer de combinatie van model, kolom en lijst in `App\FixedLists\FixedListRegistry`. Alleen wat daar
 staat, wordt gecontroleerd.
+
+Houdt de kolom daarnaast waarden vast die geldig zijn maar niet in de lijst horen, geef die dan mee als
+`ignoredValues`. Bij de landenlijst is dat de "Anders, namelijk:"-waarde: die verwijst door naar het vrije
+tekstveld `country_other` en is dus geen land, maar ook geen fout. Zonder die uitzondering zou elke registratie
+met een land buiten de adequaatheidsbesluiten als `unknown` worden gerapporteerd.
