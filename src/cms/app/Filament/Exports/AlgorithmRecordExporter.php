@@ -46,6 +46,8 @@ class AlgorithmRecordExporter extends Exporter
                 ->label(__('general.name')),
             ExportColumn::make('description')
                 ->label(__('algorithm_record.description')),
+            ExportColumn::make('tags.name')
+                ->label(__('tag.model_plural')),
             ExportColumn::make('algorithmPublicationCategory.name')
                 ->label(__('algorithm_publication_category.model_singular')),
             ExportColumn::make('algorithmStatus.name')

@@ -374,6 +374,110 @@ const FIGURES = [
     },
   },
   {
+    name: 'labels',
+    file: '06_labels/01_tags.png',
+    auth: true,
+    clip: '.fi-main',
+    async shoot(page) {
+      await page.goto(`${BASE}/${tenantOf(page)}/tags`, { waitUntil: 'networkidle' });
+      await page.waitForSelector('table');
+    },
+  },
+  {
+    name: 'labels-field',
+    file: '06_labels/02_avg-responsible-processing-records_edit_labels.png',
+    auth: true,
+    // The record form is a wizard; the Labels field lives in its first step.
+    // Clip to that step - .fi-section no longer wraps the field - and trim the
+    // tall remainder, since the rest of the step is the registers chapter's
+    // territory.
+    clip: '.fi-fo-wizard-step',
+    pad: 12,
+    maxHeight: 760,
+    async shoot(page) {
+      // A record ScreenshotSeeder tags with one label of each kind
+      // (afdeling / locatie / domein), which is what the chapter explains.
+      await gotoRecordNamed(page, 'Onderzoek vaccinatiegraad');
+      await page.evaluate(() => {
+        const label = [...document.querySelectorAll('label')].find((l) =>
+          /^\s*Labels\s*$/i.test(l.textContent || ''),
+        );
+        if (!label) throw new Error('Labels field not found');
+        // From the right: the field spans the full width of the wizard step, so
+        // a left-side arrow starts outside the clip and is cut off.
+        window.__annotate.arrow(label, { side: 'right', length: 110 });
+      });
+    },
+  },
+  {
+    name: 'labels-filter',
+    file: '06_labels/03_avg-responsible-processing-records_filter_labels.png',
+    auth: true,
+    // The panel is taller than the narrowed table, so crop to the page rather
+    // than the table; maxHeight trims the empty area below both.
+    clip: '.fi-main',
+    maxHeight: 900,
+    async shoot(page) {
+      await gotoRegister(page);
+      // The filter panel overlays the table, so the figure deliberately keeps
+      // it open: it shows the Labels filter, the selected label and the
+      // narrowed result at once.
+      await page.locator('.fi-ta-header-toolbar button').filter({ hasText: /Filteren/ }).first().click();
+      await page.waitForTimeout(1200);
+      // Labels is the first filter in the panel. Its Choices.js select only
+      // loads options once you type, so search rather than click an option.
+      await page.locator('.fi-dropdown-panel .fi-fo-field-wrp .choices').first().click();
+      await page.waitForTimeout(800);
+      // "Administratie" sits on several records, so the filtered table still
+      // shows a few rows; a label with one match reads as an empty result.
+      await page.keyboard.type('Administratie');
+      await page.waitForTimeout(2000);
+      await page.keyboard.press('Enter');
+      await page.waitForTimeout(2500);
+      // Collapse the now-empty Choices search dropdown, which would otherwise
+      // cover the filters below with "geen resultaten". Blur the input rather
+      // than press Escape: Escape closes the whole filter panel, and the panel
+      // is what this figure is about.
+      await page.evaluate(() => document.activeElement?.blur());
+      await page.waitForTimeout(1000);
+      const rows = await page.locator('table tbody tr').count();
+      if (rows === 0) throw new Error('label filter matched no rows');
+    },
+  },
+  {
+    name: 'labels-system',
+    file: '06_labels/04_systems_labels.png',
+    auth: true,
+    // Labels are not limited to the verwerkingsregisters. This figure shows the
+    // same field on Systemen/Applicaties, which is what the chapter claims.
+    clip: '.fi-main',
+    maxHeight: 620,
+    async shoot(page) {
+      // Resolved by name rather than taking the first table row: the overview
+      // sorts on updated_at, so the seeded system is not reliably on top.
+      const id = tinker(`
+        echo App\\Models\\System::query()
+          ->whereHas("organisation", fn($q) => $q->where("slug", "nipg"))
+          ->where("description", "Personeelsinformatiesysteem")
+          ->firstOrFail()->id;
+      `);
+      await page.goto(`${BASE}/${tenantOf(page)}/systems/${id}/edit`, { waitUntil: 'networkidle' });
+      // The description lives in an input, so it is not matchable as page text;
+      // wait for the Labels field itself, which is what the figure is about.
+      await page.waitForSelector('.choices__item', { timeout: 30000 });
+      await page.evaluate(() => {
+        const label = [...document.querySelectorAll('label')].find((l) =>
+          /^\s*Labels\s*$/i.test(l.textContent || ''),
+        );
+        if (!label) throw new Error('Labels field not found on system');
+        // To the right of the label text: the field spans the full width, so a
+        // left-side arrow is clipped by the page edge and one from above lands
+        // on the field sitting directly overhead.
+        window.__annotate.arrow(label, { side: 'right', length: 110 });
+      });
+    },
+  },
+  {
     name: 'users',
     file: '04_beheer/01_users_edit.png',
     auth: true,
@@ -454,6 +558,20 @@ async function gotoSeededRecord(page) {
   // Wait for the record heading rather than a bare `form`: the page renders
   // several forms and the first can be present before the record has loaded.
   await page.waitForSelector('text=/Afhandelen burgervragen/i', { timeout: 30000 });
+}
+
+/** Open the edit page of a seeded record, resolved by name rather than id. */
+async function gotoRecordNamed(page, name) {
+  const id = tinker(`
+    echo App\\Models\\Avg\\AvgResponsibleProcessingRecord::query()
+      ->whereHas("organisation", fn($q) => $q->where("slug", "nipg"))
+      ->where("name", "${name}")
+      ->firstOrFail()->id;
+  `);
+  await page.goto(`${BASE}/${tenantOf(page)}/avg-responsible-processing-records/${id}/edit`, {
+    waitUntil: 'networkidle',
+  });
+  await page.waitForSelector(`text=/${name.split(' ')[0]}/i`, { timeout: 30000 });
 }
 
 /**

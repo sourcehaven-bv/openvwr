@@ -6,6 +6,7 @@ namespace App\Filament\Resources\ResponsibleResource;
 
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
+use App\Filament\Tables\TagFilter;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
@@ -28,6 +29,9 @@ class ResponsibleResourceTable
                     ->sortable(),
                 CreatedAtColumn::make(),
                 UpdatedAtColumn::make(),
+            ])
+            ->filters([
+                TagFilter::make(),
             ])
             ->defaultSort('responsibles.updated_at', 'desc')
             ->emptyStateHeading(__('responsible.table_empty_heading'))

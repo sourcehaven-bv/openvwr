@@ -26,6 +26,11 @@ class TagsInput extends Select
         return parent::make($name)
             ->label(__('tag.model_plural'))
             ->hintIcon('heroicon-o-information-circle', __('tag.hint_icon_text'))
+            // Labels hold a variable number of chips and wrap onto several
+            // lines; half a row squeezes them next to an unrelated field. Set
+            // here rather than per form, so the field looks the same on every
+            // entity that has it.
+            ->columnSpanFull()
             ->multiple()
             ->relationship('tags', 'name', TenantScoped::getAsClosure())
             // The picker shows the same colour the label has everywhere else;
@@ -38,6 +43,12 @@ class TagsInput extends Select
             ->allowHtml()
             ->rules([CurrentOrganisation::forModel(Tag::class)])
             ->searchable(['name'])
+            // Tags are few and reused often, so offer them straight away
+            // (most recently edited first) rather than only on typing.
+            ->preload()
+            ->options(static function (): array {
+                return self::groupedTagOptions();
+            })
             ->createOptionForm(self::createTagOptionsForm())
             ->createOptionUsing(static function (array $data): string {
                 $tagData = array_merge($data, ['organisation_id' => Authentication::organisation()->id->toString()]);
@@ -65,6 +76,32 @@ class TagsInput extends Select
         }
 
         return $labels;
+    }
+
+    /**
+     * The selectable tags: the most recently edited, under a heading that
+     * explains the ordering (see {@see RecentFirstOptions}).
+     *
+     * Each option carries its own colour, so the list reads the same way as the
+     * chips above it.
+     *
+     * @return array<string, array<string, string>>
+     */
+    public static function groupedTagOptions(): array
+    {
+        $query = Tag::query();
+        (TenantScoped::getAsClosure())($query);
+
+        $recent = $query
+            ->orderByDesc('updated_at')
+            ->limit(RecentFirstOptions::RECENT_COUNT)
+            ->get()
+            ->mapWithKeys(static fn (Tag $tag): array => [
+                $tag->id->toString() => LabelSwatch::make($tag->color, $tag->name)->toHtml(),
+            ])
+            ->all();
+
+        return RecentFirstOptions::group(RecentFirstOptions::fromPlucked($recent));
     }
 
     /**

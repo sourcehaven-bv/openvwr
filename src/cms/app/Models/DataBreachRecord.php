@@ -18,6 +18,7 @@ use App\Models\Concerns\HasFgRemark;
 use App\Models\Concerns\HasOrganisation;
 use App\Models\Concerns\HasResponsibles;
 use App\Models\Concerns\HasSoftDeletes;
+use App\Models\Concerns\HasTags;
 use App\Models\Concerns\HasTimestamps;
 use App\Models\Concerns\HasUuidAsId;
 use App\Models\Contracts\EntityNumerable;
@@ -74,6 +75,7 @@ class DataBreachRecord extends Model implements EntityNumerable, HasStatesContra
     use HasResponsibles;
     use HasSoftDeletes;
     use HasStates;
+    use HasTags;
     use HasTimestamps;
     use HasUuidAsId;
 

@@ -11,6 +11,7 @@ use App\Filament\Tables\Columns\EntityNumber;
 use App\Filament\Tables\Columns\SnapshotStatusColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
 use App\Filament\Tables\DocumentFilter;
+use App\Filament\Tables\TagFilter;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -47,6 +48,7 @@ class AlgorithmRecordResourceTable
                 TransferCopyBulkAction::make(),
             ])
             ->filters([
+                TagFilter::make(),
                 DocumentFilter::make(),
             ]);
     }

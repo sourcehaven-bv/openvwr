@@ -7,7 +7,6 @@ use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\ListAvgR
 use App\Models\Tag;
 use Filament\Forms\Components\Select;
 
-use function str_contains;
 
 /**
  * The filter renders the selected labels itself, which is where an earlier

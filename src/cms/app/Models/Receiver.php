@@ -13,6 +13,7 @@ use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Concerns\HasOrganisation;
 use App\Models\Concerns\HasSnapshots;
 use App\Models\Concerns\HasSoftDeletes;
+use App\Models\Concerns\HasTags;
 use App\Models\Concerns\HasTimestamps;
 use App\Models\Concerns\HasUuidAsId;
 use App\Models\Contracts\SnapshotSource;
@@ -37,6 +38,7 @@ class Receiver extends Model implements SnapshotSource, TenantAware
     use HasOrganisation;
     use HasSnapshots;
     use HasSoftDeletes;
+    use HasTags;
     use HasTimestamps;
     use HasUuidAsId;
 

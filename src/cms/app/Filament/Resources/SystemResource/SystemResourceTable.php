@@ -6,6 +6,7 @@ namespace App\Filament\Resources\SystemResource;
 
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
+use App\Filament\Tables\TagFilter;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
@@ -26,6 +27,9 @@ class SystemResourceTable
                     ->sortable(),
                 CreatedAtColumn::make(),
                 UpdatedAtColumn::make(),
+            ])
+            ->filters([
+                TagFilter::make(),
             ])
             ->defaultSort('systems.updated_at', 'desc')
             ->emptyStateHeading(__('system.table_empty_heading'))

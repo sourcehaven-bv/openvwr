@@ -81,6 +81,16 @@ class RelationTable extends Select
             ->relationship($relationshipName, $titleAttribute, $scope)
             ->multiple()
             ->searchable([$titleAttribute])
+            // These registers are usually small, so show the options straight
+            // away instead of an empty dropdown that only fills once the user
+            // types.
+            ->preload()
+            // Note: no optionsLimit() override. It would also cap the search
+            // results, and the preloaded list is already bounded by the
+            // grouped options closure below.
+            ->options(static function (self $component) use ($model, $titleAttribute, $scope): array {
+                return $component->getGroupedOptions($model, $titleAttribute, $scope);
+            })
             // Commit selections to the server so the table re-renders when a
             // record is linked (the choices.js control is otherwise client-only).
             ->live()
@@ -168,6 +178,38 @@ class RelationTable extends Select
         }
 
         throw new InvalidArgumentException('unsupported relation type');
+    }
+
+    /**
+     * The preloaded options: the most recently edited records, grouped under a
+     * heading that explains the ordering (see {@see RecentFirstOptions}).
+     *
+     * The scope is applied exactly as Filament would apply it to the search
+     * query, so the picker cannot offer a record the search would have hidden.
+     *
+     * @param class-string<Model> $model
+     * @param Closure(Builder<Model>, ?Model): void $scope
+     *
+     * @return array<string, array<string, string>>
+     */
+    protected function getGroupedOptions(string $model, string $titleAttribute, Closure $scope): array
+    {
+        /** @var Model $instance */
+        $instance = new $model();
+
+        $query = $instance->newQuery();
+
+        // The record is passed along because the children picker's scope uses
+        // it to exclude itself and its ancestors.
+        $scope($query, $this->getRecord());
+
+        $recent = $query
+            ->orderByDesc('updated_at')
+            ->limit(RecentFirstOptions::RECENT_COUNT)
+            ->pluck($titleAttribute, $instance->getKeyName())
+            ->all();
+
+        return RecentFirstOptions::group(RecentFirstOptions::fromPlucked($recent));
     }
 
     /**

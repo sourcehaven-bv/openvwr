@@ -10,6 +10,7 @@ use App\Filament\Forms\Components\DatePicker\DatePicker;
 use App\Filament\Forms\Components\RelationTable;
 use App\Filament\Forms\Components\RelationTableColumns;
 use App\Filament\Forms\Components\Select\SelectSingleWithLookup;
+use App\Filament\Forms\Components\TagsInput;
 use App\Filament\Forms\Components\Upload\AttachmentFileField;
 use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Avg\AvgProcessorProcessingRecord;
@@ -62,6 +63,7 @@ class DocumentResourceForm
                 SelectSingleWithLookup::makeWithDisabledOptions('document_type_id', 'documentType', DocumentType::class, 'name')
                     ->label(__('document.type'))
                     ->helperText(__('document.help_type')),
+                TagsInput::make(),
                 DatePicker::make('expires_at')
                     ->label(__('document.expires_at'))
                     ->helperText(__('document.help_expires_at'))

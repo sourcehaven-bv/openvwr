@@ -7,6 +7,7 @@ namespace App\Filament\Resources\DocumentResource;
 use App\Filament\Infolists\Components\AttachmentFileEntry;
 use App\Filament\Infolists\Components\DateEntry;
 use App\Filament\Infolists\Components\ExternalLinkEntry;
+use App\Filament\Infolists\Components\TagsEntry;
 use Filament\Infolists\Components\Component;
 use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\Section;
@@ -43,6 +44,7 @@ class DocumentResourceInfolist
                     DateEntry::make('notify_at')
                         ->label(__('document.notify_at')),
                 ]),
+            TagsEntry::make(),
             ExternalLinkEntry::make('location')
                 ->label(__('document.location'))
                 ->columnSpan(2),

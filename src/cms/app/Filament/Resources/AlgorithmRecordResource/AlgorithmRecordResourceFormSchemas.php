@@ -9,6 +9,7 @@ use App\Filament\Forms\Components\RelationTable;
 use App\Filament\Forms\Components\RelationTableColumns;
 use App\Filament\Forms\Components\Section\InformationBlockSection;
 use App\Filament\Forms\Components\Select\SelectSingleWithLookup;
+use App\Filament\Forms\Components\TagsInput;
 use App\Filament\Forms\Components\TextInput\EntityNumber;
 use App\Filament\Resources\DocumentResource\DocumentResourceForm;
 use App\Models\Algorithm\AlgorithmPublicationCategory;
@@ -48,6 +49,7 @@ class AlgorithmRecordResourceFormSchemas
                 ->label(__('algorithm_record.description'))
                 ->helperText(__('algorithm_record.help_description'))
                 ->maxLength(400),
+            TagsInput::make(),
             SelectSingleWithLookup::makeWithDisabledOptions('algorithm_theme_id', 'algorithmTheme', AlgorithmTheme::class, 'name')
                 ->label(__('algorithm_record.theme'))
                 ->helperText(__('algorithm_record.help_theme')),
