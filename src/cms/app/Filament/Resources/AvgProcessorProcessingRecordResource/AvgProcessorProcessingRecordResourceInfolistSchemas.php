@@ -12,6 +12,7 @@ use App\Filament\Infolists\Components\ParentSelectEntry;
 use App\Filament\Infolists\Components\RemarksEntry;
 use App\Filament\Infolists\Components\Section\InformationBlockSection;
 use App\Filament\Infolists\Components\SelectMultipleEntry;
+use App\Filament\Infolists\Components\TagsEntry;
 use App\Filament\Infolists\Components\StakeholdersRepeatableEntry;
 use App\Filament\Infolists\Components\TextareaEntry;
 use App\Filament\Infolists\Components\ToggleEntry;
@@ -44,8 +45,7 @@ class AvgProcessorProcessingRecordResourceInfolistSchemas
                 ->label(__('general.data_collection_source')),
             TextEntry::make('avgProcessorProcessingRecordService.name')
                 ->label(__('avg_processor_processing_record_service.model_singular')),
-            SelectMultipleEntry::make('tags.name')
-                ->label(__('tag.model_plural')),
+            TagsEntry::make(),
             DateEntry::make('review_at')
                 ->label(__('general.review_at')),
             ParentSelectEntry::make(),

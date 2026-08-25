@@ -6,6 +6,7 @@ namespace Database\Seeders;
 
 use App\Enums\Authorization\Role;
 use App\Enums\EntityNumberType;
+use App\Enums\LabelColor;
 use App\Enums\RegisterLayout;
 use App\Models\Algorithm\AlgorithmPublicationCategory;
 use App\Models\Algorithm\AlgorithmStatus;
@@ -29,6 +30,7 @@ use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
+use function count;
 use function now;
 use function sprintf;
 
@@ -271,9 +273,16 @@ class DemoSeeder extends Seeder
 
         $tags = [];
 
-        foreach (DemoContent::TAGS as $name) {
+        // WithoutModelEvents suppresses TagObserver, which normally assigns the
+        // colour, so the palette is walked here instead - otherwise every demo
+        // label would render grey. DemoContent::TAGS holds exactly one label
+        // per colour, so this hands out the palette once, in order.
+        $labelColors = LabelColor::cases();
+
+        foreach (DemoContent::TAGS as $index => $name) {
             $tags[] = Tag::factory()->for($organisation)->create([
                 'name' => $name,
+                'color' => $labelColors[$index % count($labelColors)],
             ]);
         }
 

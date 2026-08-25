@@ -20,6 +20,7 @@ use App\Models\PublicWebsiteTree;
 use App\Models\Snapshot;
 use App\Models\SnapshotApproval;
 use App\Models\Stakeholder;
+use App\Models\Tag;
 use App\Models\User;
 use App\Models\Wpg\WpgProcessingRecord;
 use App\Observers\AvgProcessorProcessingRecordObserver;
@@ -34,6 +35,7 @@ use App\Observers\PublicWebsiteTreeObserver;
 use App\Observers\SnapshotApprovalObserver;
 use App\Observers\SnapshotObserver;
 use App\Observers\StakeholderObserver;
+use App\Observers\TagObserver;
 use App\Observers\UserAuditLogs;
 use App\Observers\UserObserver;
 use App\Observers\WpgProcessingRecordObserver;
@@ -67,6 +69,7 @@ class EventServiceProvider extends ServiceProvider
         Snapshot::observe(SnapshotObserver::class);
         SnapshotApproval::observe(SnapshotApprovalObserver::class);
         Stakeholder::observe(StakeholderObserver::class);
+        Tag::observe(TagObserver::class);
         User::observe([
             UserAuditLogs::class,
             UserObserver::class,

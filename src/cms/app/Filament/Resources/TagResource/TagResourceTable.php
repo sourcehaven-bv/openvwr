@@ -6,6 +6,7 @@ namespace App\Filament\Resources\TagResource;
 
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
+use App\Models\Tag;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
@@ -21,6 +22,8 @@ class TagResourceTable
             ->columns([
                 TextColumn::make('name')
                     ->label(__('general.name'))
+                    ->badge()
+                    ->color(static fn (Tag $tag): string => $tag->color->value ?? 'gray')
                     ->searchable()
                     ->sortable(),
                 CreatedAtColumn::make(),

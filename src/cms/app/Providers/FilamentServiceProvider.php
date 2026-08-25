@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use App\Config\Config;
 use App\Facades\Authentication;
+use App\Filament\LabelColorPalette;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\OnePageLayoutRenderHooks;
 use App\Filament\Pages\DevLogin;
@@ -58,9 +59,12 @@ class FilamentServiceProvider extends PanelProvider
 {
     public function boot(): void
     {
-        // Ensure primary color is set globally, including non-panel pages
+        // Ensure primary color is set globally, including non-panel pages.
+        // The label palette is registered alongside it so label badges render
+        // outside the panel too.
         FilamentColor::register([
             'primary' => '#F84F39',
+            ...LabelColorPalette::all(),
         ]);
 
         FilamentAsset::register([
