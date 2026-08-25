@@ -27,6 +27,7 @@ return [
     'source_recorded' => 'From the data breach register',
     'source_derived' => 'Derived from linked content - verify',
     'source_missing' => 'Not in the register - fill in yourself',
+    'origin_data_protection_officials' => 'Data protection officers of the organisation',
     'origin_prefix' => 'Source',
     'not_recorded' => 'To be filled in',
 

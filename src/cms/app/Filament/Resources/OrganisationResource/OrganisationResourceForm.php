@@ -71,6 +71,23 @@ class OrganisationResourceForm
                         EntityNumberPrefix::makeForField('databreach'),
                     ]),
                 Section::make()
+                    ->heading(__('organisation.section_ap'))
+                    ->columns()
+                    ->schema([
+                        TextInput::make('coc_number')
+                            ->label(__('organisation.coc_number'))
+                            ->helperText(__('organisation.help_coc_number'))
+                            ->maxLength(255),
+                        TextInput::make('fg_registration_number')
+                            ->label(__('organisation.fg_registration_number'))
+                            ->helperText(__('organisation.help_fg_registration_number'))
+                            ->maxLength(255),
+                        TextInput::make('sector')
+                            ->label(__('organisation.sector'))
+                            ->helperText(__('organisation.help_sector'))
+                            ->maxLength(255),
+                    ]),
+                Section::make()
                     ->heading(__('organisation.section_public'))
                     ->columns()
                     ->schema([

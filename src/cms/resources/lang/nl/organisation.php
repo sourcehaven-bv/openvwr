@@ -37,4 +37,11 @@ return [
     'entity_number_unique_validation_message' => 'Deze prefix is al (eerder) in gebruik genomen, mogelijk door een andere organisatie: deze is niet meer beschikbaar.',
 
     'public_from_hint_icon_text' => 'Let op: Indien u dit veld leeg laat zal de verwerking op geen enkel moment gepubliceerd worden naar de publieke website.',
+    'section_ap' => 'Gegevens voor datalekmeldingen',
+    'coc_number' => 'KvK-nummer',
+    'fg_registration_number' => 'Registratienummer FG',
+    'sector' => 'Sector',
+    'help_coc_number' => 'Wordt overgenomen in de melding aan de Autoriteit Persoonsgegevens.',
+    'help_fg_registration_number' => 'Het nummer waarmee de functionaris gegevensbescherming bij de AP is aangemeld.',
+    'help_sector' => 'De sector waarin de organisatie actief is; de AP vraagt hiernaar bij een melding.',
 ];

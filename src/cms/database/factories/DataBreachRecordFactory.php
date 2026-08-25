@@ -55,6 +55,9 @@ class DataBreachRecordFactory extends Factory
             'measures' => $this->faker->sentence(),
 
             'fg_reported' => $this->faker->boolean(),
+
+            'cross_border' => $this->faker->boolean(),
+            'affected_count_known' => $this->faker->boolean(),
         ];
     }
 

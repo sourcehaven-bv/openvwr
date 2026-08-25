@@ -74,6 +74,56 @@ class DataBreachRecordExporter extends Exporter
             ExportColumn::make('fg_reported')
                 ->label(__('data_breach_record.fg_reported')),
 
+            // melding AP
+            ExportColumn::make('how_discovered')
+                ->label(__('data_breach_record.how_discovered')),
+            ExportColumn::make('late_notification_reason')
+                ->label(__('data_breach_record.late_notification_reason')),
+            ExportColumn::make('nature_of_breach')
+                ->label(__('data_breach_record.nature_of_breach')),
+            ExportColumn::make('record_count')
+                ->label(__('data_breach_record.record_count')),
+            ExportColumn::make('record_count_explanation')
+                ->label(__('data_breach_record.record_count_explanation')),
+            ExportColumn::make('affected_groups')
+                ->label(__('data_breach_record.affected_groups')),
+            ExportColumn::make('affected_groups_other')
+                ->label(__('data_breach_record.affected_groups_other')),
+            ExportColumn::make('affected_count_known')
+                ->label(__('data_breach_record.affected_count_known')),
+            ExportColumn::make('affected_count')
+                ->label(__('data_breach_record.affected_count')),
+            ExportColumn::make('affected_count_min')
+                ->label(__('data_breach_record.affected_count_min')),
+            ExportColumn::make('affected_count_max')
+                ->label(__('data_breach_record.affected_count_max')),
+            ExportColumn::make('protection_beforehand')
+                ->label(__('data_breach_record.protection_beforehand')),
+            ExportColumn::make('protection_beforehand_explanation')
+                ->label(__('data_breach_record.protection_beforehand_explanation')),
+            ExportColumn::make('consequences_controller')
+                ->label(__('data_breach_record.consequences_controller')),
+            ExportColumn::make('consequences_controller_other')
+                ->label(__('data_breach_record.consequences_controller_other')),
+            ExportColumn::make('consequences_data_subjects')
+                ->label(__('data_breach_record.consequences_data_subjects')),
+            ExportColumn::make('consequences_data_subjects_other')
+                ->label(__('data_breach_record.consequences_data_subjects_other')),
+            ExportColumn::make('risk_severity')
+                ->label(__('data_breach_record.risk_severity')),
+            ExportColumn::make('reported_to_involved_count')
+                ->label(__('data_breach_record.reported_to_involved_count')),
+            ExportColumn::make('other_supervisors')
+                ->label(__('data_breach_record.other_supervisors')),
+            ExportColumn::make('other_supervisors_other')
+                ->label(__('data_breach_record.other_supervisors_other')),
+            ExportColumn::make('cross_border')
+                ->label(__('data_breach_record.cross_border')),
+            ExportColumn::make('cross_border_countries')
+                ->label(__('data_breach_record.cross_border_countries')),
+            ExportColumn::make('reported_other_dpas')
+                ->label(__('data_breach_record.reported_other_dpas')),
+
             // verwerkingen
             ExportColumn::make('avgResponsibleProcessingRecords.name')
                 ->label(__('avg_responsible_processing_record.model_plural')),
