@@ -68,3 +68,29 @@ it('returns its transitions oldest first', function (): void {
     expect($snapshot->snapshotTransitions->pluck('id')->map->toString()->all())
         ->toBe([$older->id->toString(), $newer->id->toString()]);
 });
+
+// Zonder ON DELETE CASCADE weigert de FK de delete van de organisatie in
+// plaats van de snapshot mee te nemen -- dat blokkeerde het definitief
+// opruimen van een organisatie.
+it('is deleted along with its organisation', function (): void {
+    $organisation = Organisation::factory()->create();
+    $snapshot = Snapshot::factory()->recycle($organisation)->create();
+
+    $organisation->forceDelete();
+
+    expect(Snapshot::query()->whereKey($snapshot->id)->exists())
+        ->toBeFalse();
+});
+
+// De onderliggende tabellen cascaden al richting `snapshots`; deze test legt
+// vast dat die keten ook vanaf de organisatie doorloopt.
+it('takes its transitions with it when the organisation is deleted', function (): void {
+    $organisation = Organisation::factory()->create();
+    $snapshot = Snapshot::factory()->recycle($organisation)->create();
+    $transition = SnapshotTransition::factory()->recycle($snapshot)->create();
+
+    $organisation->forceDelete();
+
+    expect(SnapshotTransition::query()->whereKey($transition->id)->exists())
+        ->toBeFalse();
+});
