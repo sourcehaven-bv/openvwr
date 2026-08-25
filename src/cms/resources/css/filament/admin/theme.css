@@ -247,3 +247,11 @@
 .fi-banner--danger {
     @apply bg-danger-100 text-danger-900 dark:bg-danger-950 dark:text-danger-100;
 }
+
+/* The relation pickers offer the most recently edited records under a heading
+   that explains that ordering; this keeps the heading a quiet label rather
+   than something that competes with the options themselves. */
+.choices__list .choices__group .choices__heading {
+    @apply text-xs font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500;
+    padding: 0.5rem 1rem 0.25rem;
+}
