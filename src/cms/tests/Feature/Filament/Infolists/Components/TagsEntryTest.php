@@ -6,11 +6,10 @@ use App\Enums\LabelColor;
 use App\Filament\Infolists\Components\TagsEntry;
 use App\Models\Tag;
 
-/**
- * The entry keys on the tag itself rather than on its name, so that a label's
- * colour and its name always come from the same record. These cover both
- * callbacks, including the fallbacks for a state that is not a Tag.
- */
+// The entry keys on the tag itself rather than on its name, so that a label's
+// colour and its name always come from the same record. These cover both
+// callbacks, including the fallbacks for a state that is not a Tag.
+
 it('renders a label as a badge in its own colour', function (): void {
     $tag = Tag::factory()->create(['color' => LabelColor::EMERALD]);
 

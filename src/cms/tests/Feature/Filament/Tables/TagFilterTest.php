@@ -7,7 +7,6 @@ use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\ListAvgR
 use App\Models\Tag;
 use Filament\Forms\Components\Select;
 
-
 /**
  * The filter renders the selected labels itself, which is where an earlier
  * version broke: Filament's getOptionLabelFromRecordUsing keys its result by
@@ -17,6 +16,10 @@ use Filament\Forms\Components\Select;
  * That path is getOptionLabels(), reached when the filter panel draws the
  * values already chosen. Rendering the table alone does not reach it, so the
  * call is made directly rather than through a page render.
+ */
+
+/**
+ * @param array<int, string> $values
  */
 function tagFilterSelect(array $values): Select
 {

@@ -56,9 +56,17 @@ In elk overzicht met labels zit rechtsboven de tabel een filterknop. Onder "Labe
 
 ![Labeloverzicht\label{fig:labels_overzicht}](./imgs/06_labels/01_tags.png)
 
-In het navigatiemenu staat onder "Beheer" het onderdeel "Labels". Hier ziet u alle labels van de organisatie (Figuur \ref{fig:labels_overzicht}). Met de knop "Label aanmaken" rechtsboven voegt u een label toe; met het potloodje achter een regel wijzigt u de naam van een bestaand label.
+In het navigatiemenu staat onder "Beheer" het onderdeel "Labels". Hier ziet u alle labels van de organisatie (Figuur \ref{fig:labels_overzicht}). Met de knop "Label aanmaken" rechtsboven voegt u een label toe; met het potloodje achter een regel wijzigt u de naam of de kleur van een bestaand label.
 
 Klik op een label om te zien waar het overal aan is toegekend. Per soort onderdeel is er een tabel - verwerkingen, algoritmes, datalekken, systemen, verwerkers, contactpersonen, documenten enzovoort - zodat u direct kunt doorklikken.
+
+### De kleur van een label
+
+Elk label heeft een kleur, zodat u in een volle tabel in één oogopslag ziet welk label waar staat. Een nieuw label krijgt automatisch een kleur die binnen uw organisatie nog niet of het minst in gebruik is, zodat de kleuren vanzelf gespreid blijven. U hoeft er dus niets voor te doen.
+
+Wilt u zelf een kleur kiezen - bijvoorbeeld groen voor "Akkoord" of een vaste kleur per afdeling - dan doet u dat in het veld "Kleur" op het scherm van het label. Er zijn tien kleuren. Rood zit er bewust niet bij: die kleur is in de applicatie voorbehouden aan waarschuwingen en aan statussen, en een label mag daar niet mee worden verward.
+
+> **Let op**: De kleur is een hulpmiddel, geen betekenisdrager. De naam van het label staat er altijd bij, ook voor wie kleuren niet of anders waarneemt. Laat de betekenis van een label dus nooit alleen van de kleur afhangen.
 
 > **Let op**: Het verwijderen van een label verwijdert het overal: de onderdelen zelf blijven bestaan, maar het label is er overal af. Wilt u een label maar bij één onderdeel weghalen, doe dat dan via het veld "Labels" op de detailpagina van dat onderdeel.
 

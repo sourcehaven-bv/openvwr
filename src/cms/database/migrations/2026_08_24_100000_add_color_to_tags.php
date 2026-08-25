@@ -8,15 +8,14 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * Give labels a colour.
- *
- * Nullable, because null is the honest representation of "no colour yet": a
- * bundle imported from an older version carries no colour, and the rendering
- * falls back to grey for those rather than inventing one at read time.
- *
- * Existing labels are backfilled here so the feature is not empty on arrival.
- */
+// Give labels a colour.
+//
+// Nullable, because null is the honest representation of "no colour yet": a
+// bundle imported from an older version carries no colour, and the rendering
+// falls back to grey for those rather than inventing one at read time.
+//
+// Existing labels are backfilled here so the feature is not empty on arrival.
+
 return new class extends Migration
 {
     public function up(): void

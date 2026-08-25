@@ -23,7 +23,7 @@ it('spreads the palette over the labels of one organisation', function (): void 
 
     $colors = [];
 
-    foreach (LabelColor::cases() as $ignored) {
+    for ($i = 0; $i < count(LabelColor::cases()); $i++) {
         $tag = Tag::factory()->create([
             'organisation_id' => $organisation->id,
             'color' => null,
@@ -43,7 +43,7 @@ it('spreads the palette over the labels of one organisation', function (): void 
 it('starts over once every colour is taken', function (): void {
     $organisation = Organisation::factory()->create();
 
-    foreach (LabelColor::cases() as $ignored) {
+    for ($i = 0; $i < count(LabelColor::cases()); $i++) {
         Tag::factory()->create([
             'organisation_id' => $organisation->id,
             'color' => null,
