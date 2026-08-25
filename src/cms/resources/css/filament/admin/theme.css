@@ -270,10 +270,6 @@
     height: 0.5rem;
 }
 
-.fi-label-swatch-group {
-    @apply flex flex-wrap items-center gap-x-2 gap-y-1;
-}
-
 /*
  * Label chips in a multi-select (the label picker on a processing record, the
  * label filter above a table).

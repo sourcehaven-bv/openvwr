@@ -10,12 +10,9 @@ use App\Models\Tag;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Filters\Indicator;
 use Filament\Tables\Filters\SelectFilter;
-use Illuminate\Support\HtmlString;
 
 use function __;
 use function count;
-use function e;
-use function implode;
 use function is_array;
 
 class TagFilter extends SelectFilter
@@ -70,9 +67,13 @@ class TagFilter extends SelectFilter
      * The "Actieve filters" bar.
      *
      * Filament joins the selected labels into one comma-separated string in a
-     * single indicator, which loses the colours. Rebuilt here so each label
-     * keeps its own swatch, in one indicator so the filter stays removable as
-     * a whole - the same behaviour as before, only legible.
+     * single indicator, which loses the colours. One indicator per label
+     * instead, each in its own colour.
+     *
+     * Removing a single label from here is not possible: Table::getFilterIndicators
+     * overwrites every indicator's click handler with removeTableFilter(), and
+     * that resets the whole field. Each cross therefore clears the label filter
+     * as a whole, which is the behaviour Filament had before this change too.
      *
      * @param array<mixed> $state
      *
@@ -86,24 +87,14 @@ class TagFilter extends SelectFilter
             return [];
         }
 
-        $swatches = [];
+        $indicators = [];
 
         foreach (self::tags($values) as $tag) {
-            $swatches[] = LabelSwatch::make($tag->color, $tag->name)->toHtml();
+            $indicators[] = Indicator::make($tag->name)
+                ->color($tag->color->value ?? 'gray');
         }
 
-        if (count($swatches) === 0) {
-            return [];
-        }
-
-        return [
-            Indicator::make(new HtmlString(
-                '<span class="fi-label-swatch-group">'
-                . '<span>' . e(__('tag.model_plural')) . ':</span>'
-                . implode('', $swatches)
-                . '</span>',
-            )),
-        ];
+        return $indicators;
     }
 
     /**
