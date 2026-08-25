@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace App\Services\Notification;
 
-use App\Enums\Authorization\Role;
+use App\Enums\Notification\NotificationStream;
 use App\Mail\Document\DocumentNotification;
 use App\Models\Document;
-use App\Services\User\UserByRoleService;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Mail;
 
 readonly class DocumentNotificationService
 {
     public function __construct(
-        private UserByRoleService $userByRoleService,
+        private NotificationRecipientService $notificationRecipientService,
     ) {
     }
 
@@ -29,10 +28,13 @@ readonly class DocumentNotificationService
 
     private function notify(Document $document): void
     {
-        $privacyOfficers = $this->userByRoleService->getUsersByOrganisationRole($document->organisation, [Role::PRIVACY_OFFICER]);
+        $recipients = $this->notificationRecipientService->getRecipients(
+            NotificationStream::DOCUMENT_NOTIFY_DATE_REACHED,
+            $document->organisation,
+        );
 
-        foreach ($privacyOfficers as $privacyOfficer) {
-            Mail::to($privacyOfficer->email)
+        foreach ($recipients as $recipient) {
+            Mail::to($recipient->email)
                 ->queue(new DocumentNotification($document));
         }
     }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Snapshot;
 
-use App\Enums\Authorization\Role;
+use App\Enums\Notification\NotificationStream;
 use App\Enums\Snapshot\SnapshotApprovalLogMessageType;
 use App\Enums\Snapshot\SnapshotApprovalStatus;
 use App\Mail\SnapshotApproval\ApprovalNotification;
@@ -12,13 +12,13 @@ use App\Models\Snapshot;
 use App\Models\SnapshotApproval;
 use App\Models\SnapshotApprovalLog;
 use App\Models\User;
-use App\Services\User\UserByRoleService;
+use App\Services\Notification\NotificationRecipientService;
 use Illuminate\Support\Facades\Mail;
 
 class SnapshotApprovalService
 {
     public function __construct(
-        private readonly UserByRoleService $userByRoleService,
+        private readonly NotificationRecipientService $notificationRecipientService,
     ) {
     }
 
@@ -70,13 +70,13 @@ class SnapshotApprovalService
             ],
         ]);
 
-        $privacyOfficers = $this->userByRoleService->getUsersByOrganisationRole(
+        $recipients = $this->notificationRecipientService->getRecipients(
+            NotificationStream::SNAPSHOT_APPROVAL_UPDATED,
             $snapshotApproval->snapshot->organisation,
-            [Role::PRIVACY_OFFICER],
         );
 
-        foreach ($privacyOfficers as $privacyOfficer) {
-            Mail::to($privacyOfficer)
+        foreach ($recipients as $recipient) {
+            Mail::to($recipient)
                 ->queue(new ApprovalNotification($snapshotApproval));
         }
     }

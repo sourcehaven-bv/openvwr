@@ -31,6 +31,8 @@ class UserFactory extends Factory
             'mandateholder_notify_batch' => $this->faker->randomElement(MandateholderNotifyBatch::class),
             'mandateholder_notify_directly' => $this->faker->randomElement(MandateholderNotifyDirectly::class),
             'name' => $this->faker->name(),
+            // Not randomised: a random exclusion would make every mail test flaky.
+            'notification_exclusions' => [],
             'otp_secret' => $this->faker->regexify('[A-Z]{16}'),
             'otp_confirmed_at' => $this->faker->optional()->dateTime(),
             'otp_timestamp' => $this->faker->numberBetween(),

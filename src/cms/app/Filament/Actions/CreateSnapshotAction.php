@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace App\Filament\Actions;
 
 use App\Enums\Authorization\Permission;
-use App\Enums\Authorization\Role;
+use App\Enums\Notification\NotificationStream;
 use App\Facades\Authorization;
 use App\Filament\RelationManagers\SnapshotsRelationManager;
 use App\Mail\SnapshotApproval\ApprovalRequest;
 use App\Models\Contracts\SnapshotSource;
+use App\Services\Notification\NotificationRecipientService;
 use App\Services\Snapshot\SnapshotFactory;
-use App\Services\User\UserByRoleService;
 use Filament\Actions\Action;
-use Filament\Forms\Components\Checkbox;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
@@ -23,7 +22,6 @@ use Livewire\Component;
 use Webmozart\Assert\Assert;
 
 use function __;
-use function array_key_exists;
 use function json_encode;
 use function md5;
 use function sprintf;
@@ -38,15 +36,9 @@ class CreateSnapshotAction extends Action
         return parent::make($name)
             ->label(__('snapshot.create'))
             ->visible(Authorization::hasPermission(Permission::SNAPSHOT_CREATE))
-            ->form([
-                Checkbox::make('notify_po')
-                    ->label(__('snapshot_approval.notify_po'))
-                    ->default(true),
-            ])
             ->requiresConfirmation()
-            ->action(static function (?array $data, Model $record, SnapshotFactory $snapshotFactory): void {
-                Assert::isMap($data);
-                self::createSnapshotAndNotify($data, $record, $snapshotFactory);
+            ->action(static function (Model $record, SnapshotFactory $snapshotFactory): void {
+                self::createSnapshotAndNotify($record, $snapshotFactory);
             })
             ->after(static function (Component $livewire): void {
                 $livewire->dispatch(SnapshotsRelationManager::REFRESH_TABLE_EVENT);
@@ -60,7 +52,6 @@ class CreateSnapshotAction extends Action
     {
         return self::make($name)
             ->action(static function (
-                ?array $data,
                 CreateSnapshotAction $action,
                 Component $livewire,
                 Model $record,
@@ -90,32 +81,26 @@ class CreateSnapshotAction extends Action
                     $action->halt();
                 }
 
-                Assert::isMap($data);
-                self::createSnapshotAndNotify($data, $record, $snapshotFactory);
+                self::createSnapshotAndNotify($record, $snapshotFactory);
             });
     }
 
-    /**
-     * @param ?array<string, mixed> $data
-     */
-    private static function createSnapshotAndNotify(?array $data, Model $record, SnapshotFactory $snapshotFactory): void
+    private static function createSnapshotAndNotify(Model $record, SnapshotFactory $snapshotFactory): void
     {
         Assert::isInstanceOf($record, SnapshotSource::class);
         $snapshot = $snapshotFactory->fromSnapshotSource($record);
 
-        if ($data !== null && array_key_exists('notify_po', $data) && $data['notify_po'] === true) {
-            /** @var UserByRoleService $userByRoleService */
-            $userByRoleService = App::get(UserByRoleService::class);
+        /** @var NotificationRecipientService $notificationRecipientService */
+        $notificationRecipientService = App::get(NotificationRecipientService::class);
 
-            $users = $userByRoleService->getUsersByOrganisationRole(
-                $record->getOrganisation(),
-                [Role::PRIVACY_OFFICER],
-            );
+        $users = $notificationRecipientService->getRecipients(
+            NotificationStream::SNAPSHOT_CREATED,
+            $record->getOrganisation(),
+        );
 
-            if ($users->isNotEmpty()) {
-                Mail::to($users)
-                    ->queue(new ApprovalRequest($snapshot));
-            }
+        if ($users->isNotEmpty()) {
+            Mail::to($users)
+                ->queue(new ApprovalRequest($snapshot));
         }
 
         Notification::make()

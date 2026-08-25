@@ -22,7 +22,6 @@ return [
     'mandateholder' => 'Mandate holder',
     'invited' => 'Invited mandate holders',
     'request' => 'Add mandate holders',
-    'notify_po' => 'Send the Privacy Officer(s) a notification',
     'notify' => 'Send notification',
     'notification_sent' => 'Notifications sent',
     'view_next' => 'Next version',
