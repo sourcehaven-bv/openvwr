@@ -143,8 +143,20 @@ hetzelfde label op één scherm twee keer anders oogt. Drie plekken:
 - het labelfilter boven een tabel (`TagFilter`);
 - de balk "Actieve filters", die Filament als één komma-string opbouwt.
 
-`App\Filament\LabelSwatch` zet er een gekleurde stip voor. De naam blijft
-staan — de stip komt erbij, vervangt niets.
+`App\Filament\LabelSwatch` verzorgt die drie plekken, in twee vormen:
+
+- **Als badge**, waar een gekozen label als "chip" in het veld staat. Filament
+  rendert die chip al als badge, maar met de huisstijlkleur hard erin, zodat
+  elk label dezelfde kleur kreeg. Die kleur is alleen bekend op de markup ván
+  het label, die *binnen* de chip zit, en een custom property daar erft niet
+  omhoog. De chip wordt daarom teruggebracht tot een lege huls en de badge
+  wordt op de binnenste span getekend — het element dat zijn kleur wél kent.
+  Zo ziet een label er in de kiezer hetzelfde uit als op de leespagina.
+- **Als stip vóór de naam**, in de uitklaplijst en in de balk "Actieve
+  filters", waar geen badge past. Binnen een chip is de stip verborgen: de
+  badge draagt de kleur daar al.
+
+De naam blijft in beide gevallen staan — kleur komt erbij, vervangt niets.
 
 **Niet via `getOptionLabelFromRecordUsing`.** Die methode indexeert haar
 resultaat op `$record->getKey()`, en id's zijn in dit project gecast naar een

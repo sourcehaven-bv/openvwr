@@ -273,3 +273,45 @@
 .fi-label-swatch-group {
     @apply flex flex-wrap items-center gap-x-2 gap-y-1;
 }
+
+/*
+ * Label chips in a multi-select (the label picker on a processing record, the
+ * label filter above a table).
+ *
+ * Filament already renders these as a badge, but hardcodes the colour to the
+ * primary palette, so every label came out in the house style regardless of
+ * its own colour.
+ *
+ * The chip itself cannot be recoloured from here: the colour is only known on
+ * the option's own markup, which sits inside the chip, and a custom property
+ * set there does not inherit upwards. So the chip is stripped back to a plain
+ * container and the badge is drawn on the inner span instead, which is the
+ * element that knows its colour.
+ */
+.choices__list--multiple .choices__item:has(.fi-label-swatch) {
+    background-color: transparent;
+    padding: 0;
+    --tw-ring-color: transparent;
+}
+
+.choices__list--multiple .fi-label-swatch {
+    @apply rounded-md text-xs font-medium ring-1 ring-inset;
+    padding: 0.25rem 0.5rem;
+    background-color: rgb(var(--fi-label-color-50));
+    color: rgb(var(--fi-label-color-600));
+    --tw-ring-color: rgba(var(--fi-label-color-600), 0.1);
+}
+
+.dark .choices__list--multiple .fi-label-swatch {
+    background-color: rgba(var(--fi-label-color-400), 0.1);
+    color: rgb(var(--fi-label-color-400));
+    --tw-ring-color: rgba(var(--fi-label-color-400), 0.3);
+}
+
+/*
+ * Inside a coloured chip the dot is redundant: the badge already carries the
+ * colour, and a dot in the same hue on top of it only adds noise.
+ */
+.choices__list--multiple .fi-label-swatch__dot {
+    display: none;
+}

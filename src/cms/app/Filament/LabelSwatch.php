@@ -34,10 +34,21 @@ class LabelSwatch
             return new HtmlString('<span>' . e($name) . '</span>');
         }
 
+        $value = e($labelColor->value);
+
+        // The custom properties re-point the chip's badge styling at this
+        // label's colour (see the .choices__item rules in theme.css). The dot
+        // is for the places that are not a chip - the dropdown list and the
+        // active-filter bar - and is hidden inside a chip, where the badge
+        // already carries the colour.
         return new HtmlString(
-            '<span class="fi-label-swatch">'
+            '<span class="fi-label-swatch" style="'
+            . '--fi-label-color-50: var(--' . $value . '-50);'
+            . '--fi-label-color-400: var(--' . $value . '-400);'
+            . '--fi-label-color-600: var(--' . $value . '-600);'
+            . '">'
             . '<span class="fi-label-swatch__dot" style="background-color: rgb(var(--'
-            . e($labelColor->value)
+            . $value
             . '-600))"></span>'
             . '<span>' . e($name) . '</span>'
             . '</span>',
