@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Filament\Resources\TagResource;
 
 use App\Enums\LabelColor;
+use App\Filament\LabelSwatch;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 
 use function __;
-use function e;
 
 class TagResourceForm
 {
@@ -62,18 +62,11 @@ class TagResourceForm
     }
 
     /**
-     * The swatch uses the same CSS variable Filament publishes for the
-     * registered palette (see LabelColorPalette), so it cannot drift from the
-     * colour the badge will actually use.
+     * The swatch is shared with the label picker and the label filter, so the
+     * same label looks the same wherever it is chosen.
      */
     private static function swatch(LabelColor $labelColor): string
     {
-        return
-            '<span class="flex items-center gap-x-2">'
-            . '<span class="h-4 w-4 rounded-full" style="background-color: rgb(var(--'
-            . e($labelColor->value)
-            . '-600))"></span>'
-            . '<span>' . e($labelColor->label()) . '</span>'
-            . '</span>';
+        return LabelSwatch::make($labelColor, $labelColor->label())->toHtml();
     }
 }

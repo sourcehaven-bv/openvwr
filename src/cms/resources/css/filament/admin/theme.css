@@ -247,3 +247,29 @@
 .fi-banner--danger {
     @apply bg-danger-100 text-danger-900 dark:bg-danger-950 dark:text-danger-100;
 }
+
+/*
+ * Label swatch: the coloured dot in front of a label's name, used where a
+ * label appears in a select rather than as a badge (the label picker on a
+ * processing record, the label filter above a table, and the colour picker on
+ * the label itself).
+ *
+ * The classes live here for the same reason as the banner above: this markup
+ * is built in PHP (App\Filament\LabelSwatch), which Tailwind does not scan, so
+ * utilities used only there are never compiled. The dot's own colour is an
+ * inline custom property on the element, taken from the palette registered in
+ * FilamentServiceProvider.
+ */
+.fi-label-swatch {
+    @apply inline-flex items-center gap-x-2;
+}
+
+.fi-label-swatch__dot {
+    @apply shrink-0 rounded-full;
+    width: 0.5rem;
+    height: 0.5rem;
+}
+
+.fi-label-swatch-group {
+    @apply flex flex-wrap items-center gap-x-2 gap-y-1;
+}
