@@ -40,6 +40,8 @@ return [
 
     'help_country' => 'The countries outside the EEA to which personal data is transferred.',
 
+    'picker_recent' => 'Recently edited',
+
     'parent' => 'Parent processing activity',
     'parent_hint_icon_text' => 'If this processing activity is a sub-activity of a parent processing activity, you can indicate the parent activity here. All sub-activities can be found with the parent activity in the "Sub-activities" table.',
     'parent_help' => 'Only fill in if this processing activity is part of a larger '

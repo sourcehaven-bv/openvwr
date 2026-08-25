@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Enums\Media\MediaGroup;
+use App\Filament\Forms\Components\RecentFirstOptions;
 use App\Filament\Forms\Components\RelationTable;
 use App\Filament\Resources\AlgorithmRecordResource\Pages\EditAlgorithmRecord;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\EditAvgResponsibleProcessingRecord;
@@ -227,4 +228,115 @@ it('does not render records from another organisation injected into the state', 
         ])
         ->assertSee($ownDocument->name)
         ->assertDontSee($foreignDocument->name);
+});
+
+it('offers the options straight away instead of an empty dropdown', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $system = System::factory()->recycle($organisation)->create();
+
+    $processingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create(['has_systems' => true]);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $processingRecord->getRouteKey(),
+        ])
+        ->assertFormFieldExists('systems', static function (RelationTable $field) use ($system): bool {
+            // One group, holding the option, rather than an empty dropdown.
+            return $field->getOptions() === [
+                __('general.picker_recent') => [
+                    $system->getKey()->toString() => $system->description,
+                ],
+            ];
+        });
+});
+
+it('offers the most recently edited records first, capped at the group size', function (): void {
+    $organisation = OrganisationTestHelper::create();
+
+    // More records than the dropdown shows, created oldest first.
+    $systems = [];
+    foreach (range(1, RecentFirstOptions::RECENT_COUNT + 5) as $index) {
+        $systems[] = System::factory()->recycle($organisation)->create([
+            'description' => 'Systeem ' . str_pad((string) $index, 3, '0', STR_PAD_LEFT),
+            'updated_at' => now()->subDays(RecentFirstOptions::RECENT_COUNT + 5 - $index),
+        ]);
+    }
+
+    $mostRecent = end($systems);
+    $oldest = $systems[0];
+
+    $processingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create(['has_systems' => true]);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $processingRecord->getRouteKey(),
+        ])
+        ->assertFormFieldExists(
+            'systems',
+            static function (RelationTable $field) use ($mostRecent, $oldest): bool {
+                /** @var array<string, string> $options */
+                $options = $field->getOptions()[__('general.picker_recent')] ?? [];
+
+                // The record edited last heads the list; the oldest ones fall
+                // outside it and are reached by typing instead.
+                return array_key_first($options) === $mostRecent->getKey()->toString()
+                    && count($options) === RecentFirstOptions::RECENT_COUNT
+                    && !array_key_exists($oldest->getKey()->toString(), $options);
+            },
+        );
+});
+
+it('does not offer records from another organisation in the preloaded options', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $ownSystem = System::factory()->recycle($organisation)->create();
+
+    $otherOrganisation = OrganisationTestHelper::create();
+    $foreignSystem = System::factory()->recycle($otherOrganisation)->create();
+
+    $processingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create(['has_systems' => true]);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $processingRecord->getRouteKey(),
+        ])
+        ->assertFormFieldExists(
+            'systems',
+            static function (RelationTable $field) use ($ownSystem, $foreignSystem): bool {
+                /** @var array<string, string> $options */
+                $options = $field->getOptions()[__('general.picker_recent')] ?? [];
+
+                return array_key_exists($ownSystem->getKey()->toString(), $options)
+                    && !array_key_exists($foreignSystem->getKey()->toString(), $options);
+            },
+        );
+});
+
+it('sends the heading and the recent records to the javascript control', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    System::factory()->recycle($organisation)->count(RecentFirstOptions::RECENT_COUNT + 2)->create();
+
+    // Nothing linked yet: the case where the dropdown used to open empty.
+    $processingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create(['has_systems' => true]);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $processingRecord->getRouteKey(),
+        ])
+        ->assertFormFieldExists('systems', static function (RelationTable $field): bool {
+            // choices.js draws the heading from this shape; without the
+            // nesting the ordering would look arbitrary to the user.
+            $forJs = $field->getOptionsForJs();
+
+            return count($forJs) === 1
+                && ($forJs[0]['label'] ?? null) === __('general.picker_recent')
+                && count($forJs[0]['choices'] ?? []) === RecentFirstOptions::RECENT_COUNT;
+        });
 });

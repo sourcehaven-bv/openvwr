@@ -29,6 +29,12 @@ class TagsInput extends Select
             ->relationship('tags', 'name', TenantScoped::getAsClosure())
             ->rules([CurrentOrganisation::forModel(Tag::class)])
             ->searchable(['name'])
+            // Tags are few and reused often, so offer them straight away
+            // (most recently edited first) rather than only on typing.
+            ->preload()
+            ->options(static function (): array {
+                return self::groupedTagOptions();
+            })
             ->createOptionForm(self::createTagOptionsForm())
             ->createOptionUsing(static function (array $data): string {
                 $tagData = array_merge($data, ['organisation_id' => Authentication::organisation()->id->toString()]);
@@ -36,6 +42,26 @@ class TagsInput extends Select
 
                 return Tag::create($tagData)->id->toString();
             });
+    }
+
+    /**
+     * The selectable tags: the most recently edited, under a heading that
+     * explains the ordering (see {@see RecentFirstOptions}).
+     *
+     * @return array<string, array<string, string>>
+     */
+    public static function groupedTagOptions(): array
+    {
+        $query = Tag::query();
+        (TenantScoped::getAsClosure())($query);
+
+        $recent = $query
+            ->orderByDesc('updated_at')
+            ->limit(RecentFirstOptions::RECENT_COUNT)
+            ->pluck('name', (new Tag())->getKeyName())
+            ->all();
+
+        return RecentFirstOptions::group(RecentFirstOptions::fromPlucked($recent));
     }
 
     /**
