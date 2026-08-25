@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\SystemResource;
 
 use App\Facades\Authentication;
+use App\Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -34,6 +35,7 @@ class SystemResourceForm
                 })
                 ->required()
                 ->maxLength(255),
+            TagsInput::make(),
         ];
     }
 }

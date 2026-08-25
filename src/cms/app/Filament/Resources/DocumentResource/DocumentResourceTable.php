@@ -10,6 +10,7 @@ use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\ExpiringDateColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
 use App\Filament\Tables\DateWindowFilter;
+use App\Filament\Tables\TagFilter;
 use App\Models\Document;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
@@ -41,6 +42,7 @@ class DocumentResourceTable
                 UpdatedAtColumn::make(),
             ])
             ->filters([
+                TagFilter::make(),
                 DateWindowFilter::make('expires_at')
                     ->label(__('document.expires_at')),
                 SelectFilter::make('type')

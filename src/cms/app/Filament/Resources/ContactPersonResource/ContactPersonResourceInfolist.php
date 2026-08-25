@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ContactPersonResource;
 
 use App\Filament\Infolists\Components\AddressRepeatableEntry;
+use App\Filament\Infolists\Components\SelectMultipleEntry;
 use Filament\Infolists\Components\Component;
 use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\Section;
@@ -41,6 +42,8 @@ class ContactPersonResourceInfolist
                     TextEntry::make('phone')
                         ->label(__('responsible.phone')),
                 ]),
+            SelectMultipleEntry::make('tags.name')
+                ->label(__('tag.model_plural')),
             AddressRepeatableEntry::make(),
         ];
     }

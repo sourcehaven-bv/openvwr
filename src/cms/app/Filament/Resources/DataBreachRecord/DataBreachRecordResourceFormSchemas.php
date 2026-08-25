@@ -9,6 +9,7 @@ use App\Filament\Forms\Components\DatePicker\DatePicker;
 use App\Filament\Forms\Components\RelationTable;
 use App\Filament\Forms\Components\RelationTableColumns;
 use App\Filament\Forms\Components\Section\InformationBlockSection;
+use App\Filament\Forms\Components\TagsInput;
 use App\Filament\Forms\Components\TextInput\EntityNumber;
 use App\Filament\Forms\FormHelper;
 use App\Filament\Resources\DocumentResource\DocumentResourceForm;
@@ -53,6 +54,7 @@ class DataBreachRecordResourceFormSchemas
                 ->helperText(__('data_breach_record.help_name'))
                 ->required()
                 ->maxLength(255),
+            TagsInput::make(),
             DatePicker::make('reported_at')
                 ->label(__('data_breach_record.reported_at'))
                 ->helperText(__('data_breach_record.help_reported_at')),

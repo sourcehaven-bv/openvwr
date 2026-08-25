@@ -6,6 +6,7 @@ namespace App\Filament\Resources\ProcessorResource;
 
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
+use App\Filament\Tables\TagFilter;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
@@ -32,6 +33,9 @@ class ProcessorResourceTable
                     ->sortable(),
                 CreatedAtColumn::make(),
                 UpdatedAtColumn::make(),
+            ])
+            ->filters([
+                TagFilter::make(),
             ])
             ->defaultSort('processors.updated_at', 'desc')
             ->emptyStateHeading(__('processor.table_empty_heading'))

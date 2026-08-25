@@ -6,6 +6,7 @@ namespace App\Filament\Resources\ContactPersonResource;
 
 use App\Filament\Forms\Components\Repeater\AddressRepeater;
 use App\Filament\Forms\Components\Select\SelectSingleWithLookup;
+use App\Filament\Forms\Components\TagsInput;
 use App\Models\ContactPersonPosition;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\TextInput;
@@ -47,6 +48,7 @@ class ContactPersonResourceForm
                 ->label(__('contact_person.phone'))
                 ->tel()
                 ->maxLength(255),
+            TagsInput::make(),
             AddressRepeater::make()
                 ->columnSpan(2),
         ];

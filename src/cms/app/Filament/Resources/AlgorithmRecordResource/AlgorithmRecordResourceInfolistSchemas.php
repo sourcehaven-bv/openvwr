@@ -28,6 +28,8 @@ class AlgorithmRecordResourceInfolistSchemas
                 ->label(__('general.name')),
             TextareaEntry::make('description')
                 ->label(__('algorithm_record.description')),
+            SelectMultipleEntry::make('tags.name')
+                ->label(__('tag.model_plural')),
             TextEntry::make('algorithmTheme.name')
                 ->label(__('algorithm_record.theme')),
             TextEntry::make('algorithmStatus.name')
