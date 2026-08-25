@@ -49,3 +49,15 @@ it('labels the selected labels with their colour', function (): void {
         ->and($labels[$tag->id->toString()])->toContain($tag->name)
         ->and($labels[$tag->id->toString()])->toContain('purple-600');
 });
+
+it('labels nothing when no labels are selected', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation);
+    $this->withFilamentSession($user, $organisation);
+
+    $tagsInput = TagsInput::make();
+    $tagsInput->container(FilamentTestHelper::createTestForm());
+    $tagsInput->state([]);
+
+    expect($tagsInput->getOptionLabels())->toBe([]);
+});

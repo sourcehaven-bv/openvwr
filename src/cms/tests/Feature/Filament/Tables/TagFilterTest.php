@@ -60,3 +60,19 @@ it('labels a selected label that has no colour', function (): void {
     expect($labels[$tag->id->toString()])->toContain($tag->name)
         ->and($labels[$tag->id->toString()])->not->toContain('-600');
 });
+
+it('shows no indicators when nothing is selected', function (): void {
+    $tag = Tag::factory()->create();
+
+    test()->asFilamentOrganisationUser($tag->organisation);
+
+    // The filter renders its own indicators; with no selection there is
+    // nothing to show, and the bar stays empty.
+    $indicators = test()->createLivewireTestable(ListAvgResponsibleProcessingRecords::class)
+        ->instance()
+        ->getTable()
+        ->getFilter('tag')
+        ->getIndicators();
+
+    expect($indicators)->toBe([]);
+});

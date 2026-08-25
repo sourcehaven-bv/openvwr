@@ -47,20 +47,6 @@ enum LabelColor: string
     case MAGENTA = 'magenta';
 
     /**
-     * @return array<string, string>
-     */
-    public static function options(): array
-    {
-        $options = [];
-
-        foreach (self::cases() as $case) {
-            $options[$case->value] = $case->label();
-        }
-
-        return $options;
-    }
-
-    /**
      * Pick the colour for a new label from the colours already in use.
      *
      * The least-used colour wins, so the palette stays spread out instead of

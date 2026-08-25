@@ -81,12 +81,11 @@ class TagFilter extends SelectFilter
      */
     private static function indicators(array $state): array
     {
-        $values = $state['values'] ?? null;
+        $values = $state['values'] ?? [];
 
-        if (!is_array($values)) {
-            return [];
-        }
-
+        // Filament hands the raw filter state over, so the shape is only known
+        // at runtime; anything that is not a list of ids means nothing is
+        // selected.
         $indicators = [];
 
         foreach (self::tags($values) as $tag) {
@@ -98,13 +97,11 @@ class TagFilter extends SelectFilter
     }
 
     /**
-     * @param array<mixed> $values
-     *
      * @return iterable<Tag>
      */
-    private static function tags(array $values): iterable
+    private static function tags(mixed $values): iterable
     {
-        if (count($values) === 0) {
+        if (!is_array($values) || count($values) === 0) {
             return [];
         }
 
