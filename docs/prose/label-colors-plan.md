@@ -133,7 +133,31 @@ registreren als volledige shade-ramps. Filament verwacht een map `50…950` in
 `'r, g, b'`-vorm (zie `vendor/filament/support/src/Colors/Color.php`), niet
 één hex.
 
-### 4. Tailwind-safelist — bij nader inzien niet nodig
+### 4a. Waar een label gekozen wordt (niet alleen waar het getoond wordt)
+
+Een badge is niet de enige plek waar een label verschijnt. In een `Select`
+rendert Filament de gekozen waarden als tekst in de huisstijlkleur, zodat
+hetzelfde label op één scherm twee keer anders oogt. Drie plekken:
+
+- de labelkiezer op een verwerking (`TagsInput`);
+- het labelfilter boven een tabel (`TagFilter`);
+- de balk "Actieve filters", die Filament als één komma-string opbouwt.
+
+`App\Filament\LabelSwatch` zet er een gekleurde stip voor. De naam blijft
+staan — de stip komt erbij, vervangt niets.
+
+**Niet via `getOptionLabelFromRecordUsing`.** Die methode indexeert haar
+resultaat op `$record->getKey()`, en id's zijn in dit project gecast naar een
+`Uuid`-object; PHP accepteert dat niet als array-key. Het gevolg was een harde
+`TypeError` op de verwerkingenlijst zodra er een labelfilter actief stond —
+alleen op dat pad, dus een gewone paginarender liet het niet zien. Nu via
+`getOptionLabelsUsing`, waar de key zelf een string wordt.
+
+`TagFilterTest` en `TagsInputTest` roepen `getOptionLabels()` rechtstreeks aan,
+want dat is het enige pad waar de fout optreedt. Beide tests zijn geverifieerd
+door ze op de kapotte variant te draaien: ze falen daar en slagen hier.
+
+### 4. Tailwind-safelist — genuanceerder dan gedacht
 
 In het plan stond dat de kleuren met de hand in `theme.css` gezet moesten
 worden, naar het voorbeeld van de banner-classes. Dat blijkt hier niet op te
@@ -147,12 +171,19 @@ vaste class (`text-custom-500`) plus een inline CSS-variabele:
 - `vendor/filament/support/src/Assets/AssetManager.php:258-262` publiceert
   `--amber-50` t/m `--amber-950` voor élke geregistreerde kleur.
 
-De classnamen zijn dus statisch en staan al in de Filament-preset. Registratie
-in stap 3 is voldoende; er komt geen regel CSS bij en er is geen risico dat het
-lokaal werkt en na een productiebuild niet.
+De classnamen zijn dus statisch en staan al in de Filament-preset. Voor de
+**badges** is registratie in stap 3 voldoende.
 
-Het banner-precedent blijft geldig voor zijn eigen geval: daar worden wél
-`@apply`-classes in PHP samengesteld.
+**Voor de stip uit stap 4a geldt het wél.** Die markup wordt in PHP opgebouwd
+(`LabelSwatch`), en Tailwind scant dat niet. `h-2` en `w-2` kwamen nergens
+anders in de applicatie voor en werden dus niet gecompileerd: de stip kreeg
+grootte nul en was onzichtbaar — precies het scenario "werkt lokaal niet en na
+een build ook niet". De classes staan daarom in `theme.css`, met dezelfde
+uitleg als bij de banner ernaast.
+
+Kortom: het banner-precedent geldt niet voor Filament-badges, maar wel voor
+eigen markup uit PHP. Dat onderscheid was in het oorspronkelijke plan niet
+gemaakt.
 
 ### 5. Toewijzingsalgoritme
 
@@ -214,6 +245,43 @@ uitgangspunt 2.
 - `tools/screenshots/a11y.mjs` (axe-core, WCAG A/AA) op een pagina met
   gekleurde labels, om te bevestigen dat er geen nieuwe `color-contrast`-
   bevindingen bij komen.
+
+## Inventarisatie: elke plek waar een label verschijnt
+
+Nagelopen om te voorkomen dat er nog een plek grijs blijft. Wat kleur heeft:
+
+| Plek | Weergave |
+|---|---|
+| Labelscherm, tabel | badge in eigen kleur |
+| Labelscherm, bekijken | badge + stip bij "Kleur" |
+| Labelscherm, bewerken | kleurkiezer met stippen |
+| Labelkiezer op een verwerking | stip voor de naam |
+| Labelfilter boven een tabel | stip voor de naam |
+| Balk "Actieve filters" | stip per label |
+| Verwerking, infolist (AVG/WPG) | badge in eigen kleur |
+
+Bewust zonder kleur, met reden:
+
+- **Snapshot-markdown**
+  (`snapshot-data-create/avg-responsible-processing-record/private-markdown.blade.php:13`)
+  en **CSV-export** (`AvgResponsibleProcessingRecordExporter.php:35`): platte
+  tekstformaten, kleur heeft er geen betekenis.
+- **Import/kopiëren tussen organisaties**
+  (`transfer-import.blade.php`, `transfer-copy.blade.php`): één generieke lijst
+  voor álle entiteitstypen, gevoed door een array met alleen een naam. Kleur
+  toevoegen vraagt om een uitzondering voor één type in gedeelde code; de winst
+  weegt daar niet tegenop.
+- **Documentatiegenerator** (`DocumentAssembler.php:57`): beschrijft dát een
+  register labels heeft, toont geen labels.
+
+Gaten die al bestonden en buiten deze wijziging vallen:
+
+- DPIA en DPIA-prescan hebben wél een labelkiezer, maar geen infolist en geen
+  labelfilter. Die resources hebben überhaupt geen infolist.
+- Alleen het AVG-verantwoordelijke-register exporteert labels en zet ze in de
+  snapshot-markdown; de andere registers niet.
+- `Tag` heeft geen omgekeerde relatie naar DPIA-records, dus het labelscherm
+  toont die verwerkingen niet.
 
 ## Wat hier bewust niet in zit
 
