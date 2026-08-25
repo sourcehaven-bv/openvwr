@@ -5,23 +5,19 @@ declare(strict_types=1);
 namespace App\Services\ApReport;
 
 use App\Enums\Authorization\Role;
-use App\Facades\DateFormat;
 use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\DataBreachRecord;
 use App\Models\Organisation;
 use App\Models\Stakeholder;
 use App\Services\User\UserByRoleService;
-use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 
 use function __;
-use function array_filter;
 use function array_keys;
 use function array_merge;
 use function array_unique;
 use function array_values;
-use function is_array;
 use function sprintf;
 use function trim;
 
@@ -63,6 +59,7 @@ class ApReportBuilder
 
     public function __construct(
         private readonly UserByRoleService $userByRoleService,
+        private readonly ApAnswerValues $values,
     ) {
     }
 
@@ -115,7 +112,7 @@ class ApReportBuilder
             ApAnswer::recorded(
                 '1.3',
                 __('ap_report.question.other_supervisors'),
-                $this->withOther(
+                $this->values->withOther(
                     $dataBreachRecord->other_supervisors,
                     $dataBreachRecord->other_supervisors_other,
                     'Andere toezichthouder',
@@ -129,7 +126,7 @@ class ApReportBuilder
         // Cross-border reach is a property of the incident, not of the processing:
         // a processing that may involve other countries says nothing about whether
         // the people hit by this breach live there. Only the breach record answers it.
-        $crossBorder = [$this->boolean($dataBreachRecord->cross_border)];
+        $crossBorder = [$this->values->boolean($dataBreachRecord->cross_border)];
         if ($dataBreachRecord->cross_border_countries !== null) {
             $crossBorder[] = $dataBreachRecord->cross_border_countries;
         }
@@ -195,9 +192,9 @@ class ApReportBuilder
     private function timeline(DataBreachRecord $dataBreachRecord): ApChapter
     {
         return new ApChapter('4', __('ap_report.chapter.timeline'), [
-            ApAnswer::recorded('4.1.1', __('ap_report.question.started_at'), $this->date($dataBreachRecord->started_at)),
-            ApAnswer::recorded('4.1.2', __('ap_report.question.ended_at'), $this->date($dataBreachRecord->ended_at)),
-            ApAnswer::recorded('4.2', __('ap_report.question.discovered_at'), $this->date($dataBreachRecord->discovered_at)),
+            ApAnswer::recorded('4.1.1', __('ap_report.question.started_at'), $this->values->date($dataBreachRecord->started_at)),
+            ApAnswer::recorded('4.1.2', __('ap_report.question.ended_at'), $this->values->date($dataBreachRecord->ended_at)),
+            ApAnswer::recorded('4.2', __('ap_report.question.discovered_at'), $this->values->date($dataBreachRecord->discovered_at)),
             ApAnswer::recorded('4.3', __('ap_report.question.how_discovered'), $dataBreachRecord->how_discovered),
             ApAnswer::recorded(
                 '4.5',
@@ -265,7 +262,7 @@ class ApReportBuilder
             ApAnswer::recorded(
                 '6.3.1',
                 __('ap_report.question.record_count'),
-                $this->withExplanation($dataBreachRecord->record_count, $dataBreachRecord->record_count_explanation),
+                $this->values->withExplanation($dataBreachRecord->record_count, $dataBreachRecord->record_count_explanation),
             ),
         ]);
     }
@@ -285,7 +282,7 @@ class ApReportBuilder
             ApAnswer::recorded(
                 '7.1',
                 __('ap_report.question.affected_groups'),
-                $this->withOther($dataBreachRecord->affected_groups, $dataBreachRecord->affected_groups_other),
+                $this->values->withOther($dataBreachRecord->affected_groups, $dataBreachRecord->affected_groups_other),
             ),
             ApAnswer::recordedWithHints(
                 '7.2',
@@ -294,7 +291,12 @@ class ApReportBuilder
                 $descriptions,
                 $this->processingOrigins($dataBreachRecord),
             ),
-            ApAnswer::recorded('7.3', __('ap_report.question.affected_count'), $this->affectedCount($dataBreachRecord)),
+            ApAnswer::recorded('7.3', __('ap_report.question.affected_count'), $this->values->count(
+                $dataBreachRecord->affected_count_known,
+                $dataBreachRecord->affected_count,
+                $dataBreachRecord->affected_count_min,
+                $dataBreachRecord->affected_count_max,
+            )),
         ]);
     }
 
@@ -320,7 +322,7 @@ class ApReportBuilder
             ApAnswer::recorded(
                 '8.1',
                 __('ap_report.question.encrypted_beforehand'),
-                $this->withExplanation(
+                $this->values->withExplanation(
                     $dataBreachRecord->protection_beforehand,
                     $dataBreachRecord->protection_beforehand_explanation,
                 ),
@@ -340,7 +342,7 @@ class ApReportBuilder
             ApAnswer::recorded(
                 '9.1',
                 __('ap_report.question.consequences_controller'),
-                $this->withOther(
+                $this->values->withOther(
                     $dataBreachRecord->consequences_controller,
                     $dataBreachRecord->consequences_controller_other,
                 ),
@@ -348,7 +350,7 @@ class ApReportBuilder
             ApAnswer::recorded(
                 '9.2',
                 __('ap_report.question.consequences_data_subjects'),
-                $this->withOther(
+                $this->values->withOther(
                     $dataBreachRecord->consequences_data_subjects,
                     $dataBreachRecord->consequences_data_subjects_other,
                 ),
@@ -371,13 +373,13 @@ class ApReportBuilder
             ApAnswer::recorded(
                 '10.1.1',
                 __('ap_report.question.reported_to_involved'),
-                $this->boolean($dataBreachRecord->reported_to_involved),
+                $this->values->boolean($dataBreachRecord->reported_to_involved),
             ),
             ApAnswer::recorded('10.1.7', __('ap_report.question.reported_to_involved_communication'), array_values($communication)),
             ApAnswer::recorded(
                 '10.1.3',
                 __('ap_report.question.reported_to_involved_count'),
-                $this->number($dataBreachRecord->reported_to_involved_count),
+                $this->values->number($dataBreachRecord->reported_to_involved_count),
             ),
             ApAnswer::recorded('10.2', __('ap_report.question.measures'), $dataBreachRecord->measures),
         ]);
@@ -484,69 +486,6 @@ class ApReportBuilder
     }
 
     /**
-     * A checkbox list plus the free text behind its "Anders" option. The bare
-     * option is replaced by the spelled-out one, so the AP form is not handed
-     * both "Anders" and "Anders, namelijk: ..." for the same tick.
-     *
-     * @param array<string>|null $values
-     *
-     * @return array<int, string>
-     */
-    private function withOther(?array $values, ?string $other, string $option = 'Anders'): array
-    {
-        $answer = $values ?? [];
-        if ($other === null) {
-            return array_values($answer);
-        }
-
-        $answer = array_filter($answer, static function (string $value) use ($option): bool {
-            return $value !== $option;
-        });
-        $answer[] = sprintf('%s, namelijk: %s', $option, $other);
-
-        return array_values($answer);
-    }
-
-    /**
-     * An answer plus the explanation the AP asks for alongside it.
-     *
-     * @param array<string>|string|null $value
-     *
-     * @return array<int, string>
-     */
-    private function withExplanation(array|string|null $value, ?string $explanation): array
-    {
-        $answer = is_array($value) ? $value : [$value];
-        $answer[] = $explanation;
-
-        $answer = array_filter($answer, static function (?string $item): bool {
-            return $item !== null;
-        });
-
-        return array_values($answer);
-    }
-
-    /**
-     * The AP asks for an exact number of data subjects, or a range if the exact
-     * number is not known yet.
-     */
-    private function affectedCount(DataBreachRecord $dataBreachRecord): ?string
-    {
-        if ($dataBreachRecord->affected_count_known) {
-            return $this->number($dataBreachRecord->affected_count);
-        }
-
-        $min = $this->number($dataBreachRecord->affected_count_min);
-        $max = $this->number($dataBreachRecord->affected_count_max);
-
-        if ($min === null && $max === null) {
-            return null;
-        }
-
-        return sprintf('%s - %s', $min ?? '?', $max ?? '?');
-    }
-
-    /**
      * The contact person the AP can reach: the organisation's data protection
      * officials. Derived, because the officer may want to name someone else.
      *
@@ -565,28 +504,5 @@ class ApReportBuilder
         }
 
         return array_values(array_unique($officials));
-    }
-
-    private function number(?int $value): ?string
-    {
-        if ($value === null) {
-            return null;
-        }
-
-        return (string) $value;
-    }
-
-    private function date(?CarbonImmutable $date): ?string
-    {
-        if ($date === null) {
-            return null;
-        }
-
-        return DateFormat::toDate($date);
-    }
-
-    private function boolean(bool $value): string
-    {
-        return $value ? __('general.yes') : __('general.no');
     }
 }

@@ -16,7 +16,22 @@ class DataBreachRecordExporter extends Exporter
     public static function getColumns(): array
     {
         return [
-            // naam datalek
+            ...self::identificationColumns(),
+            ...self::responsibleColumns(),
+            ...self::datesColumns(),
+            ...self::incidentColumns(),
+            ...self::notificationColumns(),
+            ...self::processingRecordsColumns(),
+            ...self::metadataColumns(),
+        ];
+    }
+
+    /**
+     * @return array<ExportColumn>
+     */
+    private static function identificationColumns(): array
+    {
+        return [
             ExportColumn::make('organisation.name')
                 ->label(__('organisation.model_singular')),
             ExportColumn::make('organisation.responsibleLegalEntity.name')
@@ -31,12 +46,26 @@ class DataBreachRecordExporter extends Exporter
                 ->label(__('data_breach_record.type')),
             ExportColumn::make('ap_reported')
                 ->label(__('data_breach_record.ap_reported')),
+        ];
+    }
 
-            // verantwoordelijke
+    /**
+     * @return array<ExportColumn>
+     */
+    private static function responsibleColumns(): array
+    {
+        return [
             ExportColumn::make('responsibles.name')
                 ->label(__('responsible.model_plural')),
+        ];
+    }
 
-            // dates
+    /**
+     * @return array<ExportColumn>
+     */
+    private static function datesColumns(): array
+    {
+        return [
             ExportColumn::make('discovered_at')
                 ->label(__('data_breach_record.discovered_at')),
             ExportColumn::make('started_at')
@@ -47,8 +76,15 @@ class DataBreachRecordExporter extends Exporter
                 ->label(__('data_breach_record.ap_reported_at')),
             ExportColumn::make('completed_at')
                 ->label(__('data_breach_record.completed_at')),
+        ];
+    }
 
-            // incident
+    /**
+     * @return array<ExportColumn>
+     */
+    private static function incidentColumns(): array
+    {
+        return [
             ExportColumn::make('nature_of_incident')
                 ->label(__('data_breach_record.nature_of_incident')),
             ExportColumn::make('nature_of_incident_other')
@@ -73,8 +109,15 @@ class DataBreachRecordExporter extends Exporter
                 ->label(__('data_breach_record.reported_to_involved_communication_other')),
             ExportColumn::make('fg_reported')
                 ->label(__('data_breach_record.fg_reported')),
+        ];
+    }
 
-            // melding AP
+    /**
+     * @return array<ExportColumn>
+     */
+    private static function notificationColumns(): array
+    {
+        return [
             ExportColumn::make('how_discovered')
                 ->label(__('data_breach_record.how_discovered')),
             ExportColumn::make('late_notification_reason')
@@ -123,16 +166,30 @@ class DataBreachRecordExporter extends Exporter
                 ->label(__('data_breach_record.cross_border_countries')),
             ExportColumn::make('reported_other_dpas')
                 ->label(__('data_breach_record.reported_other_dpas')),
+        ];
+    }
 
-            // verwerkingen
+    /**
+     * @return array<ExportColumn>
+     */
+    private static function processingRecordsColumns(): array
+    {
+        return [
             ExportColumn::make('avgResponsibleProcessingRecords.name')
                 ->label(__('avg_responsible_processing_record.model_plural')),
             ExportColumn::make('avgProcessorProcessingRecords.name')
                 ->label(__('avg_processor_processing_record.model_plural')),
             ExportColumn::make('wpgProcessingRecords.name')
                 ->label(__('wpg_processing_record.model_plural')),
+        ];
+    }
 
-            // overig
+    /**
+     * @return array<ExportColumn>
+     */
+    private static function metadataColumns(): array
+    {
+        return [
             ExportColumn::make('created_at')
                 ->label(__('general.created_at')),
             ExportColumn::make('updated_at')

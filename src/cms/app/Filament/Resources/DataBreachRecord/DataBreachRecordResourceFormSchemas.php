@@ -205,32 +205,30 @@ class DataBreachRecordResourceFormSchemas
      */
     public static function getNotification(): array
     {
-        $otherSupervisorsOptions = __('data_breach_record.other_supervisors_options');
-        Assert::allString($otherSupervisorsOptions);
-
-        $natureOfBreachOptions = __('data_breach_record.nature_of_breach_options');
-        Assert::allString($natureOfBreachOptions);
-
-        $affectedGroupsOptions = __('data_breach_record.affected_groups_options');
-        Assert::allString($affectedGroupsOptions);
-
-        $protectionBeforehandOptions = __('data_breach_record.protection_beforehand_options');
-        Assert::allString($protectionBeforehandOptions);
-
-        $consequencesControllerOptions = __('data_breach_record.consequences_controller_options');
-        Assert::allString($consequencesControllerOptions);
-
-        $consequencesDataSubjectsOptions = __('data_breach_record.consequences_data_subjects_options');
-        Assert::allString($consequencesDataSubjectsOptions);
-
-        $riskSeverityOptions = __('data_breach_record.risk_severity_options');
-        Assert::allString($riskSeverityOptions);
-
         return [
             InformationBlockSection::makeCollapsible(
                 __('information_blocks.data_breach_record.step_notification_title'),
                 __('information_blocks.data_breach_record.step_notification_info'),
             ),
+            ...self::getNotificationBreach(),
+            ...self::getNotificationAffectedPeople(),
+            ...self::getNotificationConsequences(),
+            ...self::getNotificationOtherAuthorities(),
+        ];
+    }
+
+    /**
+     * Questions 4 and 5 of the AP form: how the breach came to light and what
+     * kind of breach it was.
+     *
+     * @return array<Component>
+     */
+    private static function getNotificationBreach(): array
+    {
+        $natureOfBreachOptions = __('data_breach_record.nature_of_breach_options');
+        Assert::allString($natureOfBreachOptions);
+
+        return [
             Textarea::make('how_discovered')
                 ->label(__('data_breach_record.how_discovered'))
                 ->helperText(__('data_breach_record.help_how_discovered')),
@@ -246,6 +244,20 @@ class DataBreachRecordResourceFormSchemas
                 ->maxLength(255),
             Textarea::make('record_count_explanation')
                 ->label(__('data_breach_record.record_count_explanation')),
+        ];
+    }
+
+    /**
+     * Question 7 of the AP form: who was hit, and how many of them.
+     *
+     * @return array<Component>
+     */
+    private static function getNotificationAffectedPeople(): array
+    {
+        $affectedGroupsOptions = __('data_breach_record.affected_groups_options');
+        Assert::allString($affectedGroupsOptions);
+
+        return [
             CheckboxList::makeWithValidatedOptions('affected_groups', FormHelper::setValueAsKey($affectedGroupsOptions))
                 ->label(__('data_breach_record.affected_groups'))
                 ->live(),
@@ -271,6 +283,30 @@ class DataBreachRecordResourceFormSchemas
                 ->numeric()
                 ->minValue(0)
                 ->visible(FormHelper::isFieldDisabled('affected_count_known')),
+        ];
+    }
+
+    /**
+     * Questions 8, 9 and 10 of the AP form: what protected the data beforehand,
+     * what the fallout is and how severe that is.
+     *
+     * @return array<Component>
+     */
+    private static function getNotificationConsequences(): array
+    {
+        $protectionBeforehandOptions = __('data_breach_record.protection_beforehand_options');
+        Assert::allString($protectionBeforehandOptions);
+
+        $consequencesControllerOptions = __('data_breach_record.consequences_controller_options');
+        Assert::allString($consequencesControllerOptions);
+
+        $consequencesDataSubjectsOptions = __('data_breach_record.consequences_data_subjects_options');
+        Assert::allString($consequencesDataSubjectsOptions);
+
+        $riskSeverityOptions = __('data_breach_record.risk_severity_options');
+        Assert::allString($riskSeverityOptions);
+
+        return [
             CheckboxList::makeWithValidatedOptions(
                 'protection_beforehand',
                 FormHelper::setValueAsKey($protectionBeforehandOptions),
@@ -305,6 +341,21 @@ class DataBreachRecordResourceFormSchemas
                 ->label(__('data_breach_record.reported_to_involved_count'))
                 ->numeric()
                 ->minValue(0),
+        ];
+    }
+
+    /**
+     * Questions 1.3 and 2 of the AP form: other supervisors and the countries
+     * this breach reaches into.
+     *
+     * @return array<Component>
+     */
+    private static function getNotificationOtherAuthorities(): array
+    {
+        $otherSupervisorsOptions = __('data_breach_record.other_supervisors_options');
+        Assert::allString($otherSupervisorsOptions);
+
+        return [
             CheckboxList::makeWithValidatedOptions(
                 'other_supervisors',
                 FormHelper::setValueAsKey($otherSupervisorsOptions),
