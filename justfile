@@ -23,6 +23,11 @@ docs-pdf *locales:
     @echo "📄 Building data-model PDFs..."
     ./docs/build-pdf.sh {{locales}}
 
+# Build the Dutch user manual and copy it into the CMS public directory
+docs-manual:
+    @echo "📖 Building the user manual..."
+    ./docs/handleiding/build-pdf.sh
+
 # Fail if the committed documentation is out of date with the code
 docs-check:
     @echo "🔍 Checking whether the documentation matches the code..."
