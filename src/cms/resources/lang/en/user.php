@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\Notification\NotificationStream;
 use App\Enums\RegisterLayout;
 use App\Enums\Snapshot\MandateholderNotifyBatch;
 use App\Enums\Snapshot\MandateholderNotifyDirectly;
@@ -105,6 +106,16 @@ return [
                 MandateholderNotifyDirectly::NONE->value => 'None',
                 MandateholderNotifyDirectly::BATCH->value => 'Summary',
                 MandateholderNotifyDirectly::SINGLE->value => 'Separate message',
+            ],
+
+            'notifications' => 'Notifications',
+            'notification_streams' => 'Send me an email when',
+            'notification_streams_helper' => 'Untick anything you no longer want to be emailed about. Only notifications that match your roles are shown.',
+            'notification_streams_options' => [
+                NotificationStream::DATA_BREACH_AP_REPORTED->value => 'A data breach has been reported to the Dutch DPA',
+                NotificationStream::DOCUMENT_NOTIFY_DATE_REACHED->value => "A document's notification date has been reached",
+                NotificationStream::SNAPSHOT_APPROVAL_UPDATED->value => 'A mandate holder has handled a version',
+                NotificationStream::SNAPSHOT_CREATED->value => 'A new version has been created',
             ],
 
             'layout' => 'Layout',

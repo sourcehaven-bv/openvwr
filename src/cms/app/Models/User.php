@@ -10,6 +10,7 @@ use App\Collections\SnapshotApprovalCollection;
 use App\Collections\UserCollection;
 use App\Collections\UserGlobalRoleCollection;
 use App\Collections\UserLoginTokenCollection;
+use App\Enums\Notification\NotificationStream;
 use App\Enums\RegisterLayout;
 use App\Enums\Snapshot\MandateholderNotifyBatch;
 use App\Enums\Snapshot\MandateholderNotifyDirectly;
@@ -25,6 +26,7 @@ use Filament\Models\Contracts\HasTenants;
 use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
+use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -34,6 +36,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 use MinVWS\AuditLogger\Contracts\LoggableUser;
 use Webmozart\Assert\Assert;
 
@@ -45,6 +48,7 @@ use function sprintf;
  * @property MandateholderNotifyBatch $mandateholder_notify_batch
  * @property MandateholderNotifyDirectly $mandateholder_notify_directly
  * @property string $name
+ * @property Collection<int, NotificationStream> $notification_exclusions
  * @property mixed|null $otp_secret
  * @property CarbonImmutable|null $otp_confirmed_at
  * @property mixed $password
@@ -75,6 +79,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants, Loggable
         'mandateholder_notify_batch',
         'mandateholder_notify_directly',
         'name',
+        'notification_exclusions',
         'register_layout',
     ];
     protected $hidden = [
@@ -87,6 +92,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants, Loggable
         return [
             'mandateholder_notify_batch' => MandateholderNotifyBatch::class,
             'mandateholder_notify_directly' => MandateholderNotifyDirectly::class,
+            'notification_exclusions' => AsEnumCollection::of(NotificationStream::class),
             'otp_secret' => 'encrypted',
             'otp_confirmed_at' => 'datetime',
             'register_layout' => RegisterLayout::class,
@@ -96,6 +102,11 @@ class User extends Authenticatable implements FilamentUser, HasTenants, Loggable
     public function canAccessPanel(Panel $panel): bool
     {
         return true;
+    }
+
+    public function receivesNotification(NotificationStream $notificationStream): bool
+    {
+        return !$this->notification_exclusions->contains($notificationStream);
     }
 
     /**

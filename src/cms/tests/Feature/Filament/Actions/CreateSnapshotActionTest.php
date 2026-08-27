@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Filament\Actions;
 
 use App\Enums\Authorization\Role;
+use App\Enums\Notification\NotificationStream;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\EditAvgResponsibleProcessingRecord;
 use App\Mail\SnapshotApproval\ApprovalRequest;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
@@ -66,7 +67,7 @@ it('will notify po', function (): void {
     User::factory()
         ->hasAttached($organisation)
         ->hasOrganisationRole(Role::PRIVACY_OFFICER, $organisation)
-        ->create();
+        ->create(['notification_exclusions' => []]);
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
         ->recycle($organisation)
         ->withValidState()
@@ -82,14 +83,14 @@ it('will notify po', function (): void {
     Mail::assertQueued(ApprovalRequest::class);
 });
 
-it('will not notify po if unchecked', function (): void {
+it('will notify cpo', function (): void {
     Mail::fake();
 
     $organisation = OrganisationTestHelper::create();
     User::factory()
         ->hasAttached($organisation)
-        ->hasOrganisationRole(Role::PRIVACY_OFFICER, $organisation)
-        ->create();
+        ->hasOrganisationRole(Role::CHIEF_PRIVACY_OFFICER, $organisation)
+        ->create(['notification_exclusions' => []]);
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
         ->recycle($organisation)
         ->withValidState()
@@ -99,9 +100,32 @@ it('will not notify po if unchecked', function (): void {
         ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
             'record' => $avgResponsibleProcessingRecord->id,
         ])
-        ->callAction('snapshot_create', [
-            'notify_po' => false,
+        ->callAction('snapshot_create')
+        ->assertSuccessful();
+
+    Mail::assertQueued(ApprovalRequest::class);
+});
+
+it('will not notify a po that excluded the stream', function (): void {
+    Mail::fake();
+
+    $organisation = OrganisationTestHelper::create();
+    User::factory()
+        ->hasAttached($organisation)
+        ->hasOrganisationRole(Role::PRIVACY_OFFICER, $organisation)
+        ->create([
+            'notification_exclusions' => [NotificationStream::SNAPSHOT_CREATED],
+        ]);
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->withValidState()
+        ->create();
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->id,
         ])
+        ->callAction('snapshot_create')
         ->assertSuccessful();
 
     Mail::assertNotQueued(ApprovalRequest::class);
