@@ -657,6 +657,10 @@ return [
         'step_incident_info' => '
             <p class="text-sm text-gray-500">Beschrijf bij "Aard van incident" de aard van het datalek. Geef een korte "Samenvatting incident". Vermeld bij "Betrokken groep(en) personen" welke groepen personen betrokken zijn. Noteer de "Categorieën van persoonsgegevens" en de "Bijzondere categorieën van persoonsgegevens" die zijn gelekt. Geef een "Inschatting risico" van het incident. Beschrijf de "Maatregelen" die zijn genomen. Geef aan of het incident is "Gemeld aan betrokkene". Noteer het "Communicatiemiddel melding betrokkene". Vermeld ook of het incident is "Gemeld aan FG" (Functionaris Gegevensbescherming).</p>',
 
+        'step_notification_title' => 'Informatie over Melding AP',
+        'step_notification_info' => '
+            <p class="text-sm text-gray-500">Deze stap bevat de vragen die het online meldformulier van de Autoriteit Persoonsgegevens stelt en die nergens anders in het register staan. Vul ze in als u het datalek bij de AP meldt; ze verschijnen dan in de AP-meldformulier voorbereiding. Meldt u niet, dan hoeft u deze stap niet in te vullen.</p>',
+
         'step_processing_records_title' => 'Informatie over Verwerkingen',
         'step_processing_records_info' => '
             <p class="text-sm text-gray-500">Koppel hier het datalek aan verwerkingen uit de drie verwerkingsregisters. In de tabellen onderaan deze pagina zijn de verwerkingen waar dit Datalek aan gekoppeld is terug te vinden en kun je ernaar navigeren.</p>',

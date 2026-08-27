@@ -76,6 +76,9 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property CarbonImmutable|null $published_at
  * @property int $review_at_default_in_months
  * @property string $slug
+ * @property ?string $coc_number
+ * @property ?string $fg_registration_number
+ * @property ?string $sector
  *
  * @property-read AlgorithmPublicationCategoryCollection $algorithmPublicationCategories
  * @property-read AlgorithmRecordCollection $algorithmRecords
@@ -130,6 +133,9 @@ class Organisation extends Model implements HasMedia
         'register_entity_number_counter_id',
         'databreach_entity_number_counter_id',
         'public_from',
+        'coc_number',
+        'fg_registration_number',
+        'sector',
     ];
 
     public function casts(): array

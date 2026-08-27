@@ -47,6 +47,16 @@ leeg, dan blijft de vraag op "nog invullen" staan, met daarbij wat de gekoppelde
 als aanwijzing. Zo legt de privacy officer in het datalek vast wat er werkelijk gelekt is, wat
 artikel 33 lid 5 sowieso van het register vraagt.
 
-Antwoorden die over de verwerking zelf gaan en niet op het datalek thuishoren — de wettelijke
-grondslag (1.2), de betrokken verwerkers en ontvangers (3.3) en de pseudonimisering (8.1) — worden
-wel overgenomen, met vermelding van de verwerking waaruit ze komen.
+### Waar de antwoorden vandaan komen
+
+De stap **Melding AP** op het datalek bevat de vragen die het meldformulier stelt en die nergens
+anders in het register staan: hoe het lek is ontdekt, de aard van de inbreuk, aantallen
+gegevensrecords en betrokkenen, bescherming vooraf, gevolgen, ernst en internationale aspecten.
+Op de organisatie staan het KvK-nummer, het registratienummer van de FG en de sector, die bij
+elke melding hetzelfde zijn.
+
+Drie antwoorden komen ergens anders vandaan en moeten dus gecontroleerd worden: de wettelijke
+grondslag (1.2) en de betrokken verwerkers en ontvangers (3.3) volgen uit de gekoppelde
+verwerking, en de contactpersoon voor de AP (3.2.2) uit de functionarissen gegevensbescherming
+van de organisatie. Wie de melding doet (3.2.1) wordt bij het melden zelf bepaald en staat
+daarom nergens vast.

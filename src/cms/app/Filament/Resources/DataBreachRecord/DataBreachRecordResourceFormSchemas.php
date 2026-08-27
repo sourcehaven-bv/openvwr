@@ -205,6 +205,185 @@ class DataBreachRecordResourceFormSchemas
     /**
      * @return array<Component>
      */
+    public static function getNotification(): array
+    {
+        return [
+            InformationBlockSection::makeCollapsible(
+                __('information_blocks.data_breach_record.step_notification_title'),
+                __('information_blocks.data_breach_record.step_notification_info'),
+            ),
+            ...self::getNotificationBreach(),
+            ...self::getNotificationAffectedPeople(),
+            ...self::getNotificationConsequences(),
+            ...self::getNotificationOtherAuthorities(),
+        ];
+    }
+
+    /**
+     * Questions 4 and 5 of the AP form: how the breach came to light and what
+     * kind of breach it was.
+     *
+     * @return array<Component>
+     */
+    private static function getNotificationBreach(): array
+    {
+        $natureOfBreachOptions = __('data_breach_record.nature_of_breach_options');
+        Assert::allString($natureOfBreachOptions);
+
+        return [
+            Textarea::make('how_discovered')
+                ->label(__('data_breach_record.how_discovered'))
+                ->helperText(__('data_breach_record.help_how_discovered')),
+            Textarea::make('late_notification_reason')
+                ->label(__('data_breach_record.late_notification_reason'))
+                ->helperText(__('data_breach_record.help_late_notification_reason')),
+            CheckboxList::makeWithValidatedOptions('nature_of_breach', FormHelper::setValueAsKey($natureOfBreachOptions))
+                ->label(__('data_breach_record.nature_of_breach'))
+                ->helperText(__('data_breach_record.help_nature_of_breach')),
+            TextInput::make('record_count')
+                ->label(__('data_breach_record.record_count'))
+                ->helperText(__('data_breach_record.help_record_count'))
+                ->maxLength(255),
+            Textarea::make('record_count_explanation')
+                ->label(__('data_breach_record.record_count_explanation')),
+        ];
+    }
+
+    /**
+     * Question 7 of the AP form: who was hit, and how many of them.
+     *
+     * @return array<Component>
+     */
+    private static function getNotificationAffectedPeople(): array
+    {
+        $affectedGroupsOptions = __('data_breach_record.affected_groups_options');
+        Assert::allString($affectedGroupsOptions);
+
+        return [
+            CheckboxList::makeWithValidatedOptions('affected_groups', FormHelper::setValueAsKey($affectedGroupsOptions))
+                ->label(__('data_breach_record.affected_groups'))
+                ->live(),
+            Textarea::make('affected_groups_other')
+                ->label(__('data_breach_record.affected_groups_other'))
+                ->visible(FormHelper::fieldValuesContainValue('affected_groups', 'Anders')),
+            Toggle::make('affected_count_known')
+                ->label(__('data_breach_record.affected_count_known'))
+                ->helperText(__('data_breach_record.help_affected_count_known'))
+                ->live(),
+            TextInput::make('affected_count')
+                ->label(__('data_breach_record.affected_count'))
+                ->numeric()
+                ->minValue(0)
+                ->visible(FormHelper::isFieldEnabled('affected_count_known')),
+            TextInput::make('affected_count_min')
+                ->label(__('data_breach_record.affected_count_min'))
+                ->numeric()
+                ->minValue(0)
+                ->visible(FormHelper::isFieldDisabled('affected_count_known')),
+            TextInput::make('affected_count_max')
+                ->label(__('data_breach_record.affected_count_max'))
+                ->numeric()
+                ->minValue(0)
+                ->visible(FormHelper::isFieldDisabled('affected_count_known')),
+        ];
+    }
+
+    /**
+     * Questions 8, 9 and 10 of the AP form: what protected the data beforehand,
+     * what the fallout is and how severe that is.
+     *
+     * @return array<Component>
+     */
+    private static function getNotificationConsequences(): array
+    {
+        $protectionBeforehandOptions = __('data_breach_record.protection_beforehand_options');
+        Assert::allString($protectionBeforehandOptions);
+
+        $consequencesControllerOptions = __('data_breach_record.consequences_controller_options');
+        Assert::allString($consequencesControllerOptions);
+
+        $consequencesDataSubjectsOptions = __('data_breach_record.consequences_data_subjects_options');
+        Assert::allString($consequencesDataSubjectsOptions);
+
+        $riskSeverityOptions = __('data_breach_record.risk_severity_options');
+        Assert::allString($riskSeverityOptions);
+
+        return [
+            CheckboxList::makeWithValidatedOptions(
+                'protection_beforehand',
+                FormHelper::setValueAsKey($protectionBeforehandOptions),
+            )
+                ->label(__('data_breach_record.protection_beforehand'))
+                ->helperText(__('data_breach_record.help_protection_beforehand')),
+            Textarea::make('protection_beforehand_explanation')
+                ->label(__('data_breach_record.protection_beforehand_explanation')),
+            CheckboxList::makeWithValidatedOptions(
+                'consequences_controller',
+                FormHelper::setValueAsKey($consequencesControllerOptions),
+            )
+                ->label(__('data_breach_record.consequences_controller'))
+                ->live(),
+            Textarea::make('consequences_controller_other')
+                ->label(__('data_breach_record.consequences_controller_other'))
+                ->visible(FormHelper::fieldValuesContainValue('consequences_controller', 'Anders')),
+            CheckboxList::makeWithValidatedOptions(
+                'consequences_data_subjects',
+                FormHelper::setValueAsKey($consequencesDataSubjectsOptions),
+            )
+                ->label(__('data_breach_record.consequences_data_subjects'))
+                ->live(),
+            Textarea::make('consequences_data_subjects_other')
+                ->label(__('data_breach_record.consequences_data_subjects_other'))
+                ->visible(FormHelper::fieldValuesContainValue('consequences_data_subjects', 'Anders')),
+            Radio::make('risk_severity')
+                ->label(__('data_breach_record.risk_severity'))
+                ->helperText(__('data_breach_record.help_risk_severity'))
+                ->options(FormHelper::setValueAsKey($riskSeverityOptions)),
+            TextInput::make('reported_to_involved_count')
+                ->label(__('data_breach_record.reported_to_involved_count'))
+                ->numeric()
+                ->minValue(0),
+        ];
+    }
+
+    /**
+     * Questions 1.3 and 2 of the AP form: other supervisors and the countries
+     * this breach reaches into.
+     *
+     * @return array<Component>
+     */
+    private static function getNotificationOtherAuthorities(): array
+    {
+        $otherSupervisorsOptions = __('data_breach_record.other_supervisors_options');
+        Assert::allString($otherSupervisorsOptions);
+
+        return [
+            CheckboxList::makeWithValidatedOptions(
+                'other_supervisors',
+                FormHelper::setValueAsKey($otherSupervisorsOptions),
+            )
+                ->label(__('data_breach_record.other_supervisors'))
+                ->helperText(__('data_breach_record.help_other_supervisors'))
+                ->live(),
+            Textarea::make('other_supervisors_other')
+                ->label(__('data_breach_record.other_supervisors_other'))
+                ->visible(FormHelper::fieldValuesContainValue('other_supervisors', 'Andere toezichthouder')),
+            Toggle::make('cross_border')
+                ->label(__('data_breach_record.cross_border'))
+                ->helperText(__('data_breach_record.help_cross_border'))
+                ->live(),
+            Textarea::make('cross_border_countries')
+                ->label(__('data_breach_record.cross_border_countries'))
+                ->visible(FormHelper::isFieldEnabled('cross_border')),
+            Textarea::make('reported_other_dpas')
+                ->label(__('data_breach_record.reported_other_dpas'))
+                ->visible(FormHelper::isFieldEnabled('cross_border')),
+        ];
+    }
+
+    /**
+     * @return array<Component>
+     */
     public static function getProcessingRecords(): array
     {
         return [
