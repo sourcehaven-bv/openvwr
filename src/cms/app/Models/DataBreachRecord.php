@@ -57,6 +57,30 @@ use Spatie\ModelStates\HasStatesContract;
  * @property array<string>|null $reported_to_involved_communication
  * @property string|null $reported_to_involved_communication_other
  * @property bool $fg_reported
+ * @property array<string>|null $other_supervisors
+ * @property string|null $other_supervisors_other
+ * @property bool $cross_border
+ * @property string|null $cross_border_countries
+ * @property string|null $reported_other_dpas
+ * @property string|null $how_discovered
+ * @property string|null $late_notification_reason
+ * @property array<string>|null $nature_of_breach
+ * @property string|null $record_count
+ * @property string|null $record_count_explanation
+ * @property array<string>|null $affected_groups
+ * @property string|null $affected_groups_other
+ * @property bool $affected_count_known
+ * @property int|null $affected_count
+ * @property int|null $affected_count_min
+ * @property int|null $affected_count_max
+ * @property array<string>|null $protection_beforehand
+ * @property string|null $protection_beforehand_explanation
+ * @property array<string>|null $consequences_controller
+ * @property string|null $consequences_controller_other
+ * @property array<string>|null $consequences_data_subjects
+ * @property string|null $consequences_data_subjects_other
+ * @property string|null $risk_severity
+ * @property int|null $reported_to_involved_count
  *
  * @property-read AvgProcessorProcessingRecordCollection $avgProcessorProcessingRecords
  * @property-read AvgResponsibleProcessingRecordCollection $avgResponsibleProcessingRecords
@@ -106,6 +130,31 @@ class DataBreachRecord extends Model implements EntityNumerable, HasStatesContra
         'reported_to_involved_communication',
         'reported_to_involved_communication_other',
         'fg_reported',
+
+        'other_supervisors',
+        'other_supervisors_other',
+        'cross_border',
+        'cross_border_countries',
+        'reported_other_dpas',
+        'how_discovered',
+        'late_notification_reason',
+        'nature_of_breach',
+        'record_count',
+        'record_count_explanation',
+        'affected_groups',
+        'affected_groups_other',
+        'affected_count_known',
+        'affected_count',
+        'affected_count_min',
+        'affected_count_max',
+        'protection_beforehand',
+        'protection_beforehand_explanation',
+        'consequences_controller',
+        'consequences_controller_other',
+        'consequences_data_subjects',
+        'consequences_data_subjects_other',
+        'risk_severity',
+        'reported_to_involved_count',
     ];
 
     public function casts(): array
@@ -124,6 +173,20 @@ class DataBreachRecord extends Model implements EntityNumerable, HasStatesContra
             'personal_data_categories' => 'array',
             'personal_data_special_categories' => 'array',
             'reported_to_involved_communication' => 'array',
+
+            'cross_border' => 'boolean',
+            'affected_count_known' => 'boolean',
+            'affected_count' => 'integer',
+            'affected_count_min' => 'integer',
+            'affected_count_max' => 'integer',
+            'reported_to_involved_count' => 'integer',
+
+            'other_supervisors' => 'array',
+            'nature_of_breach' => 'array',
+            'affected_groups' => 'array',
+            'protection_beforehand' => 'array',
+            'consequences_controller' => 'array',
+            'consequences_data_subjects' => 'array',
         ];
     }
 

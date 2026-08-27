@@ -76,6 +76,8 @@ Een Mandaathouder kan geen gegevens invoeren of wijzigen en geen versies goedkeu
 
 > **Hint**: Voor het akkoord geven op versies: zie Hoofdstuk \ref{Goedkeuringsproces}, "Goedkeuringsproces".
 
+> **Hint**: Ook andere rollen kunnen op hun profielpagina instellen welke e-mails zij ontvangen. Zie Hoofdstuk \ref{OverigeFuncties}, "Notificaties".
+
 ## Raadpleger
 
 De Raadpleger heeft alleen leesrechten. Deze rol kan registers, documenten, versies en het goedkeuringsproces bekijken, maar geen gegevens invoeren, wijzigen of verwijderen.

@@ -37,4 +37,11 @@ return [
     'entity_number_unique_validation_message' => 'This prefix is already (or has previously been) in use, possibly by another organisation: it is no longer available.',
 
     'public_from_hint_icon_text' => 'Please note: if you leave this field empty, the processing activity will never be published to the public website.',
+    'section_ap' => 'Details for data breach notifications',
+    'coc_number' => 'Chamber of Commerce number',
+    'fg_registration_number' => 'DPO registration number',
+    'sector' => 'Sector',
+    'help_coc_number' => 'Carried over into the notification to the Dutch Data Protection Authority.',
+    'help_fg_registration_number' => 'The number under which the data protection officer is registered with the AP.',
+    'help_sector' => 'The sector the organisation operates in; the AP asks for this when notifying.',
 ];

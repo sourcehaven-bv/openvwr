@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Enums\Authorization\Role;
+use App\Enums\Notification\NotificationStream;
 use App\Enums\Snapshot\SnapshotApprovalLogMessageType;
 use App\Enums\Snapshot\SnapshotApprovalStatus;
 use App\Mail\SnapshotApproval\ApprovalNotification;
@@ -104,6 +105,35 @@ it('can set status to approved with notification to other approvals', function (
         ->toBe(SnapshotApprovalStatus::APPROVED);
 
     Mail::assertQueued(ApprovalNotification::class);
+});
+
+it('will not notify a privacy officer that excluded the stream', function (): void {
+    $organisation = Organisation::factory()->create();
+
+    $snapshot = Snapshot::factory()
+        ->for($organisation)
+        ->create();
+    $snapshotApproval = SnapshotApproval::factory()
+        ->for($snapshot)
+        ->create([
+            'status' => SnapshotApprovalStatus::UNKNOWN,
+        ]);
+    $user = User::factory()
+        ->hasAttached($organisation)
+        ->create();
+    User::factory()
+        ->hasAttached($organisation)
+        ->hasOrganisationRole(Role::PRIVACY_OFFICER, $organisation)
+        ->create([
+            'notification_exclusions' => [NotificationStream::SNAPSHOT_APPROVAL_UPDATED],
+        ]);
+    Mail::fake();
+
+    /** @var SnapshotApprovalService $snapshotApprovalService */
+    $snapshotApprovalService = $this->app->get(SnapshotApprovalService::class);
+    $snapshotApprovalService->setStatus($user, $snapshotApproval, SnapshotApprovalStatus::APPROVED);
+
+    Mail::assertNotQueued(ApprovalNotification::class);
 });
 
 it('can set status to declined', function (): void {

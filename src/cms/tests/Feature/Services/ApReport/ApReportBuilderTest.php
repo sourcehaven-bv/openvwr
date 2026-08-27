@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\Authorization\Role;
 use App\Models\Address;
 use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
@@ -11,6 +12,7 @@ use App\Models\Processor;
 use App\Models\Receiver;
 use App\Models\Responsible;
 use App\Models\Stakeholder;
+use App\Models\User;
 use App\Models\Wpg\WpgProcessingRecord;
 use App\Services\ApReport\AnswerSource;
 use App\Services\ApReport\ApAnswer;
@@ -64,9 +66,9 @@ it('reports a question the register has no field for as missing', function (): v
 
     $report = buildApReport($dataBreachRecord);
 
-    // 6.3.1 asks for the number of affected data records, which the register
-    // does not hold anywhere.
-    expect(apAnswer($report, '6.3.1')->source)->toBe(AnswerSource::MISSING);
+    // 3.2.1 asks who files the notification, which is decided at filing time
+    // and is deliberately not a field anywhere in the register.
+    expect(apAnswer($report, '3.2.1')->source)->toBe(AnswerSource::MISSING);
 });
 
 it('treats an empty field as missing rather than as an answered question', function (): void {
@@ -390,4 +392,205 @@ it('points at the BSN of the linked processing without filling in 6.1', function
 
     expect($answer->source)->toBe(AnswerSource::MISSING)
         ->and($answer->hints)->toBe(['Burgerservicenummer (BSN)']);
+});
+
+it('takes the AP-only notification fields from the data breach record', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $dataBreachRecord = DataBreachRecord::factory()->recycle($organisation)->create([
+        'how_discovered' => 'Een medewerker meldde een verdachte e-mail.',
+        'late_notification_reason' => 'De omvang was pas na forensisch onderzoek duidelijk.',
+        'nature_of_breach' => ['Persoonsgegevens (mogelijk) ingezien door onbevoegden'],
+        'risk_severity' => 'Aanzienlijk',
+        'reported_to_involved_count' => 240,
+    ]);
+
+    $report = buildApReport($dataBreachRecord);
+
+    expect(apAnswer($report, '4.3')->values)->toBe(['Een medewerker meldde een verdachte e-mail.'])
+        ->and(apAnswer($report, '4.5')->values)
+        ->toBe(['De omvang was pas na forensisch onderzoek duidelijk.'])
+        ->and(apAnswer($report, '5.1')->values)
+        ->toBe(['Persoonsgegevens (mogelijk) ingezien door onbevoegden'])
+        ->and(apAnswer($report, '9.3')->values)->toBe(['Aanzienlijk'])
+        ->and(apAnswer($report, '10.1.3')->values)->toBe(['240'])
+        ->and(apAnswer($report, '10.1.3')->source)->toBe(AnswerSource::RECORDED);
+});
+
+it('replaces the bare "other" tick with the free text typed behind it', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $dataBreachRecord = DataBreachRecord::factory()->recycle($organisation)->create([
+        'other_supervisors' => ['De Nederlandsche Bank (DNB)', 'Andere toezichthouder'],
+        'other_supervisors_other' => 'De Kansspelautoriteit',
+        'affected_groups' => ['Werknemers', 'Anders'],
+        'affected_groups_other' => 'Oud-medewerkers',
+        'consequences_controller' => ['Anders'],
+        'consequences_controller_other' => 'Verstoring van de dienstverlening',
+        'consequences_data_subjects' => ['Reputatieschade'],
+        'consequences_data_subjects_other' => null,
+    ]);
+
+    $report = buildApReport($dataBreachRecord);
+
+    expect(apAnswer($report, '1.3')->values)
+        ->toBe(['De Nederlandsche Bank (DNB)', 'Andere toezichthouder, namelijk: De Kansspelautoriteit'])
+        ->and(apAnswer($report, '7.1')->values)
+        ->toBe(['Werknemers', 'Anders, namelijk: Oud-medewerkers'])
+        ->and(apAnswer($report, '9.1')->values)
+        ->toBe(['Anders, namelijk: Verstoring van de dienstverlening'])
+        ->and(apAnswer($report, '9.2')->values)->toBe(['Reputatieschade']);
+});
+
+it('adds the explanation the AP asks for next to the answer', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $dataBreachRecord = DataBreachRecord::factory()->recycle($organisation)->create([
+        'record_count' => '1200',
+        'record_count_explanation' => 'Schatting op basis van de exportlogs.',
+        'protection_beforehand' => ['Versleuteld (encryptie)'],
+        'protection_beforehand_explanation' => 'AES-256 op de hele schijf.',
+    ]);
+
+    $report = buildApReport($dataBreachRecord);
+
+    expect(apAnswer($report, '6.3.1')->values)->toBe(['1200', 'Schatting op basis van de exportlogs.'])
+        ->and(apAnswer($report, '8.1')->values)->toBe(['Versleuteld (encryptie)', 'AES-256 op de hele schijf.']);
+});
+
+it('leaves an explanation-only question missing when nothing was filled in', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $dataBreachRecord = DataBreachRecord::factory()->recycle($organisation)->create([
+        'record_count' => null,
+        'record_count_explanation' => null,
+        'protection_beforehand' => null,
+        'protection_beforehand_explanation' => null,
+    ]);
+
+    $report = buildApReport($dataBreachRecord);
+
+    expect(apAnswer($report, '6.3.1')->source)->toBe(AnswerSource::MISSING)
+        ->and(apAnswer($report, '8.1')->source)->toBe(AnswerSource::MISSING);
+});
+
+it('gives the exact number of data subjects when it is known', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $dataBreachRecord = DataBreachRecord::factory()->recycle($organisation)->create([
+        'affected_count_known' => true,
+        'affected_count' => 42,
+        'affected_count_min' => 10,
+        'affected_count_max' => 100,
+    ]);
+
+    $report = buildApReport($dataBreachRecord);
+
+    expect(apAnswer($report, '7.3')->values)->toBe(['42']);
+});
+
+it('gives a range of data subjects when the exact number is not known', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $dataBreachRecord = DataBreachRecord::factory()->recycle($organisation)->create([
+        'affected_count_known' => false,
+        'affected_count_min' => 10,
+        'affected_count_max' => 100,
+    ]);
+
+    $report = buildApReport($dataBreachRecord);
+
+    expect(apAnswer($report, '7.3')->values)->toBe(['10 - 100']);
+});
+
+it('marks an open end of the range so the gap is visible', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $dataBreachRecord = DataBreachRecord::factory()->recycle($organisation)->create([
+        'affected_count_known' => false,
+        'affected_count_min' => 10,
+        'affected_count_max' => null,
+    ]);
+
+    $report = buildApReport($dataBreachRecord);
+
+    expect(apAnswer($report, '7.3')->values)->toBe(['10 - ?']);
+});
+
+it('reports the number of data subjects as missing when neither end is known', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $dataBreachRecord = DataBreachRecord::factory()->recycle($organisation)->create([
+        'affected_count_known' => false,
+        'affected_count_min' => null,
+        'affected_count_max' => null,
+    ]);
+
+    $report = buildApReport($dataBreachRecord);
+
+    expect(apAnswer($report, '7.3')->source)->toBe(AnswerSource::MISSING);
+});
+
+it('answers the international questions from the data breach record', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $dataBreachRecord = DataBreachRecord::factory()->recycle($organisation)->create([
+        'cross_border' => true,
+        'cross_border_countries' => 'België en Duitsland',
+        'reported_other_dpas' => 'Gemeld bij de Belgische Gegevensbeschermingsautoriteit.',
+    ]);
+
+    $report = buildApReport($dataBreachRecord);
+
+    expect(apAnswer($report, '2.1.1')->values)->toBe([__('general.yes'), 'België en Duitsland'])
+        ->and(apAnswer($report, '2.2.1')->values)
+        ->toBe(['Gemeld bij de Belgische Gegevensbeschermingsautoriteit.']);
+});
+
+it('answers no to the cross-border question without listing countries', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $dataBreachRecord = DataBreachRecord::factory()->recycle($organisation)->create([
+        'cross_border' => false,
+        'cross_border_countries' => null,
+    ]);
+
+    $report = buildApReport($dataBreachRecord);
+
+    expect(apAnswer($report, '2.1.1')->values)->toBe([__('general.no')]);
+});
+
+it('takes the organisation details the AP asks for from the organisation', function (): void {
+    $organisation = OrganisationTestHelper::create([
+        'coc_number' => '12345678',
+        'fg_registration_number' => 'FG012345',
+        'sector' => 'Openbaar bestuur',
+    ]);
+    $dataBreachRecord = DataBreachRecord::factory()->recycle($organisation)->create();
+
+    $report = buildApReport($dataBreachRecord);
+
+    expect(apAnswer($report, '3.1.1d')->values)->toBe(['FG012345'])
+        ->and(apAnswer($report, '3.1.1e')->values)->toBe(['12345678'])
+        ->and(apAnswer($report, '3.1.2')->values)->toBe(['Openbaar bestuur']);
+});
+
+it('suggests the data protection officials as contact person for the AP', function (): void {
+    $organisation = OrganisationTestHelper::create();
+
+    $user = User::factory()->create(['name' => 'Nadia de Wit', 'email' => 'fg@example.com']);
+    $user->organisations()->attach($organisation);
+    $user->organisationRoles()->create([
+        'organisation_id' => $organisation->id,
+        'role' => Role::DATA_PROTECTION_OFFICIAL,
+    ]);
+
+    $dataBreachRecord = DataBreachRecord::factory()->recycle($organisation)->create();
+
+    $report = buildApReport($dataBreachRecord);
+    $answer = apAnswer($report, '3.2.2');
+
+    // Derived, not recorded: the officer may want to name someone else as the
+    // point of contact for this particular breach.
+    expect($answer->source)->toBe(AnswerSource::DERIVED)
+        ->and($answer->values)->toBe(['Nadia de Wit (fg@example.com)']);
+});
+
+it('leaves the contact person open when the organisation has no data protection official', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $dataBreachRecord = DataBreachRecord::factory()->recycle($organisation)->create();
+
+    $report = buildApReport($dataBreachRecord);
+
+    expect(apAnswer($report, '3.2.2')->source)->toBe(AnswerSource::MISSING);
 });

@@ -161,7 +161,7 @@ The most detailed part of the record. For each category of data subjects it capt
 | Field | Kind of input | Explanation |
 |----------------------------------|--------------|----------------------------------------------------|
 | Transfer outside the EEA | Yes/no | Does your data processing transfer personal data to one or more countries outside the European Union or to an international organisation? |
-| Countries | Choice | The countries outside the EEA to which personal data is transferred. Choose from: Andorra; Argentina; Canada (commercial organisations only); Faroe Islands; Guernsey; Isle of Man; Israel; Japan; Jersey; New Zealand; Uruguay; United Kingdom; United States (organisations participating in the Data Privacy Framework); Switzerland; South Korea; Other, namely:. |
+| Countries | Choice | The countries outside the EEA to which personal data is transferred. Choose from: Andorra; Argentinië; Canada (alleen commerciële bedrijven); Faeröer Eilanden; Guernsey; Isle of Man; Israël; Japan; Jersey; Nieuw-Zeeland; Uruguay; Verenigd Koninkrijk; Verenigde Staten (organisaties die meedoen aan het Data Privacy Framework); Zwitserland; Zuid-Korea; Other, namely:. |
 | Other, namely: | Text |  |
 | Are all transfers covered by an adequacy decision? | Yes/no | Switch on if the data is transferred exclusively to countries or organisations which the European Commission has determined offer an adequate level of protection (an adequacy decision). Switch off if that is not the case; in that case describe below which other appropriate safeguards cover the transfer. |
 | Explanation of the adequate protection | Free text | Describe here which appropriate safeguards (in accordance with Article 46 GDPR) cover the transfer, for example standard contractual clauses or binding corporate rules. |
@@ -320,7 +320,7 @@ Processing of personal data that your organisation carries out on behalf of anot
 | Field | Kind of input | Explanation |
 |----------------------------------|--------------|----------------------------------------------------|
 | Transfer outside the EEA | Yes/no | Does your data processing transfer personal data to one or more countries outside the European Union or to an international organisation? |
-| Countries | Choice | The countries outside the EEA to which personal data is transferred. Choose from: Andorra; Argentina; Canada (commercial organisations only); Faroe Islands; Guernsey; Isle of Man; Israel; Japan; Jersey; New Zealand; Uruguay; United Kingdom; United States (organisations participating in the Data Privacy Framework); Switzerland; South Korea; Other, namely:. |
+| Countries | Choice | The countries outside the EEA to which personal data is transferred. Choose from: Andorra; Argentinië; Canada (alleen commerciële bedrijven); Faeröer Eilanden; Guernsey; Isle of Man; Israël; Japan; Jersey; Nieuw-Zeeland; Uruguay; Verenigd Koninkrijk; Verenigde Staten (organisaties die meedoen aan het Data Privacy Framework); Zwitserland; Zuid-Korea; Other, namely:. |
 | Other, namely: | Text |  |
 | Are all transfers covered by an adequacy decision? | Yes/no | Is the data transferred exclusively to countries which the Commission has decided offer an adequate level of protection? |
 | Explanation | Free text | State here which other appropriate safeguards (in accordance with Article 46 GDPR) are in place, how a copy of them can be obtained or where these safeguards can be consulted. Where applicable, the documents on the appropriate safeguards under Article 49(1), second subparagraph GDPR must be added to the GDPR record (under Attachments). This in view of Article 30(1) GDPR. * |
@@ -638,6 +638,35 @@ Breaches of the security of personal data, including the notification to the Dut
 | Means of communication used to inform the data subject | Multiple choice | Choose from: By telephone; By letter; By email; Via an announcement on the website; Via social media; Via an advertisement in the newspaper; Other. |
 | Namely | Free text |  |
 | Reported to the DPO | Yes/no | The Data Protection Officer must be involved in every personal data breach. |
+
+## AP notification
+
+| Field | Kind of input | Explanation |
+|----------------------------------|--------------|----------------------------------------------------|
+| How was the personal data breach discovered? | Free text | Briefly: by whom or through what the breach came to light. |
+| Reason for notifying later than 72 hours | Free text | Only fill in when more than 72 hours passed between discovery and notification. |
+| Nature of the breach | Multiple choice | Confidentiality, integrity or availability; more than one is possible. Choose from: Personal data (possibly) accessed by unauthorised persons; Personal data altered without authorisation or unintentionally; Personal data permanently unavailable (lost/deleted); Personal data temporarily unavailable. |
+| Number of data records affected | Text | An estimate is enough. If unknown, enter 1 and explain below. |
+| Explanation of the number of data records | Free text |  |
+| Affected group(s) of data subjects | Multiple choice | Choose from: Employees; Customers (current and prospective); Pupils or students; Patients; Minors; People from other vulnerable groups; Other. |
+| Namely | Free text |  |
+| Exact number of data subjects known | Yes/no | If not, give a minimum and a maximum below. |
+| Exact number of data subjects | Text |  |
+| Minimum number of data subjects | Text |  |
+| Maximum number of data subjects | Text |  |
+| Data made unintelligible or inaccessible beforehand | Multiple choice | Encryption by ransomware does not count as protection here. Choose from: Encrypted; Hashed; Made unintelligible or inaccessible in another way; No. |
+| Explanation of the technique applied | Free text |  |
+| (Possible) consequences for the controller | Multiple choice | Choose from: Unauthorised persons were able to take note of the data; The data may be used in an improper or unlawful way; Incorrect, incomplete or outdated personal data may be used within your own organisation; Incorrect, incomplete or outdated personal data may be reused for other purposes or passed to other organisations; An essential service can temporarily no longer be provided to those whose data was leaked; An essential service can permanently no longer be provided to those whose data was leaked; Other. |
+| Namely | Free text |  |
+| (Possible) consequences for the data subject(s) | Multiple choice | Choose from: Discrimination or exclusion; Identity theft or fraud; Financial loss; Reputational damage; Loss of confidentiality of personal data protected by professional secrecy; Unauthorised reversal of pseudonymisation; Data subjects cannot access their personal data or have them erased on request; Data subjects lose track of which organisations process their personal data; Other. |
+| Namely | Free text |  |
+| Severity of the possible consequences | Choice | Weigh which data are involved, how many data subjects and how vulnerable they are. Choose from: Negligible; Limited; Significant; Very high. |
+| Number of data subjects informed | Text |  |
+| Reported to other supervisory authorities | Multiple choice | For example DNB, AFM or the IGJ; only where the breach is reported there too. Choose from: Netherlands Authority for the Financial Markets (AFM); Radiocommunications Agency (AT); De Nederlandsche Bank (DNB); Health and Youth Care Inspectorate (IGJ); Human Environment and Transport Inspectorate (ILT); Inspectorate of Education; National Coordinator for Security and Counterterrorism (NCTV); Dutch Safety Board (OVV); Another supervisory authority. |
+| Namely | Free text |  |
+| Affects people in more than one country | Yes/no | With data subjects in several countries, an authority in another country may be competent. |
+| Which countries are involved? | Free text |  |
+| Reported to data protection authorities in other countries | Free text |  |
 
 ## Processing activities
 

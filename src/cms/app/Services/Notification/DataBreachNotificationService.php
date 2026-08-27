@@ -4,38 +4,27 @@ declare(strict_types=1);
 
 namespace App\Services\Notification;
 
-use App\Enums\Authorization\Role;
+use App\Enums\Notification\NotificationStream;
 use App\Mail\DataBreachRecordApReportedNotification;
 use App\Models\DataBreachRecord;
-use App\Services\User\UserByRoleService;
 use Illuminate\Support\Facades\Mail;
 
 class DataBreachNotificationService
 {
     public function __construct(
-        private readonly UserByRoleService $userByRoleService,
+        private readonly NotificationRecipientService $notificationRecipientService,
     ) {
     }
 
     public function sendNotifications(DataBreachRecord $dataBreachRecord): void
     {
-        $chiefPrivacyOfficers = $this->userByRoleService->getUsersByOrganisationRole(
+        $recipients = $this->notificationRecipientService->getRecipients(
+            NotificationStream::DATA_BREACH_AP_REPORTED,
             $dataBreachRecord->organisation,
-            [Role::CHIEF_PRIVACY_OFFICER],
         );
 
-        foreach ($chiefPrivacyOfficers as $chiefPrivacyOfficer) {
-            Mail::to($chiefPrivacyOfficer)
-                ->queue(new DataBreachRecordApReportedNotification($dataBreachRecord));
-        }
-
-        $dataProtectionOfficials = $this->userByRoleService->getUsersByOrganisationRole(
-            $dataBreachRecord->organisation,
-            [Role::DATA_PROTECTION_OFFICIAL],
-        );
-
-        foreach ($dataProtectionOfficials as $dataProtectionOfficial) {
-            Mail::to($dataProtectionOfficial)
+        foreach ($recipients as $recipient) {
+            Mail::to($recipient)
                 ->queue(new DataBreachRecordApReportedNotification($dataBreachRecord));
         }
     }

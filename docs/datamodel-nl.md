@@ -637,6 +637,35 @@ Inbreuken op de beveiliging van persoonsgegevens, inclusief de melding aan de Au
 | Namelijk | Toelichting |  |
 | Gemeld aan FG | Ja/nee | De Functionaris Gegevensbescherming moet bij ieder datalek betrokken worden. |
 
+## Melding AP
+
+| Veld | Soort invoer | Toelichting |
+|----------------------------------|--------------|----------------------------------------------------|
+| Hoe is het datalek ontdekt? | Toelichting | Kort: door wie of waardoor het datalek aan het licht kwam. |
+| Reden van melding later dan 72 uur | Toelichting | Alleen invullen als er meer dan 72 uur zit tussen ontdekking en melding. |
+| Aard van de inbreuk | Meerkeuze | Gaat het om vertrouwelijkheid, integriteit of beschikbaarheid; meerdere mogelijk. Keuze uit: Persoonsgegevens (mogelijk) ingezien door onbevoegden; Persoonsgegevens ongeoorloofd of onopzettelijk gewijzigd; Persoonsgegevens permanent niet beschikbaar (verloren/verwijderd); Persoonsgegevens tijdelijk niet beschikbaar. |
+| Aantal getroffen gegevensrecords | Tekst | Een schatting volstaat. Weet u het niet, vul dan 1 in en licht dat hieronder toe. |
+| Toelichting op het aantal gegevensrecords | Toelichting |  |
+| Getroffen groep(en) betrokkenen | Meerkeuze | Keuze uit: Werknemers; Klanten (huidig en potentieel); Leerlingen of studenten; Patiënten; Minderjarigen; Personen uit andere kwetsbare groepen; Anders. |
+| Namelijk | Toelichting |  |
+| Exact aantal betrokkenen bekend | Ja/nee | Zo niet, geef dan hieronder een minimum en een maximum. |
+| Exact aantal betrokkenen | Tekst |  |
+| Minimum aantal betrokkenen | Tekst |  |
+| Maximum aantal betrokkenen | Tekst |  |
+| Gegevens vooraf onbegrijpelijk of ontoegankelijk gemaakt | Meerkeuze | Versleuteling door ransomware telt hier niet als bescherming. Keuze uit: Versleuteld (encryptie); Gehasht; Op een andere manier onbegrijpelijk of ontoegankelijk gemaakt; Nee. |
+| Toelichting op de toegepaste techniek | Toelichting |  |
+| (Mogelijke) gevolgen voor de verwerkingsverantwoordelijke | Meerkeuze | Keuze uit: Onbevoegden hebben kennis kunnen nemen van de gegevens; De gegevens kunnen op een onbehoorlijke of onrechtmatige manier worden gebruikt; Er worden binnen uw eigen organisatie mogelijk onjuiste, onvolledige of achterhaalde persoonsgegevens gebruikt; Er worden mogelijk onjuiste, onvolledige of achterhaalde persoonsgegevens hergebruikt voor andere doeleinden of doorgegeven aan andere organisaties; Een essentiële dienst kan tijdelijk niet meer worden verleend aan degenen van wie gegevens zijn gelekt; Een essentiële dienst kan permanent niet meer worden verleend aan degenen van wie gegevens zijn gelekt; Anders. |
+| Namelijk | Toelichting |  |
+| (Mogelijke) gevolgen voor de betrokkene(n) | Meerkeuze | Keuze uit: Discriminatie of uitsluiting; Identiteitsdiefstal of -fraude; Financieel verlies; Reputatieschade; Verlies van vertrouwelijkheid van door het beroepsgeheim beschermde persoonsgegevens; Ongeoorloofde ongedaanmaking van pseudonimisering; Betrokkenen kunnen hun persoonsgegevens niet inzien of op verzoek laten verwijderen; Betrokkenen verliezen het overzicht van welke organisaties hun persoonsgegevens verwerken; Anders. |
+| Namelijk | Toelichting |  |
+| Ernst van de mogelijke gevolgen | Keuze | Weeg mee om welke gegevens het gaat, hoeveel betrokkenen en hoe kwetsbaar zij zijn. Keuze uit: Verwaarloosbaar; Beperkt; Aanzienlijk; Zeer groot. |
+| Aantal betrokkenen dat is geïnformeerd | Tekst |  |
+| Gemeld bij andere toezichthouders | Meerkeuze | Bijvoorbeeld DNB, AFM of de IGJ; alleen als u het datalek daar ook meldt. Keuze uit: Autoriteit Financiële Markten (AFM); Agentschap Telecom (AT); De Nederlandsche Bank (DNB); Inspectie Gezondheidszorg en Jeugd (IGJ); Inspectie Leefomgeving en Transport (ILT); Inspectie voor het Onderwijs; Nationaal Coördinator Terrorismebestrijding en Veiligheid (NCTV); Onderzoeksraad voor Veiligheid (OVV); Andere toezichthouder. |
+| Namelijk | Toelichting |  |
+| Gevolgen voor personen in meerdere landen | Ja/nee | Bij betrokkenen in meerdere landen kan een toezichthouder in een ander land bevoegd zijn. |
+| Om welke landen gaat het? | Toelichting |  |
+| Gemeld bij privacytoezichthouders in andere landen | Toelichting |  |
+
 ## Verwerkingen
 
 | Veld | Soort invoer | Toelichting |

@@ -27,6 +27,7 @@ return [
     'source_recorded' => 'Uit het datalekregister',
     'source_derived' => 'Overname uit gekoppelde inhoud - controleren',
     'source_missing' => 'Niet in het register - zelf invullen',
+    'origin_data_protection_officials' => 'Functionarissen gegevensbescherming van de organisatie',
     'origin_prefix' => 'Bron',
     'not_recorded' => 'Nog invullen',
 

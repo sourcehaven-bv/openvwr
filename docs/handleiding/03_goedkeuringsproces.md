@@ -38,6 +38,8 @@ De knop "Mandaathouders toevoegen" toont een lijst met Mandaathouders: deze zijn
 
 ![Mandaathouder toevoegen\label{fig:ondertekeningen_mandaathouder}](./imgs/03_goedkeuringsproces/04_snapshots_mandaathouder.png)
 
+> **Hint**: Privacy Officers krijgen automatisch een e-mail als er een nieuwe versie is aangemaakt. Wie die e-mails niet wil ontvangen, zet ze uit op de eigen profielpagina (zie \ref{sec:notificaties}). Wil je één specifieke versie onder de aandacht brengen, gebruik dan de "Ondertekeningen" hieronder: dat legt het verzoek vast in het portaal in plaats van alleen in iemands mailbox.
+
 > **Let op**: Is eenmaal een versie aangemaakt, dan is de inhoud van deze versie niet meer aanpasbaar: slechts de status van een versie kan nog aangepast worden door een Privacy Officer. Indien er op een vastgestelde versie van een entiteit wijzigingen moeten worden aangebracht, dan is het de bedoeling dat de wijzigingen worden doorgevoerd in het formulier, de wijzigingen worden opgeslagen en er vervolgens een *nieuwe* versie wordt aangemaakt die door het goedkeuringsproces wordt geleid.
 
 ## Goedkeuren\label{sec:goedkeuren}

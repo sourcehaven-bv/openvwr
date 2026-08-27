@@ -27,6 +27,8 @@ class DataBreachRecordResourceForm
                             ->schema(DataBreachRecordResourceFormSchemas::getDates()),
                         Step::make(__('data_breach_record.step_incident'))
                             ->schema(DataBreachRecordResourceFormSchemas::getIncident()),
+                        Step::make(__('data_breach_record.step_notification'))
+                            ->schema(DataBreachRecordResourceFormSchemas::getNotification()),
                         Step::make(__('data_breach_record.step_processing_records'))
                             ->schema(DataBreachRecordResourceFormSchemas::getProcessingRecords()),
                         Step::make(__('data_breach_record.step_attachments'))
@@ -54,6 +56,9 @@ class DataBreachRecordResourceForm
                 Section::make(__('data_breach_record.step_incident'))
                     ->schema(DataBreachRecordResourceFormSchemas::getIncident())
                     ->extraAttributes(['data-onepage-section' => 'step_incident']),
+                Section::make(__('data_breach_record.step_notification'))
+                    ->schema(DataBreachRecordResourceFormSchemas::getNotification())
+                    ->extraAttributes(['data-onepage-section' => 'step_notification']),
                 Section::make(__('data_breach_record.step_processing_records'))
                     ->schema(DataBreachRecordResourceFormSchemas::getProcessingRecords())
                     ->extraAttributes(['data-onepage-section' => 'step_processing_records']),

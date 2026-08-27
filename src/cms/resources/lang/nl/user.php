@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\Notification\NotificationStream;
 use App\Enums\RegisterLayout;
 use App\Enums\Snapshot\MandateholderNotifyBatch;
 use App\Enums\Snapshot\MandateholderNotifyDirectly;
@@ -105,6 +106,16 @@ return [
                 MandateholderNotifyDirectly::NONE->value => 'Geen notificatie',
                 MandateholderNotifyDirectly::BATCH->value => 'Overzicht alle openstaande verzoeken',
                 MandateholderNotifyDirectly::SINGLE->value => 'Directe link naar verzoek',
+            ],
+
+            'notifications' => 'Notificaties',
+            'notification_streams' => 'Ontvang een e-mail bij',
+            'notification_streams_helper' => 'Vink uit waar je geen e-mail meer over wilt ontvangen. Je ziet alleen notificaties die bij jouw rollen horen.',
+            'notification_streams_options' => [
+                NotificationStream::DATA_BREACH_AP_REPORTED->value => 'Een datalek is gemeld bij de Autoriteit Persoonsgegevens',
+                NotificationStream::DOCUMENT_NOTIFY_DATE_REACHED->value => 'De notificatiedatum van een document is bereikt',
+                NotificationStream::SNAPSHOT_APPROVAL_UPDATED->value => 'Een mandaathouder heeft een versie behandeld',
+                NotificationStream::SNAPSHOT_CREATED->value => 'Een nieuwe versie is aangemaakt',
             ],
 
             'layout' => 'Layout',

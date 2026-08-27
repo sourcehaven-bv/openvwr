@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Services\ApReport;
 
-use App\Facades\DateFormat;
+use App\Enums\Authorization\Role;
 use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\DataBreachRecord;
+use App\Models\Organisation;
 use App\Models\Stakeholder;
-use Carbon\CarbonImmutable;
+use App\Services\User\UserByRoleService;
 use Illuminate\Database\Eloquent\Model;
 
 use function __;
@@ -56,11 +57,17 @@ class ApReportBuilder
             . ' of daarmee verband houdende veiligheidsmaatregelen',
     ];
 
+    public function __construct(
+        private readonly UserByRoleService $userByRoleService,
+        private readonly ApAnswerValues $values,
+    ) {
+    }
+
     public function build(DataBreachRecord $dataBreachRecord): ApReport
     {
         return new ApReport($dataBreachRecord, [
             $this->introduction($dataBreachRecord),
-            $this->international(),
+            $this->international($dataBreachRecord),
             $this->controller($dataBreachRecord),
             $this->timeline($dataBreachRecord),
             $this->breach($dataBreachRecord),
@@ -102,18 +109,35 @@ class ApReportBuilder
                 array_values(array_unique($regimes)),
                 array_values(array_unique($origins)),
             ),
-            ApAnswer::missing('1.3', __('ap_report.question.other_supervisors')),
+            ApAnswer::recorded(
+                '1.3',
+                __('ap_report.question.other_supervisors'),
+                $this->values->withOther(
+                    $dataBreachRecord->other_supervisors,
+                    $dataBreachRecord->other_supervisors_other,
+                    'Andere toezichthouder',
+                ),
+            ),
         ]);
     }
 
-    private function international(): ApChapter
+    private function international(DataBreachRecord $dataBreachRecord): ApChapter
     {
         // Cross-border reach is a property of the incident, not of the processing:
         // a processing that may involve other countries says nothing about whether
-        // the people hit by this breach live there.
+        // the people hit by this breach live there. Only the breach record answers it.
+        $crossBorder = [$this->values->boolean($dataBreachRecord->cross_border)];
+        if ($dataBreachRecord->cross_border_countries !== null) {
+            $crossBorder[] = $dataBreachRecord->cross_border_countries;
+        }
+
         return new ApChapter('2', __('ap_report.chapter.international'), [
-            ApAnswer::missing('2.1.1', __('ap_report.question.cross_border')),
-            ApAnswer::missing('2.2.1', __('ap_report.question.reported_other_dpas')),
+            ApAnswer::recorded('2.1.1', __('ap_report.question.cross_border'), $crossBorder),
+            ApAnswer::recorded(
+                '2.2.1',
+                __('ap_report.question.reported_other_dpas'),
+                $dataBreachRecord->reported_other_dpas,
+            ),
         ]);
     }
 
@@ -145,11 +169,17 @@ class ApReportBuilder
             // something about this breach rather than about a processing.
             ApAnswer::recorded('3.1.1b', __('ap_report.question.responsible'), $names),
             ApAnswer::recorded('3.1.1c', __('ap_report.question.address'), $addresses),
-            ApAnswer::missing('3.1.1d', __('ap_report.question.fg_registration_number')),
-            ApAnswer::missing('3.1.1e', __('ap_report.question.coc_number')),
-            ApAnswer::missing('3.1.2', __('ap_report.question.sector')),
+            ApAnswer::recorded('3.1.1d', __('ap_report.question.fg_registration_number'), $organisation->fg_registration_number),
+            ApAnswer::recorded('3.1.1e', __('ap_report.question.coc_number'), $organisation->coc_number),
+            ApAnswer::recorded('3.1.2', __('ap_report.question.sector'), $organisation->sector),
+            // Who files is decided at filing time and is nowhere in the register.
             ApAnswer::missing('3.2.1', __('ap_report.question.reporter')),
-            ApAnswer::missing('3.2.2', __('ap_report.question.contact_person')),
+            ApAnswer::derived(
+                '3.2.2',
+                __('ap_report.question.contact_person'),
+                $this->dataProtectionOfficials($organisation),
+                [__('ap_report.origin_data_protection_officials')],
+            ),
             ApAnswer::derived(
                 '3.3',
                 __('ap_report.question.other_organisations'),
@@ -162,11 +192,15 @@ class ApReportBuilder
     private function timeline(DataBreachRecord $dataBreachRecord): ApChapter
     {
         return new ApChapter('4', __('ap_report.chapter.timeline'), [
-            ApAnswer::recorded('4.1.1', __('ap_report.question.started_at'), $this->date($dataBreachRecord->started_at)),
-            ApAnswer::recorded('4.1.2', __('ap_report.question.ended_at'), $this->date($dataBreachRecord->ended_at)),
-            ApAnswer::recorded('4.2', __('ap_report.question.discovered_at'), $this->date($dataBreachRecord->discovered_at)),
-            ApAnswer::missing('4.3', __('ap_report.question.how_discovered')),
-            ApAnswer::missing('4.5', __('ap_report.question.late_notification_reason')),
+            ApAnswer::recorded('4.1.1', __('ap_report.question.started_at'), $this->values->date($dataBreachRecord->started_at)),
+            ApAnswer::recorded('4.1.2', __('ap_report.question.ended_at'), $this->values->date($dataBreachRecord->ended_at)),
+            ApAnswer::recorded('4.2', __('ap_report.question.discovered_at'), $this->values->date($dataBreachRecord->discovered_at)),
+            ApAnswer::recorded('4.3', __('ap_report.question.how_discovered'), $dataBreachRecord->how_discovered),
+            ApAnswer::recorded(
+                '4.5',
+                __('ap_report.question.late_notification_reason'),
+                $dataBreachRecord->late_notification_reason,
+            ),
         ]);
     }
 
@@ -183,7 +217,11 @@ class ApReportBuilder
         }
 
         return new ApChapter('5', __('ap_report.chapter.breach'), [
-            ApAnswer::missing('5.1', __('ap_report.question.nature_of_breach')),
+            ApAnswer::recorded(
+                '5.1',
+                __('ap_report.question.nature_of_breach'),
+                array_values($dataBreachRecord->nature_of_breach ?? []),
+            ),
             ApAnswer::recorded('5.2', __('ap_report.question.nature_of_incident'), $natureOfIncident),
             ApAnswer::recorded('5.3', __('ap_report.question.summary'), $dataBreachRecord->summary),
             ApAnswer::recorded('5.4', __('ap_report.question.attachments'), $documents),
@@ -221,7 +259,11 @@ class ApReportBuilder
                 $derivedSpecial,
                 $origins,
             ),
-            ApAnswer::missing('6.3.1', __('ap_report.question.record_count')),
+            ApAnswer::recorded(
+                '6.3.1',
+                __('ap_report.question.record_count'),
+                $this->values->withExplanation($dataBreachRecord->record_count, $dataBreachRecord->record_count_explanation),
+            ),
         ]);
     }
 
@@ -237,7 +279,11 @@ class ApReportBuilder
         }
 
         return new ApChapter('7', __('ap_report.chapter.affected_people'), [
-            ApAnswer::missing('7.1', __('ap_report.question.affected_groups')),
+            ApAnswer::recorded(
+                '7.1',
+                __('ap_report.question.affected_groups'),
+                $this->values->withOther($dataBreachRecord->affected_groups, $dataBreachRecord->affected_groups_other),
+            ),
             ApAnswer::recordedWithHints(
                 '7.2',
                 __('ap_report.question.affected_description'),
@@ -245,7 +291,12 @@ class ApReportBuilder
                 $descriptions,
                 $this->processingOrigins($dataBreachRecord),
             ),
-            ApAnswer::missing('7.3', __('ap_report.question.affected_count')),
+            ApAnswer::recorded('7.3', __('ap_report.question.affected_count'), $this->values->count(
+                $dataBreachRecord->affected_count_known,
+                $dataBreachRecord->affected_count,
+                $dataBreachRecord->affected_count_min,
+                $dataBreachRecord->affected_count_max,
+            )),
         ]);
     }
 
@@ -268,7 +319,14 @@ class ApReportBuilder
             // Question 8.1 asks whether the data were unreadable to outsiders.
             // Pseudonymisation recorded on a processing is related but not the
             // same thing, so it is offered as context rather than as the answer.
-            ApAnswer::missing('8.1', __('ap_report.question.encrypted_beforehand')),
+            ApAnswer::recorded(
+                '8.1',
+                __('ap_report.question.encrypted_beforehand'),
+                $this->values->withExplanation(
+                    $dataBreachRecord->protection_beforehand,
+                    $dataBreachRecord->protection_beforehand_explanation,
+                ),
+            ),
             ApAnswer::derived(
                 '8.1b',
                 __('ap_report.question.pseudonymisation_from_processing'),
@@ -281,11 +339,25 @@ class ApReportBuilder
     private function consequences(DataBreachRecord $dataBreachRecord): ApChapter
     {
         return new ApChapter('9', __('ap_report.chapter.consequences'), [
-            ApAnswer::missing('9.1', __('ap_report.question.consequences_controller')),
-            ApAnswer::missing('9.2', __('ap_report.question.consequences_data_subjects')),
-            // The AP wants one of four severity levels; the register holds free
-            // text, which is useful to base the choice on but is not the choice.
-            ApAnswer::missing('9.3', __('ap_report.question.risk_severity')),
+            ApAnswer::recorded(
+                '9.1',
+                __('ap_report.question.consequences_controller'),
+                $this->values->withOther(
+                    $dataBreachRecord->consequences_controller,
+                    $dataBreachRecord->consequences_controller_other,
+                ),
+            ),
+            ApAnswer::recorded(
+                '9.2',
+                __('ap_report.question.consequences_data_subjects'),
+                $this->values->withOther(
+                    $dataBreachRecord->consequences_data_subjects,
+                    $dataBreachRecord->consequences_data_subjects_other,
+                ),
+            ),
+            // The AP wants one of four severity levels; the free-text estimate
+            // below is what the choice is based on, not the choice itself.
+            ApAnswer::recorded('9.3', __('ap_report.question.risk_severity'), $dataBreachRecord->risk_severity),
             ApAnswer::recorded('9.3b', __('ap_report.question.estimated_risk'), $dataBreachRecord->estimated_risk),
         ]);
     }
@@ -301,10 +373,14 @@ class ApReportBuilder
             ApAnswer::recorded(
                 '10.1.1',
                 __('ap_report.question.reported_to_involved'),
-                $this->boolean($dataBreachRecord->reported_to_involved),
+                $this->values->boolean($dataBreachRecord->reported_to_involved),
             ),
             ApAnswer::recorded('10.1.7', __('ap_report.question.reported_to_involved_communication'), array_values($communication)),
-            ApAnswer::missing('10.1.3', __('ap_report.question.reported_to_involved_count')),
+            ApAnswer::recorded(
+                '10.1.3',
+                __('ap_report.question.reported_to_involved_count'),
+                $this->values->number($dataBreachRecord->reported_to_involved_count),
+            ),
             ApAnswer::recorded('10.2', __('ap_report.question.measures'), $dataBreachRecord->measures),
         ]);
     }
@@ -409,17 +485,24 @@ class ApReportBuilder
         return $name;
     }
 
-    private function date(?CarbonImmutable $date): ?string
+    /**
+     * The contact person the AP can reach: the organisation's data protection
+     * officials. Derived, because the officer may want to name someone else.
+     *
+     * @return array<int, string>
+     */
+    private function dataProtectionOfficials(Organisation $organisation): array
     {
-        if ($date === null) {
-            return null;
+        $officials = [];
+        $users = $this->userByRoleService->getUsersByOrganisationRole(
+            $organisation,
+            [Role::DATA_PROTECTION_OFFICIAL],
+        );
+
+        foreach ($users as $user) {
+            $officials[] = sprintf('%s (%s)', $user->name, $user->email);
         }
 
-        return DateFormat::toDate($date);
-    }
-
-    private function boolean(bool $value): string
-    {
-        return $value ? __('general.yes') : __('general.no');
+        return array_values(array_unique($officials));
     }
 }

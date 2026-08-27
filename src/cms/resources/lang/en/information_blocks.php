@@ -657,6 +657,10 @@ return [
         'step_incident_info' => '
             <p class="text-sm text-gray-500">Under "Nature of the incident", describe the nature of the personal data breach. Give a short "Summary of the incident". Under "Group(s) of people involved", state which groups of people are involved. Note the "Categories of personal data" and the "Special categories of personal data" that were breached. Give a "Risk assessment" of the incident. Describe the "Measures" that have been taken. State whether the incident has been "Communicated to the data subject". Note the "Means of communication used to inform the data subject". Also state whether the incident has been "Reported to the DPO" (Data Protection Officer).</p>',
 
+        'step_notification_title' => 'Information about Notification to the AP',
+        'step_notification_info' => '
+            <p class="text-sm text-gray-500">This step holds the questions the Dutch Data Protection Authority asks in its online notification form and that are recorded nowhere else in the register. Fill them in if you notify the personal data breach to the AP; they then appear in the AP notification preparation. If you do not notify, you do not need to complete this step.</p>',
+
         'step_processing_records_title' => 'Information about Processing Activities',
         'step_processing_records_info' => '
             <p class="text-sm text-gray-500">Link the personal data breach here to processing activities from the three records of processing activities. The tables at the bottom of this page show the processing activities this personal data breach is linked to, and you can navigate to them.</p>',

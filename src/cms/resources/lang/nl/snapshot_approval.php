@@ -22,7 +22,6 @@ return [
     'mandateholder' => 'Mandaathouder',
     'invited' => 'Uitgenodigde mandaathouders',
     'request' => 'Mandaathouders toevoegen',
-    'notify_po' => 'Stuur Privacy Officer(s) een notificatie',
     'notify' => 'Notificatie versturen',
     'notification_sent' => 'Notificaties verstuurd',
     'view_next' => 'Volgende versie',

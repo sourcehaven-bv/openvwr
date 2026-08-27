@@ -20,6 +20,20 @@ Is de export voltooid, dan zal er een notificatie getoond worden in het scherm r
 
 ![Exporteren voltooid\label{fig:export_complete}](./imgs/05_overige_functies/02_avg-responsible-processing-records_export_complete.png)
 
+## Notificaties\label{sec:notificaties}
+
+**Beschikbaar voor**: iedereen die e-mails uit het portaal ontvangt
+
+Het portaal stuurt e-mails op basis van de rollen die u heeft: een Privacy Officer krijgt bijvoorbeeld bericht als er een nieuwe versie is aangemaakt, en een Chief Privacy Officer als een datalek is gemeld bij de Autoriteit Persoonsgegevens. U bepaalt zelf welke van deze e-mails u wilt blijven ontvangen.
+
+Deze instellingen staan onder "Profiel" > "Instellingen", in het blok "Notificaties" (Figuur \ref{fig:profiel_notificaties}).
+
+![Notificatie-instellingen\label{fig:profiel_notificaties}](./imgs/05_overige_functies/05_profile_settings_notifications.png)
+
+Alle notificaties staan standaard aan. Vink een notificatie uit om er geen e-mail meer over te ontvangen; de wijziging geldt voor al uw organisaties. U ziet alleen de notificaties die bij uw eigen rollen horen: een notificatie die u toch niet zou ontvangen, wordt niet getoond.
+
+> **Let op**: Het uitzetten van een notificatie heeft alleen effect op de e-mail. De onderliggende gebeurtenis blijft gewoon zichtbaar in het portaal, bijvoorbeeld in de overzichten van versies en datalekken.
+
 ## Opzoeklijsten
 
 **Beschikbaar voor**: (Chief) Privacy Officer
