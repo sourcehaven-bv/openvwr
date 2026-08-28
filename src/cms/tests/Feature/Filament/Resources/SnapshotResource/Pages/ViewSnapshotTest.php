@@ -162,6 +162,23 @@ it('can approve a snapshotApproval and view next', function (): void {
     ]);
 });
 
+it('does not select a next snapshot from another organisation', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $otherOrganisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation);
+    $current = Snapshot::factory()->for($organisation)->create();
+    $otherSnapshot = Snapshot::factory()->for($otherOrganisation)->create();
+
+    SnapshotApproval::factory()
+        ->for($otherSnapshot)
+        ->for($user, 'assignedTo')
+        ->create(['status' => SnapshotApprovalStatus::UNKNOWN]);
+
+    $this->asFilamentOrganisationUser($organisation);
+
+    expect(ViewSnapshot::getNext($current))->toBeNull();
+});
+
 it('can decline a snapshotApproval', function (): void {
     $organisation = OrganisationTestHelper::create();
     $user = UserTestHelper::createForOrganisation($organisation);
