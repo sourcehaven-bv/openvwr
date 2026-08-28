@@ -11,6 +11,8 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 use function __;
 
@@ -19,12 +21,23 @@ class TagResourceTable
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(static function (Builder $query): void {
+                $query->addSelect([
+                    'items_count' => DB::table('taggables')
+                        ->selectRaw('count(*)')
+                        ->whereColumn('taggables.tag_id', 'tags.id'),
+                ]);
+            })
             ->columns([
                 TextColumn::make('name')
                     ->label(__('general.name'))
                     ->badge()
                     ->color(static fn (Tag $tag): string => $tag->color->value ?? 'gray')
                     ->searchable()
+                    ->sortable(),
+                TextColumn::make('items_count')
+                    ->label(__('tag.items_count'))
+                    ->numeric()
                     ->sortable(),
                 CreatedAtColumn::make(),
                 UpdatedAtColumn::make(),

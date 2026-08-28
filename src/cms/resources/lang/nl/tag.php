@@ -22,6 +22,7 @@ return [
     'color_purple' => 'Paars',
     'color_magenta' => 'Magenta',
 
+    'items_count' => 'Gekoppelde items',
     'name' => 'Naam',
     'type' => 'Type',
 ];

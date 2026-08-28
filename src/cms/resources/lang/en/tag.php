@@ -22,6 +22,7 @@ return [
     'color_purple' => 'Purple',
     'color_magenta' => 'Magenta',
 
+    'items_count' => 'Linked items',
     'name' => 'Name',
     'type' => 'Type',
 ];
