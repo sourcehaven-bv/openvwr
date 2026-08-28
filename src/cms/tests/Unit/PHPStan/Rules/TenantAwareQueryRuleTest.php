@@ -30,9 +30,9 @@ class TenantAwareQueryRuleTest extends RuleTestCase
             sprintf('%s/../../../Fixtures/PHPStan/tenant-aware-query.php', __DIR__),
             sprintf('%s/../../../Fixtures/PHPStan/non-filament-tenant-aware-query.php', __DIR__),
         ], [
-            [$message, 9],
             [$message, 10],
             [$message, 11],
+            [$message, 12],
         ]);
     }
 }
