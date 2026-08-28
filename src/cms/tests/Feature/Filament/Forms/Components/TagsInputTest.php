@@ -61,3 +61,17 @@ it('labels nothing when no labels are selected', function (): void {
 
     expect($tagsInput->getOptionLabels())->toBe([]);
 });
+
+it('does not label selected labels from another organisation', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation);
+    $this->withFilamentSession($user, $organisation);
+
+    $otherTag = Tag::factory()->create();
+
+    $tagsInput = TagsInput::make();
+    $tagsInput->container(FilamentTestHelper::createTestForm());
+    $tagsInput->state([$otherTag->id->toString()]);
+
+    expect($tagsInput->getOptionLabels())->toBe([]);
+});

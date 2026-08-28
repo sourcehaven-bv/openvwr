@@ -6,6 +6,7 @@ use App\Enums\LabelColor;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\ListAvgResponsibleProcessingRecords;
 use App\Models\Tag;
 use Filament\Forms\Components\Select;
+use Tests\Helpers\Model\OrganisationTestHelper;
 
 /**
  * The filter renders the selected labels itself, which is where an earlier
@@ -75,4 +76,13 @@ it('shows no indicators when nothing is selected', function (): void {
         ->getIndicators();
 
     expect($indicators)->toBe([]);
+});
+
+it('does not label selected labels from another organisation', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $otherTag = Tag::factory()->create();
+
+    test()->asFilamentOrganisationUser($organisation);
+
+    expect(tagFilterSelect([$otherTag->id->toString()])->getOptionLabels())->toBe([]);
 });

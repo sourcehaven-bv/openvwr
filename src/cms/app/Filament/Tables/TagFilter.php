@@ -105,7 +105,10 @@ class TagFilter extends SelectFilter
             return [];
         }
 
-        return Tag::query()
+        $query = Tag::query();
+        (TenantScoped::getAsClosure())($query);
+
+        return $query
             ->whereKey($values)
             ->orderBy('name')
             ->get();

@@ -71,7 +71,10 @@ class TagsInput extends Select
 
         $labels = [];
 
-        foreach (Tag::query()->whereKey($values)->orderBy('name')->get() as $tag) {
+        $query = Tag::query();
+        (TenantScoped::getAsClosure())($query);
+
+        foreach ($query->whereKey($values)->orderBy('name')->get() as $tag) {
             $labels[$tag->id->toString()] = LabelSwatch::make($tag->color, $tag->name)->toHtml();
         }
 
