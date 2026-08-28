@@ -12,6 +12,7 @@ use App\Filament\Tables\Columns\EntityNumber;
 use App\Filament\Tables\Columns\ExpiringDateColumn;
 use App\Filament\Tables\Columns\ImportNumberColumn;
 use App\Filament\Tables\Columns\SnapshotStatusColumn;
+use App\Filament\Tables\Columns\TagsColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
 use App\Filament\Tables\ContactPersonFilter;
 use App\Filament\Tables\DateWindowFilter;
@@ -42,6 +43,7 @@ class AvgResponsibleProcessingRecordResourceTable
                 ExpiringDateColumn::make('review_at')
                     ->label(__('general.review_at')),
                 ImportNumberColumn::make(),
+                TagsColumn::make(),
                 CreatedAtColumn::make(),
                 UpdatedAtColumn::make(),
             ])

@@ -8,6 +8,7 @@ use App\Enums\Dpia\DpiaSubjectType;
 use App\Enums\Dpia\RiskLevel;
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\EntityNumber;
+use App\Filament\Tables\Columns\TagsColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
 use App\Models\Dpia\DpiaRecord;
 use App\Services\DateFormatService;
@@ -68,6 +69,7 @@ class DpiaRecordResourceTable
                     ->label(__('dpia_record.review_at'))
                     ->date(DateFormatService::FORMAT_DATE, DateFormatService::getDisplayTimezone())
                     ->sortable(),
+                TagsColumn::make(),
                 CreatedAtColumn::make(),
                 UpdatedAtColumn::make(),
             ])

@@ -9,6 +9,7 @@ use App\Filament\Actions\TransferExportBulkAction;
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\EntityNumber;
 use App\Filament\Tables\Columns\SnapshotStatusColumn;
+use App\Filament\Tables\Columns\TagsColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
 use App\Filament\Tables\DocumentFilter;
 use App\Filament\Tables\TagFilter;
@@ -31,6 +32,7 @@ class AlgorithmRecordResourceTable
                     ->searchable()
                     ->sortable(),
                 SnapshotStatusColumn::make(),
+                TagsColumn::make(),
                 CreatedAtColumn::make(),
                 UpdatedAtColumn::make(),
             ])
