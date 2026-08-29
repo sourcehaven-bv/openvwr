@@ -185,7 +185,8 @@ class ViewSnapshot extends ViewRecord
 
     public static function getNext(Snapshot $current): ?Snapshot
     {
-        return Snapshot::whereNot('id', $current->id->toString())
+        return Snapshot::tenantQuery()
+            ->whereNot('id', $current->id->toString())
             ->whereHas('snapshotApprovals', static function (Builder $query): void {
                 $query->where('assigned_to', Authentication::user()->id)
                     ->whereNotIn('status', SnapshotApprovalStatus::signed());

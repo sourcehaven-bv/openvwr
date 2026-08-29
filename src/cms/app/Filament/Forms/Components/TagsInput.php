@@ -71,10 +71,7 @@ class TagsInput extends Select
 
         $labels = [];
 
-        $query = Tag::query();
-        (TenantScoped::getAsClosure())($query);
-
-        foreach ($query->whereKey($values)->orderBy('name')->get() as $tag) {
+        foreach (Tag::tenantQuery()->whereKey($values)->orderBy('name')->get() as $tag) {
             $labels[$tag->id->toString()] = LabelSwatch::make($tag->color, $tag->name)->toHtml();
         }
 
@@ -92,10 +89,7 @@ class TagsInput extends Select
      */
     public static function groupedTagOptions(): array
     {
-        $query = Tag::query();
-        (TenantScoped::getAsClosure())($query);
-
-        $recent = $query
+        $recent = Tag::tenantQuery()
             ->orderByDesc('updated_at')
             ->limit(RecentFirstOptions::RECENT_COUNT)
             ->get()

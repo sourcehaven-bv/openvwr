@@ -71,8 +71,11 @@ class PersonalSnapshotApprovalResourceTable
                     ->label(__('snapshot.snapshot_source_type'))
                     ->multiple()
                     ->options(static function (): array {
-                        return Snapshot::withoutGlobalScope(OrderByCreatedAtAscScope::class)
-                            ->distinct('snapshot_source_type')
+                        $query = Snapshot::tenantQuery()
+                            ->withoutGlobalScope(OrderByCreatedAtAscScope::class);
+                        $query->getQuery()->distinct('snapshot_source_type');
+
+                        return $query
                             ->get()
                             ->keyBy('snapshot_source_type')
                             ->map(static function (Snapshot $snapshot): string {

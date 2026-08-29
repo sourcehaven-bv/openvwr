@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms\Components;
 
-use App\Facades\Authentication;
 use App\Models\RetentionPeriod;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Group;
@@ -165,9 +164,8 @@ class RetentionPeriodInput
     private static function terms(): Collection
     {
         /** @var Collection<int, string> $names */
-        $names = RetentionPeriod::query()
+        $names = RetentionPeriod::tenantQuery()
             ->where('enabled', true)
-            ->whereBelongsTo(Authentication::organisation())
             ->orderBy('name')
             ->pluck('name');
 

@@ -169,8 +169,7 @@ abstract class Exporter extends FilamentExporter
         }
 
         /** @var array<string, string> $types */
-        $types = DocumentType::query()
-            ->withGlobalScope('tenant', new TenantScope())
+        $types = DocumentType::tenantQuery()
             ->where('enabled', true)
             ->orderBy('name')
             ->pluck('name', 'id')

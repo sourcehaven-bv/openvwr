@@ -17,6 +17,7 @@ use App\Models\Concerns\HasUuidAsId;
 use App\Models\Contracts\SnapshotSource;
 use App\Models\Contracts\TenantAware;
 use App\Models\Scopes\OrderByCreatedAtAscScope;
+use App\Models\Scopes\TenantScope;
 use App\Models\States\SnapshotState;
 use Carbon\CarbonImmutable;
 use Database\Factories\SnapshotFactory;
@@ -64,6 +65,14 @@ class Snapshot extends Model implements HasStatesContract, TenantAware
         'version',
         'state',
     ];
+
+    /**
+     * Preserve this model's custom builder while applying the tenant scope.
+     */
+    public static function tenantQuery(): SnapshotBuilder
+    {
+        return static::query()->withGlobalScope('tenant', new TenantScope());
+    }
 
     public function casts(): array
     {
