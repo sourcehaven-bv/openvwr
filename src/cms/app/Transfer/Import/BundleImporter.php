@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Webmozart\Assert\Assert;
 
 use function __;
+use function array_keys;
 use function array_search;
 use function is_array;
 use function is_string;
@@ -125,6 +126,13 @@ class BundleImporter
             }
 
             $this->relationRestorer->restore($bundle, $this->idMap, $this->written);
+
+            // Re-stamp after the relations exist. markSynced() during the loop above
+            // runs before the pivots are written, so their updated_at can land a
+            // whole second later than the watermark (both columns are second
+            // precision) and EditDetector would then read a freshly written copy back
+            // as locally edited.
+            $this->markWrittenSynced();
         });
 
         return $result;
@@ -297,6 +305,21 @@ class BundleImporter
 
         if ($model instanceof Document) {
             $this->documentMediaImporter->import($model, $entity, $mediaResolver);
+        }
+    }
+
+    /**
+     * Re-stamp every entity this import wrote, once its relations are in place, so
+     * the watermark is never older than the pivot rows that belong to the same copy.
+     */
+    private function markWrittenSynced(): void
+    {
+        foreach (array_keys($this->written) as $id) {
+            $model = $this->idMap[$id] ?? null;
+
+            if ($model instanceof Model) {
+                $this->markSynced($model);
+            }
         }
     }
 
