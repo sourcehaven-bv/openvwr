@@ -61,9 +61,15 @@ jobs:
         # Only used when no sha was passed in. Marking the workspace safe
         # covers the case where the checkout is owned by a different user than
         # this container's build user, which makes git refuse to read it.
+        #
+        # Inputs reach the script through env rather than `${{ }}` interpolation:
+        # an expression is pasted into the script body before the shell sees it,
+        # so a crafted value would be executed as code (CWE-94).
+        env:
+          INPUT_SHA: ${{ inputs.sha }}
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          SHA="${{ inputs.sha }}"
+          SHA="$INPUT_SHA"
           if [ -z "$SHA" ]; then
             SHA=$(git rev-parse HEAD)
           fi
@@ -73,7 +79,9 @@ jobs:
         # Fail the build rather than publish an archive stamped "unknown".
         env:
           RELEASE_REQUIRE_SHA: "1"
-        run: just release "${{ inputs.version }}" "${{ steps.commit.outputs.SHA }}"
+          INPUT_VERSION: ${{ inputs.version }}
+          BUILD_SHA: ${{ steps.commit.outputs.SHA }}
+        run: just release "$INPUT_VERSION" "$BUILD_SHA"
 
       - name: Find release archive
         id: archive

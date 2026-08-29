@@ -2,6 +2,15 @@
 set -xeuo pipefail
 
 VERSION="${1:-dev}"
+
+# Same reasoning as the SHA check below: the version ends up in a single-quoted
+# PHP string, a tar filename and a JSON document, so restrict it to the shapes
+# actually used (dev, dev-<sha>, v20260721).
+if ! [[ "$VERSION" =~ ^[0-9A-Za-z._-]+$ ]]; then
+    echo "error: '$VERSION' is not a valid release version (expected letters, digits, '.', '_' or '-')." >&2
+    exit 1
+fi
+
 RELEASE_NAME="openvwr-cms-$VERSION"
 
 # The commit being packaged. Released archives have been shipping
@@ -20,6 +29,15 @@ fi
 if [ "$GIT_COMMIT" = "unknown" ] && [ "${RELEASE_REQUIRE_SHA:-0}" = "1" ]; then
     echo "error: could not determine the commit SHA to stamp into this release." >&2
     echo "Pass it explicitly: ./scripts/create-release.sh <version> <sha>" >&2
+    exit 1
+fi
+
+# The SHA is interpolated into a single-quoted PHP string in config/version.php
+# below, so anything but hex would let a caller close that quote and have the
+# rest evaluated as code. Every caller today passes `git rev-parse` output;
+# checking the shape here keeps that true for callers added later.
+if [ "$GIT_COMMIT" != "unknown" ] && ! [[ "$GIT_COMMIT" =~ ^[0-9a-fA-F]{7,40}$ ]]; then
+    echo "error: '$GIT_COMMIT' is not a valid commit SHA (expected 7-40 hex characters)." >&2
     exit 1
 fi
 
