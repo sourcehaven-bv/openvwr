@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ProcessorResource;
 
 use App\Filament\Infolists\Components\AddressRepeatableEntry;
-use App\Filament\Infolists\Components\SelectMultipleEntry;
+use App\Filament\Infolists\Components\TagsEntry;
 use Filament\Infolists\Components\Component;
 use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\Section;
@@ -40,8 +40,7 @@ class ProcessorResourceInfolist
                     TextEntry::make('phone')
                         ->label(__('processor.phone')),
                 ]),
-            SelectMultipleEntry::make('tags.name')
-                ->label(__('tag.model_plural')),
+            TagsEntry::make(),
             AddressRepeatableEntry::make(),
         ];
     }

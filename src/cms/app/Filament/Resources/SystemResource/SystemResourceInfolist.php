@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemResource;
 
-use App\Filament\Infolists\Components\SelectMultipleEntry;
+use App\Filament\Infolists\Components\TagsEntry;
 use Filament\Infolists\Components\Component;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
@@ -32,8 +32,7 @@ class SystemResourceInfolist
         return [
             TextEntry::make('description')
                 ->label(__('system.description')),
-            SelectMultipleEntry::make('tags.name')
-                ->label(__('tag.model_plural')),
+            TagsEntry::make(),
         ];
     }
 }

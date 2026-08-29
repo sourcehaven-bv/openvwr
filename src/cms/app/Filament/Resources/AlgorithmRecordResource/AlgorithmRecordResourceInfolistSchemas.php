@@ -9,6 +9,7 @@ use App\Filament\Infolists\Components\EntityNumberEntry;
 use App\Filament\Infolists\Components\ParentSelectEntry;
 use App\Filament\Infolists\Components\Section\InformationBlockSection;
 use App\Filament\Infolists\Components\SelectMultipleEntry;
+use App\Filament\Infolists\Components\TagsEntry;
 use App\Filament\Infolists\Components\TextareaEntry;
 use Filament\Infolists\Components\Component;
 use Filament\Infolists\Components\TextEntry;
@@ -28,8 +29,7 @@ class AlgorithmRecordResourceInfolistSchemas
                 ->label(__('general.name')),
             TextareaEntry::make('description')
                 ->label(__('algorithm_record.description')),
-            SelectMultipleEntry::make('tags.name')
-                ->label(__('tag.model_plural')),
+            TagsEntry::make(),
             TextEntry::make('algorithmTheme.name')
                 ->label(__('algorithm_record.theme')),
             TextEntry::make('algorithmStatus.name')

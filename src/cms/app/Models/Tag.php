@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Collections\Avg\AvgResponsibleProcessingRecordCollection;
 use App\Collections\TagCollection;
+use App\Enums\LabelColor;
 use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
@@ -24,6 +25,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 /**
  * @property string $name
+ * @property ?LabelColor $color
  *
  * @property-read AvgResponsibleProcessingRecordCollection $avgResponsibleProcessingRecords
  */
@@ -39,7 +41,18 @@ class Tag extends Model implements TenantAware
     protected static string $collectionClass = TagCollection::class;
     protected $fillable = [
         'name',
+        'color',
     ];
+
+    /**
+     * @return array<string, string>
+     */
+    public function casts(): array
+    {
+        return [
+            'color' => LabelColor::class,
+        ];
+    }
 
     /**
      * @return MorphToMany<AvgResponsibleProcessingRecord, $this>
