@@ -11,6 +11,10 @@ on:
         description: "Git ref to check out. Defaults to `version` for tag builds; the dev path passes a real SHA."
         required: false
         type: string
+      sha:
+        description: "Commit stamped into config/version.php. Resolved from the checkout when omitted."
+        required: false
+        type: string
       documentation:
         description: "Build and attach the data-model PDF. Only worth the extra minutes on a real release; dev builds skip it."
         required: false
@@ -52,8 +56,32 @@ jobs:
       - name: Install just
         uses: extractions/setup-just@v2
 
+      - name: Resolve build commit
+        id: commit
+        # Only used when no sha was passed in. Marking the workspace safe
+        # covers the case where the checkout is owned by a different user than
+        # this container's build user, which makes git refuse to read it.
+        #
+        # Inputs reach the script through env rather than `${{ }}` interpolation:
+        # an expression is pasted into the script body before the shell sees it,
+        # so a crafted value would be executed as code (CWE-94).
+        env:
+          INPUT_SHA: ${{ inputs.sha }}
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          SHA="$INPUT_SHA"
+          if [ -z "$SHA" ]; then
+            SHA=$(git rev-parse HEAD)
+          fi
+          echo "SHA=${SHA}" >> $GITHUB_OUTPUT
+
       - name: Create release package
-        run: just release "${{ inputs.version }}"
+        # Fail the build rather than publish an archive stamped "unknown".
+        env:
+          RELEASE_REQUIRE_SHA: "1"
+          INPUT_VERSION: ${{ inputs.version }}
+          BUILD_SHA: ${{ steps.commit.outputs.SHA }}
+        run: just release "$INPUT_VERSION" "$BUILD_SHA"
 
       - name: Find release archive
         id: archive

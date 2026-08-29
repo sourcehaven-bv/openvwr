@@ -29,3 +29,4 @@ jobs:
       # dev-<sha> is only a label; check out the actual commit, not a ref by that name.
       version: ${{ needs.version.outputs.version }}
       ref: ${{ needs.version.outputs.sha }}
+      sha: ${{ needs.version.outputs.sha }}
