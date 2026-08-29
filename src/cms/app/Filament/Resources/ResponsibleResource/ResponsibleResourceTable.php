@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ResponsibleResource;
 
 use App\Filament\Tables\Columns\CreatedAtColumn;
+use App\Filament\Tables\Columns\TagsColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
 use App\Filament\Tables\TagFilter;
 use Filament\Tables\Actions\DeleteBulkAction;
@@ -27,6 +28,7 @@ class ResponsibleResourceTable
                 TextColumn::make('phone')
                     ->label(__('responsible.phone'))
                     ->sortable(),
+                TagsColumn::make(),
                 CreatedAtColumn::make(),
                 UpdatedAtColumn::make(),
             ])

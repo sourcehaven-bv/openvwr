@@ -6,6 +6,7 @@ namespace App\Filament\Resources\DpiaPrescanRecordResource;
 
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\EntityNumber;
+use App\Filament\Tables\Columns\TagsColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
 use App\Models\Dpia\DpiaPrescanRecord;
 use App\Services\DateFormatService;
@@ -47,6 +48,7 @@ class DpiaPrescanRecordResourceTable
                     ->label(__('dpia_prescan_record.assessed_at'))
                     ->date(DateFormatService::FORMAT_DATE, DateFormatService::getDisplayTimezone())
                     ->sortable(),
+                TagsColumn::make(),
                 CreatedAtColumn::make(),
                 UpdatedAtColumn::make(),
             ])

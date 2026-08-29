@@ -8,6 +8,7 @@ use App\Facades\Authentication;
 use App\Filament\Resources\DocumentResource;
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\ExpiringDateColumn;
+use App\Filament\Tables\Columns\TagsColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
 use App\Filament\Tables\DateWindowFilter;
 use App\Filament\Tables\TagFilter;
@@ -38,6 +39,7 @@ class DocumentResourceTable
                 TextColumn::make('documentType.name')
                     ->label(__('document.type'))
                     ->sortable(),
+                TagsColumn::make(),
                 CreatedAtColumn::make(),
                 UpdatedAtColumn::make(),
             ])

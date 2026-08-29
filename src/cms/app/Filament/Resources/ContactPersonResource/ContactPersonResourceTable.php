@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ContactPersonResource;
 
 use App\Filament\Tables\Columns\CreatedAtColumn;
+use App\Filament\Tables\Columns\TagsColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
 use App\Filament\Tables\TagFilter;
 use Filament\Tables\Actions\DeleteBulkAction;
@@ -34,6 +35,7 @@ class ContactPersonResourceTable
                 TextColumn::make('phone')
                     ->label(__('contact_person.phone'))
                     ->sortable(),
+                TagsColumn::make(),
                 CreatedAtColumn::make(),
                 UpdatedAtColumn::make(),
             ])
