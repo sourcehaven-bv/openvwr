@@ -11,8 +11,11 @@ use App\Transfer\CrossOrgCopier;
 use App\Transfer\Export\BundleBuilder;
 use App\Transfer\Import\EditDetector;
 use App\Transfer\Import\PreviewBuilder;
+use App\Transfer\Import\RelationRestorer;
 use App\Transfer\TransferEntityType;
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Facades\DB;
+use Tests\Doubles\Transfer\ClockAdvancingRelationRestorer;
 
 function copyOnce(Organisation $source, Organisation $destination, User $user, AvgResponsibleProcessingRecord $record): void
 {
@@ -130,4 +133,32 @@ it('re-copies an untouched copy without creating duplicates', function (): void 
 
     expect($countAfterSecond)->toBe($countAfterFirst)
         ->and($countAfterFirst)->toBe(1);
+});
+
+it('stamps the sync watermark no earlier than the relation pivots it covers', function (): void {
+    $source = Organisation::factory()->create();
+    $destination = Organisation::factory()->create();
+    $user = copyableUser($source, $destination);
+    [$record] = seedCopyableRecord($source);
+
+    app()->extend(
+        RelationRestorer::class,
+        static fn (RelationRestorer $inner): RelationRestorer => new ClockAdvancingRelationRestorer($inner),
+    );
+
+    copyOnce($source, $destination, $user, $record);
+    CarbonImmutable::setTestNow();
+
+    $copy = AvgResponsibleProcessingRecord::query()
+        ->whereBelongsTo($destination)
+        ->whereNotNull('last_synced_at')
+        ->firstOrFail();
+
+    // A watermark older than the pivots it is meant to cover makes EditDetector read
+    // a freshly written copy back as locally edited.
+    $latestPivot = DB::table('processor_relatables')->max('updated_at');
+
+    expect($latestPivot)->not->toBeNull()
+        ->and($copy->last_synced_at->timestamp)
+        ->toBeGreaterThanOrEqual(CarbonImmutable::parse($latestPivot)->timestamp);
 });
