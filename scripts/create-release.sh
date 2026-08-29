@@ -3,9 +3,28 @@ set -xeuo pipefail
 
 VERSION="${1:-dev}"
 RELEASE_NAME="openvwr-cms-$VERSION"
+
+# The commit being packaged. Released archives have been shipping
+# 'sha' => 'unknown', because the lookup below runs in the build container and
+# silently falls back when git cannot read the checkout. Rather than rely on
+# the packaging step rediscovering the commit, prefer a value passed in by the
+# caller; that also works when packaging an exported tree with no .git at all.
+#   ./scripts/create-release.sh v20260820 <sha>
+# RELEASE_REQUIRE_SHA=1 turns a missing SHA into a hard failure so an official
+# build cannot silently publish "unknown".
+GIT_COMMIT="${2:-${RELEASE_SHA:-}}"
+if [ -z "$GIT_COMMIT" ]; then
+    GIT_COMMIT=$(git rev-parse HEAD 2>/dev/null || echo "unknown")
+fi
+
+if [ "$GIT_COMMIT" = "unknown" ] && [ "${RELEASE_REQUIRE_SHA:-0}" = "1" ]; then
+    echo "error: could not determine the commit SHA to stamp into this release." >&2
+    echo "Pass it explicitly: ./scripts/create-release.sh <version> <sha>" >&2
+    exit 1
+fi
+
 # Create release info file
 BUILD_DATE=$(date -u)
-GIT_COMMIT=$(git rev-parse HEAD 2>/dev/null || echo "unknown")
 GIT_BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 
 echo "Creating OpenVWR CMS release version $VERSION..."
@@ -42,7 +61,12 @@ EOF
 cp ../../.db_requirements ./
 
 # Stamp the deployment version into the app (overwrites the committed dev defaults).
-GIT_COMMIT_SHORT=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+if [ "$GIT_COMMIT" = "unknown" ]; then
+    GIT_COMMIT_SHORT="unknown"
+else
+    # Shorten locally; the packaged tree may not have git metadata to ask.
+    GIT_COMMIT_SHORT="${GIT_COMMIT:0:7}"
+fi
 cat >"config/version.php" <<EOF
 <?php
 

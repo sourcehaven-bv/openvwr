@@ -5,9 +5,11 @@
 default:
     @just --list
 
-# Create a production release archive of the CMS
-release version="dev":
-    ./scripts/create-release.sh {{version}}
+# Create a production release archive of the CMS.
+# Pass the commit to stamp into config/version.php when the build environment
+# cannot read it from git itself (see scripts/create-release.sh).
+release version="dev" sha="":
+    ./scripts/create-release.sh {{version}} {{sha}}
 
 # Documentation
 # =============
