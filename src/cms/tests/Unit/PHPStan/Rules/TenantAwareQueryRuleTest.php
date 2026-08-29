@@ -33,6 +33,9 @@ class TenantAwareQueryRuleTest extends RuleTestCase
             [$message, 10],
             [$message, 11],
             [$message, 12],
+            [$message, 15],
+            [$message, 16],
+            [$message, 17],
         ]);
     }
 }
