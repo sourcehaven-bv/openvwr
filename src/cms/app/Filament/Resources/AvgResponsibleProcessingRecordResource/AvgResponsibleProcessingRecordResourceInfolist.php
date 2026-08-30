@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 
+use App\Config\Feature;
 use App\Filament\Infolists\Components\ProcessingRecordTabs;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\Tabs\Tab;
@@ -50,7 +51,8 @@ class AvgResponsibleProcessingRecordResourceInfolist
                         Tab::make(__('avg_responsible_processing_record.step_remarks'))
                             ->schema(AvgResponsibleProcessingRecordResourceInfolistSchemas::getRemarks()),
                         Tab::make(__('avg_responsible_processing_record.step_publish'))
-                            ->schema(AvgResponsibleProcessingRecordResourceInfolistSchemas::getPublish()),
+                            ->schema(AvgResponsibleProcessingRecordResourceInfolistSchemas::getPublish())
+                            ->visible(Feature::publishingEnabled()),
                     ]),
             ]);
     }
@@ -103,7 +105,8 @@ class AvgResponsibleProcessingRecordResourceInfolist
                     ->extraAttributes(['data-onepage-section' => 'step_remarks']),
                 Section::make(__('avg_responsible_processing_record.step_publish'))
                     ->schema(AvgResponsibleProcessingRecordResourceInfolistSchemas::getPublish())
-                    ->extraAttributes(['data-onepage-section' => 'step_publish']),
+                    ->extraAttributes(['data-onepage-section' => 'step_publish'])
+                    ->visible(Feature::publishingEnabled()),
             ]);
     }
 }

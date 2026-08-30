@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 
+use App\Config\Feature;
 use App\Filament\Forms\Components\ProcessingRecordWizard;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Wizard\Step;
@@ -48,7 +49,8 @@ class AvgResponsibleProcessingRecordResourceForm
                         Step::make(__('avg_responsible_processing_record.step_remarks'))
                             ->schema(AvgResponsibleProcessingRecordResourceFormSchemas::getRemarks()),
                         Step::make(__('avg_responsible_processing_record.step_publish'))
-                            ->schema(AvgResponsibleProcessingRecordResourceFormSchemas::getPublish()),
+                            ->schema(AvgResponsibleProcessingRecordResourceFormSchemas::getPublish())
+                            ->visible(Feature::publishingEnabled()),
                     ])
                     ->skippable()
                     ->persistStepInQueryString()
@@ -104,7 +106,8 @@ class AvgResponsibleProcessingRecordResourceForm
                     ->extraAttributes(['data-onepage-section' => 'step_remarks']),
                 Section::make(__('avg_responsible_processing_record.step_publish'))
                     ->schema(AvgResponsibleProcessingRecordResourceFormSchemas::getPublish())
-                    ->extraAttributes(['data-onepage-section' => 'step_publish']),
+                    ->extraAttributes(['data-onepage-section' => 'step_publish'])
+                    ->visible(Feature::publishingEnabled()),
             ]);
     }
 }

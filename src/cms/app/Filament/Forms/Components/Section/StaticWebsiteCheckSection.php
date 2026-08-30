@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms\Components\Section;
 
+use App\Config\Feature;
 use App\Models\Contracts\Publishable;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Placeholder;
@@ -25,7 +26,8 @@ class StaticWebsiteCheckSection extends Section
                 }
 
                 return self::getSchema($record);
-            });
+            })
+            ->visible(Feature::publishingEnabled());
     }
 
     /**

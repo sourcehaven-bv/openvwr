@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Tables\Actions;
 
+use App\Config\Feature;
 use App\Models\Contracts\Publishable;
 use App\Models\StaticWebsiteSnapshotEntry;
 use Filament\Tables\Actions\Action;
@@ -29,7 +30,7 @@ class GoToStaticWebsiteAction extends Action
             ->openUrlInNewTab()
             ->extraAttributes(['rel' => 'noopener noreferrer'])
             ->visible(static function (Publishable $record): bool {
-                return $record->isPublished();
+                return Feature::publishingEnabled() && $record->isPublished();
             });
     }
 }
