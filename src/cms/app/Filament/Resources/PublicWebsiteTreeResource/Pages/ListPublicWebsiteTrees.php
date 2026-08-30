@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\PublicWebsiteTreeResource\Pages;
 
+use App\Config\Feature;
 use App\Filament\Resources\PublicWebsiteTreeResource;
 use App\Models\PublicWebsiteTree;
 use Filament\Actions\CreateAction;
@@ -38,12 +39,21 @@ class ListPublicWebsiteTrees extends TreePage
     {
         Assert::isInstanceOf($record, PublicWebsiteTree::class);
 
-        return new HtmlString(view('filament.resources.public_website_tree.description', ['publicWebsiteTree' => $record])->render());
+        return new HtmlString(view('filament.resources.public_website_tree.description', [
+            'publicWebsiteTree' => $record,
+            'publishingEnabled' => Feature::publishingEnabled(),
+        ])->render());
     }
 
     public function getTreeRecordIcon(?Model $record = null): string
     {
         Assert::isInstanceOf($record, PublicWebsiteTree::class);
+
+        // Without publishing every node is private, so there is nothing for the
+        // eye icon to distinguish.
+        if (!Feature::publishingEnabled()) {
+            return 'heroicon-o-document-text';
+        }
 
         $publicationDate = $record->public_from;
 

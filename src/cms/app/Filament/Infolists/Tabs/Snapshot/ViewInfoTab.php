@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Infolists\Tabs\Snapshot;
 
+use App\Config\Feature;
 use App\Enums\Authorization\Permission;
 use App\Enums\Snapshot\SnapshotApprovalStatus;
 use App\Enums\Snapshot\SnapshotDataSection;
@@ -94,6 +95,7 @@ class ViewInfoTab extends Tab
     {
         return Section::make(__('snapshot.public_data'))
             ->description(new HtmlString(view('filament.infolists.components.entries.snapshot_data_description')->render()))
+            ->visible(Feature::publishingEnabled())
             ->schema([
                 TextEntry::make('snapshotData.public_markdown')
                     ->label('')
@@ -115,7 +117,13 @@ class ViewInfoTab extends Tab
 
     private static function getPrivateDataSection(): Section
     {
-        return Section::make(__('snapshot.private_data'))
+        // Without publishing there is no public counterpart, so the section is
+        // simply "the data" instead of "the private data".
+        $heading = Feature::publishingEnabled()
+            ? __('snapshot.private_data')
+            : __('snapshot.data');
+
+        return Section::make($heading)
             ->description(new HtmlString(view('filament.infolists.components.entries.snapshot_data_description')->render()))
             ->schema([
                 TextEntry::make('snapshotData.private_markdown')
