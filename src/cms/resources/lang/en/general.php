@@ -18,7 +18,12 @@ return [
     'data_collection_source' => 'Primary / Secondary',
     'data_collection_source_help_short' => 'Primary: belongs to the organisation\'s own core task. '
         . 'Secondary: business operations (such as HR or ICT), often recurring and standard.',
-    'data_collection_source_help' => 'Within the ministry there are many processing activities involving personal data. On the one hand these relate to the specific tasks of the ministry. These are the processing activities concerning the tasks and work of the ministry in its specific policy areas (the primary processes at corporate level). These processing activities are also referred to as primary processing activities. In addition there are the processing activities in the area of business operations (the secondary processes at corporate level). These are also referred to as secondary processing activities. Secondary processing activities are as a rule activities that occur more often and have a more or less standard character. The primary/secondary distinction can be relevant to the way in which information about the processing activity is published. Where secondary processing activities consistently concern the processing of staff data, the publication policy may have opted not to place the information on the externally accessible website, but on the internal website, such as the government intranet.',
+    'data_collection_source_help' => 'A primary processing activity belongs to your organisation\'s core task: '
+        . 'the work the organisation exists for. A secondary processing activity belongs to the business '
+        . 'operations that support that work, such as HR, finance, ICT and facility services. Secondary '
+        . 'processing activities occur more often and usually have a standard character. The distinction can '
+        . 'play a part in where you publish the processing activity; follow your organisation\'s publication '
+        . 'policy in this.',
     'attention' => 'Please note',
 
     'all' => 'All',
@@ -45,8 +50,9 @@ return [
     'parent' => 'Parent processing activity',
     'parent_hint_icon_text' => 'If this processing activity is a sub-activity of a parent processing activity, you can indicate the parent activity here. All sub-activities can be found with the parent activity in the "Sub-activities" table.',
     'parent_help' => 'Only fill in if this processing activity is part of a larger '
-        . 'processing activity. In that case choose the overarching activity; this activity will appear there '
-        . 'in the "Sub-activities" table. Leave empty for a standalone processing activity.',
+        . 'processing activity. In that case choose the overarching activity; this activity is then '
+        . 'shown in the "Sub-activities" table of that activity. '
+        . 'Leave empty for a standalone processing activity.',
     'child' => 'Sub-activity',
     'children' => 'Sub-activities',
     'children_help' => 'The processing activities that fall under this processing activity. Only '

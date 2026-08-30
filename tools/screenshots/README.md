@@ -105,6 +105,11 @@ om een echte TOTP-code te laten berekenen uit het geseede secret.
 - Niet alle figuren uit de handleiding zijn geautomatiseerd. `FIGURES` bevat op
   dit moment een deel; de rest staat nog in de originele afbeeldingen.
 
+De figuur `otp-setup` zet de geseede gebruiker tijdelijk terug naar "wel
+ingeschakeld, nog niet bevestigd", zodat de verplichte instelpagina in beeld
+komt. Dat wordt in een `finally` hersteld; breekt een run halverwege af,
+controleer dan `otp_confirmed_at` van de gebruiker voordat je opnieuw begint.
+
 Voor de exportfiguren is `QUEUE_CONNECTION=database` nodig plus een draaiende
 worker (zie boven); die instelling staat in
 [`.env.nodocker.example`](../../src/cms/.env.nodocker.example). Op de
