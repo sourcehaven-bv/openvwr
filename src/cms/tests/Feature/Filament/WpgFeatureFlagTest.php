@@ -10,6 +10,7 @@ use App\Filament\Resources\WpgProcessingRecordServiceResource;
 use App\Filament\Resources\WpgProcessingRecordServiceResource\Pages\ListWpgProcessingRecordServices;
 use App\Models\Document;
 use App\Models\Wpg\WpgProcessingRecord;
+use App\Models\Wpg\WpgProcessingRecordService;
 use App\Services\Dashboard\AttentionCountService;
 use Carbon\CarbonImmutable;
 use Tests\Helpers\Model\OrganisationTestHelper;
@@ -50,9 +51,25 @@ it('refuses viewing the wpg register when the feature is disabled', function ():
         ->and(WpgProcessingRecordServiceResource::canViewAny())->toBeFalse();
 });
 
+it('allows creating and editing wpg records when the feature is enabled', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $record = WpgProcessingRecord::factory()->recycle($organisation)->create();
+    $service = WpgProcessingRecordService::factory()->recycle($organisation)->create();
+
+    $this->asFilamentOrganisationUser($organisation);
+
+    expect(WpgProcessingRecordResource::canCreate())->toBeTrue()
+        ->and(WpgProcessingRecordResource::canView($record))->toBeTrue()
+        ->and(WpgProcessingRecordResource::canEdit($record))->toBeTrue()
+        ->and(WpgProcessingRecordServiceResource::canCreate())->toBeTrue()
+        ->and(WpgProcessingRecordServiceResource::canView($service))->toBeTrue()
+        ->and(WpgProcessingRecordServiceResource::canEdit($service))->toBeTrue();
+});
+
 it('refuses creating and editing wpg records when the feature is disabled', function (): void {
     $organisation = OrganisationTestHelper::create();
     $record = WpgProcessingRecord::factory()->recycle($organisation)->create();
+    $service = WpgProcessingRecordService::factory()->recycle($organisation)->create();
 
     $this->asFilamentOrganisationUser($organisation);
 
@@ -60,7 +77,10 @@ it('refuses creating and editing wpg records when the feature is disabled', func
 
     expect(WpgProcessingRecordResource::canCreate())->toBeFalse()
         ->and(WpgProcessingRecordResource::canView($record))->toBeFalse()
-        ->and(WpgProcessingRecordResource::canEdit($record))->toBeFalse();
+        ->and(WpgProcessingRecordResource::canEdit($record))->toBeFalse()
+        ->and(WpgProcessingRecordServiceResource::canCreate())->toBeFalse()
+        ->and(WpgProcessingRecordServiceResource::canView($service))->toBeFalse()
+        ->and(WpgProcessingRecordServiceResource::canEdit($service))->toBeFalse();
 });
 
 it('loads the wpg list page when the feature is enabled', function (): void {
