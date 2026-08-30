@@ -50,9 +50,11 @@ Tweefactorauthenticatie is verplicht. Zolang u deze nog niet heeft ingesteld, br
 
 Op deze pagina stelt u de authenticator als volgt in:
 
- 1. Klik op "Inschakelen". Er verschijnt een QR-code met daaronder een sleutel.
+ 1. Klik op "Inschakelen". Er verschijnt een QR-code met daaronder een sleutel, zoals in Figuur \ref{fig:authenticator_instellen}.
  2. Scan de QR-code met de authenticator applicatie op uw mobiele device. Kan uw device geen QR-code scannen, dan voert u de getoonde sleutel handmatig in de applicatie in.
  3. Klik op "Bevestigen" en vul de code van zes cijfers in die uw authenticator applicatie toont.
+
+Met de knop "Resetten" begint u de instelling opnieuw; er wordt dan een nieuwe QR-code met een nieuwe sleutel aangemaakt.
 
 Na een geldige code is de tweefactorauthenticatie ingeschakeld en heeft u toegang tot de applicatie. Voert u een onjuiste code in, dan meldt de applicatie dat en kunt u het opnieuw proberen.
 

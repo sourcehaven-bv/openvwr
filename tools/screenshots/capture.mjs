@@ -520,9 +520,13 @@ const FIGURES = [
     file: '01_welkom/02_profile_one_time_password.png',
     auth: true,
     // The profile page the OTP gate forces an un-enrolled user onto. Clip to the
-    // card rather than the whole layout: the manual's text walks through the
-    // buttons on this one panel, not the surrounding navigation.
-    clip: '.fi-main',
+    // two-factor block rather than .fi-main: the profile page also carries the
+    // personal-info and settings panels, which would push the card the text
+    // actually describes off the bottom of the figure.
+    // Anchored on the visible heading rather than nth-of-type: reordering the
+    // profile panels then moves the figure with them instead of silently
+    // capturing whichever block happens to sit in that position.
+    clip: '.filament-breezy-grid-section:has(.filament-breezy-grid-title:text-is("Tweefactorauthenticatie"))',
     pad: 16,
     async shoot(page) {
       // The seeded user already has a confirmed factor, so the gate would never
@@ -550,6 +554,11 @@ const FIGURES = [
         if (!page.url().includes('profile')) {
           throw new Error(`OTP gate did not redirect to the profile page, at ${page.url()}`);
         }
+        // The block sits below the personal-info and settings panels, so it
+        // starts outside the viewport; without this the clip rectangle falls off
+        // the captured image and the screenshot call fails outright.
+        await page.locator(this.clip).first().scrollIntoViewIfNeeded();
+        await page.waitForTimeout(400);
       } finally {
         // Always restore, even on failure: otherwise every later figure in this
         // run would be bounced to the profile page as well.
