@@ -432,3 +432,83 @@ it('hides the compare header action when only one version exists', function (): 
         ])
         ->assertTableActionHidden('compare');
 });
+
+/**
+ * Version 1 created while publishing was still on (it has a public part),
+ * version 2 created after it was switched off (it has none). This is the
+ * realistic upgrade path across a flag change.
+ *
+ * @return array{0: Snapshot, 1: Snapshot}
+ */
+function createSnapshotsAcrossFlagChange(AvgResponsibleProcessingRecord $source): array
+{
+    $organisation = $source->getOrganisation();
+
+    $from = Snapshot::factory()
+        ->recycle($organisation)
+        ->for($source, 'snapshotSource')
+        ->create(['version' => 1]);
+    SnapshotData::factory()
+        ->for($from)
+        ->create([
+            'public_markdown' => 'publieke-inhoud',
+            'private_markdown' => 'private-inhoud',
+        ]);
+
+    $to = Snapshot::factory()
+        ->recycle($organisation)
+        ->for($source, 'snapshotSource')
+        ->create(['version' => 2]);
+    SnapshotData::factory()
+        ->for($to)
+        ->create([
+            'public_markdown' => null,
+            'private_markdown' => 'private-inhoud',
+        ]);
+
+    return [$from, $to];
+}
+
+it('omits the public diff across a flag change when publishing is disabled', function (): void {
+    config()->set('features.publishing', false);
+
+    $organisation = OrganisationTestHelper::create();
+    $source = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create();
+    [, $to] = createSnapshotsAcrossFlagChange($source);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(CompareSnapshots::class, [
+            'record' => $to->getRouteKey(),
+        ])
+        ->assertOk()
+        // The stored public markdown of the older version must not surface as
+        // a phantom removal: it changed because we stopped rendering it, not
+        // because the registration changed.
+        ->assertDontSee('publieke-inhoud')
+        ->assertDontSee(__('snapshot.public_data'))
+        ->assertDontSee(__('snapshot.private_data'))
+        // The remaining part is simply "the data".
+        ->assertSee(__('snapshot.data'));
+});
+
+it('still diffs the public part across a flag change when publishing is enabled', function (): void {
+    config()->set('features.publishing', true);
+
+    $organisation = OrganisationTestHelper::create();
+    $source = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create();
+    [, $to] = createSnapshotsAcrossFlagChange($source);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(CompareSnapshots::class, [
+            'record' => $to->getRouteKey(),
+        ])
+        ->assertOk()
+        ->assertSee(__('snapshot.public_data'))
+        ->assertSee(__('snapshot.private_data'))
+        // A null on one side is diffed as an empty document, not a crash.
+        ->assertSee('publieke-inhoud');
+});

@@ -1,3 +1,4 @@
+@php use App\Config\Feature; @endphp
 @php use App\Models\Responsible; @endphp
 @php
     /**: @var App\Models\Avg\AvgResponsibleProcessingRecord $record */
@@ -146,6 +147,8 @@
 - Geen
 @endforelse
 
+@if(Feature::publishingEnabled())
 ## {{ __('avg_responsible_processing_record.step_publish') }}
 
 - **{{ __('general.public_from') }}**: {{ $record->public_from ? DateFormat::toDateTime($record->public_from) : '-' }}
+@endif
