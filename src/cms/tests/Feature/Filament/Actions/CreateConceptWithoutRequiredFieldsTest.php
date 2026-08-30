@@ -76,6 +76,25 @@ it('still rejects a created concept whose data is genuinely invalid', function (
         ->toBe(0);
 });
 
+// The boundary of the `nullable` swap: an empty field is not judged, but a field that
+// was actually filled in is still held to every other rule. Without this the relaxation
+// would silently accept a lookup value that does not exist.
+it('still rejects a filled in value that is invalid, even while saving a concept', function (): void {
+    $organisation = OrganisationTestHelper::create();
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(CreateAvgResponsibleProcessingRecord::class)
+        ->fillForm([
+            'name' => 'Wel ingevuld',
+            'avg_responsible_processing_record_service_id' => '01a05419-0000-7000-8000-000000000000',
+        ])
+        ->call('create')
+        ->assertHasFormErrors(['avg_responsible_processing_record_service_id']);
+
+    expect(AvgResponsibleProcessingRecord::query()->count())
+        ->toBe(0);
+});
+
 // Relaxing create must not weaken the gate: a record created as an empty concept is
 // still incomplete, so it cannot become a version until it is filled in.
 it('blocks creating a version for a record that was created as an empty concept', function (): void {
