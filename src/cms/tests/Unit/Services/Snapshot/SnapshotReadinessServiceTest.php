@@ -1,0 +1,277 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Unit\Services\Snapshot;
+
+use App\Filament\Forms\DraftableForm;
+use App\Services\Snapshot\DraftSave;
+use App\Services\Snapshot\SnapshotReadinessService;
+use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Wizard;
+use Filament\Forms\Components\Wizard\Step;
+use Filament\Forms\Form;
+use Illuminate\Support\HtmlString;
+use Tests\Helpers\LivewireTestHelper;
+use Tests\TestCase;
+
+use function __;
+use function count;
+use function expect;
+use function it;
+use function sprintf;
+use function uses;
+
+uses(TestCase::class);
+
+/**
+ * A wizard mirroring the register forms: skippable, with a required field on more
+ * than one step, so a missing field can be traced back to the step it belongs to.
+ *
+ * @param array<string, mixed> $state
+ */
+$readinessForm = static function (array $state = []): Form {
+    $livewire = LivewireTestHelper::createTestFormComponent();
+    $livewire->data = $state;
+
+    return DraftableForm::make($livewire)
+        ->statePath('data')
+        ->schema([
+            Wizard::make()
+                ->schema([
+                    Step::make('Naam verwerking')
+                        ->schema([
+                            TextInput::make('name')
+                                ->label('Naam')
+                                ->required(),
+                        ]),
+                    Step::make('Verwerkingsdoel')
+                        ->schema([
+                            TextInput::make('goal')
+                                ->label('Doel')
+                                ->required(),
+                            TextInput::make('note')
+                                ->label('Toelichting'),
+                        ]),
+                ])
+                ->skippable(),
+        ]);
+};
+
+it('reports no missing fields when every required field is filled', function () use ($readinessForm): void {
+    $form = $readinessForm(['name' => 'Verwerking A', 'goal' => 'Doel A']);
+
+    expect((new SnapshotReadinessService())->isReadyForSnapshot($form))
+        ->toBeTrue();
+});
+
+it('names the missing required field and the step it lives on', function () use ($readinessForm): void {
+    $form = $readinessForm(['name' => 'Verwerking A', 'goal' => null]);
+
+    $missingRequiredFields = (new SnapshotReadinessService())->getMissingRequiredFields($form);
+
+    expect(count($missingRequiredFields))
+        ->toBe(1)
+        ->and($missingRequiredFields[0]->label)
+        ->toBe('Doel')
+        ->and($missingRequiredFields[0]->stepLabel)
+        ->toBe('Verwerkingsdoel');
+});
+
+it('treats a blank string as a missing required field', function () use ($readinessForm): void {
+    $form = $readinessForm(['name' => '   ', 'goal' => 'Doel A']);
+
+    $missingRequiredFields = (new SnapshotReadinessService())->getMissingRequiredFields($form);
+
+    expect(count($missingRequiredFields))
+        ->toBe(1)
+        ->and($missingRequiredFields[0]->label)
+        ->toBe('Naam');
+});
+
+it('does not report optional fields as missing', function () use ($readinessForm): void {
+    $form = $readinessForm(['name' => 'Verwerking A', 'goal' => 'Doel A', 'note' => null]);
+
+    expect((new SnapshotReadinessService())->getMissingRequiredFields($form))
+        ->toBe([]);
+});
+
+it('builds a message that names each missing field with its step', function () use ($readinessForm): void {
+    $form = $readinessForm([]);
+
+    $snapshotReadinessService = new SnapshotReadinessService();
+    $message = $snapshotReadinessService->buildMissingRequiredFieldsMessage(
+        $snapshotReadinessService->getMissingRequiredFields($form),
+    );
+
+    expect($message)
+        ->toContain('Naam')
+        ->toContain('Naam verwerking')
+        ->toContain('Doel')
+        ->toContain('Verwerkingsdoel');
+});
+
+it('drops the required rule while a concept is being saved', function () use ($readinessForm): void {
+    $form = $readinessForm([]);
+
+    $rulesWhileSavingDraft = DraftSave::whileSavingDraft(
+        static fn (): array => $form->getValidationRules(),
+    );
+
+    expect($rulesWhileSavingDraft['data.name'] ?? [])
+        ->not->toContain('required')
+        ->and($form->getValidationRules()['data.name'] ?? [])
+        ->toContain('required');
+});
+
+it('keeps rules other than required while a concept is being saved', function (): void {
+    $livewire = LivewireTestHelper::createTestFormComponent();
+    $livewire->data = [];
+
+    $form = DraftableForm::make($livewire)
+        ->statePath('data')
+        ->schema([
+            TextInput::make('name')
+                ->required()
+                ->maxLength(10),
+        ]);
+
+    $rulesWhileSavingDraft = DraftSave::whileSavingDraft(
+        static fn (): array => $form->getValidationRules(),
+    );
+
+    expect($rulesWhileSavingDraft['data.name'] ?? [])
+        ->toContain('max:10')
+        ->not->toContain('required');
+});
+
+it('names a field without a step by its label alone', function (): void {
+    $livewire = LivewireTestHelper::createTestFormComponent();
+    $livewire->data = [];
+
+    $form = DraftableForm::make($livewire)
+        ->statePath('data')
+        ->schema([
+            TextInput::make('name')
+                ->label('Naam')
+                ->required(),
+        ]);
+
+    $snapshotReadinessService = new SnapshotReadinessService();
+    $missingRequiredFields = $snapshotReadinessService->getMissingRequiredFields($form);
+
+    expect($missingRequiredFields[0]->stepLabel)
+        ->toBeNull()
+        ->and($snapshotReadinessService->buildMissingRequiredFieldsMessage($missingRequiredFields))
+        ->toBe('Naam');
+});
+
+it('reads a label that renders as html', function (): void {
+    $livewire = LivewireTestHelper::createTestFormComponent();
+    $livewire->data = [];
+
+    $form = DraftableForm::make($livewire)
+        ->statePath('data')
+        ->schema([
+            TextInput::make('name')
+                ->label(new HtmlString('<b>Naam</b>'))
+                ->required(),
+        ]);
+
+    $missingRequiredFields = (new SnapshotReadinessService())->getMissingRequiredFields($form);
+
+    expect($missingRequiredFields[0]->label)
+        ->toBe('Naam');
+});
+
+it('falls back to the field name when it has no label', function (): void {
+    $livewire = LivewireTestHelper::createTestFormComponent();
+    $livewire->data = [];
+
+    $form = DraftableForm::make($livewire)
+        ->statePath('data')
+        ->schema([
+            TextInput::make('name')
+                ->label('')
+                ->required(),
+        ]);
+
+    $missingRequiredFields = (new SnapshotReadinessService())->getMissingRequiredFields($form);
+
+    expect($missingRequiredFields[0]->label)
+        ->toBe('name');
+});
+
+it('summarises the remainder when many required fields are missing', function (): void {
+    $livewire = LivewireTestHelper::createTestFormComponent();
+    $livewire->data = [];
+
+    $fields = [];
+    for ($index = 1; $index <= 12; $index++) {
+        $fields[] = TextInput::make(sprintf('field_%d', $index))
+            ->label(sprintf('Veld %d', $index))
+            ->required();
+    }
+
+    $form = DraftableForm::make($livewire)
+        ->statePath('data')
+        ->schema($fields);
+
+    $snapshotReadinessService = new SnapshotReadinessService();
+    $message = $snapshotReadinessService->buildMissingRequiredFieldsMessage(
+        $snapshotReadinessService->getMissingRequiredFields($form),
+    );
+
+    // Only the first ten are listed; the rest are summarised so the message stays readable.
+    expect($message)
+        ->toContain('Veld 10')
+        ->not->toContain('Veld 11')
+        ->and($message)
+        ->toContain(__('snapshot.incomplete_and_more', ['count' => 2]));
+});
+
+it('treats an empty relation selection as a missing required field', function (): void {
+    $livewire = LivewireTestHelper::createTestFormComponent();
+    $livewire->data = ['responsibles' => []];
+
+    $form = DraftableForm::make($livewire)
+        ->statePath('data')
+        ->schema([
+            CheckboxList::make('responsibles')
+                ->label('Verantwoordelijken')
+                ->options(['a' => 'A'])
+                ->required(),
+        ]);
+
+    $missingRequiredFields = (new SnapshotReadinessService())->getMissingRequiredFields($form);
+
+    expect(count($missingRequiredFields))
+        ->toBe(1)
+        ->and($missingRequiredFields[0]->label)
+        ->toBe('Verantwoordelijken');
+});
+
+it('reports the section as the step in the one page layout', function (): void {
+    $livewire = LivewireTestHelper::createTestFormComponent();
+    $livewire->data = [];
+
+    $form = DraftableForm::make($livewire)
+        ->statePath('data')
+        ->schema([
+            Section::make('Verwerkingsdoel')
+                ->schema([
+                    TextInput::make('goal')
+                        ->label('Doel')
+                        ->required(),
+                ]),
+        ]);
+
+    $missingRequiredFields = (new SnapshotReadinessService())->getMissingRequiredFields($form);
+
+    expect(count($missingRequiredFields))
+        ->toBe(1)
+        ->and($missingRequiredFields[0]->stepLabel)
+        ->toBe('Verwerkingsdoel');
+});

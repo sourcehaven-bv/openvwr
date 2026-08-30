@@ -12,7 +12,10 @@ use App\Mail\SnapshotApproval\ApprovalRequest;
 use App\Models\Contracts\SnapshotSource;
 use App\Services\Notification\NotificationRecipientService;
 use App\Services\Snapshot\SnapshotFactory;
+use App\Services\Snapshot\SnapshotReadinessService;
 use Filament\Actions\Action;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
@@ -51,6 +54,11 @@ class CreateSnapshotAction extends Action
     public static function makeWithChangesCheck(?array $snapshotData, string $savedDataHash, string $name = 'snapshot_create'): static
     {
         return self::make($name)
+            // Surfaced up front, so an incomplete record is apparent before the user
+            // commits to creating a version rather than only after trying.
+            ->modalDescription(static function (Component $livewire): ?string {
+                return self::describeReadiness($livewire);
+            })
             ->action(static function (
                 CreateSnapshotAction $action,
                 Component $livewire,
@@ -60,6 +68,8 @@ class CreateSnapshotAction extends Action
                 $snapshotData,
                 $savedDataHash,
             ): void {
+                self::haltOnIncompleteRecord($action, $livewire);
+
                 try {
                     $livewire->validate();
                 } catch (ValidationException $validationException) {
@@ -83,6 +93,74 @@ class CreateSnapshotAction extends Action
 
                 self::createSnapshotAndNotify($record, $snapshotFactory);
             });
+    }
+
+    /**
+     * Warns in the confirmation modal when required fields are still empty, naming them
+     * so the user knows what to complete before the version can be created.
+     */
+    private static function describeReadiness(Component $livewire): ?string
+    {
+        $form = self::resolveForm($livewire);
+        if (!$form instanceof Form) {
+            return null;
+        }
+
+        /** @var SnapshotReadinessService $snapshotReadinessService */
+        $snapshotReadinessService = App::get(SnapshotReadinessService::class);
+
+        $missingRequiredFields = $snapshotReadinessService->getMissingRequiredFields($form);
+        if ($missingRequiredFields === []) {
+            return null;
+        }
+
+        return sprintf(
+            '%s %s',
+            __('snapshot.not_ready_help'),
+            $snapshotReadinessService->buildMissingRequiredFieldsMessage($missingRequiredFields),
+        );
+    }
+
+    private static function resolveForm(Component $livewire): ?Form
+    {
+        if (!$livewire instanceof HasForms) {
+            return null;
+        }
+
+        return $livewire->getForm('form');
+    }
+
+    /**
+     * Reports concretely which required fields are still empty, and on which step, so the
+     * user does not have to hunt through a long wizard for a generic "required" message.
+     *
+     * Halts the action when the record is not complete enough for a version.
+     */
+    private static function haltOnIncompleteRecord(CreateSnapshotAction $action, Component $livewire): void
+    {
+        $form = self::resolveForm($livewire);
+        if (!$form instanceof Form) {
+            return;
+        }
+
+        /** @var SnapshotReadinessService $snapshotReadinessService */
+        $snapshotReadinessService = App::get(SnapshotReadinessService::class);
+
+        $missingRequiredFields = $snapshotReadinessService->getMissingRequiredFields($form);
+        if ($missingRequiredFields === []) {
+            return;
+        }
+
+        Notification::make()
+            ->title(__('snapshot.incomplete'))
+            ->body($snapshotReadinessService->buildMissingRequiredFieldsMessage($missingRequiredFields))
+            ->persistent()
+            ->danger()
+            ->send();
+
+        // @phpstan-ignore argument.type
+        $livewire->dispatch('close-modal', id: sprintf('%s-action', $livewire->getId()));
+        $action->halt();
     }
 
     private static function createSnapshotAndNotify(Model $record, SnapshotFactory $snapshotFactory): void

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use App\Filament\Pages\Concerns\SavesConceptWithoutRequiredFields;
 use App\Filament\Widgets\FgRemarksWidget;
 use App\Models\Contracts\EntityNumerable;
 use App\Models\Contracts\SnapshotSource;
@@ -14,6 +15,8 @@ use function sprintf;
 
 class ProcessingRecordEditRecord extends EditRecord
 {
+    use SavesConceptWithoutRequiredFields;
+
     protected function getHeaderWidgets(): array
     {
         return [
