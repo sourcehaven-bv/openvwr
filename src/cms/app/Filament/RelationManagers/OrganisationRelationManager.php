@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\RelationManagers;
 
+use Filament\Actions\AttachAction;
+use Filament\Actions\DetachAction;
 use App\Filament\Resources\OrganisationResource;
-use Filament\Tables\Actions\AttachAction;
-use Filament\Tables\Actions\DetachAction;
 use Filament\Tables\Table;
 
 use function __;
@@ -28,7 +28,7 @@ class OrganisationRelationManager extends RelationManager
                     ->multiple()
                     ->attachAnother(false),
             ])
-            ->actions([
+            ->recordActions([
                 DetachAction::make(),
             ]);
     }

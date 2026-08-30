@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\RelatedSnapshotSourceResource;
 
+use Filament\Actions\ViewAction;
 use App\Filament\Resources\Resource;
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Models\Contracts\SnapshotSource;
@@ -17,7 +18,6 @@ use App\Services\DateFormatService;
 use Carbon\CarbonInterface;
 use Closure;
 use Filament\Facades\Filament;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
@@ -74,7 +74,7 @@ class RelatedSnapshotSourceResourceTable
             ->defaultSort('created_at', 'desc')
             ->emptyStateHeading(__('snapshot.table_empty_heading'))
             ->emptyStateDescription(null)
-            ->actions([
+            ->recordActions([
                 ViewAction::make()
                     ->visible(static function (RelatedSnapshotSource $relatedSnapshotSource): bool {
                         $source = $relatedSnapshotSource->snapshotSource;

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Snapshot;
 
+use Filament\Actions\Concerns\InteractsWithActions;
 use App\Filament\Resources\RelatedSnapshotSourceResource;
 use App\Models\RelatedSnapshotSource;
 use App\Models\Snapshot;
@@ -19,6 +20,7 @@ use function view;
 
 class RelatedSnapshotSources extends Component implements HasForms, HasTable
 {
+    use InteractsWithActions;
     use InteractsWithForms;
     use InteractsWithTable;
 

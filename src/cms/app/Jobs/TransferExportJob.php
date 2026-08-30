@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
+use Filament\Actions\Action;
 use App\Components\Uuid\UuidInterface;
 use App\Enums\Queue;
 use App\Enums\RouteName;
@@ -11,7 +12,6 @@ use App\Models\Organisation;
 use App\Models\User;
 use App\Transfer\Export\BundleExporter;
 use App\Transfer\TransferEntityType;
-use Filament\Notifications\Actions\Action;
 use Filament\Notifications\Notification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

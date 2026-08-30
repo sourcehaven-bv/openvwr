@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Tables\Table;
+use App\Filament\Resources\ResponsibleLegalEntityResource\Pages\CreateResponsibleLegalEntity;
+use App\Filament\Resources\ResponsibleLegalEntityResource\Pages\EditResponsibleLegalEntity;
+use App\Filament\Resources\ResponsibleLegalEntityResource\Pages\ViewResponsibleLegalEntity;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\Resources\ResponsibleLegalEntityResource\Pages;
 use App\Filament\Resources\ResponsibleLegalEntityResource\Pages\ListResponsibleLegalEnties;
@@ -11,8 +16,6 @@ use App\Filament\Resources\ResponsibleLegalEntityResource\ResponsibleLegalEntity
 use App\Filament\Resources\ResponsibleLegalEntityResource\ResponsibleLegalEntityResourceInfolist;
 use App\Filament\Resources\ResponsibleLegalEntityResource\ResponsibleLegalEntityResourceTable;
 use App\Models\ResponsibleLegalEntity;
-use Filament\Forms\Form;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 
@@ -21,7 +24,7 @@ use function __;
 class ResponsibleLegalEntityResource extends Resource
 {
     protected static ?string $model = ResponsibleLegalEntity::class;
-    protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-academic-cap';
     protected static ?int $navigationSort = 5;
     protected static bool $isScopedToTenant = false;
 
@@ -30,17 +33,17 @@ class ResponsibleLegalEntityResource extends Resource
         return __(NavigationGroup::FUNCTIONAL_MANAGEMENT->value);
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return ResponsibleLegalEntityResourceForm::form($form);
+        return ResponsibleLegalEntityResourceForm::form($schema);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return ResponsibleLegalEntityResourceInfolist::infolist($infolist);
+        return ResponsibleLegalEntityResourceInfolist::infolist($schema);
     }
 
-    public static function table(Tables\Table $table): Tables\Table
+    public static function table(Table $table): Table
     {
         return ResponsibleLegalEntityResourceTable::table($table);
     }
@@ -49,9 +52,9 @@ class ResponsibleLegalEntityResource extends Resource
     {
         return [
             'index' => ListResponsibleLegalEnties::route('/'),
-            'create' => Pages\CreateResponsibleLegalEntity::route('/create'),
-            'edit' => Pages\EditResponsibleLegalEntity::route('/{record}/edit'),
-            'view' => Pages\ViewResponsibleLegalEntity::route('/{record}'),
+            'create' => CreateResponsibleLegalEntity::route('/create'),
+            'edit' => EditResponsibleLegalEntity::route('/{record}/edit'),
+            'view' => ViewResponsibleLegalEntity::route('/{record}'),
         ];
     }
 

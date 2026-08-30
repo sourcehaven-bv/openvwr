@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\ListAvgResponsibleProcessingRecords;
+use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\CreateAvgResponsibleProcessingRecord;
+use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\ViewAvgResponsibleProcessingRecord;
+use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\EditAvgResponsibleProcessingRecord;
 use App\Enums\RegisterLayout;
 use App\Facades\Authentication;
 use App\Filament\NavigationGroups\NavigationGroup;
@@ -13,8 +18,6 @@ use App\Filament\Resources\AvgResponsibleProcessingRecordResource\AvgResponsible
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource\AvgResponsibleProcessingRecordResourceTable;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
-use Filament\Forms\Form;
-use Filament\Infolists\Infolist;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -24,7 +27,7 @@ class AvgResponsibleProcessingRecordResource extends Resource
 {
     protected static bool $hasNavigationBadge = true;
     protected static ?string $model = AvgResponsibleProcessingRecord::class;
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-document-text';
     protected static ?int $navigationSort = 1;
 
     public static function getNavigationGroup(): ?string
@@ -32,19 +35,19 @@ class AvgResponsibleProcessingRecordResource extends Resource
         return __(NavigationGroup::REGISTERS->value);
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return match (Authentication::user()->register_layout) {
-            RegisterLayout::STEPS => AvgResponsibleProcessingRecordResourceForm::stepsForm($form),
-            RegisterLayout::ONE_PAGE => AvgResponsibleProcessingRecordResourceForm::onePageForm($form),
+            RegisterLayout::STEPS => AvgResponsibleProcessingRecordResourceForm::stepsForm($schema),
+            RegisterLayout::ONE_PAGE => AvgResponsibleProcessingRecordResourceForm::onePageForm($schema),
         };
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
         return match (Authentication::user()->register_layout) {
-            RegisterLayout::STEPS => AvgResponsibleProcessingRecordResourceInfolist::stepsInfolist($infolist),
-            RegisterLayout::ONE_PAGE => AvgResponsibleProcessingRecordResourceInfolist::onePageInfolist($infolist),
+            RegisterLayout::STEPS => AvgResponsibleProcessingRecordResourceInfolist::stepsInfolist($schema),
+            RegisterLayout::ONE_PAGE => AvgResponsibleProcessingRecordResourceInfolist::onePageInfolist($schema),
         };
     }
 
@@ -74,10 +77,10 @@ class AvgResponsibleProcessingRecordResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAvgResponsibleProcessingRecords::route('/'),
-            'create' => Pages\CreateAvgResponsibleProcessingRecord::route('/create'),
-            'view' => Pages\ViewAvgResponsibleProcessingRecord::route('/{record}'),
-            'edit' => Pages\EditAvgResponsibleProcessingRecord::route('/{record}/edit'),
+            'index' => ListAvgResponsibleProcessingRecords::route('/'),
+            'create' => CreateAvgResponsibleProcessingRecord::route('/create'),
+            'view' => ViewAvgResponsibleProcessingRecord::route('/{record}'),
+            'edit' => EditAvgResponsibleProcessingRecord::route('/{record}/edit'),
         ];
     }
 

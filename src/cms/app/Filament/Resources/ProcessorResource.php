@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use App\Filament\Resources\ProcessorResource\Pages\ListProcessors;
+use App\Filament\Resources\ProcessorResource\Pages\CreateProcessor;
+use App\Filament\Resources\ProcessorResource\Pages\ViewProcessor;
+use App\Filament\Resources\ProcessorResource\Pages\EditProcessor;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\RelationManagers\AvgProcessorProcessingRecordRelationManager;
 use App\Filament\RelationManagers\AvgResponsibleProcessingRecordRelationManager;
@@ -14,8 +19,6 @@ use App\Filament\Resources\ProcessorResource\ProcessorResourceForm;
 use App\Filament\Resources\ProcessorResource\ProcessorResourceInfolist;
 use App\Filament\Resources\ProcessorResource\ProcessorResourceTable;
 use App\Models\Processor;
-use Filament\Forms\Form;
-use Filament\Infolists\Infolist;
 use Filament\Tables\Table;
 
 use function __;
@@ -23,7 +26,7 @@ use function __;
 class ProcessorResource extends Resource
 {
     protected static ?string $model = Processor::class;
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-users';
     protected static ?int $navigationSort = 2;
 
     public static function getNavigationGroup(): ?string
@@ -31,14 +34,14 @@ class ProcessorResource extends Resource
         return __(NavigationGroup::MANAGEMENT->value);
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return ProcessorResourceForm::form($form);
+        return ProcessorResourceForm::form($schema);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return ProcessorResourceInfolist::infolist($infolist);
+        return ProcessorResourceInfolist::infolist($schema);
     }
 
     public static function table(Table $table): Table
@@ -59,10 +62,10 @@ class ProcessorResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProcessors::route('/'),
-            'create' => Pages\CreateProcessor::route('/create'),
-            'view' => Pages\ViewProcessor::route('/{record}'),
-            'edit' => Pages\EditProcessor::route('/{record}/edit'),
+            'index' => ListProcessors::route('/'),
+            'create' => CreateProcessor::route('/create'),
+            'view' => ViewProcessor::route('/{record}'),
+            'edit' => EditProcessor::route('/{record}/edit'),
         ];
     }
 

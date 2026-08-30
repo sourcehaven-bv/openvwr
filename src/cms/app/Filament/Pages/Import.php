@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use Filament\Schemas\Schema;
 use App\Enums\Authorization\Permission;
 use App\Events\StaticWebsite\BuildEvent;
 use App\Facades\Authentication;
@@ -16,7 +17,6 @@ use App\Services\BuildContextService;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Log;
@@ -32,8 +32,8 @@ class Import extends Page implements HasForms
 
     protected static ?string $slug = 'import';
     protected static ?int $navigationSort = 3;
-    protected static string $view = 'filament.pages.import';
-    protected static ?string $navigationIcon = 'heroicon-o-document-plus';
+    protected string $view = 'filament.pages.import';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-document-plus';
 
     /** @var ?array<TemporaryUploadedFile> $files */
     public ?array $files;
@@ -48,9 +48,9 @@ class Import extends Page implements HasForms
         return __(NavigationGroup::FUNCTIONAL_MANAGEMENT->value);
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->components([
             FileUpload::make('files')
                 ->required()
                 ->label(__('import.files'))

@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\AlgorithmPublicationCategoryResource\Pages\ListAlgorithmPublicationCategories;
+use App\Filament\Resources\AlgorithmPublicationCategoryResource\Pages\CreateAlgorithmPublicationCategory;
+use App\Filament\Resources\AlgorithmPublicationCategoryResource\Pages\EditAlgorithmPublicationCategory;
+use App\Filament\Resources\AlgorithmPublicationCategoryResource\Pages\ViewAlgorithmPublicationCategory;
 use App\Filament\RelationManagers\AlgorithmRecordRelationManager;
 use App\Filament\Resources\AlgorithmPublicationCategoryResource\Pages;
 use App\Models\Algorithm\AlgorithmPublicationCategory;
@@ -19,10 +23,10 @@ class AlgorithmPublicationCategoryResource extends LookupListResource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAlgorithmPublicationCategories::route('/'),
-            'create' => Pages\CreateAlgorithmPublicationCategory::route('/create'),
-            'edit' => Pages\EditAlgorithmPublicationCategory::route('/{record}/edit'),
-            'view' => Pages\ViewAlgorithmPublicationCategory::route('/{record}'),
+            'index' => ListAlgorithmPublicationCategories::route('/'),
+            'create' => CreateAlgorithmPublicationCategory::route('/create'),
+            'edit' => EditAlgorithmPublicationCategory::route('/{record}/edit'),
+            'view' => ViewAlgorithmPublicationCategory::route('/{record}'),
         ];
     }
 

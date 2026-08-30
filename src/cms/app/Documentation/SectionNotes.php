@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Documentation;
 
-use Filament\Forms\Components\Component;
+use Filament\Schemas\Components\Component;
 use Filament\Forms\Components\Field;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
@@ -83,7 +83,7 @@ class SectionNotes
     /**
      * The note belonging to a section, found through the first field inside it.
      *
-     * @param array<int, Component> $sectionComponents
+     * @param array<int, \Filament\Schemas\Components\Component> $sectionComponents
      */
     public function forSection(array $sectionComponents): ?string
     {
@@ -132,12 +132,12 @@ class SectionNotes
      * A component's children, or an empty list when those can only be resolved
      * while filling in the form.
      *
-     * @return array<int, Component>
+     * @return array<int, \Filament\Schemas\Components\Component>
      */
     public function childrenOf(Component $component): array
     {
         try {
-            return array_values($component->getChildComponents());
+            return array_values($component->getDefaultChildComponents());
         } catch (Throwable) {
             return [];
         }

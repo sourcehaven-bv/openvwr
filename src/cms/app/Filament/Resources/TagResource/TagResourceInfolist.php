@@ -4,30 +4,29 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\TagResource;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
 use App\Enums\LabelColor;
 use App\Filament\LabelSwatch;
 use App\Models\Tag;
-use Filament\Infolists\Components\Component;
-use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 
 use function __;
 
 class TagResourceInfolist
 {
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist
+        return $schema
             ->columns(1)
-            ->schema([
+            ->components([
                 Section::make()
                     ->schema(self::getSchema()),
             ]);
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getSchema(): array
     {

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Pages;
 
+use Filament\Schemas\Components\Tabs\Tab;
 use App\Filament\Resources\Pages\Concerns\PersistsFiltersInSession;
 use Filament\Actions\CreateAction;
-use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 

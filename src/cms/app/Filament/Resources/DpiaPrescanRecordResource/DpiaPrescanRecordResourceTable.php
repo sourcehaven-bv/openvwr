@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DpiaPrescanRecordResource;
 
+use Filament\Actions\EditAction;
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\EntityNumber;
 use App\Filament\Tables\Columns\TagsColumn;
@@ -11,7 +12,6 @@ use App\Filament\Tables\Columns\UpdatedAtColumn;
 use App\Models\Dpia\DpiaPrescanRecord;
 use App\Services\DateFormatService;
 use App\Services\Dpia\PrescanEvaluator;
-use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -55,8 +55,8 @@ class DpiaPrescanRecordResourceTable
             ->defaultSort('dpia_prescan_records.updated_at', 'desc')
             ->emptyStateHeading(__('dpia_prescan_record.table_empty_heading'))
             ->emptyStateDescription(null)
-            ->actionsColumnLabel(__('general.edit'))
-            ->actions([
+            ->recordActionsColumnLabel(__('general.edit'))
+            ->recordActions([
                 EditAction::make()
                     ->hiddenLabel()
                     ->tooltip(static fn (EditAction $action) => $action->getLabel()),

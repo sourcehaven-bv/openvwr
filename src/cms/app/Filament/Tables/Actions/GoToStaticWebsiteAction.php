@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Tables\Actions;
 
+use Filament\Actions\Action;
 use App\Config\Feature;
 use App\Models\Contracts\Publishable;
 use App\Models\StaticWebsiteSnapshotEntry;
-use Filament\Tables\Actions\Action;
 use Webmozart\Assert\Assert;
 
 use function __;

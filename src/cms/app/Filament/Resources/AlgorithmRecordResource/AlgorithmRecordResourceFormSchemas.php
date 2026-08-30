@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AlgorithmRecordResource;
 
+use Filament\Schemas\Components\Utilities\Get;
 use App\Filament\Forms\Components\DatePicker\DatePicker;
 use App\Filament\Forms\Components\RelationTable;
 use App\Filament\Forms\Components\RelationTableColumns;
@@ -16,12 +17,10 @@ use App\Models\Algorithm\AlgorithmPublicationCategory;
 use App\Models\Algorithm\AlgorithmStatus;
 use App\Models\Algorithm\AlgorithmTheme;
 use App\Models\Document;
-use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Get;
 use Illuminate\Support\HtmlString;
 
 use function __;
@@ -29,7 +28,7 @@ use function __;
 class AlgorithmRecordResourceFormSchemas
 {
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getProcessingName(): array
     {
@@ -89,7 +88,7 @@ class AlgorithmRecordResourceFormSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getResponsibleUse(): array
     {
@@ -137,7 +136,7 @@ class AlgorithmRecordResourceFormSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getMechanics(): array
     {
@@ -170,7 +169,7 @@ class AlgorithmRecordResourceFormSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getMeta(): array
     {
@@ -207,7 +206,7 @@ class AlgorithmRecordResourceFormSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getImpact(): array
     {
@@ -235,7 +234,7 @@ class AlgorithmRecordResourceFormSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getValidation(): array
     {
@@ -249,7 +248,7 @@ class AlgorithmRecordResourceFormSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getAttachments(): array
     {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\OrganisationSnapshotApprovalResource\Pages\ListOrganisationSnapshotApprovalItems;
 use App\Enums\Authorization\Permission;
 use App\Facades\Authorization;
 use App\Filament\NavigationGroups\NavigationGroup;
@@ -19,7 +20,7 @@ use function __;
 class OrganisationSnapshotApprovalResource extends Resource
 {
     protected static ?string $model = Snapshot::class;
-    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-check';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-clipboard-document-check';
     protected static bool $hasNavigationBadge = true;
     protected static ?int $navigationSort = 2;
 
@@ -41,7 +42,7 @@ class OrganisationSnapshotApprovalResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListOrganisationSnapshotApprovalItems::route('/'),
+            'index' => ListOrganisationSnapshotApprovalItems::route('/'),
             'view' => ViewSnapshot::route('{record}'),
         ];
     }

@@ -4,28 +4,27 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemResource;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
 use App\Filament\Infolists\Components\TagsEntry;
-use Filament\Infolists\Components\Component;
-use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 
 use function __;
 
 class SystemResourceInfolist
 {
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist
+        return $schema
             ->columns(1)
-            ->schema([
+            ->components([
                 Section::make()
                     ->schema(self::getSchema()),
             ]);
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getSchema(): array
     {

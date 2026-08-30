@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
 use App\Config\Feature;
 use App\Documentation\DocNote;
 use App\Filament\Forms\Components\ChildrenRelationTable;
@@ -42,11 +45,7 @@ use App\Models\Receiver;
 use App\Models\Responsible;
 use App\Models\System;
 use Filament\Forms\Components\Checkbox;
-use Filament\Forms\Components\Component;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -57,7 +56,7 @@ use function array_map;
 class AvgResponsibleProcessingRecordResourceFormSchemas
 {
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getProcessingName(): array
     {
@@ -95,7 +94,7 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getResponsible(): array
     {
@@ -123,7 +122,7 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getProcessor(): array
     {
@@ -155,7 +154,7 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getReceiver(): array
     {
@@ -179,7 +178,7 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getProcessingGoal(): array
     {
@@ -194,7 +193,7 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     #[DocNote('documentation.avg_responsible_processing_record.stakeholders')]
     public static function getStakeholder(): array
@@ -210,7 +209,7 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getDecisionMaking(): array
     {
@@ -242,7 +241,7 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getSystem(): array
     {
@@ -294,7 +293,7 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getSecurity(): array
     {
@@ -343,7 +342,7 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getPassthrough(): array
     {
@@ -386,7 +385,7 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getGebDpia(): array
     {
@@ -423,7 +422,7 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getContactPerson(): array
     {
@@ -437,7 +436,7 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getAttachments(): array
     {
@@ -459,7 +458,7 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getRemarks(): array
     {
@@ -475,7 +474,7 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getPublish(): array
     {

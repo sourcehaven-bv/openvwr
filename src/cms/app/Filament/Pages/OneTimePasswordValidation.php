@@ -31,7 +31,7 @@ class OneTimePasswordValidation extends SimplePage
     use WithRateLimiting;
 
     private AuthenticationService $authenticationService;
-    protected static string $view = 'filament.pages.one-time-password-validation';
+    protected string $view = 'filament.pages.one-time-password-validation';
     public ?string $code;
 
     #[Url]

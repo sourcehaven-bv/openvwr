@@ -29,7 +29,7 @@ class ListPublicWebsiteTrees extends TreePage
         ];
     }
 
-    public static function canAccess(): bool
+    public static function canAccess(array $parameters = []): bool
     {
         return Gate::allows('update', PublicWebsiteTree::class);
     }

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\TagResource;
 
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteBulkAction;
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
 use App\Models\Tag;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -45,13 +45,13 @@ class TagResourceTable
             ->defaultSort('tags.updated_at', 'desc')
             ->emptyStateHeading(__('tag.table_empty_heading'))
             ->emptyStateDescription(null)
-            ->actionsColumnLabel(__('general.edit'))
-            ->actions([
+            ->recordActionsColumnLabel(__('general.edit'))
+            ->recordActions([
                 EditAction::make()
                     ->hiddenLabel()
                     ->tooltip(static fn (EditAction $action) => $action->getLabel()),
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 DeleteBulkAction::make(),
             ]);
     }

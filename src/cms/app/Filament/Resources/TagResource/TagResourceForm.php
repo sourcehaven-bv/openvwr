@@ -4,25 +4,24 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\TagResource;
 
+use Filament\Schemas\Schema;
 use App\Enums\LabelColor;
 use App\Filament\LabelSwatch;
-use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 
 use function __;
 
 class TagResourceForm
 {
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema(self::getSchema());
+        return $schema
+            ->components(self::getSchema());
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getSchema(): array
     {

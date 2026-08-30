@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\DocumentTypeResource\Pages\ListDocumentTypes;
+use App\Filament\Resources\DocumentTypeResource\Pages\CreateDocumentType;
+use App\Filament\Resources\DocumentTypeResource\Pages\EditDocumentType;
+use App\Filament\Resources\DocumentTypeResource\Pages\ViewDocumentType;
 use App\Filament\RelationManagers\DocumentRelationManager;
 use App\Filament\Resources\DocumentTypeResource\Pages;
 use App\Models\DocumentType;
@@ -19,10 +23,10 @@ class DocumentTypeResource extends LookupListResource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDocumentTypes::route('/'),
-            'create' => Pages\CreateDocumentType::route('/create'),
-            'edit' => Pages\EditDocumentType::route('/{record}/edit'),
-            'view' => Pages\ViewDocumentType::route('/{record}'),
+            'index' => ListDocumentTypes::route('/'),
+            'create' => CreateDocumentType::route('/create'),
+            'edit' => EditDocumentType::route('/{record}/edit'),
+            'view' => ViewDocumentType::route('/{record}'),
         ];
     }
 

@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms\Components;
 
+use Filament\Actions\Action;
+use Filament\Schemas\Schema;
 use App\Components\Uuid\UuidInterface;
 use App\Facades\Authentication;
 use App\Filament\TenantScoped;
 use App\Rules\CurrentOrganisation;
 use Closure;
-use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Form;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -56,7 +55,7 @@ class RelationTable extends Select
     /**
      * @param class-string<Model> $model
      * @param array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null), download?: Closure(Model): (string|null)}> $columns
-     * @param array<Component> $createForm the schema for the inline "create new" modal
+     * @param array<\Filament\Schemas\Components\Component> $createForm the schema for the inline "create new" modal
      * @param (Closure(Builder<Model>): void)|null $scope tenant scope for the search and render queries;
      *        defaults to the organisation_id column scope, override for models
      *        that relate to the organisation differently (e.g. via a pivot)
@@ -136,14 +135,14 @@ class RelationTable extends Select
                     Hidden::make('organisation_id')
                         ->default(Authentication::organisation()->id->toString()),
                 ]))
-                ->createOptionUsing(static function (Select $component, array $data, Form $form): string {
+                ->createOptionUsing(static function (Select $component, array $data, Schema $schema): string {
                     Assert::isMap($data);
 
                     $record = self::getEloquentRelationship($component)->getRelated();
                     $record->fill($data);
                     $record->save();
 
-                    $form->model($record)->saveRelationships();
+                    $schema->model($record)->saveRelationships();
 
                     $key = $record->getKey();
                     Assert::isInstanceOf($key, UuidInterface::class);

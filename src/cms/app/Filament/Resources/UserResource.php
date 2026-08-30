@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\RelationManagers\OrganisationRelationManager;
 use App\Filament\Resources\UserResource\Pages\CreateUser;
@@ -14,8 +15,6 @@ use App\Filament\Resources\UserResource\UserResourceForm;
 use App\Filament\Resources\UserResource\UserResourceInfolist;
 use App\Filament\Resources\UserResource\UserResourceTable;
 use App\Models\User;
-use Filament\Forms\Form;
-use Filament\Infolists\Infolist;
 use Filament\Tables\Table;
 
 use function __;
@@ -24,7 +23,7 @@ class UserResource extends Resource
 {
     protected static bool $isScopedToTenant = false;
     protected static ?string $model = User::class;
-    protected static ?string $navigationIcon = 'heroicon-o-user';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-user';
     protected static ?int $navigationSort = 2;
 
     public static function getNavigationGroup(): ?string
@@ -32,14 +31,14 @@ class UserResource extends Resource
         return __(NavigationGroup::FUNCTIONAL_MANAGEMENT->value);
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return UserResourceForm::form($form);
+        return UserResourceForm::form($schema);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return UserResourceInfolist::infolist($infolist);
+        return UserResourceInfolist::infolist($schema);
     }
 
     public static function table(Table $table): Table

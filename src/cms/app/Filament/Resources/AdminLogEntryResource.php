@@ -16,7 +16,7 @@ use function __;
 class AdminLogEntryResource extends Resource
 {
     protected static ?string $model = AdminLogEntry::class;
-    protected static ?string $navigationIcon = 'heroicon-o-command-line';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-command-line';
     protected static ?int $navigationSort = 4;
     protected static bool $isScopedToTenant = false;
 

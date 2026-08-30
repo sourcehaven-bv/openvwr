@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrganisationResource;
 
+use Filament\Actions\EditAction;
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
-use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -34,8 +34,8 @@ class OrganisationResourceTable
             ->defaultSort('organisations.updated_at', 'desc')
             ->emptyStateHeading(__('organisation.table_empty_heading'))
             ->emptyStateDescription(null)
-            ->actionsColumnLabel(__('general.edit'))
-            ->actions([
+            ->recordActionsColumnLabel(__('general.edit'))
+            ->recordActions([
                 EditAction::make()
                     ->hiddenLabel()
                     ->tooltip(static fn (EditAction $action) => $action->getLabel()),

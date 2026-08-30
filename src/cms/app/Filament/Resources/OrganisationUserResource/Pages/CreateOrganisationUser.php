@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrganisationUserResource\Pages;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
 use App\Enums\Authorization\Permission;
 use App\Enums\Authorization\Role;
 use App\Facades\Authentication;
@@ -14,9 +16,7 @@ use App\Filament\Resources\OrganisationUserResource;
 use App\Models\OrganisationUserRole;
 use App\Models\User;
 use Closure;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -35,9 +35,9 @@ class CreateOrganisationUser extends CreateRecord
         return __('user.organisation_role_attach');
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->components([
             Section::make(__('user.model_singular'))
                 ->schema([
                     TextInput::make('email')
@@ -86,7 +86,7 @@ class CreateOrganisationUser extends CreateRecord
     }
 
     /**
-     * @return array<Section>
+     * @return array<\Filament\Schemas\Components\Section>
      */
     private static function getOrganisationRoleToggles(): array
     {

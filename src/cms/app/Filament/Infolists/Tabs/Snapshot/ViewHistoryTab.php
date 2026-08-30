@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Infolists\Tabs\Snapshot;
 
-use Filament\Infolists\Components\Tabs\Tab;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Infolists\Components\ViewEntry;
 
 class ViewHistoryTab extends Tab

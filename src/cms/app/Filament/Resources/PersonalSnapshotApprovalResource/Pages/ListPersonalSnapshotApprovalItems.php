@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\PersonalSnapshotApprovalResource\Pages;
 
+use Filament\Schemas\Components\Tabs\Tab;
 use App\Facades\Authentication;
 use App\Filament\Resources\Pages\Concerns\PersistsFiltersInSession;
 use App\Filament\Resources\PersonalSnapshotApprovalResource;
 use App\Models\Builders\SnapshotApprovalBuilder;
 use App\Models\Builders\SnapshotBuilder;
-use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 
 use function __;

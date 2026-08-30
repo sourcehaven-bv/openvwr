@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrganisationResource\Pages;
 
+use Filament\Schemas\Components\Wizard\Step;
+use Filament\Schemas\Components\Grid;
 use App\Components\Uuid\UuidInterface;
 use App\Enums\EntityNumberType;
 use App\Filament\Pages\CreateRecord;
 use App\Filament\Resources\OrganisationResource;
 use App\Models\EntityNumberCounter;
 use App\Models\ResponsibleLegalEntity;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Wizard\Step;
 use Filament\Resources\Pages\CreateRecord\Concerns\HasWizard;
 use Illuminate\Validation\Rules\Unique;
 
@@ -26,7 +26,7 @@ class CreateOrganisation extends CreateRecord
     protected static string $resource = OrganisationResource::class;
 
     /**
-     * @return array<Step>
+     * @return array<\Filament\Schemas\Components\Wizard\Step>
      */
     protected function getSteps(): array
     {

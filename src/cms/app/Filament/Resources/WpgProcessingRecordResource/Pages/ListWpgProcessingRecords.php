@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\WpgProcessingRecordResource\Pages;
 
+use Filament\Actions\CreateAction;
 use App\Filament\Actions\ExportAction;
 use App\Filament\Exports\WpgProcessingRecordExporter;
 use App\Filament\Resources\Pages\Concerns\PersistsFiltersInSession;
@@ -30,7 +31,7 @@ class ListWpgProcessingRecords extends ListRecords
             ExportAction::make()
                 ->exporter(WpgProcessingRecordExporter::class)
                 ->pluralModelLabel(__('wpg_processing_record.model_plural')),
-            Actions\CreateAction::make()
+            CreateAction::make()
                 ->modelLabel(__('processing_record.model_singular')),
         ];
     }

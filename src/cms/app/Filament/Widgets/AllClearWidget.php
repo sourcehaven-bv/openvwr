@@ -38,7 +38,7 @@ class AllClearWidget extends Widget
     // anything; the sort is irrelevant when it is the only widget on the page.
     protected static ?int $sort = 99;
     protected int|string|array $columnSpan = 'full';
-    protected static string $view = 'filament.widgets.all-clear';
+    protected string $view = 'filament.widgets.all-clear';
 
     public static function canView(): bool
     {

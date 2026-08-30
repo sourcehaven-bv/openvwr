@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use Filament\Schemas\Schema;
+use Filament\Auth\Http\Responses\Contracts\LoginResponse;
 use App\Config\Config;
 use App\Facades\AdminLog;
 use App\Models\User;
 use App\Services\UserLoginToken\UserLoginService;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
-use Filament\Forms\Form;
-use Filament\Http\Responses\Auth\Contracts\LoginResponse;
 use Filament\Notifications\Notification;
-use Filament\Pages\Auth\Login as FilamentLogin;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
@@ -22,11 +21,11 @@ use function __;
 use function app;
 use function ceil;
 
-class Login extends FilamentLogin
+class Login extends \Filament\Auth\Pages\Login
 {
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->components([
             $this->getEmailFormComponent(),
         ]);
     }

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Documentation;
 
-use Filament\Forms\Components\Component;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Forms\Components\Field;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Illuminate\Support\Str;
 use RuntimeException;
@@ -85,7 +85,7 @@ class RegisterRenderer
     }
 
     /**
-     * @param array<int, Component> $children
+     * @param array<int, \Filament\Schemas\Components\Component> $children
      * @param array<int, array{field: string, kind: string, help: string}> $rows
      *
      * @return array<int, string>
@@ -123,7 +123,7 @@ class RegisterRenderer
     /**
      * Walks the component tree and turns it into table rows.
      *
-     * @param array<int, Component> $components
+     * @param array<int, \Filament\Schemas\Components\Component> $components
      * @param array<int, array{field: string, kind: string, help: string}> $rows
      */
     private function collect(array $components, array &$rows, int $depth): void
@@ -213,11 +213,11 @@ class RegisterRenderer
     }
 
     /**
-     * @return array<int, Component>
+     * @return array<int, \Filament\Schemas\Components\Component>
      */
     private function componentsOf(mixed $form): array
     {
-        if (!$form instanceof Form) {
+        if (!$form instanceof Schema) {
             return [];
         }
 

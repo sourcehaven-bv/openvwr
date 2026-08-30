@@ -8,7 +8,6 @@ use App\Enums\Authorization\Role;
 use App\Models\OrganisationUserRole;
 use App\Models\User;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Webmozart\Assert\Assert;
 
@@ -58,7 +57,7 @@ class OrganisationUserRolesRepeater extends Repeater
     }
 
     /**
-     * @return array<Section>
+     * @return array<\Filament\Schemas\Components\Section>
      */
     private static function getOrganisationRoleToggles(string $name): array
     {

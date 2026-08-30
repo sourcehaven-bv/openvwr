@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Actions\SnapshotTransition;
 
+use Filament\Schemas\Components\Wizard\Step;
+use Filament\Schemas\Components\View;
+use Filament\Support\Enums\Width;
 use App\Facades\Snapshot as SnapshotFacade;
 use App\Models\RelatedSnapshotSource;
 use App\Models\Snapshot;
 use App\Models\States\Snapshot\Established;
 use App\Models\States\SnapshotState;
-use Filament\Forms\Components\View;
-use Filament\Forms\Components\Wizard\Step;
-use Filament\Support\Enums\MaxWidth;
 use Illuminate\Database\Eloquent\Builder;
 
 use function __;
@@ -46,6 +46,6 @@ class EstablishAction extends SnapshotTransitionAction
                             ->view('filament.actions.snapshot_transition.establish_action_step_validate_approvals'),
                     ]),
             ])
-            ->modalWidth(MaxWidth::FiveExtraLarge);
+            ->modalWidth(Width::FiveExtraLarge);
     }
 }

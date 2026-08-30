@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DocumentResource;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Actions\Action;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use App\Config\Feature;
 use App\Enums\Authorization\Permission;
 use App\Facades\Authorization;
@@ -20,14 +25,8 @@ use App\Models\DataBreachRecord;
 use App\Models\DocumentType;
 use App\Models\Wpg\WpgProcessingRecord;
 use Carbon\CarbonImmutable;
-use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\Component;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
 use Webmozart\Assert\Assert;
 
 use function __;
@@ -35,14 +34,14 @@ use function filled;
 
 class DocumentResourceForm
 {
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema(self::getSchema());
+        return $schema
+            ->components(self::getSchema());
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getSchema(): array
     {

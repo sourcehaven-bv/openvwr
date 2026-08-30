@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use App\Filament\Resources\ContactPersonResource\Pages\ListContactPersons;
+use App\Filament\Resources\ContactPersonResource\Pages\CreateContactPerson;
+use App\Filament\Resources\ContactPersonResource\Pages\ViewContactPerson;
+use App\Filament\Resources\ContactPersonResource\Pages\EditContactPerson;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\RelationManagers\AvgProcessorProcessingRecordRelationManager;
 use App\Filament\RelationManagers\AvgResponsibleProcessingRecordRelationManager;
@@ -15,8 +20,6 @@ use App\Filament\Resources\ContactPersonResource\ContactPersonResourceInfolist;
 use App\Filament\Resources\ContactPersonResource\ContactPersonResourceTable;
 use App\Filament\Resources\ContactPersonResource\Pages;
 use App\Models\ContactPerson;
-use Filament\Forms\Form;
-use Filament\Infolists\Infolist;
 use Filament\Tables\Table;
 
 use function __;
@@ -24,7 +27,7 @@ use function __;
 class ContactPersonResource extends Resource
 {
     protected static ?string $model = ContactPerson::class;
-    protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-chat-bubble-left';
     protected static ?int $navigationSort = 10;
     protected static ?string $tenantRelationshipName = 'contactPersons';
 
@@ -33,14 +36,14 @@ class ContactPersonResource extends Resource
         return __(NavigationGroup::MANAGEMENT->value);
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return ContactPersonResourceForm::form($form);
+        return ContactPersonResourceForm::form($schema);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return ContactPersonResourceInfolist::infolist($infolist);
+        return ContactPersonResourceInfolist::infolist($schema);
     }
 
     public static function table(Table $table): Table
@@ -62,10 +65,10 @@ class ContactPersonResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListContactPersons::route('/'),
-            'create' => Pages\CreateContactPerson::route('/create'),
-            'view' => Pages\ViewContactPerson::route('/{record}'),
-            'edit' => Pages\EditContactPerson::route('/{record}/edit'),
+            'index' => ListContactPersons::route('/'),
+            'create' => CreateContactPerson::route('/create'),
+            'view' => ViewContactPerson::route('/{record}'),
+            'edit' => EditContactPerson::route('/{record}/edit'),
         ];
     }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ContactPersonResource\Pages;
 
+use Filament\Actions\CreateAction;
 use App\Filament\Resources\ContactPersonResource;
 use App\Filament\Resources\Pages\Concerns\PersistsFiltersInSession;
 use Filament\Actions;
@@ -18,7 +19,7 @@ class ListContactPersons extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms\Components\Section;
 
+use Filament\Schemas\Components\Section;
 use App\Config\Feature;
 use App\Models\Contracts\Publishable;
-use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
 use Illuminate\Support\Collection;
 
 use function __;
@@ -31,7 +30,7 @@ class StaticWebsiteCheckSection extends Section
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     private static function getSchema(Publishable $record): array
     {

@@ -38,7 +38,7 @@ class OpenDataBreachesWidget extends Widget
 
     protected static ?int $sort = 1;
     protected int|string|array $columnSpan = 'full';
-    protected static string $view = 'filament.widgets.open-data-breaches';
+    protected string $view = 'filament.widgets.open-data-breaches';
 
     /** @var array<string, DataBreachRecordCollection> */
     private static array $records = [];

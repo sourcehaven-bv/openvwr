@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Snapshot;
 
+use Filament\Actions\Concerns\InteractsWithActions;
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\SnapshotStateColumn;
 use App\Models\Snapshot;
@@ -22,6 +23,7 @@ use function view;
 
 class Transitions extends Component implements HasForms, HasTable
 {
+    use InteractsWithActions;
     use InteractsWithTable;
     use InteractsWithForms;
 

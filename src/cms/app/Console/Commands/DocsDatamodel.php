@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use Filament\Schemas\Schema;
 use App\Documentation\DocumentAssembler;
 use App\Documentation\FieldDescriber;
 use App\Documentation\FormEnvironment;
 use App\Documentation\RegisterFinder;
 use App\Documentation\RegisterRenderer;
 use App\Documentation\SectionNotes;
-use Filament\Forms\Form;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
@@ -101,7 +101,7 @@ class DocsDatamodel extends Command
                 $notes->load($resourceClass);
 
                 $form = $environment->run(
-                    static fn (): mixed => $resourceClass::form(Form::make($environment->makeFormHost())),
+                    static fn (): mixed => $resourceClass::form(Schema::make($environment->makeFormHost())),
                 );
 
                 $chapters[] = $renderer->render($form, $resourceClass, $title);

@@ -11,7 +11,6 @@ use App\Filament\Infolists\Components\Section\InformationBlockSection;
 use App\Filament\Infolists\Components\SelectMultipleEntry;
 use App\Filament\Infolists\Components\TagsEntry;
 use App\Filament\Infolists\Components\TextareaEntry;
-use Filament\Infolists\Components\Component;
 use Filament\Infolists\Components\TextEntry;
 
 use function __;
@@ -19,7 +18,7 @@ use function __;
 class AlgorithmRecordResourceInfolistSchemas
 {
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getProcessingName(): array
     {
@@ -55,7 +54,7 @@ class AlgorithmRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getResponsibleUse(): array
     {
@@ -88,7 +87,7 @@ class AlgorithmRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getMechanics(): array
     {
@@ -111,7 +110,7 @@ class AlgorithmRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getMeta(): array
     {
@@ -136,7 +135,7 @@ class AlgorithmRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getImpact(): array
     {
@@ -152,7 +151,7 @@ class AlgorithmRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getValidation(): array
     {
@@ -166,7 +165,7 @@ class AlgorithmRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getAttachments(): array
     {

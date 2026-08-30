@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Infolists\Tabs\Snapshot;
 
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Group;
 use App\Enums\Authorization\Permission;
 use App\Facades\Authorization;
 use App\Facades\Snapshot as SnapshotFacade;
 use App\Models\Snapshot;
-use Filament\Infolists\Components\Group;
-use Filament\Infolists\Components\Tabs\Tab;
 use Filament\Infolists\Components\ViewEntry;
 
 use function sprintf;

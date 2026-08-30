@@ -4,23 +4,22 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ReceiverResource;
 
+use Filament\Schemas\Schema;
 use App\Filament\Forms\Components\TagsInput;
-use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Form;
 
 use function __;
 
 class ReceiverResourceForm
 {
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema(self::getSchema());
+        return $schema
+            ->components(self::getSchema());
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getSchema(): array
     {

@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrganisationUserResource;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
 use App\Enums\Authorization\Permission;
 use App\Enums\Authorization\Role;
 use App\Facades\Authorization;
 use App\Filament\Forms\Components\RoleToggle;
 use App\Models\OrganisationUserRole;
 use App\Models\User;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 
 use function __;
 
@@ -22,10 +22,10 @@ class OrganisationUserResourceForm
     public const string FIELD_USER_GLOBAL_ROLES = 'user_global_roles';
     public const string FIELD_ORGANISATION_USER_ROLES = 'organisation_user_roles';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Section::make(__('user.model_singular'))
                     ->schema([
                         TextInput::make('name')
@@ -42,7 +42,7 @@ class OrganisationUserResourceForm
     }
 
     /**
-     * @return array<Section>
+     * @return array<\Filament\Schemas\Components\Section>
      */
     private static function getOrganisationRoleToggles(): array
     {

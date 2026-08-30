@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use App\Filament\Resources\WpgProcessingRecordResource\Pages\ListWpgProcessingRecords;
+use App\Filament\Resources\WpgProcessingRecordResource\Pages\CreateWpgProcessingRecord;
+use App\Filament\Resources\WpgProcessingRecordResource\Pages\ViewWpgProcessingRecord;
+use App\Filament\Resources\WpgProcessingRecordResource\Pages\EditWpgProcessingRecord;
 use App\Config\Feature;
 use App\Enums\RegisterLayout;
 use App\Facades\Authentication;
@@ -14,8 +19,6 @@ use App\Filament\Resources\WpgProcessingRecordResource\WpgProcessingRecordResour
 use App\Filament\Resources\WpgProcessingRecordResource\WpgProcessingRecordResourceInfolist;
 use App\Filament\Resources\WpgProcessingRecordResource\WpgProcessingRecordResourceTable;
 use App\Models\Wpg\WpgProcessingRecord;
-use Filament\Forms\Form;
-use Filament\Infolists\Infolist;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 
@@ -25,7 +28,7 @@ class WpgProcessingRecordResource extends Resource
 {
     protected static bool $hasNavigationBadge = true;
     protected static ?string $model = WpgProcessingRecord::class;
-    protected static ?string $navigationIcon = 'heroicon-o-document-magnifying-glass';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-document-magnifying-glass';
     protected static ?int $navigationSort = 3;
 
     public static function getNavigationGroup(): ?string
@@ -63,19 +66,19 @@ class WpgProcessingRecordResource extends Resource
         return Feature::wpgEnabled() && parent::canEdit($record);
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return match (Authentication::user()->register_layout) {
-            RegisterLayout::STEPS => WpgProcessingRecordResourceForm::stepsForm($form),
-            RegisterLayout::ONE_PAGE => WpgProcessingRecordResourceForm::onePageForm($form),
+            RegisterLayout::STEPS => WpgProcessingRecordResourceForm::stepsForm($schema),
+            RegisterLayout::ONE_PAGE => WpgProcessingRecordResourceForm::onePageForm($schema),
         };
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
         return match (Authentication::user()->register_layout) {
-            RegisterLayout::STEPS => WpgProcessingRecordResourceInfolist::stepsInfolist($infolist),
-            RegisterLayout::ONE_PAGE => WpgProcessingRecordResourceInfolist::onePageInfolist($infolist),
+            RegisterLayout::STEPS => WpgProcessingRecordResourceInfolist::stepsInfolist($schema),
+            RegisterLayout::ONE_PAGE => WpgProcessingRecordResourceInfolist::onePageInfolist($schema),
         };
     }
 
@@ -94,10 +97,10 @@ class WpgProcessingRecordResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListWpgProcessingRecords::route('/'),
-            'create' => Pages\CreateWpgProcessingRecord::route('/create'),
-            'view' => Pages\ViewWpgProcessingRecord::route('/{record}'),
-            'edit' => Pages\EditWpgProcessingRecord::route('/{record}/edit'),
+            'index' => ListWpgProcessingRecords::route('/'),
+            'create' => CreateWpgProcessingRecord::route('/create'),
+            'view' => ViewWpgProcessingRecord::route('/{record}'),
+            'edit' => EditWpgProcessingRecord::route('/{record}/edit'),
         ];
     }
 

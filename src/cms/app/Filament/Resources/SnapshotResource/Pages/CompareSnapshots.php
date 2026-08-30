@@ -41,7 +41,7 @@ class CompareSnapshots extends Page
     private const string RELATED_SECTION = 'related_snapshot_sources';
 
     protected static string $resource = SnapshotResource::class;
-    protected static string $view = 'filament.resources.snapshot-resource.pages.compare-snapshots';
+    protected string $view = 'filament.resources.snapshot-resource.pages.compare-snapshots';
 
     #[Url]
     public ?string $fromId = null;

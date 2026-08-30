@@ -4,22 +4,21 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms\Components\Repeater;
 
+use Filament\Actions\Action;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Grid;
 use App\Enums\Dpia\MeasureType;
 use App\Enums\Dpia\RiskLevel;
 use App\Facades\Authentication;
 use App\Filament\TenantScoped;
 use App\Models\Dpia\DpiaMeasure;
 use App\Services\Dpia\DpiaMeasureRiskLinker;
-use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\CheckboxList;
-use Filament\Forms\Components\Component;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Get;
 
 use function __;
 use function is_array;
@@ -58,7 +57,7 @@ class DpiaMeasuresRepeater extends Repeater
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     private static function getMeasureSchema(): array
     {

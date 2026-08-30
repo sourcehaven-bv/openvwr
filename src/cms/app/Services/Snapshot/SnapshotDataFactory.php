@@ -4,6 +4,26 @@ declare(strict_types=1);
 
 namespace App\Services\Snapshot;
 
+use App\Models\Algorithm\AlgorithmRecord;
+use App\Services\Snapshot\SnapshotSource\AlgorithmRecordDataFactory;
+use App\Models\Avg\AvgProcessorProcessingRecord;
+use App\Services\Snapshot\SnapshotSource\AvgProcessorProcessingRecordDataFactory;
+use App\Models\Avg\AvgResponsibleProcessingRecord;
+use App\Services\Snapshot\SnapshotSource\AvgResponsibleProcessingRecordDataFactory;
+use App\Models\Dpia\DpiaRecord;
+use App\Services\Snapshot\SnapshotSource\DpiaRecordDataFactory;
+use App\Models\Wpg\WpgProcessingRecord;
+use App\Services\Snapshot\SnapshotSource\WpgProcessingRecordDataFactory;
+use App\Models\ContactPerson;
+use App\Services\Snapshot\SnapshotSource\ContactPersonDataFactory;
+use App\Models\Processor;
+use App\Services\Snapshot\SnapshotSource\ProcessorDataFactory;
+use App\Models\Receiver;
+use App\Services\Snapshot\SnapshotSource\ReceiverDataFactory;
+use App\Models\Responsible;
+use App\Services\Snapshot\SnapshotSource\ResponsibleDataFactory;
+use App\Models\System;
+use App\Services\Snapshot\SnapshotSource\SystemDataFactory;
 use App\Models;
 use App\Models\Snapshot;
 use App\Models\SnapshotData;
@@ -32,17 +52,17 @@ class SnapshotDataFactory
         $className = $snapshotSource::class;
 
         $snapshotSourceDataFactory = match ($className) {
-            Models\Algorithm\AlgorithmRecord::class => SnapshotSource\AlgorithmRecordDataFactory::class,
-            Models\Avg\AvgProcessorProcessingRecord::class => SnapshotSource\AvgProcessorProcessingRecordDataFactory::class,
-            Models\Avg\AvgResponsibleProcessingRecord::class => SnapshotSource\AvgResponsibleProcessingRecordDataFactory::class,
-            Models\Dpia\DpiaRecord::class => SnapshotSource\DpiaRecordDataFactory::class,
-            Models\Wpg\WpgProcessingRecord::class => SnapshotSource\WpgProcessingRecordDataFactory::class,
+            AlgorithmRecord::class => AlgorithmRecordDataFactory::class,
+            AvgProcessorProcessingRecord::class => AvgProcessorProcessingRecordDataFactory::class,
+            AvgResponsibleProcessingRecord::class => AvgResponsibleProcessingRecordDataFactory::class,
+            DpiaRecord::class => DpiaRecordDataFactory::class,
+            WpgProcessingRecord::class => WpgProcessingRecordDataFactory::class,
 
-            Models\ContactPerson::class => SnapshotSource\ContactPersonDataFactory::class,
-            Models\Processor::class => SnapshotSource\ProcessorDataFactory::class,
-            Models\Receiver::class => SnapshotSource\ReceiverDataFactory::class,
-            Models\Responsible::class => SnapshotSource\ResponsibleDataFactory::class,
-            Models\System::class => SnapshotSource\SystemDataFactory::class,
+            ContactPerson::class => ContactPersonDataFactory::class,
+            Processor::class => ProcessorDataFactory::class,
+            Receiver::class => ReceiverDataFactory::class,
+            Responsible::class => ResponsibleDataFactory::class,
+            System::class => SystemDataFactory::class,
 
             default => throw new InvalidArgumentException('missing snapshot-data factory for model'),
         };

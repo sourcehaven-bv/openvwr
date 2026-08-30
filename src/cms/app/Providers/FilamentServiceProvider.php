@@ -215,7 +215,7 @@ class FilamentServiceProvider extends PanelProvider
             ->userMenuItems([
                 'account' => MenuItem::make()
                     ->url(static function (): string {
-                        $panel = Filament::getCurrentPanel();
+                        $panel = Filament::getCurrentOrDefaultPanel();
                         Assert::isInstanceOf($panel, Panel::class);
 
                         $route = request()->route();

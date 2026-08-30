@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms\Components;
 
+use Filament\Actions\Action;
 use App\Facades\Authentication;
 use App\Filament\Forms\FormHelper;
 use App\Filament\TenantScoped;
-use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
@@ -41,7 +40,7 @@ class StakeholderDataItemsRepeater extends Repeater
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     private static function getStakeholderDataItemSchema(): array
     {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Documentation;
 
+use Filament\Actions\Concerns\InteractsWithActions;
 use App\Components\Uuid\Uuid;
 use App\Enums\RegisterLayout;
 use App\Models\Organisation;
@@ -98,6 +99,7 @@ class FormEnvironment
     {
         return new class extends LivewireComponent implements HasForms
         {
+            use InteractsWithActions;
             use InteractsWithForms;
 
             public function render(): string

@@ -24,7 +24,7 @@ use function __;
  */
 class Dashboard extends BaseDashboard
 {
-    protected static ?string $navigationIcon = 'heroicon-o-home';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-home';
     protected static ?int $navigationSort = -1;
 
     public function getTitle(): string

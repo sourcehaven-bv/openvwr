@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Actions;
 
+use Filament\Actions\BulkAction;
 use App\Enums\Authorization\Permission;
 use App\Facades\Authentication;
 use App\Facades\Authorization;
@@ -14,7 +15,6 @@ use App\Transfer\TransferEntityType;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Placeholder;
 use Filament\Notifications\Notification;
-use Filament\Tables\Actions\BulkAction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Webmozart\Assert\Assert;

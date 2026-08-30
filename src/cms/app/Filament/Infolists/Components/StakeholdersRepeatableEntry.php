@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Infolists\Components;
 
+use Filament\Schemas\Components\Section;
 use App\Filament\Infolists\InfolistHelper;
 use Filament\Infolists\Components\RepeatableEntry;
-use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 
 use function __;

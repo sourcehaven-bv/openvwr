@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DataBreachRecord;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Wizard\Step;
+use Filament\Schemas\Components\Section;
 use App\Filament\Forms\Components\ProcessingRecordWizard;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Wizard\Step;
-use Filament\Forms\Form;
 
 use function __;
 
 class DataBreachRecordResourceForm
 {
-    public static function stepsForm(Form $form): Form
+    public static function stepsForm(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 ProcessingRecordWizard::make()
                     ->schema([
                         Step::make(__('data_breach_record.step_name'))
@@ -40,10 +40,10 @@ class DataBreachRecordResourceForm
             ]);
     }
 
-    public static function onePageForm(Form $form): Form
+    public static function onePageForm(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Section::make(__('data_breach_record.step_name'))
                     ->schema(DataBreachRecordResourceFormSchemas::getName())
                     ->extraAttributes(['data-onepage-section' => 'step_name']),

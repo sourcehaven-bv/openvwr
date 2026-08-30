@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms\Components;
 
+use Filament\Schemas\Components\Section;
 use App\Enums\Authorization\Role;
 use Closure;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Toggle;
 
 use function __;
@@ -27,7 +27,7 @@ class RoleToggle extends Toggle
      * @param Closure(Role): string $nameResolver
      * @param Closure(static, Role): Toggle|null $configure
      *
-     * @return array<Section>
+     * @return array<\Filament\Schemas\Components\Section>
      */
     public static function organisationRoleSections(
         bool $includeCpoRoles,

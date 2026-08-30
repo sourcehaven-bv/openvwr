@@ -23,7 +23,7 @@ class ConfirmAction extends Action
             ->color('success')
             ->label(__('user.profile.one_time_password.actions.confirm_finish'))
             ->modalWidth('sm')
-            ->form([
+            ->schema([
                 TextInput::make('code')
                     ->label(__('user.profile.one_time_password.code'))
                     ->autofocus()

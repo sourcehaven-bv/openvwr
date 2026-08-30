@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\WpgProcessingRecordResource;
 
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Group;
 use App\Filament\Infolists\Components\DateEntry;
 use App\Filament\Infolists\Components\EntityNumberEntry;
 use App\Filament\Infolists\Components\ImportNumberEntry;
@@ -17,10 +20,6 @@ use App\Filament\Infolists\Components\ToggleEntry;
 use App\Filament\Infolists\Components\WpgGoalsRepeatableEntry;
 use App\Filament\Infolists\Group\ProcessingRecordContactPersons;
 use App\Filament\Infolists\InfolistHelper;
-use Filament\Infolists\Components\Component;
-use Filament\Infolists\Components\Grid;
-use Filament\Infolists\Components\Group;
-use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 
 use function __;
@@ -28,7 +27,7 @@ use function __;
 class WpgProcessingRecordResourceInfolistSchemas
 {
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getProcessingName(): array
     {
@@ -59,7 +58,7 @@ class WpgProcessingRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getResponsible(): array
     {
@@ -75,7 +74,7 @@ class WpgProcessingRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getProcessor(): array
     {
@@ -94,7 +93,7 @@ class WpgProcessingRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getReceiver(): array
     {
@@ -146,7 +145,7 @@ class WpgProcessingRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getProcessingGoal(): array
     {
@@ -160,7 +159,7 @@ class WpgProcessingRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getSpecialPoliceData(): array
     {
@@ -192,7 +191,7 @@ class WpgProcessingRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getDecisionMaking(): array
     {
@@ -219,7 +218,7 @@ class WpgProcessingRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getSystems(): array
     {
@@ -243,7 +242,7 @@ class WpgProcessingRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getSecurity(): array
     {
@@ -280,7 +279,7 @@ class WpgProcessingRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getGebDpia(): array
     {
@@ -296,7 +295,7 @@ class WpgProcessingRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getContactPersons(): array
     {
@@ -310,7 +309,7 @@ class WpgProcessingRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getAttachments(): array
     {
@@ -325,7 +324,7 @@ class WpgProcessingRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getRemarks(): array
     {
@@ -340,7 +339,7 @@ class WpgProcessingRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getCategoriesInvolved(): array
     {

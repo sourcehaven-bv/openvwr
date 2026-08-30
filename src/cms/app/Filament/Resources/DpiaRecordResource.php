@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use App\Filament\Resources\DpiaRecordResource\Pages\ListDpiaRecords;
+use App\Filament\Resources\DpiaRecordResource\Pages\CreateDpiaRecord;
+use App\Filament\Resources\DpiaRecordResource\Pages\EditDpiaRecord;
 use App\Enums\RegisterLayout;
 use App\Facades\Authentication;
 use App\Filament\NavigationGroups\NavigationGroup;
@@ -12,7 +16,6 @@ use App\Filament\Resources\DpiaRecordResource\DpiaRecordResourceForm;
 use App\Filament\Resources\DpiaRecordResource\DpiaRecordResourceTable;
 use App\Filament\Resources\DpiaRecordResource\Pages;
 use App\Models\Dpia\DpiaRecord;
-use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -21,7 +24,7 @@ use function __;
 class DpiaRecordResource extends Resource
 {
     protected static ?string $model = DpiaRecord::class;
-    protected static ?string $navigationIcon = 'heroicon-o-shield-exclamation';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-shield-exclamation';
     protected static ?int $navigationSort = 2;
 
     public static function getNavigationGroup(): ?string
@@ -29,11 +32,11 @@ class DpiaRecordResource extends Resource
         return __(NavigationGroup::DPIA->value);
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return match (Authentication::user()->register_layout) {
-            RegisterLayout::STEPS => DpiaRecordResourceForm::stepsForm($form),
-            RegisterLayout::ONE_PAGE => DpiaRecordResourceForm::onePageForm($form),
+            RegisterLayout::STEPS => DpiaRecordResourceForm::stepsForm($schema),
+            RegisterLayout::ONE_PAGE => DpiaRecordResourceForm::onePageForm($schema),
         };
     }
 
@@ -61,9 +64,9 @@ class DpiaRecordResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDpiaRecords::route('/'),
-            'create' => Pages\CreateDpiaRecord::route('/create'),
-            'edit' => Pages\EditDpiaRecord::route('/{record}/edit'),
+            'index' => ListDpiaRecords::route('/'),
+            'create' => CreateDpiaRecord::route('/create'),
+            'edit' => EditDpiaRecord::route('/{record}/edit'),
         ];
     }
 

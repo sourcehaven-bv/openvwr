@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use App\Filament\Resources\AlgorithmRecordResource\Pages\ListAlgorithmRecords;
+use App\Filament\Resources\AlgorithmRecordResource\Pages\CreateAlgorithmRecord;
+use App\Filament\Resources\AlgorithmRecordResource\Pages\ViewAlgorithmRecord;
+use App\Filament\Resources\AlgorithmRecordResource\Pages\EditAlgorithmRecord;
 use App\Enums\RegisterLayout;
 use App\Facades\Authentication;
 use App\Filament\NavigationGroups\NavigationGroup;
@@ -19,8 +24,6 @@ use App\Filament\Resources\AlgorithmRecordResource\AlgorithmRecordResourceInfoli
 use App\Filament\Resources\AlgorithmRecordResource\AlgorithmRecordResourceTable;
 use App\Filament\Resources\AlgorithmRecordResource\Pages;
 use App\Models\Algorithm\AlgorithmRecord;
-use Filament\Forms\Form;
-use Filament\Infolists\Infolist;
 use Filament\Tables\Table;
 
 use function __;
@@ -29,7 +32,7 @@ class AlgorithmRecordResource extends Resource
 {
     protected static bool $hasNavigationBadge = true;
     protected static ?string $model = AlgorithmRecord::class;
-    protected static ?string $navigationIcon = 'heroicon-o-calculator';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-calculator';
     protected static ?int $navigationSort = 4;
 
     public static function getNavigationGroup(): ?string
@@ -37,19 +40,19 @@ class AlgorithmRecordResource extends Resource
         return __(NavigationGroup::REGISTERS->value);
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return match (Authentication::user()->register_layout) {
-            RegisterLayout::STEPS => AlgorithmRecordResourceForm::stepsForm($form),
-            RegisterLayout::ONE_PAGE => AlgorithmRecordResourceForm::onePageForm($form),
+            RegisterLayout::STEPS => AlgorithmRecordResourceForm::stepsForm($schema),
+            RegisterLayout::ONE_PAGE => AlgorithmRecordResourceForm::onePageForm($schema),
         };
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
         return match (Authentication::user()->register_layout) {
-            RegisterLayout::STEPS => AlgorithmRecordResourceInfolist::stepsInfolist($infolist),
-            RegisterLayout::ONE_PAGE => AlgorithmRecordResourceInfolist::onePageInfolist($infolist),
+            RegisterLayout::STEPS => AlgorithmRecordResourceInfolist::stepsInfolist($schema),
+            RegisterLayout::ONE_PAGE => AlgorithmRecordResourceInfolist::onePageInfolist($schema),
         };
     }
 
@@ -74,10 +77,10 @@ class AlgorithmRecordResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAlgorithmRecords::route('/'),
-            'create' => Pages\CreateAlgorithmRecord::route('/create'),
-            'view' => Pages\ViewAlgorithmRecord::route('/{record}'),
-            'edit' => Pages\EditAlgorithmRecord::route('/{record}/edit'),
+            'index' => ListAlgorithmRecords::route('/'),
+            'create' => CreateAlgorithmRecord::route('/create'),
+            'view' => ViewAlgorithmRecord::route('/{record}'),
+            'edit' => EditAlgorithmRecord::route('/{record}/edit'),
         ];
     }
 

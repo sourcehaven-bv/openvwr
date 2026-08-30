@@ -4,27 +4,26 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrganisationUserResource;
 
+use Filament\Schemas\Schema;
 use App\Filament\Infolists\Components\Section\OrganisationUserRolesSection;
 use App\Filament\Infolists\Components\Section\UserGlobalRolesSection;
 use App\Filament\Infolists\Components\Section\UserSection;
 use App\Models\User;
-use Filament\Infolists\Components\Component;
-use Filament\Infolists\Infolist;
 
 class OrganisationUserResourceInfolist
 {
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
         /** @var User $user */
-        $user = $infolist->record;
+        $user = $schema->record;
 
-        return $infolist
+        return $schema
             ->columns(1)
-            ->schema(self::getSchema($user));
+            ->components(self::getSchema($user));
     }
 
     /**
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getSchema(User $user): array
     {

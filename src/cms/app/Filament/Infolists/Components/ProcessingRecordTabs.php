@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Infolists\Components;
 
-use Filament\Infolists\Components\Tabs;
+use Filament\Schemas\Components\Tabs;
 
 class ProcessingRecordTabs extends Tabs
 {

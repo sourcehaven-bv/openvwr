@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DpiaRecordResource;
 
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Grid;
 use App\Filament\Forms\Components\DatePicker\DatePicker;
 use App\Filament\Forms\Components\Repeater\DpiaMeasuresRepeater;
 use App\Filament\Forms\Components\Repeater\DpiaPersonalDataRepeater;
@@ -11,12 +13,9 @@ use App\Filament\Forms\Components\Repeater\DpiaRisksRepeater;
 use App\Filament\Forms\Components\Section\InformationBlockSection;
 use App\Filament\Forms\FormHelper;
 use App\Services\Dpia\DpiaSectionNotice;
-use Filament\Forms\Components\Component;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Get;
 use Illuminate\Support\HtmlString;
 
 use function __;
@@ -39,7 +38,7 @@ class DpiaRecordResourceAssessmentSchemas
     /**
      * 2. Persoonsgegevens
      *
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getPersonalData(): array
     {
@@ -61,7 +60,7 @@ class DpiaRecordResourceAssessmentSchemas
     /**
      * 3. Gegevensverwerkingen
      *
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getProcessing(): array
     {
@@ -77,7 +76,7 @@ class DpiaRecordResourceAssessmentSchemas
     /**
      * 16. Risico's voor betrokkenen
      *
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getRisks(): array
     {
@@ -106,7 +105,7 @@ class DpiaRecordResourceAssessmentSchemas
     /**
      * 17. Maatregelen
      *
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getMeasures(): array
     {
@@ -138,7 +137,7 @@ class DpiaRecordResourceAssessmentSchemas
     /**
      * Consultatie en advies (proceskader, deel I).
      *
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getConsultation(): array
     {
@@ -201,7 +200,7 @@ class DpiaRecordResourceAssessmentSchemas
     /**
      * Vaststelling en herziening.
      *
-     * @return array<Component>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     public static function getReview(): array
     {

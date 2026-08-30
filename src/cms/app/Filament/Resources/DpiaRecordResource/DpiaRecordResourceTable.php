@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DpiaRecordResource;
 
+use Filament\Actions\EditAction;
 use App\Enums\Dpia\DpiaSubjectType;
 use App\Enums\Dpia\RiskLevel;
 use App\Filament\Tables\Columns\CreatedAtColumn;
@@ -12,7 +13,6 @@ use App\Filament\Tables\Columns\TagsColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
 use App\Models\Dpia\DpiaRecord;
 use App\Services\DateFormatService;
-use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -76,8 +76,8 @@ class DpiaRecordResourceTable
             ->defaultSort('dpia_records.updated_at', 'desc')
             ->emptyStateHeading(__('dpia_record.table_empty_heading'))
             ->emptyStateDescription(null)
-            ->actionsColumnLabel(__('general.edit'))
-            ->actions([
+            ->recordActionsColumnLabel(__('general.edit'))
+            ->recordActions([
                 EditAction::make()
                     ->hiddenLabel()
                     ->tooltip(static fn (EditAction $action) => $action->getLabel()),

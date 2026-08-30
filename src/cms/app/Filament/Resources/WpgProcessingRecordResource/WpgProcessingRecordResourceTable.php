@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\WpgProcessingRecordResource;
 
+use Filament\Actions\EditAction;
 use App\Filament\Actions\TransferCopyBulkAction;
 use App\Filament\Actions\TransferExportBulkAction;
 use App\Filament\Tables\Columns\CreatedAtColumn;
@@ -20,7 +21,6 @@ use App\Filament\Tables\ProcessorFilter;
 use App\Filament\Tables\ResponsibleFilter;
 use App\Filament\Tables\SystemFilter;
 use App\Filament\Tables\TagFilter;
-use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -48,13 +48,13 @@ class WpgProcessingRecordResourceTable
             ->defaultSort('wpg_processing_records.updated_at', 'desc')
             ->emptyStateHeading(__('wpg_processing_record.table_empty_heading'))
             ->emptyStateDescription(null)
-            ->actionsColumnLabel(__('general.edit'))
-            ->actions([
+            ->recordActionsColumnLabel(__('general.edit'))
+            ->recordActions([
                 EditAction::make()
                     ->hiddenLabel()
                     ->tooltip(static fn (EditAction $action) => $action->getLabel()),
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 TransferExportBulkAction::make(),
                 TransferCopyBulkAction::make(),
             ])

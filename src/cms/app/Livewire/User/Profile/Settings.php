@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\User\Profile;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
 use App\Enums\Authorization\Permission;
 use App\Enums\Authorization\Role;
 use App\Enums\Notification\NotificationStream;
@@ -18,10 +20,8 @@ use App\Models\User;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\Radio;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
@@ -68,11 +68,11 @@ class Settings extends Component implements HasActions, HasForms
         $form->fill($data);
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->statePath('data')
-            ->schema([
+            ->components([
                 $this->getRegisterLayoutGroup(),
                 $this->getNotificationsComponent(),
                 $this->getMandateHolderComponent(),
@@ -113,10 +113,10 @@ class Settings extends Component implements HasActions, HasForms
     /**
      * @throws PropertyNotFoundException
      */
-    private function getSettingsForm(): Form
+    private function getSettingsForm(): Schema
     {
         $form = $this->__get('form');
-        Assert::isInstanceOf($form, Form::class);
+        Assert::isInstanceOf($form, Schema::class);
 
         return $form;
     }

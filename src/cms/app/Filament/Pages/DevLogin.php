@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use Filament\Auth\Pages\Login;
+use Filament\Schemas\Schema;
+use Filament\Auth\Http\Responses\LoginResponse;
 use App\Models\User;
 use App\Services\Authentication\AuthenticationStrategyFactory;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Form;
-use Filament\Http\Responses\Auth\Contracts\LoginResponse as LoginResponseContract;
-use Filament\Http\Responses\Auth\LoginResponse;
-use Filament\Pages\Auth\Login as FilamentLogin;
 use Illuminate\Support\Facades\Auth;
 use RuntimeException;
 use Webmozart\Assert\Assert;
@@ -33,7 +32,7 @@ use function sprintf;
  * to build outside local/testing (AuthenticationStrategyFactory), and the guard
  * below is a third, independent check at the point of use.
  */
-class DevLogin extends FilamentLogin
+class DevLogin extends Login
 {
     /**
      * Filament discovers every class under app/Filament/Pages and registers it as
@@ -50,9 +49,9 @@ class DevLogin extends FilamentLogin
         parent::mount();
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->components([
             Select::make('userId')
                 ->label(__('auth.dev_login_user'))
                 ->options(self::userOptions())
@@ -81,7 +80,7 @@ class DevLogin extends FilamentLogin
         Auth::login($user);
         session()->regenerate();
 
-        return app(LoginResponseContract::class);
+        return app(\Filament\Auth\Http\Responses\Contracts\LoginResponse::class);
     }
 
     public function getHeading(): string

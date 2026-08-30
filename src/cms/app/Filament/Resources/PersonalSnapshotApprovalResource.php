@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\PersonalSnapshotApprovalResource\Pages\ListPersonalSnapshotApprovalItems;
 use App\Enums\Authorization\Permission;
 use App\Facades\Authentication;
 use App\Facades\Authorization;
@@ -21,7 +22,7 @@ use function __;
 class PersonalSnapshotApprovalResource extends Resource
 {
     protected static ?string $model = Snapshot::class;
-    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-check';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-clipboard-document-check';
     protected static bool $hasNavigationBadge = true;
     protected static ?int $navigationSort = 1;
 
@@ -54,7 +55,7 @@ class PersonalSnapshotApprovalResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPersonalSnapshotApprovalItems::route('/'),
+            'index' => ListPersonalSnapshotApprovalItems::route('/'),
             'view' => ViewSnapshot::route('{record}'),
         ];
     }

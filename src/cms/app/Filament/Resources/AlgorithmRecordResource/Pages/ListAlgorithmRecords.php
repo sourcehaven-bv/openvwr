@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AlgorithmRecordResource\Pages;
 
+use Filament\Actions\CreateAction;
 use App\Filament\Actions\ExportAction;
 use App\Filament\Exports\AlgorithmRecordExporter;
 use App\Filament\Resources\AlgorithmRecordResource;
@@ -30,7 +31,7 @@ class ListAlgorithmRecords extends ListRecords
             ExportAction::make()
                 ->exporter(AlgorithmRecordExporter::class)
                 ->pluralModelLabel(__('algorithm_record.model_plural')),
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }
