@@ -71,7 +71,7 @@ return [
                 <li class="text-sm text-gray-950 dark:text-gray-300">Derden: De personen/partijen aan wie persoonsgegevens worden verstrekt en die niet zijn aan te merken als de verwerkingsverantwoordelijke, de verwerker, de betrokkene of de personen die onder het rechtstreekse gezag van de verwerkingsverantwoordelijke of verwerker gemachtigd zijn om persoonsgegevens te verwerken (zie ook art. 4(10) AVG). In tegenstelling tot de verwerker zal de &lsquo;derde&rsquo; de gegevens veelal voor diens eigen behoefte verwerken. Derden zijn bijvoorbeeld:
                     <ul class="list-disc list-outside mb-4">
                         <li class="text-sm text-gray-950 dark:text-gray-300 mb-1">Concernonderdelen waarbinnen de doorgifte van persoonsgegevens plaatsvindt (zoals de doorgifte van personeelsgegevens van de dochtermaatschappij naar de moedermaatschappij);</li>
-                        <li class="text-sm text-gray-950 dark:text-gray-300 mb-1">Verschillende Rijksonderdelen waarbinnen doorgifte van persoonsgegevens plaatsvindt;</li>
+                        <li class="text-sm text-gray-950 dark:text-gray-300 mb-1">Andere onderdelen van dezelfde overkoepelende organisatie waarbinnen doorgifte van persoonsgegevens plaatsvindt;</li>
                         <li class="text-sm text-gray-950 dark:text-gray-300">Verzekeringsmaatschappijen, arbodiensten, incassobureaus etc.</li>
                     </ul>
                 </li>
@@ -304,7 +304,7 @@ return [
                 <li class="text-sm text-gray-950 dark:text-gray-300">Derden: De personen/partijen aan wie persoonsgegevens worden verstrekt en die niet zijn aan te merken als de verwerkingsverantwoordelijke, de verwerker, de betrokkene of de personen die onder het rechtstreekse gezag van de verwerkingsverantwoordelijke of verwerker gemachtigd zijn om persoonsgegevens te verwerken (zie ook art. 4(10) AVG). In tegenstelling tot de verwerker zal de &lsquo;derde&rsquo; de gegevens veelal voor diens eigen behoefte verwerken. Derden zijn bijvoorbeeld:
                     <ul class="list-disc list-outside mb-4">
                         <li class="text-sm text-gray-950 dark:text-gray-300 mb-1">Concernonderdelen waarbinnen de doorgifte van persoonsgegevens plaatsvindt (zoals de doorgifte van personeelsgegevens van de dochtermaatschappij naar de moedermaatschappij);</li>
-                        <li class="text-sm text-gray-950 dark:text-gray-300 mb-1">Verschillende Rijksonderdelen waarbinnen doorgifte van persoonsgegevens plaatsvindt;</li>
+                        <li class="text-sm text-gray-950 dark:text-gray-300 mb-1">Andere onderdelen van dezelfde overkoepelende organisatie waarbinnen doorgifte van persoonsgegevens plaatsvindt;</li>
                         <li class="text-sm text-gray-950 dark:text-gray-300">Verzekeringsmaatschappijen, arbodiensten, incassobureaus etc.</li>
                     </ul>
                 </li>

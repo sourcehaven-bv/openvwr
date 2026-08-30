@@ -9,6 +9,10 @@ return [
     'passwordless_login_button_text' => 'Login',
     'email_sent' => 'E-mail verzonden',
 
+    'login_link_expired' => 'Deze loginlink is verlopen. Vraag een nieuwe login-e-mail aan om in te loggen.',
+    'login_link_invalid' => 'Deze loginlink is niet geldig. Vraag een nieuwe login-e-mail aan om in te loggen.',
+    'login_no_organisation' => 'Uw account is nog niet aan een organisatie gekoppeld. Neem contact op met uw beheerder.',
+
     'snapshot_sign_subject' => 'Login link',
     'snapshot_sign_login_text' => 'Hallo :userName, klik op de onderstaande knop om toegang te krijgen tot OpenVWR',
     'snapshot_sign_login_button_text' => 'Naar OpenVWR',

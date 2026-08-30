@@ -71,7 +71,7 @@ return [
                 <li class="text-sm text-gray-950 dark:text-gray-300">Third parties: The persons/parties to whom personal data is disclosed and which cannot be regarded as the controller, the processor, the data subject or the persons who, under the direct authority of the controller or processor, are authorised to process personal data (see also Art. 4(10) GDPR). Unlike the processor, the &lsquo;third party&rsquo; will generally process the data for its own purposes. Third parties are for example:
                     <ul class="list-disc list-outside mb-4">
                         <li class="text-sm text-gray-950 dark:text-gray-300 mb-1">Group entities between which personal data is transferred (such as the transfer of personnel data from the subsidiary to the parent company);</li>
-                        <li class="text-sm text-gray-950 dark:text-gray-300 mb-1">Different central government units between which personal data is transferred;</li>
+                        <li class="text-sm text-gray-950 dark:text-gray-300 mb-1">Other units of the same overarching organisation between which personal data is transferred;</li>
                         <li class="text-sm text-gray-950 dark:text-gray-300">Insurance companies, occupational health services, debt collection agencies, etc.</li>
                     </ul>
                 </li>
@@ -304,7 +304,7 @@ return [
                 <li class="text-sm text-gray-950 dark:text-gray-300">Third parties: The persons/parties to whom personal data is disclosed and which cannot be regarded as the controller, the processor, the data subject or the persons who, under the direct authority of the controller or processor, are authorised to process personal data (see also Art. 4(10) GDPR). Unlike the processor, the &lsquo;third party&rsquo; will generally process the data for its own purposes. Third parties are for example:
                     <ul class="list-disc list-outside mb-4">
                         <li class="text-sm text-gray-950 dark:text-gray-300 mb-1">Group entities between which personal data is transferred (such as the transfer of personnel data from the subsidiary to the parent company);</li>
-                        <li class="text-sm text-gray-950 dark:text-gray-300 mb-1">Different central government units between which personal data is transferred;</li>
+                        <li class="text-sm text-gray-950 dark:text-gray-300 mb-1">Other units of the same overarching organisation between which personal data is transferred;</li>
                         <li class="text-sm text-gray-950 dark:text-gray-300">Insurance companies, occupational health services, debt collection agencies, etc.</li>
                     </ul>
                 </li>

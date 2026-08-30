@@ -515,6 +515,60 @@ const FIGURES = [
       await page.waitForTimeout(300);
     },
   },
+  {
+    name: 'otp-setup',
+    file: '01_welkom/02_profile_one_time_password.png',
+    auth: true,
+    // The profile page the OTP gate forces an un-enrolled user onto. Clip to the
+    // two-factor block rather than .fi-main: the page also carries the
+    // personal-info and settings panels, which would push the card the text
+    // actually describes off the bottom of the figure. Anchored on the visible
+    // heading rather than nth-of-type, so reordering the panels moves the figure
+    // with them instead of silently capturing whichever block sits there.
+    clip: '.filament-breezy-grid-section:has(.filament-breezy-grid-title:text-is("Tweefactorauthenticatie"))',
+    pad: 16,
+    async shoot(page) {
+      // The seeded user already has a confirmed factor, so the gate would never
+      // fire. Roll it back to "enrolled but not confirmed" - the state a real
+      // user is in halfway through setup, which is what renders the QR code and
+      // the "Bevestigen" button the surrounding text describes.
+      const restore = tinker(`
+        $u = App\\Models\\User::where("email", "${EMAIL}")->firstOrFail();
+        echo $u->otp_confirmed_at?->toIso8601String() ?? "";
+      `);
+      tinker(`
+        $u = App\\Models\\User::where("email", "${EMAIL}")->firstOrFail();
+        $u->otp_confirmed_at = null;
+        $u->save();
+      `);
+      try {
+        // Any protected URL will do: EnforceOneTimePassword redirects it to the
+        // profile page, which is precisely the forced step being documented.
+        await page.goto(`${BASE}/${tenantOf(page)}/avg-responsible-processing-records`, {
+          waitUntil: 'networkidle',
+        });
+        await page.waitForSelector('text=/Tweefactorauthenticatie is verplicht/i', {
+          timeout: 30000,
+        });
+        if (!page.url().includes('profile')) {
+          throw new Error(`OTP gate did not redirect to the profile page, at ${page.url()}`);
+        }
+        // The block sits below the personal-info and settings panels, so it
+        // starts outside the viewport; without this the clip rectangle falls off
+        // the captured image and the screenshot call fails outright.
+        await page.locator(this.clip).first().scrollIntoViewIfNeeded();
+        await page.waitForTimeout(400);
+      } finally {
+        // Always restore, even on failure: otherwise every later figure in this
+        // run would be bounced to the profile page as well.
+        tinker(`
+          $u = App\\Models\\User::where("email", "${EMAIL}")->firstOrFail();
+          $u->otp_confirmed_at = ${restore ? `"${restore}"` : 'now()'};
+          $u->save();
+        `);
+      }
+    },
+  },
 ];
 
 const tenantOf = (page) => {
