@@ -20,7 +20,6 @@ use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Webmozart\Assert\Assert;
 
@@ -68,16 +67,9 @@ class CreateSnapshotAction extends Action
                 $snapshotData,
                 $savedDataHash,
             ): void {
+                // Reports the missing fields by name and halts; this replaces the plain
+                // `validate()` call that used to surface them as inline form errors.
                 self::haltOnIncompleteRecord($action, $livewire);
-
-                try {
-                    $livewire->validate();
-                } catch (ValidationException $validationException) {
-                    // @phpstan-ignore argument.type
-                    $livewire->dispatch('close-modal', id: sprintf('%s-action', $livewire->getId()));
-
-                    throw $validationException;
-                }
 
                 $dataHash = self::createDataHash($snapshotData);
                 if ($dataHash !== $savedDataHash) {
