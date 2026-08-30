@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use App\Config\Feature;
 use App\Enums\Authorization\Permission;
 use App\Facades\Authorization;
 use App\Filament\Forms\Components\MarkdownEditor\MarkdownEditor;
@@ -36,6 +37,11 @@ class PublicWebsite extends Page implements HasForms
     public static function canAccess(): bool
     {
         return Authorization::hasPermission(Permission::PUBLIC_WEBSITE_UPDATE);
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return Feature::publishingEnabled();
     }
 
     public static function getNavigationGroup(): ?string

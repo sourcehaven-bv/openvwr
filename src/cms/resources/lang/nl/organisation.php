@@ -10,6 +10,7 @@ return [
     'section_general' => 'Algemeen',
     'section_prefix' => 'Prefix',
     'section_public' => 'Publieke website',
+    'section_access' => 'Toegang',
 
     'user_attach' => 'Koppel gebruikers',
     'user_attach_description' => 'Zoek de gebruiker door (een deel van) het mailadres op te geven. Reeds gekoppelde gebruikers worden niet opgenomen in de resultaten.',

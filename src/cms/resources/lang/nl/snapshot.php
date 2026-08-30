@@ -39,6 +39,7 @@ return [
     'properties' => 'Gegevens',
     'public_data' => 'Publieke gegevens',
     'private_data' => 'Private gegevens',
+    'data' => 'Gegevens van de registratie',
     'related_snapshot_sources' => 'Gerelateerde entiteiten',
 
     'latest' => 'Laatste versie',

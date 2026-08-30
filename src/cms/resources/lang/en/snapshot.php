@@ -39,6 +39,7 @@ return [
     'properties' => 'Details',
     'public_data' => 'Public data',
     'private_data' => 'Private data',
+    'data' => 'Record data',
     'related_snapshot_sources' => 'Related entities',
 
     'latest' => 'Latest version',

@@ -10,6 +10,7 @@ return [
     'section_general' => 'General',
     'section_prefix' => 'Prefix',
     'section_public' => 'Public website',
+    'section_access' => 'Access',
 
     'user_attach' => 'Link users',
     'user_attach_description' => 'Find the user by entering (part of) the email address. Users who are already linked are not included in the results.',
