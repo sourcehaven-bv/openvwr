@@ -45,8 +45,9 @@ return [
     'parent' => 'Parent processing activity',
     'parent_hint_icon_text' => 'If this processing activity is a sub-activity of a parent processing activity, you can indicate the parent activity here. All sub-activities can be found with the parent activity in the "Sub-activities" table.',
     'parent_help' => 'Only fill in if this processing activity is part of a larger '
-        . 'processing activity. In that case choose the overarching activity; this activity will appear there '
-        . 'in the "Sub-activities" table. Leave empty for a standalone processing activity.',
+        . 'processing activity. In that case choose the overarching activity; this activity is then '
+        . 'shown in the "Sub-activities" table of that activity. '
+        . 'Leave empty for a standalone processing activity.',
     'child' => 'Sub-activity',
     'children' => 'Sub-activities',
     'children_help' => 'The processing activities that fall under this processing activity. Only '
