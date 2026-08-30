@@ -15,8 +15,6 @@ return [
     'incomplete' => 'Version not created, required fields are still missing',
     'incomplete_step' => 'step :step',
     'incomplete_and_more' => 'and :count more required fields.',
-    'ready' => 'Ready for a version',
-    'not_ready' => 'Not ready for a version yet',
     'not_ready_help' => 'Required fields are still missing. You can still save the processing activity as a concept.',
 
     'compare' => 'Compare',

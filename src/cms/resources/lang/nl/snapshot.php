@@ -15,8 +15,6 @@ return [
     'incomplete' => 'Versie niet aangemaakt, er ontbreken nog verplichte velden',
     'incomplete_step' => 'stap :step',
     'incomplete_and_more' => 'en nog :count andere verplichte velden.',
-    'ready' => 'Gereed voor een versie',
-    'not_ready' => 'Nog niet gereed voor een versie',
     'not_ready_help' => 'Er ontbreken nog verplichte velden. U kunt de verwerking wel opslaan als concept.',
 
     'compare' => 'Vergelijken',
