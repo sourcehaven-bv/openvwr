@@ -9,6 +9,22 @@ titlepage: true
 toc-own-page: true
 toc: true
 footnotes-pretty: true
+header-includes:
+  - |
+    ```{=latex}
+    % Houd kopjes bij hun tekst: een kopje begint alleen als er onder aan de
+    % pagina nog genoeg ruimte is voor het kopje plus een paar regels tekst.
+    % Anders schuift het kopje door naar de volgende pagina.
+    \usepackage{needspace}
+    \let\ovwroldsubsection\subsection
+    \renewcommand\subsection{\needspace{6\baselineskip}\ovwroldsubsection}
+    \let\ovwroldsubsubsection\subsubsection
+    \renewcommand\subsubsection{\needspace{5\baselineskip}\ovwroldsubsubsection}
+    % Laat geen losse begin- of eindregel van een alinea achter op een pagina.
+    \widowpenalty=10000
+    \clubpenalty=10000
+    \displaywidowpenalty=10000
+    ```
 ...
 
 <!--
