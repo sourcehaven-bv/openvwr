@@ -8,7 +8,7 @@ use Filament\Forms\Components\MarkdownEditor as FilamentMarkdownEditor;
 
 class MarkdownEditor extends FilamentMarkdownEditor
 {
-    public static function make(string $name): static
+    public static function make(?string $name = null): static
     {
         $toolbarButtons = [
             'bold',

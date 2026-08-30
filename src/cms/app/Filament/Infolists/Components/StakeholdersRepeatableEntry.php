@@ -13,7 +13,7 @@ use function __;
 
 class StakeholdersRepeatableEntry extends RepeatableEntry
 {
-    public static function make(string $name = 'stakeholders'): static
+    public static function make(?string $name = 'stakeholders'): static
     {
         return parent::make($name)
             ->label(__('stakeholder.model_plural'))

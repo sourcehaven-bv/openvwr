@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
 use App\Documentation\FieldDescriber;
 use App\Documentation\FormEnvironment;
 use App\Documentation\RegisterRenderer;
@@ -9,9 +11,7 @@ use App\Documentation\SectionNotes;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 
 beforeEach(function (): void {
     $this->environment = new FormEnvironment();
@@ -22,8 +22,8 @@ beforeEach(function (): void {
     $this->renderer = new RegisterRenderer($describer, $this->notes);
 
     // Builds a form from the given sections.
-    $this->form = function (array $sections): Form {
-        return Form::make($this->environment->makeFormHost())->schema($sections);
+    $this->form = function (array $sections): Schema {
+        return Schema::make($this->environment->makeFormHost())->components($sections);
     };
 });
 

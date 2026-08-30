@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Fixtures\Documentation\AwkwardNotesResource;
 
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Component;
 use App\Documentation\DocNote;
-use Filament\Forms\Components\Component;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\TextInput;
 use RuntimeException;
 

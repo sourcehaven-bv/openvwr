@@ -20,7 +20,7 @@ use function array_merge;
 
 class TagsInput extends Select
 {
-    public static function make(string $name = 'tags'): static
+    public static function make(?string $name = 'tags'): static
     {
         return parent::make($name)
             ->label(__('tag.model_plural'))

@@ -13,7 +13,7 @@ use Webmozart\Assert\Assert;
 
 class ExpiringDateColumn extends TextColumn
 {
-    public static function make(string $name): static
+    public static function make(?string $name = null): static
     {
         return parent::make($name)
             ->date(DateFormatService::FORMAT_DATE, DateFormatService::getDisplayTimezone())

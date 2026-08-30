@@ -18,7 +18,7 @@ use function __;
 
 class AvgGoalsRepeater extends Repeater
 {
-    public static function make(string $name = 'avgGoals'): static
+    public static function make(?string $name = 'avgGoals'): static
     {
         return parent::make($name)
             ->label(__('avg_goal.model_plural'))

@@ -35,7 +35,7 @@ use function is_string;
  */
 class DpiaPersonalDataRepeater extends Repeater
 {
-    public static function make(string $name = 'personalData'): static
+    public static function make(?string $name = 'personalData'): static
     {
         return parent::make($name)
             ->label(__('dpia_record.personal_data'))

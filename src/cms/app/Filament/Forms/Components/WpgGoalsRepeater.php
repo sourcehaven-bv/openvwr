@@ -21,7 +21,7 @@ use function sprintf;
 
 class WpgGoalsRepeater extends Repeater
 {
-    public static function make(string $name = 'wpgGoals'): static
+    public static function make(?string $name = 'wpgGoals'): static
     {
         return parent::make($name)
             ->label(__('wpg_goal.model_plural'))

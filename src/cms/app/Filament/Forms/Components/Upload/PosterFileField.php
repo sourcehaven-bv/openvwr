@@ -11,7 +11,7 @@ use Symfony\Component\Mime\MimeTypesInterface;
 
 class PosterFileField extends SpatieMediaLibraryFileUpload
 {
-    public static function make(string $name): static
+    public static function make(?string $name = null): static
     {
         return parent::make($name)
             ->imageEditor()

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
+use Filament\Schemas\Components\Grid;
 use App\Documentation\FieldDescriber;
 use App\Documentation\FormEnvironment;
 use App\Documentation\SectionNotes;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 use App\Filament\Resources\DocumentResource;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\TextInput;

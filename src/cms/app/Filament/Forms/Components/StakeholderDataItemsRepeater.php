@@ -18,7 +18,7 @@ use function __;
 
 class StakeholderDataItemsRepeater extends Repeater
 {
-    public static function make(string $name = 'stakeholder_data_items'): static
+    public static function make(?string $name = 'stakeholder_data_items'): static
     {
         return parent::make($name)
             ->label(__('stakeholder_data_item.model_plural'))

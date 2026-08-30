@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Filament\Forms;
 
+use Filament\Schemas\Components\Utilities\Get;
 use App\Filament\Forms\GebDpiaQuestionnaire;
-use Filament\Forms\Get;
 use Mockery;
 
 use function expect;

@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Tests\Helpers;
 
+use Filament\Schemas\Schema;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 
 class FilamentTestHelper
 {
-    public static function createTestForm(?HasForms $component = null): Form
+    public static function createTestForm(?HasForms $component = null): Schema
     {
         if ($component === null) {
             $component = LivewireTestHelper::createTestFormComponent();
         }
 
-        return Form::make($component);
+        return Schema::make($component);
     }
 }

@@ -195,7 +195,7 @@ it('takes the user global roles into account when resolving permissions in an or
     $user->globalRoles()->create(['role' => Role::FUNCTIONAL_MANAGER]);
     $user->organisationRoles()->create(['organisation_id' => $organisation->id, 'role' => Role::CHIEF_PRIVACY_OFFICER]);
 
-    $authorized = app(App\Services\CrossOrgAuthorization::class)->userHasPermissionInOrganisation(
+    $authorized = app(CrossOrgAuthorization::class)->userHasPermissionInOrganisation(
         $user,
         $organisation,
         Permission::CORE_ENTITY_IMPORT,

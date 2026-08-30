@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
+use Filament\Schemas\Components\Section;
 use App\Documentation\FieldDescriber;
 use Filament\Forms\Components\Radio;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 
 beforeEach(function (): void {

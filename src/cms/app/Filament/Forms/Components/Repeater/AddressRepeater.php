@@ -12,7 +12,7 @@ use function __;
 
 class AddressRepeater extends Repeater
 {
-    public static function make(string $name = 'address'): static
+    public static function make(?string $name = 'address'): static
     {
         return parent::make($name)
             ->label(__('address.model_plural'))
