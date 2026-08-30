@@ -7,20 +7,17 @@ namespace App\Filament\Resources\DpiaRecordResource\Pages;
 use App\Filament\Actions\CloneAction;
 use App\Filament\Actions\CreateSnapshotAction;
 use App\Filament\Actions\ToggleRegisterLayoutAction;
-use App\Filament\Forms\DraftableForm;
 use App\Filament\Notifications\DpiaQualityNotification;
+use App\Filament\Pages\ConceptEditRecord;
 use App\Filament\Resources\DpiaRecordResource;
 use App\Models\Dpia\DpiaRecord;
 use App\Services\Dpia\DpiaMeasureRiskLinker;
-use App\Services\Snapshot\DraftSave;
 use Filament\Actions\DeleteAction;
-use Filament\Forms\Form;
-use Filament\Resources\Pages\EditRecord;
 use Illuminate\Contracts\Support\Arrayable;
 
 use function app;
 
-class EditDpiaRecord extends EditRecord
+class EditDpiaRecord extends ConceptEditRecord
 {
     protected static string $resource = DpiaRecordResource::class;
 
@@ -57,16 +54,7 @@ class EditDpiaRecord extends EditRecord
         $rawState = $this->form->getRawState();
         $this->riskSelectionState = $rawState instanceof Arrayable ? $rawState->toArray() : $rawState;
 
-        // A DPIA in progress may be saved half-finished; required fields are enforced
-        // when a version is created instead. See DraftableForm.
-        DraftSave::whileSavingDraft(function () use ($shouldRedirect, $shouldSendSavedNotification): void {
-            parent::save($shouldRedirect, $shouldSendSavedNotification);
-        });
-    }
-
-    protected function makeForm(): Form
-    {
-        return DraftableForm::make($this);
+        parent::save($shouldRedirect, $shouldSendSavedNotification);
     }
 
     /**

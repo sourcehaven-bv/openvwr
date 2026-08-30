@@ -7,6 +7,7 @@ namespace App\Filament\Forms;
 use App\Services\Snapshot\DraftSave;
 use Filament\Forms\Form;
 
+use function array_filter;
 use function array_values;
 use function is_string;
 
@@ -32,14 +33,14 @@ class DraftableForm extends Form
     {
         $rules = parent::getValidationRules();
 
-        if (! DraftSave::isSavingDraft()) {
+        if (!DraftSave::isSavingDraft()) {
             return $rules;
         }
 
         foreach ($rules as $statePath => $componentRules) {
             $rules[$statePath] = array_values(array_filter(
                 $componentRules,
-                static fn (mixed $rule): bool => ! is_string($rule) || $rule !== 'required',
+                static fn (mixed $rule): bool => !is_string($rule) || $rule !== 'required',
             ));
         }
 

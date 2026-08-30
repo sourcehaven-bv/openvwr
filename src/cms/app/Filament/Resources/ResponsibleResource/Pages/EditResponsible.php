@@ -5,15 +5,12 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ResponsibleResource\Pages;
 
 use App\Filament\Actions\CreateSnapshotAction;
-use App\Filament\Pages\Concerns\SavesConceptWithoutRequiredFields;
+use App\Filament\Pages\ConceptEditRecord;
 use App\Filament\Resources\ResponsibleResource;
 use Filament\Actions\DeleteAction;
-use Filament\Resources\Pages\EditRecord;
 
-class EditResponsible extends EditRecord
+class EditResponsible extends ConceptEditRecord
 {
-    use SavesConceptWithoutRequiredFields;
-
     protected static string $resource = ResponsibleResource::class;
 
     protected function getHeaderActions(): array

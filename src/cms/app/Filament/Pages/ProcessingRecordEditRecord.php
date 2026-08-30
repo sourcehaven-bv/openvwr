@@ -4,19 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
-use App\Filament\Pages\Concerns\SavesConceptWithoutRequiredFields;
 use App\Filament\Widgets\FgRemarksWidget;
 use App\Models\Contracts\EntityNumerable;
 use App\Models\Contracts\SnapshotSource;
-use Filament\Resources\Pages\EditRecord;
 use Webmozart\Assert\Assert;
 
 use function sprintf;
 
-class ProcessingRecordEditRecord extends EditRecord
+class ProcessingRecordEditRecord extends ConceptEditRecord
 {
-    use SavesConceptWithoutRequiredFields;
-
     protected function getHeaderWidgets(): array
     {
         return [

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Filament\Pages\Concerns;
+namespace App\Filament\Pages;
 
 use App\Filament\Forms\DraftableForm;
 use App\Services\Snapshot\DraftSave;
@@ -10,11 +10,12 @@ use Filament\Forms\Components\Field;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Resources\Pages\EditRecord;
 
 use function array_key_exists;
 
 /**
- * Lets a record be saved as a concept even when required fields are still empty.
+ * An edit page whose record may be saved as a concept, even half-finished.
  *
  * The tester feedback this addresses: stepping through the wizard with `->skippable()`
  * never complains, but pressing save suddenly reports required fields — often on steps
@@ -22,7 +23,7 @@ use function array_key_exists;
  * (docs/handleiding/02_registers.md), so save no longer enforces required fields.
  * They are enforced when a version (snapshot) is created instead.
  */
-trait SavesConceptWithoutRequiredFields
+abstract class ConceptEditRecord extends EditRecord
 {
     protected function makeForm(): Form
     {
@@ -56,7 +57,7 @@ trait SavesConceptWithoutRequiredFields
         $data = parent::mutateFormDataBeforeSave($data);
 
         foreach ($this->form->getFlatFields() as $statePath => $field) {
-            if (! $this->storesEmptyStringWhenCleared($field)) {
+            if (!$this->storesEmptyStringWhenCleared($field)) {
                 continue;
             }
 
