@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Forms\Components;
 
 use App\Config\Config;
+use App\Config\Feature;
 use App\Facades\Authentication;
 use App\Filament\Forms\Components\DatePicker\DateTimePicker;
 use App\Services\DateFormatService;
@@ -42,6 +43,7 @@ class PublicFromField extends DateTimePicker
 
                         $set('public_from', $publicFromNow);
                     }),
-            );
+            )
+            ->visible(Feature::publishingEnabled());
     }
 }

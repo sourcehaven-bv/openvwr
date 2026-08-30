@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Config\Feature;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\Resources\PublicWebsiteTreeResource\Pages\ListPublicWebsiteTrees;
 use App\Filament\Resources\PublicWebsiteTreeResource\PublicWebsiteTreeResourceForm;
@@ -24,6 +25,11 @@ class PublicWebsiteTreeResource extends Resource
     public static function getNavigationGroup(): ?string
     {
         return __(NavigationGroup::FUNCTIONAL_MANAGEMENT->value);
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return Feature::publishingEnabled();
     }
 
     public static function form(Form $form): Form

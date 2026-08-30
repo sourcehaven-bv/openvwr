@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 
+use App\Config\Feature;
 use App\Filament\Forms\GebDpiaQuestionnaire;
 use App\Filament\Infolists\Components\AvgGoalsRepeatableEntry;
 use App\Filament\Infolists\Components\CheckboxEntry;
@@ -351,6 +352,10 @@ class AvgResponsibleProcessingRecordResourceInfolistSchemas
      */
     public static function getPublish(): array
     {
+        if (!Feature::publishingEnabled()) {
+            return [];
+        }
+
         return [
             DateTimeEntry::make('public_from')
                 ->label(__('general.public_from')),
