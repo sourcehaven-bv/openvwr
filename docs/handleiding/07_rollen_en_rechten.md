@@ -14,6 +14,8 @@ Het portaal kent de volgende rollen:
 - Raadpleger
 - Functionaris Gegevensbescherming
 
+Niet elke organisatie gebruikt alle rollen. Welke rollen bij u in gebruik zijn, hangt af van de manier waarop uw organisatie het beheer van het register heeft ingericht. Rollen die uw organisatie niet toekent, komt u in de praktijk dan ook niet tegen.
+
 ## Chief Privacy Officer
 
 De Chief Privacy Officer is het aanspreekpunt voor toegang tot het portaal binnen de organisatie. Deze rol heeft de meeste rechten.
