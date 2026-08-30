@@ -7,8 +7,7 @@ namespace App\Filament\Forms;
 use App\Filament\Pages\Contracts\SavesConcepts;
 use Filament\Forms\Form;
 
-use function array_filter;
-use function array_values;
+use function array_map;
 use function is_string;
 
 /**
@@ -20,11 +19,19 @@ use function is_string;
  * process and must be complete.
  *
  * The `->required()` declarations in the form schemas remain untouched and stay the
- * single source of truth. Only the resulting `required` rule is dropped; every other
- * rule (maxLength, regex, date comparisons, …) still applies, so a concept can never
- * be saved with genuinely invalid data.
+ * single source of truth. Only the resulting `required` rule is relaxed; every other
+ * rule (maxLength, regex, date comparisons, …) still applies to a value that was
+ * filled in, so a concept can never be saved with genuinely invalid data.
  *
- * Whether to drop it is read from the owning page rather than from global state, so
+ * The rule becomes `nullable` rather than disappearing, which is exactly what Filament
+ * emits for a field that is not required (see
+ * {@see \Filament\Forms\Components\Concerns\CanBeValidated::getRequiredValidationRule()}).
+ * Merely dropping it would leave rules such as the `in` of a lookup select running
+ * against the null of an empty field, so an untouched select would still refuse to
+ * store a concept. `nullable` makes Laravel skip those rules while the field is empty,
+ * which is the whole point: what has not been filled in yet is not yet judged.
+ *
+ * Whether to relax it is read from the owning page rather than from global state, so
  * there is no flag that can leak across requests.
  */
 class DraftableForm extends Form
@@ -41,10 +48,10 @@ class DraftableForm extends Form
         }
 
         foreach ($rules as $statePath => $componentRules) {
-            $rules[$statePath] = array_values(array_filter(
+            $rules[$statePath] = array_map(
+                static fn (mixed $rule): mixed => is_string($rule) && $rule === 'required' ? 'nullable' : $rule,
                 $componentRules,
-                static fn (mixed $rule): bool => !is_string($rule) || $rule !== 'required',
-            ));
+            );
         }
 
         return $rules;
