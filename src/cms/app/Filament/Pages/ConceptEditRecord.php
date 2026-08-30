@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Filament\Forms\DraftableForm;
-use App\Services\Snapshot\DraftSave;
+use App\Filament\Pages\Contracts\SavesConcepts;
 use Filament\Forms\Components\Field;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -23,18 +23,11 @@ use function array_key_exists;
  * (docs/handleiding/02_registers.md), so save no longer enforces required fields.
  * They are enforced when a version (snapshot) is created instead.
  */
-abstract class ConceptEditRecord extends EditRecord
+abstract class ConceptEditRecord extends EditRecord implements SavesConcepts
 {
     protected function makeForm(): Form
     {
         return DraftableForm::make($this);
-    }
-
-    public function save(bool $shouldRedirect = true, bool $shouldSendSavedNotification = true): void
-    {
-        DraftSave::whileSavingDraft(function () use ($shouldRedirect, $shouldSendSavedNotification): void {
-            parent::save($shouldRedirect, $shouldSendSavedNotification);
-        });
     }
 
     /**

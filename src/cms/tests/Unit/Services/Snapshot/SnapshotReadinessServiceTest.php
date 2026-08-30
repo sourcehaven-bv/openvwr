@@ -5,15 +5,18 @@ declare(strict_types=1);
 namespace Tests\Unit\Services\Snapshot;
 
 use App\Filament\Forms\DraftableForm;
-use App\Services\Snapshot\DraftSave;
+use App\Filament\Pages\Contracts\SavesConcepts;
 use App\Services\Snapshot\SnapshotReadinessService;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Wizard;
 use Filament\Forms\Components\Wizard\Step;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Illuminate\Support\HtmlString;
+use Livewire\Component;
 use Tests\Helpers\LivewireTestHelper;
 use Tests\TestCase;
 
@@ -58,6 +61,25 @@ $readinessForm = static function (array $state = []): Form {
                 ])
                 ->skippable(),
         ]);
+};
+
+/**
+ * A form on a page that saves concepts, so the required rule is dropped.
+ *
+ * @param array<int, mixed> $schema
+ */
+$conceptForm = static function (array $schema): Form {
+    $livewire = new class extends Component implements HasForms, SavesConcepts
+    {
+        use InteractsWithForms;
+
+        /** @var array<string, mixed> */
+        public array $data = [];
+    };
+
+    return DraftableForm::make($livewire)
+        ->statePath('data')
+        ->schema($schema);
 };
 
 it('reports no missing fields when every required field is filled', function () use ($readinessForm): void {
@@ -113,20 +135,17 @@ it('builds a message that names each missing field with its step', function () u
         ->toContain('Verwerkingsdoel');
 });
 
-it('drops the required rule while a concept is being saved', function () use ($readinessForm): void {
-    $form = $readinessForm([]);
+it('drops the required rule on a page that saves concepts', function () use ($conceptForm): void {
+    $form = $conceptForm([
+        TextInput::make('name')
+            ->required(),
+    ]);
 
-    $rulesWhileSavingDraft = DraftSave::whileSavingDraft(
-        static fn (): array => $form->getValidationRules(),
-    );
-
-    expect($rulesWhileSavingDraft['data.name'] ?? [])
-        ->not->toContain('required')
-        ->and($form->getValidationRules()['data.name'] ?? [])
-        ->toContain('required');
+    expect($form->getValidationRules()['data.name'] ?? [])
+        ->not->toContain('required');
 });
 
-it('keeps rules other than required while a concept is being saved', function (): void {
+it('keeps the required rule on a page that does not save concepts', function (): void {
     $livewire = LivewireTestHelper::createTestFormComponent();
     $livewire->data = [];
 
@@ -134,15 +153,21 @@ it('keeps rules other than required while a concept is being saved', function ()
         ->statePath('data')
         ->schema([
             TextInput::make('name')
-                ->required()
-                ->maxLength(10),
+                ->required(),
         ]);
 
-    $rulesWhileSavingDraft = DraftSave::whileSavingDraft(
-        static fn (): array => $form->getValidationRules(),
-    );
+    expect($form->getValidationRules()['data.name'] ?? [])
+        ->toContain('required');
+});
 
-    expect($rulesWhileSavingDraft['data.name'] ?? [])
+it('keeps rules other than required on a page that saves concepts', function () use ($conceptForm): void {
+    $form = $conceptForm([
+        TextInput::make('name')
+            ->required()
+            ->maxLength(10),
+    ]);
+
+    expect($form->getValidationRules()['data.name'] ?? [])
         ->toContain('max:10')
         ->not->toContain('required');
 });

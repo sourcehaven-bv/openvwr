@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms;
 
-use App\Services\Snapshot\DraftSave;
+use App\Filament\Pages\Contracts\SavesConcepts;
 use Filament\Forms\Form;
 
 use function array_filter;
@@ -12,7 +12,7 @@ use function array_values;
 use function is_string;
 
 /**
- * A form that does not enforce required fields while a concept is being saved.
+ * A form that does not enforce required fields on pages which save concepts.
  *
  * Saving a half-finished record is a deliberate feature: a user may fill in what they
  * know, save, and continue later. Required fields are enforced when a version
@@ -20,9 +20,12 @@ use function is_string;
  * process and must be complete.
  *
  * The `->required()` declarations in the form schemas remain untouched and stay the
- * single source of truth. This only drops the resulting `required` rule for the
- * duration of a draft save; every other rule (maxLength, regex, date comparisons, …)
- * still applies, so a concept can never be saved with genuinely invalid data.
+ * single source of truth. Only the resulting `required` rule is dropped; every other
+ * rule (maxLength, regex, date comparisons, …) still applies, so a concept can never
+ * be saved with genuinely invalid data.
+ *
+ * Whether to drop it is read from the owning page rather than from global state, so
+ * there is no flag that can leak across requests.
  */
 class DraftableForm extends Form
 {
@@ -33,7 +36,7 @@ class DraftableForm extends Form
     {
         $rules = parent::getValidationRules();
 
-        if (!DraftSave::isSavingDraft()) {
+        if (!$this->getLivewire() instanceof SavesConcepts) {
             return $rules;
         }
 
