@@ -9,4 +9,7 @@ declare(strict_types=1);
 return [
     // publishing records to the public static website
     'publishing' => env('FEATURE_PUBLISHING', true),
+
+    // the WPG register ("WPG verantwoordelijke") and its lookup list
+    'wpg' => env('FEATURE_WPG', true),
 ];

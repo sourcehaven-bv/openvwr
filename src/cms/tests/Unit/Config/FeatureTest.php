@@ -26,3 +26,16 @@ it('reports the configured publishing flag', function (bool $enabled): void {
     'on' => true,
     'off' => false,
 ]);
+
+it('enables wpg by default so existing deployments are unaffected', function (): void {
+    expect(Feature::wpgEnabled())->toBeTrue();
+});
+
+it('reports the configured wpg flag', function (bool $enabled): void {
+    config()->set('features.wpg', $enabled);
+
+    expect(Feature::wpgEnabled())->toBe($enabled);
+})->with([
+    'on' => true,
+    'off' => false,
+]);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DataBreachRecord;
 
+use App\Config\Feature;
 use App\Filament\Forms\Components\CheckboxList;
 use App\Filament\Forms\Components\DatePicker\DatePicker;
 use App\Filament\Forms\Components\RelationTable;
@@ -406,7 +407,8 @@ class DataBreachRecordResourceFormSchemas
                 ->label(__('wpg_processing_record.model_plural'))
                 ->relationship('wpgProcessingRecords', 'name', TenantScoped::getAsClosure())
                 ->rules([CurrentOrganisation::forModel(WpgProcessingRecord::class)])
-                ->multiple(),
+                ->multiple()
+                ->visible(Feature::wpgEnabled()),
         ];
     }
 

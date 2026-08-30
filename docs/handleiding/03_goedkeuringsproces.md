@@ -3,17 +3,17 @@
 Het portaal ondersteunt het goedkeuringsproces van verwerkingen middels overzichten en automatisering:
 
 - het aanmaken van versies en het aanpassen van de status van een versie
-- het ophalen van een akkoord bij Mandaathouders op een goedgekeurde versie
-- het vaststellen van versies met een akkoord
+- het eventueel ophalen van een akkoord bij Mandaathouders op een goedgekeurde versie
+- het vaststellen van versies
 - overzichten van openstaande acties
 
-Dit hoofdstuk beschrijft stap voor stap het goedkeuringsproces voor iedereen betrokken.
+Dit hoofdstuk beschrijft stap voor stap het goedkeuringsproces voor iedereen betrokken. Welke stappen uw organisatie daadwerkelijk doorloopt, en welke rollen daarbij betrokken zijn, hangt af van de manier waarop uw organisatie het proces heeft ingericht. Werkt uw organisatie bijvoorbeeld niet met Mandaathouders, dan slaat u het ophalen van een akkoord over en stelt een Privacy Officer de versie zelf vast.
 
 Een versie heeft altijd een status uit de volgende lijst:
 
-1. \textcolor{blue}{"In Review"}: Deze versie is ingediend door een Invoerder en moet nog beoordeeld worden door een Privacy Officer
-2. \textcolor{orange}{"Goedgekeurd"}: Deze versie is goedgekeurd door een Privacy Officer en mag worden aangeboden aan Mandaathouders voor akkoord.
-3. \textcolor{green}{"Vastgesteld"}: Deze versie heeft goedkeuring van een mandaathouder gekregen en is daarmee vastgesteld.
+1. \textcolor{blue}{"In Review"}: Deze versie is ingediend en moet nog beoordeeld worden door een Privacy Officer
+2. \textcolor{orange}{"Goedgekeurd"}: Deze versie is goedgekeurd door een Privacy Officer en kan worden vastgesteld, eventueel nadat Mandaathouders akkoord hebben gegeven.
+3. \textcolor{green}{"Vastgesteld"}: Deze versie is vastgesteld en geldt daarmee als de geldende versie.
 4. \textcolor{gray}{"Vervallen"}: Deze versie is komen te vervallen, mogelijk omdat een nieuwere versie is aangemaakt die dezelfde status heeft verkregen.
 
 ## Versie aanmaken en Mandaathouders koppelen
@@ -38,7 +38,7 @@ De knop "Mandaathouders toevoegen" toont een lijst met Mandaathouders: deze zijn
 
 ![Mandaathouder toevoegen\label{fig:ondertekeningen_mandaathouder}](./imgs/03_goedkeuringsproces/04_snapshots_mandaathouder.png)
 
-> **Hint**: Privacy Officers krijgen automatisch een e-mail als er een nieuwe versie is aangemaakt. Wie die e-mails niet wil ontvangen, zet ze uit op de eigen profielpagina (zie \ref{sec:notificaties}). Wil je één specifieke versie onder de aandacht brengen, gebruik dan de "Ondertekeningen" hieronder: dat legt het verzoek vast in het portaal in plaats van alleen in iemands mailbox.
+> **Hint**: Privacy Officers krijgen automatisch een e-mail als er een nieuwe versie is aangemaakt. Wilt u die e-mails niet ontvangen, dan zet u ze uit op uw eigen profielpagina (zie \ref{sec:notificaties}). Wilt u één specifieke versie onder de aandacht brengen, gebruik dan de "Ondertekeningen" hieronder: dat legt het verzoek vast in het portaal in plaats van alleen in iemands mailbox.
 
 > **Let op**: Is eenmaal een versie aangemaakt, dan is de inhoud van deze versie niet meer aanpasbaar: slechts de status van een versie kan nog aangepast worden door een Privacy Officer. Indien er op een vastgestelde versie van een entiteit wijzigingen moeten worden aangebracht, dan is het de bedoeling dat de wijzigingen worden doorgevoerd in het formulier, de wijzigingen worden opgeslagen en er vervolgens een *nieuwe* versie wordt aangemaakt die door het goedkeuringsproces wordt geleid.
 
@@ -46,7 +46,7 @@ De knop "Mandaathouders toevoegen" toont een lijst met Mandaathouders: deze zijn
 
 **Beschikbaar voor**: (Chief) Privacy Officer
 
-Het goedkeuren van een versie kan op de detailpagina van de desbetreffende versie. Een Privacy Officer keurt een versie goed als deze correct is opgesteld, er op korte termijn geen nieuwe versies verwacht worden en de versie in die context aangeboden mag worden aan Mandaathouders voor een akkoord.
+Het goedkeuren van een versie kan op de detailpagina van de desbetreffende versie. Een Privacy Officer keurt een versie goed als deze correct is opgesteld en er op korte termijn geen nieuwe versies verwacht worden. Werkt uw organisatie met Mandaathouders, dan betekent goedkeuring bovendien dat de versie in die context aan hen mag worden aangeboden voor een akkoord.
 
 Er is een overicht van alle versies te vinden in het navigatiemenu links (Figuur \ref{fig:versie_overzicht}). Deze tabel geeft een overzicht van alle versies en is te sorteren en filteren op *Entiteit-type*, *Naam versie*, *Versienummer* en *Status*.
 
@@ -54,13 +54,15 @@ De filter kan ingesteld worden rechtsboven in de tabel (Figuur \ref{fig:versie_o
 
 ![Versie overzicht\label{fig:versie_overzicht}](./imgs/03_goedkeuringsproces/05_organisation-snapshots.png)
 
-> **Hint**: Dit overzicht kan gebruikt worden als To Do lijst. Filter op alle versies die de status "In review" hebben: dit geeft een overzicht van alle nieuwe versies die zijn aangemaakt waar een Invoerder een goedkeuring op wil hebben.
+> **Hint**: Dit overzicht kan gebruikt worden als To Do lijst. Filter op alle versies die de status "In review" hebben: dit geeft een overzicht van alle nieuw aangemaakte versies waarop nog een goedkeuring wordt verwacht.
 
-Is eenmaal een versie geselecteerd, dan kan een versie met de status "In review" goedgekeurd worden met de knop "Goedkeuren" rechtsbovenin het scherm. Dit geeft aan dat deze versie is goedgekeurd door een Privacy Officer en mag worden aangeboden aan Mandaathouders voor akkoord.
+Is eenmaal een versie geselecteerd, dan kan een versie met de status "In review" goedgekeurd worden met de knop "Goedkeuren" rechtsbovenin het scherm. Dit geeft aan dat deze versie is goedgekeurd door een Privacy Officer en kan worden vastgesteld, eventueel eerst nog ter akkoord aan Mandaathouders.
 
 ## Akkoord geven
 
 **Beschikbaar voor**: Mandaathouder
+
+Deze stap is alleen aan de orde als uw organisatie met Mandaathouders werkt en er Mandaathouders aan de versie zijn gekoppeld.
 
 ![Akkoord geven\label{fig:akkoord_geven}](./imgs/03_goedkeuringsproces/07_personal-snapshot-approvals_akkoord_geven.png)
 
@@ -74,4 +76,4 @@ Een Mandaathouder kan akkoord geven op een versie door op de versie detailpagina
 
 Deze stap is identiek aan Sectie \ref{sec:goedkeuren} "Goedkeuren", met als enige verschil dat het hier "Vaststellen" betreft.
 
-> **Hint**: Ook hier kan het overzicht gebruikt worden als To Do lijst. Filter op alle versies die de status "Goedgekeurd" hebben: kijk in de tabel of er al versies zijn met genoeg ondertekeningen om vastgesteld te worden.
+> **Hint**: Ook hier kan het overzicht gebruikt worden als To Do lijst. Filter op alle versies die de status "Goedgekeurd" hebben: kijk in de tabel welke versies vastgesteld kunnen worden, en - als u met Mandaathouders werkt - of er al genoeg ondertekeningen zijn.
