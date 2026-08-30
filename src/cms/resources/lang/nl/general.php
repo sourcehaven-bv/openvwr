@@ -45,8 +45,9 @@ return [
     'parent' => 'Hoofdverwerking',
     'parent_hint_icon_text' => 'Indien deze verwerking een subverwerking is van een hoofdverwerking kunt u de hoofdverwerking hier aangeven. Bij de hoofdverwerking zijn alle subverwerkingen te vinden in de tabel "Subverwerkingen".',
     'parent_help' => 'Alleen invullen als deze verwerking onderdeel is van een grotere '
-        . 'verwerking. Kies dan de overkoepelende verwerking; deze verschijnt daar '
-        . 'in de tabel "Subverwerkingen". Laat leeg voor een zelfstandige verwerking.',
+        . 'verwerking. Kies dan de overkoepelende verwerking; deze verwerking wordt '
+        . 'vervolgens weergegeven in de tabel "Subverwerkingen" van die verwerking. '
+        . 'Laat leeg voor een zelfstandige verwerking.',
     'child' => 'Subverwerking',
     'children' => 'Subverwerkingen',
     'children_help' => 'De verwerkingen die onder deze verwerking vallen. Alleen '
