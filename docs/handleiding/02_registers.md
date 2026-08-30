@@ -21,7 +21,7 @@ Als u op een verwerking klikt, of op de knop "Verwerking aanmaken", komt u op he
 
 Op deze pagina zijn alle gegevens van een verwerking in te voeren en kunnen relaties gelegd worden tussen andere verwerkingen. Aan de rechterkant is een navigatiemenu voor de verschillende domeinen van gegevensinvoer.
 
-> **Hint**: U kunt een verwerking opslaan zonder dat alle informatie is ingevoerd. Als een verwerking eenmaal klaar is voor het goedkeuringsproces kunt u een versie aanmaken die via dat proces vastgesteld kan worden, afhankelijk van de inrichting bij uw organisatie eventueel nadat Mandaathouders akkoord hebben gegeven. Voor meer informatie: zie Hoofdstuk \ref{Goedkeuringsproces}, "Goedkeuringsproces".
+> **Hint**: U kunt een verwerking opslaan zonder dat alle informatie is ingevoerd. Verplichte velden worden pas gecontroleerd op het moment dat u een versie aanmaakt; ontbreekt er dan nog iets, dan ziet u welke velden dat zijn en bij welke stap ze horen. Als een verwerking eenmaal klaar is voor het goedkeuringsproces kunt u een versie aanmaken die via dat proces vastgesteld kan worden, afhankelijk van de inrichting bij uw organisatie eventueel nadat Mandaathouders akkoord hebben gegeven. Voor meer informatie: zie Hoofdstuk \ref{Goedkeuringsproces}, "Goedkeuringsproces".
 
 Eenmaal opgeslagen in het systeem zullen relaties met andere entiteiten zichtbaar zijn in de tabellen onderaan in het scherm. Hiermee kunt u snel navigeren naar de gerelateerde entiteiten.
 

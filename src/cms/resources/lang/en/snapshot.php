@@ -12,6 +12,10 @@ return [
     'create' => 'Create version',
     'created' => 'Version created',
     'unsaved_changes' => 'Version not created, there are still unsaved changes',
+    'incomplete' => 'Version not created, required fields are still missing',
+    'incomplete_step' => 'step :step',
+    'incomplete_and_more' => 'and :count more required fields.',
+    'not_ready_help' => 'Required fields are still missing. You can still save the processing activity as a concept.',
 
     'compare' => 'Compare',
     'compare_title' => 'Compare versions: :name',

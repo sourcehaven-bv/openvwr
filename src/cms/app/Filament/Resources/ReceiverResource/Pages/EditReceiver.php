@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ReceiverResource\Pages;
 
 use App\Filament\Actions\CreateSnapshotAction;
+use App\Filament\Pages\ConceptEditRecord;
 use App\Filament\Resources\ReceiverResource;
 use Filament\Actions\DeleteAction;
-use Filament\Resources\Pages\EditRecord;
 
-class EditReceiver extends EditRecord
+class EditReceiver extends ConceptEditRecord
 {
     protected static string $resource = ReceiverResource::class;
 

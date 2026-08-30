@@ -12,6 +12,10 @@ return [
     'create' => 'Versie aanmaken',
     'created' => 'Versie aangemaakt',
     'unsaved_changes' => 'Versie niet aangemaakt, er zijn nog niet opgeslagen wijzigingen',
+    'incomplete' => 'Versie niet aangemaakt, er ontbreken nog verplichte velden',
+    'incomplete_step' => 'stap :step',
+    'incomplete_and_more' => 'en nog :count andere verplichte velden.',
+    'not_ready_help' => 'Er ontbreken nog verplichte velden. U kunt de verwerking wel opslaan als concept.',
 
     'compare' => 'Vergelijken',
     'compare_title' => 'Versies vergelijken: :name',

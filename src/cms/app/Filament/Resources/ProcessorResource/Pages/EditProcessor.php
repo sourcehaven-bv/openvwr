@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ProcessorResource\Pages;
 
 use App\Filament\Actions\CreateSnapshotAction;
+use App\Filament\Pages\ConceptEditRecord;
 use App\Filament\Resources\ProcessorResource;
 use Filament\Actions\DeleteAction;
-use Filament\Resources\Pages\EditRecord;
 
-class EditProcessor extends EditRecord
+class EditProcessor extends ConceptEditRecord
 {
     protected static string $resource = ProcessorResource::class;
 
