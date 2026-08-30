@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SnapshotResource\Pages;
 
+use App\Config\Feature;
 use App\Enums\Authorization\Permission;
 use App\Enums\Snapshot\SnapshotDataSection;
 use App\Facades\Authorization;
@@ -167,20 +168,30 @@ class CompareSnapshots extends Page
             return [];
         }
 
-        return [
-            SnapshotDataSection::PUBLIC->value => $this->diffSection(
+        $diffs = [];
+
+        // Without publishing there is no public part to compare. Snapshots
+        // taken before the flag was switched off still carry stored public
+        // markdown, so diffing it anyway would report the public part
+        // vanishing -- a change in what we render, not in the registration.
+        if (Feature::publishingEnabled()) {
+            $diffs[SnapshotDataSection::PUBLIC->value] = $this->diffSection(
                 $from->snapshotData?->public_markdown,
                 $to->snapshotData?->public_markdown,
-            ),
-            SnapshotDataSection::PRIVATE->value => $this->diffSection(
-                $from->snapshotData?->private_markdown,
-                $to->snapshotData?->private_markdown,
-            ),
-            self::RELATED_SECTION => $this->diffText(
-                $this->relatedSourcesText($from),
-                $this->relatedSourcesText($to),
-            ),
-        ];
+            );
+        }
+
+        $diffs[SnapshotDataSection::PRIVATE->value] = $this->diffSection(
+            $from->snapshotData?->private_markdown,
+            $to->snapshotData?->private_markdown,
+        );
+
+        $diffs[self::RELATED_SECTION] = $this->diffText(
+            $this->relatedSourcesText($from),
+            $this->relatedSourcesText($to),
+        );
+
+        return $diffs;
     }
 
     /**
@@ -190,9 +201,18 @@ class CompareSnapshots extends Page
      */
     public function getDiffHeading(string $section): string
     {
-        return $section === self::RELATED_SECTION
-            ? __(sprintf('snapshot.%s', self::RELATED_SECTION))
-            : __(sprintf('snapshot.%s_data', $section));
+        if ($section === self::RELATED_SECTION) {
+            return __(sprintf('snapshot.%s', self::RELATED_SECTION));
+        }
+
+        // Without publishing the private part is the only part, so it is
+        // simply "the data" instead of "the private data" -- the same wording
+        // the snapshot info tab uses.
+        if ($section === SnapshotDataSection::PRIVATE->value && !Feature::publishingEnabled()) {
+            return __('snapshot.data');
+        }
+
+        return __(sprintf('snapshot.%s_data', $section));
     }
 
     /**
