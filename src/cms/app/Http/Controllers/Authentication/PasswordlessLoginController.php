@@ -15,7 +15,6 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\Factory;
-use Throwable;
 
 use function auth;
 use function is_string;
@@ -33,9 +32,9 @@ class PasswordlessLoginController extends Controller
     {
         try {
             $this->getValidUserLoginToken($request);
-        } catch (Throwable $throwable) {
+        } catch (PasswordlessLoginException $exception) {
             Notification::make()
-                ->title($throwable->getMessage())
+                ->title($exception->getTranslatedMessage())
                 ->danger()
                 ->send();
 
@@ -53,9 +52,9 @@ class PasswordlessLoginController extends Controller
     {
         try {
             $userLoginToken = $this->getValidUserLoginToken($request);
-        } catch (Throwable $throwable) {
+        } catch (PasswordlessLoginException $exception) {
             Notification::make()
-                ->title($throwable->getMessage())
+                ->title($exception->getTranslatedMessage())
                 ->danger()
                 ->send();
 
@@ -82,7 +81,7 @@ class PasswordlessLoginController extends Controller
 
         if (!is_string($token)) {
             $this->auditLogger->register(AuthenticationFailedEvent::invalidToken());
-            throw new PasswordlessLoginException('invalid token');
+            throw PasswordlessLoginException::invalidToken();
         }
 
         $userLoginToken = UserLoginToken::where(['token' => $token])
@@ -91,13 +90,13 @@ class PasswordlessLoginController extends Controller
 
         if ($userLoginToken === null) {
             $this->auditLogger->register(AuthenticationFailedEvent::noTokenFound());
-            throw new PasswordlessLoginException('no token found');
+            throw PasswordlessLoginException::noTokenFound();
         }
 
         $user = $userLoginToken->user;
         if ($user->organisations->isEmpty()) {
             $this->auditLogger->register(AuthenticationFailedEvent::noOrganisationFound());
-            throw new PasswordlessLoginException('no organisation found');
+            throw PasswordlessLoginException::noOrganisationFound();
         }
 
         return $userLoginToken;
