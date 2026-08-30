@@ -24,7 +24,8 @@ use function is_string;
  * filled in, so a concept can never be saved with genuinely invalid data.
  *
  * The rule becomes `nullable` rather than disappearing, which is exactly what Filament
- * emits for a field that is not required ({@see CanBeValidated::getRequiredValidationRule()}).
+ * emits for a field that is not required (see
+ * {@see \Filament\Forms\Components\Concerns\CanBeValidated::getRequiredValidationRule()}).
  * Merely dropping it would leave rules such as the `in` of a lookup select running
  * against the null of an empty field, so an untouched select would still refuse to
  * store a concept. `nullable` makes Laravel skip those rules while the field is empty,
