@@ -9,6 +9,10 @@ return [
     'passwordless_login_button_text' => 'Login',
     'email_sent' => 'Email sent',
 
+    'login_link_expired' => 'This login link has expired. Request a new login email to log in.',
+    'login_link_invalid' => 'This login link is not valid. Request a new login email to log in.',
+    'login_no_organisation' => 'Your account is not linked to an organisation yet. Please contact your administrator.',
+
     'snapshot_sign_subject' => 'Login link',
     'snapshot_sign_login_text' => 'Hello :userName, click the button below to gain access to OpenVWR',
     'snapshot_sign_login_button_text' => 'Go to OpenVWR',

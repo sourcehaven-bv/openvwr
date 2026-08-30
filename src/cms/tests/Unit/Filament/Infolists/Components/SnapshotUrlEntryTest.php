@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Tests\Unit\Filament\Infolists\Components;
 
 use App\Filament\Infolists\Components\SnapshotUrlEntry;
+use App\Models\Contracts\Publishable;
 use App\Models\Snapshot;
 use Closure;
 use Illuminate\Support\Facades\Config;
+use Mockery;
 use ReflectionProperty;
 use Tests\TestCase;
 
@@ -40,3 +42,21 @@ it('falls back to the publication state when publishing is enabled', function ()
 
     expect($isVisible(new Snapshot()))->toBeFalse();
 });
+
+it('follows the publishable source when publishing is enabled', function (bool $published): void {
+    Config::set('features.publishing', true);
+
+    $source = Mockery::mock(Publishable::class);
+    $source->shouldReceive('isPublished')->andReturn($published);
+
+    $snapshot = new Snapshot();
+    $snapshot->setRelation('snapshotSource', $source);
+
+    $isVisible = (new ReflectionProperty(SnapshotUrlEntry::class, 'isVisible'))
+        ->getValue(SnapshotUrlEntry::make());
+
+    expect($isVisible($snapshot))->toBe($published);
+})->with([
+    'published' => true,
+    'not published' => false,
+]);

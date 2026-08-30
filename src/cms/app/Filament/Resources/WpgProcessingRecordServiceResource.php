@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Config\Feature;
 use App\Filament\RelationManagers\WpgProcessingRecordRelationManager;
 use App\Filament\Resources\WpgProcessingRecordServiceResource\Pages;
 use App\Models\Wpg\WpgProcessingRecordService;
+use Illuminate\Database\Eloquent\Model;
 
 use function __;
 
@@ -14,6 +16,36 @@ class WpgProcessingRecordServiceResource extends LookupListResource
 {
     protected static ?string $model = WpgProcessingRecordService::class;
     protected static ?int $navigationSort = 4;
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return Feature::wpgEnabled() && parent::shouldRegisterNavigation();
+    }
+
+    /**
+     * Filament checks this before it registers the routes' pages and before it
+     * renders a record page, so switching the feature off also makes the urls
+     * unreachable instead of only hiding the menu entry.
+     */
+    public static function canViewAny(): bool
+    {
+        return Feature::wpgEnabled() && parent::canViewAny();
+    }
+
+    public static function canCreate(): bool
+    {
+        return Feature::wpgEnabled() && parent::canCreate();
+    }
+
+    public static function canView(Model $record): bool
+    {
+        return Feature::wpgEnabled() && parent::canView($record);
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return Feature::wpgEnabled() && parent::canEdit($record);
+    }
 
     public static function getPages(): array
     {

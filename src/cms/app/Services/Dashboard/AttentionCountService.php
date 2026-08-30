@@ -7,6 +7,7 @@ namespace App\Services\Dashboard;
 use App\Collections\DataBreachRecordCollection;
 use App\Collections\SnapshotApprovalCollection;
 use App\Collections\SnapshotCollection;
+use App\Config\Feature;
 use App\Enums\Authorization\Permission;
 use App\Enums\Snapshot\SnapshotApprovalStatus;
 use App\Facades\Authorization;
@@ -268,11 +269,14 @@ readonly class AttentionCountService
      * owns each one so a caller can link back to it, a short label for listing
      * the record among other types, and the tenant-scoped query.
      *
+     * WPG is left out when its feature flag is off: the dashboard would
+     * otherwise count and link to a register the user cannot open.
+     *
      * @return array<int, array{class-string<Resource>, string, Builder<covariant Model>}>
      */
     private function reviewableRegisters(Organisation $organisation): array
     {
-        return [
+        $registers = [
             [
                 AvgResponsibleProcessingRecordResource::class,
                 __('dashboard.type.avg_responsible'),
@@ -283,11 +287,16 @@ readonly class AttentionCountService
                 __('dashboard.type.avg_processor'),
                 $organisation->avgProcessorProcessingRecords()->getQuery(),
             ],
-            [
+        ];
+
+        if (Feature::wpgEnabled()) {
+            $registers[] = [
                 WpgProcessingRecordResource::class,
                 __('dashboard.type.wpg'),
                 $organisation->wpgProcessingRecords()->getQuery(),
-            ],
-        ];
+            ];
+        }
+
+        return $registers;
     }
 }

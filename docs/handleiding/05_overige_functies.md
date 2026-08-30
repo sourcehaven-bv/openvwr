@@ -1,12 +1,12 @@
 # Overige Functies\label{OverigeFuncties}
 
-Het portaal biedt een aantal overige functies zoals het kunnen importeren vanuit het [AVG Register Rijksoverheid](https://www.avgregisterrijksoverheid.nl/) systeem of het exporteren naar sheets voor het maken van overzichten.
+Het portaal biedt een aantal overige functies, zoals het importeren van een bestaand register of het exporteren naar sheets voor het maken van overzichten.
 
 ## Import
 
 **Beschikbaar voor**: (Chief) Privacy Officer
 
-Het [AVG Register Rijksoverheid](https://www.avgregisterrijksoverheid.nl/) biedt de mogelijkheid om exports te maken van verwerkingen. Deze zip-files zijn direct te importeren met de "import" functionaliteit.
+Met de "import" functionaliteit leest u een bestaand register in. Komt uw register uit het [AVG Register Rijksoverheid](https://www.avgregisterrijksoverheid.nl/), dan zijn de zip-files die dat systeem exporteert direct te importeren.
 
 ## Export
 
