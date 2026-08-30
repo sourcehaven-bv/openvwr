@@ -520,12 +520,11 @@ const FIGURES = [
     file: '01_welkom/02_profile_one_time_password.png',
     auth: true,
     // The profile page the OTP gate forces an un-enrolled user onto. Clip to the
-    // two-factor block rather than .fi-main: the profile page also carries the
+    // two-factor block rather than .fi-main: the page also carries the
     // personal-info and settings panels, which would push the card the text
-    // actually describes off the bottom of the figure.
-    // Anchored on the visible heading rather than nth-of-type: reordering the
-    // profile panels then moves the figure with them instead of silently
-    // capturing whichever block happens to sit in that position.
+    // actually describes off the bottom of the figure. Anchored on the visible
+    // heading rather than nth-of-type, so reordering the panels moves the figure
+    // with them instead of silently capturing whichever block sits there.
     clip: '.filament-breezy-grid-section:has(.filament-breezy-grid-title:text-is("Tweefactorauthenticatie"))',
     pad: 16,
     async shoot(page) {
