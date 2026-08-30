@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DocumentResource;
 
+use App\Config\Feature;
 use App\Enums\Authorization\Permission;
 use App\Facades\Authorization;
 use App\Filament\Forms\Components\DatePicker\DatePicker;
@@ -157,7 +158,7 @@ class DocumentResourceForm
                     RelationTableColumns::for(WpgProcessingRecord::class),
                 )
                     ->label(__('wpg_processing_record.model_plural'))
-                    ->visible(Authorization::hasPermission(Permission::CORE_ENTITY_VIEW))
+                    ->visible(Feature::wpgEnabled() && Authorization::hasPermission(Permission::CORE_ENTITY_VIEW))
                     ->columnSpanFull(),
                 RelationTable::makeForRelationship(
                     'algorithm_record_id',

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 
+use App\Config\Feature;
 use App\Documentation\DocNote;
 use App\Filament\Forms\Components\ChildrenRelationTable;
 use App\Filament\Forms\Components\DataLossToggle;
@@ -478,6 +479,10 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
      */
     public static function getPublish(): array
     {
+        if (!Feature::publishingEnabled()) {
+            return [];
+        }
+
         return [
             InformationBlockSection::makeCollapsible(
                 __('information_blocks.avg_responsible_processing_record.step_publish_title'),

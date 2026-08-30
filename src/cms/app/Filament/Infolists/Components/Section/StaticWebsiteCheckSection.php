@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Infolists\Components\Section;
 
+use App\Config\Feature;
 use App\Models\Contracts\Publishable;
 use App\Services\DateFormatService;
 use Filament\Infolists\Components\Component;
@@ -22,7 +23,8 @@ class StaticWebsiteCheckSection extends Section
             ->description(__('static_website.public_from_section.subtitle'))
             ->schema(static function (Publishable $record): array {
                 return self::getSchema($record);
-            });
+            })
+            ->visible(Feature::publishingEnabled());
     }
 
     /**

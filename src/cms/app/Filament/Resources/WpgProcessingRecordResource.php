@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Config\Feature;
 use App\Enums\RegisterLayout;
 use App\Facades\Authentication;
 use App\Filament\NavigationGroups\NavigationGroup;
@@ -16,6 +17,7 @@ use App\Models\Wpg\WpgProcessingRecord;
 use Filament\Forms\Form;
 use Filament\Infolists\Infolist;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 use function __;
 
@@ -29,6 +31,36 @@ class WpgProcessingRecordResource extends Resource
     public static function getNavigationGroup(): ?string
     {
         return __(NavigationGroup::REGISTERS->value);
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return Feature::wpgEnabled() && parent::shouldRegisterNavigation();
+    }
+
+    /**
+     * Filament checks this before it registers the routes' pages and before it
+     * renders a record page, so switching the feature off also makes the urls
+     * unreachable instead of only hiding the menu entry.
+     */
+    public static function canViewAny(): bool
+    {
+        return Feature::wpgEnabled() && parent::canViewAny();
+    }
+
+    public static function canCreate(): bool
+    {
+        return Feature::wpgEnabled() && parent::canCreate();
+    }
+
+    public static function canView(Model $record): bool
+    {
+        return Feature::wpgEnabled() && parent::canView($record);
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return Feature::wpgEnabled() && parent::canEdit($record);
     }
 
     public static function form(Form $form): Form

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Infolists\Components;
 
+use App\Config\Feature;
 use App\Models\Contracts\Publishable;
 use App\Models\Snapshot;
 use Filament\Infolists\Components\TextEntry;
@@ -17,6 +18,10 @@ class SnapshotUrlEntry extends TextEntry
         return parent::make($name)
             ->label(__('snapshot.url'))
             ->visible(static function (Snapshot $snapshot): bool {
+                if (!Feature::publishingEnabled()) {
+                    return false;
+                }
+
                 $snapshotSource = $snapshot->snapshotSource;
                 if ($snapshotSource instanceof Publishable) {
                     return $snapshotSource->isPublished();
