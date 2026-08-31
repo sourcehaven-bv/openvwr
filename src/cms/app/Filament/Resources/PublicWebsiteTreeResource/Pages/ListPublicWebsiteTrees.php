@@ -30,9 +30,14 @@ class ListPublicWebsiteTrees extends TreePage
         ];
     }
 
+    /**
+     * The tree page replaces the resource's own access check, so the feature flag
+     * has to be repeated here: without it the url stays reachable for a tenant
+     * that does not publish, even though the menu entry is already hidden.
+     */
     public static function canAccess(): bool
     {
-        return Gate::allows('update', PublicWebsiteTree::class);
+        return Feature::publishingEnabled() && Gate::allows('update', PublicWebsiteTree::class);
     }
 
     public function getTreeRecordDescription(?Model $record = null): HtmlString
