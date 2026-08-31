@@ -6,8 +6,11 @@ use App\Filament\Pages\DevLogin;
 use App\Filament\Pages\Login;
 use App\Http\Middleware\EnforceOneTimePassword;
 use App\Providers\FilamentServiceProvider;
+use Filament\Facades\Filament;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Panel;
+use Illuminate\Routing\Route;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /*
  * The panel's login page and auth middleware depend on the active driver, and
@@ -56,3 +59,19 @@ it('skips the one-time password gate under the dev driver', function (): void {
         ->toContain(Authenticate::class)
         ->not->toContain(EnforceOneTimePassword::class);
 });
+
+/*
+ * The manual is reached from the user menu, whose url is resolved lazily against
+ * the tenant in the current route. A slug that no longer resolves to an
+ * organisation must abort rather than build a url for a tenant that is not there.
+ */
+it('aborts the manual menu link when the route tenant does not exist', function (): void {
+    $panel = buildPanel('builtin');
+    Filament::setCurrentPanel($panel);
+
+    $route = new Route(['GET'], '/{tenant}/handleiding', static fn (): string => '');
+    $route->parameters = ['tenant' => 'bestaat-niet'];
+    request()->setRouteResolver(static fn (): Route => $route);
+
+    $panel->getUserMenuItems()['manual']->getUrl();
+})->throws(NotFoundHttpException::class);

@@ -6,6 +6,7 @@ use App\Enums\Authorization\Role;
 use App\Filament\Pages\Handleiding;
 use App\Manual\Content\ReferenceContent;
 use App\Manual\Manual;
+use App\Models\User;
 use Tests\Helpers\ConfigTestHelper;
 use Tests\Helpers\Model\OrganisationTestHelper;
 use Tests\Helpers\RoleTestHelper;
@@ -19,6 +20,17 @@ it('loads the page', function (): void {
         ->assertSee(__('general.manual'))
         ->assertSee(__('manual.tasks_heading'))
         ->assertSee(__('manual.reference_heading'));
+});
+
+it('returns 404 when the user has no access to the organisation', function (): void {
+    // The manual's user-menu link resolves the tenant from the route, and aborts
+    // when it cannot: covered here the same way ProfileTest covers the profile link.
+    $organisation = OrganisationTestHelper::create();
+    $user = User::factory()->create();
+
+    $this->asFilamentUser($user)
+        ->get(sprintf('%s/handleiding', $organisation->slug))
+        ->assertNotFound();
 });
 
 it('shows every chapter and topic', function (): void {
