@@ -110,22 +110,17 @@ img {
 }
 
 /*
- * Sized in CSS as well as via width/height attributes on the tag, because the
- * source PNG is rendered at 2x for retina and must not display at that size.
- * The type rules style the alt text, which is what clients that block remote
- * images show in place of the logo.
+ * The brand name sits on a coral underline rather than beside a logo image:
+ * remote images are blocked by default in most mail clients, so anything
+ * image-based leaves the header blank for a large share of recipients.
  */
-.brand-logo {
+.brand-name {
+    border-bottom: 3px solid #f84f39;
     color: #1a202c;
-    display: block;
     font-size: 22px;
     font-weight: bold;
-    height: 48px;
     letter-spacing: -0.01em;
-    line-height: 48px;
-    max-width: 179px;
-    text-align: center;
-    width: 179px;
+    padding-bottom: 6px;
 }
 
 /* Logo */
