@@ -9,7 +9,7 @@
     <div class="mx-auto w-full max-w-5xl space-y-8">
 
         {{-- Search across both layers --}}
-        <div class="space-y-3">
+        <div class="manual-search space-y-3">
             <x-filament::input.wrapper
                 :prefix-icon="'heroicon-m-magnifying-glass'"
                 class="w-full"
@@ -106,11 +106,11 @@
                         <x-slot name="heading">{{ $group['title'] }}</x-slot>
                         <x-slot name="description">{{ $group['summary'] }}</x-slot>
 
-                        <div class="grid gap-4 sm:grid-cols-2">
+                        <div class="manual-grid manual-grid--tasks">
                             @foreach ($group['tasks'] as $task)
                                 @php $capability = $this->capabilityFor($task); @endphp
                                 <a href="#taak-{{ $task->id }}"
-                                   class="block rounded-xl border border-gray-200 p-4 transition hover:border-primary-500 hover:bg-gray-50 dark:border-white/10 dark:hover:border-primary-500 dark:hover:bg-white/5">
+                                   class="manual-card">
                                     <h3 class="font-semibold text-gray-950 dark:text-white">
                                         {{ $task->title }}
                                     </h3>
@@ -234,7 +234,7 @@
                     <x-slot name="heading">{{ __('manual.overview_heading') }}</x-slot>
                     <x-slot name="description">{{ __('manual.overview_intro') }}</x-slot>
 
-                    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <div class="manual-grid manual-grid--chapters">
                         @foreach ($manual->chapters() as $chapter)
                             <div class="space-y-1">
                                 <h3 class="text-sm font-semibold text-gray-950 dark:text-white">
@@ -262,7 +262,7 @@
 
                         <div class="divide-y divide-gray-200 dark:divide-white/10">
                             @foreach ($chapter->topics as $topic)
-                                <article id="{{ $topic->id }}" class="scroll-mt-24 py-6 first:pt-0 last:pb-0">
+                                <article id="{{ $topic->id }}" class="manual-topic py-6 first:pt-0 last:pb-0">
                                     <h3 class="text-lg font-semibold text-gray-950 dark:text-white">
                                         {{ $topic->title }}
                                     </h3>

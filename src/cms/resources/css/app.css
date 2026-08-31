@@ -192,3 +192,64 @@
     background-color: rgb(255 255 255 / 0.1);
     color: rgb(156 163 175);
 }
+
+/* Layout for the manual page.
+   These few rules are plain css rather than utility classes on purpose: the
+   compiled Tailwind bundle is a build artefact that is not rebuilt in every
+   environment, so a layout that depends on newly generated utilities would
+   silently fall back to a single column. The manual styles itself instead. */
+
+.manual-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+    .manual-grid--tasks {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .manual-grid--chapters {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1024px) {
+    .manual-grid--chapters {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+/* Task cards. */
+.manual-card {
+    display: block;
+    border-radius: 0.75rem;
+    border: 1px solid rgb(229 231 235);
+    padding: 1rem;
+    transition: border-color 0.15s, background-color 0.15s;
+}
+
+.manual-card:hover {
+    border-color: rgb(248 79 57);
+    background-color: rgb(249 250 251);
+}
+
+.dark .manual-card {
+    border-color: rgb(255 255 255 / 0.1);
+}
+
+.dark .manual-card:hover {
+    border-color: rgb(248 79 57);
+    background-color: rgb(255 255 255 / 0.05);
+}
+
+/* Anchored topics need room under the sticky Filament topbar. */
+.manual-topic {
+    scroll-margin-top: 6rem;
+}
+
+/* The search box sits above the first heading; give it room of its own. */
+.manual-search {
+    margin-bottom: 0.5rem;
+}
