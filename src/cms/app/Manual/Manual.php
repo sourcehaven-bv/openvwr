@@ -33,8 +33,12 @@ class Manual
     private ?array $tasks = null;
 
     /**
-     * The chapters whose feature flag is on, with their hidden topics removed.
-     * A chapter that keeps no topics at all disappears with them.
+     * The chapters, with any flag-hidden topics removed.
+     *
+     * Every chapter keeps at least one ungated topic, so no chapter can be
+     * emptied by switching a flag off; ManualTest locks that invariant down. If
+     * a future chapter ever consists solely of gated topics, this needs to skip
+     * the empty ones rather than render an empty heading.
      *
      * @return array<Chapter>
      */
@@ -47,13 +51,12 @@ class Manual
         $chapters = [];
 
         foreach (ReferenceContent::chapters() as $chapter) {
-            $topics = $chapter->visibleTopics();
-
-            if ($topics === []) {
-                continue;
-            }
-
-            $chapters[] = new Chapter(id: $chapter->id, title: $chapter->title, summary: $chapter->summary, topics: $topics);
+            $chapters[] = new Chapter(
+                id: $chapter->id,
+                title: $chapter->title,
+                summary: $chapter->summary,
+                topics: $chapter->visibleTopics(),
+            );
         }
 
         return $this->chapters = $chapters;
@@ -75,8 +78,10 @@ class Manual
     }
 
     /**
-     * The visible tasks by group, in the order the groups are defined. Groups
-     * that keep no tasks are left out.
+     * The visible tasks by group, in the order the groups are defined.
+     *
+     * Every group keeps at least one ungated task, so no group can be emptied
+     * by switching a flag off; ManualTest locks that invariant down.
      *
      * @return array<array{title: string, summary: string, tasks: array<Task>}>
      */
@@ -89,10 +94,6 @@ class Manual
                 $this->tasks(),
                 static fn (Task $task): bool => $task->group === $title,
             ));
-
-            if ($tasks === []) {
-                continue;
-            }
 
             $groups[] = ['title' => $title, 'summary' => $summary, 'tasks' => $tasks];
         }

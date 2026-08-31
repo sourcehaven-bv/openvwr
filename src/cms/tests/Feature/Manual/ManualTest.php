@@ -40,11 +40,25 @@ it('drops a gated task when its flag is off', function (): void {
     expect($ids)->not->toContain('verwerking-publiceren');
 });
 
-it('leaves out a task group that keeps no tasks', function (): void {
-    $manual = new Manual();
+it('keeps at least one ungated task in every group, whatever the flags', function (): void {
+    // Manual::taskGroups() renders a group unconditionally, which is only safe
+    // while no group can be emptied by switching a flag off.
+    ConfigTestHelper::set('features.wpg', false);
+    ConfigTestHelper::set('features.publishing', false);
 
-    foreach ($manual->taskGroups() as $group) {
-        expect($group['tasks'])->not->toBeEmpty();
+    foreach ((new Manual())->taskGroups() as $group) {
+        expect($group['tasks'])->not->toBeEmpty($group['title']);
+    }
+});
+
+it('keeps at least one ungated topic in every chapter, whatever the flags', function (): void {
+    // Same invariant for the reference layer: Manual::chapters() renders every
+    // chapter, so none of them may end up without topics.
+    ConfigTestHelper::set('features.wpg', false);
+    ConfigTestHelper::set('features.publishing', false);
+
+    foreach ((new Manual())->chapters() as $chapter) {
+        expect($chapter->topics)->not->toBeEmpty($chapter->title);
     }
 });
 
@@ -223,7 +237,7 @@ it('follows the publishing flag for a gated task', function (): void {
     expect($task->isVisible())->toBeFalse();
 });
 
-it('drops a chapter whose topics are all hidden', function (): void {
+it('reports no visible topics when they are all hidden', function (): void {
     ConfigTestHelper::set('features.wpg', false);
 
     $chapter = new Chapter(
