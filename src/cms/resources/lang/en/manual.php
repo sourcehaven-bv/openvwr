@@ -1,12 +1,13 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * The chrome around the manual. The manual text itself is Dutch only: it
  * describes a Dutch privacy register for Dutch organisations, and a half
  * translated manual would be worse than an untranslated one.
  */
+
+declare(strict_types=1);
+
 return [
     'tasks' => 'Tasks',
     'reference' => 'Reference',

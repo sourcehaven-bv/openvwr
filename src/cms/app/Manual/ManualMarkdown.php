@@ -17,8 +17,8 @@ use function trim;
  * The manual text uses two constructs the plain markdown renderer does not
  * know about, both kept because they read well in the source:
  *
- *   > **Hint**: ...    becomes a styled callout
- *   > **Let op**: ...  becomes a styled warning callout
+ *   > **Hint**: ... becomes a styled callout
+ *   > **Let op**: ... becomes a styled warning callout
  *
  * Figures are written as normal markdown images and get a caption from the
  * alt text. Cross references between topics are plain markdown links to an
@@ -82,11 +82,7 @@ final class ManualMarkdown
 
     private static function callout(string $kind, string $title, string $body, string $label): string
     {
-        $body = (string) preg_replace(
-            '#<strong>' . $label . '</strong>\s*:?\s*#',
-            '',
-            $body,
-        );
+        $body = (string) preg_replace('#<strong>' . $label . '</strong>\s*:?\s*#', '', $body);
 
         return '<div class="manual-callout manual-callout--' . $kind . '">'
             . '<p class="manual-callout__title">' . $title . '</p>'

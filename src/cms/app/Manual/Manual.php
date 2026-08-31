@@ -53,12 +53,7 @@ class Manual
                 continue;
             }
 
-            $chapters[] = new Chapter(
-                id: $chapter->id,
-                title: $chapter->title,
-                summary: $chapter->summary,
-                topics: $topics,
-            );
+            $chapters[] = new Chapter(id: $chapter->id, title: $chapter->title, summary: $chapter->summary, topics: $topics);
         }
 
         return $this->chapters = $chapters;
