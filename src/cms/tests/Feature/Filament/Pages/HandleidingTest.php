@@ -6,55 +6,9 @@ use App\Enums\Authorization\Role;
 use App\Filament\Pages\Handleiding;
 use App\Manual\Content\ReferenceContent;
 use App\Manual\Manual;
-use App\Models\Organisation;
-use App\Models\Principal;
-use App\Models\User;
-use App\Services\Authentication\AuthenticationStrategy;
-use App\Services\AuthenticationService;
-use App\Services\AuthorizationService;
 use Tests\Helpers\ConfigTestHelper;
 use Tests\Helpers\Model\OrganisationTestHelper;
-
-use function count;
-
-/**
- * Act as a user holding exactly these roles.
- *
- * AuthorizationService is readonly and therefore cannot be mocked, so this
- * swaps in a real one built on a strategy that reports fixed roles. That keeps
- * the real permission logic in the test rather than stubbing it out.
- *
- * @param array<Role> $roles
- */
-function actingWithRoles(array $roles): void
-{
-    $strategy = new class ($roles) implements AuthenticationStrategy {
-        /** @param array<Role> $roles */
-        public function __construct(private array $roles)
-        {
-        }
-
-        public function user(): User
-        {
-            throw new RuntimeException('not used');
-        }
-
-        public function organisation(): Organisation
-        {
-            throw new RuntimeException('not used');
-        }
-
-        public function principal(): Principal
-        {
-            return new Principal($this->roles);
-        }
-    };
-
-    app()->instance(
-        AuthorizationService::class,
-        new AuthorizationService(new AuthenticationService($strategy), []),
-    );
-}
+use Tests\Helpers\RoleTestHelper;
 
 it('loads the page', function (): void {
     $organisation = OrganisationTestHelper::create();
@@ -185,7 +139,7 @@ it('tells a user with the role that the task can be performed', function (): voi
     $organisation = OrganisationTestHelper::create();
 
     $this->asFilamentOrganisationUser($organisation);
-    actingWithRoles([Role::INPUT_PROCESSOR]);
+    RoleTestHelper::actAs([Role::INPUT_PROCESSOR]);
 
     $this
         ->get(sprintf('%s/handleiding', $organisation->slug))
@@ -197,7 +151,7 @@ it('tells a read only role that it can only follow along', function (): void {
     $organisation = OrganisationTestHelper::create();
 
     $this->asFilamentOrganisationUser($organisation);
-    actingWithRoles([Role::COUNSELOR]);
+    RoleTestHelper::actAs([Role::COUNSELOR]);
 
     $this
         ->get(sprintf('%s/handleiding', $organisation->slug))
@@ -209,7 +163,7 @@ it('tells a role without any of the tasks that they are not for it', function ()
     $organisation = OrganisationTestHelper::create();
 
     $this->asFilamentOrganisationUser($organisation);
-    actingWithRoles([Role::FUNCTIONAL_MANAGER]);
+    RoleTestHelper::actAs([Role::FUNCTIONAL_MANAGER]);
 
     $this
         ->get(sprintf('%s/handleiding', $organisation->slug))

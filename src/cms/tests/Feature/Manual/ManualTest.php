@@ -12,9 +12,6 @@ use App\Manual\TaskCapability;
 use App\Manual\Topic;
 use Tests\Helpers\ConfigTestHelper;
 
-use function array_map;
-use function count;
-
 it('keeps every chapter when both flags are on', function (): void {
     ConfigTestHelper::set('features.wpg', true);
     ConfigTestHelper::set('features.publishing', true);
