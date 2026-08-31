@@ -52,9 +52,8 @@
             <div>
                 <section class="grid auto-cols-fr gap-y-6">
                     <header class="fi-simple-header flex flex-col items-center">
-                        <div
-                            class="fi-logo flex text-xl font-bold leading-5 tracking-tight text-gray-950 dark:text-white mb-4">
-                            Verwerkingsregister
+                        <div class="mb-4">
+                            @include('filament.brand.logo')
                         </div>
                     </header>
                     @yield('body')

@@ -33,6 +33,7 @@ use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Facades\FilamentColor;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -42,6 +43,7 @@ use Illuminate\Routing\Route;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Route as RouteFacade;
+use Illuminate\Support\HtmlString;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Illuminate\View\View;
 use Spatie\Csp\AddCspHeaders;
@@ -154,6 +156,17 @@ class FilamentServiceProvider extends PanelProvider
             ->id('admin')
             ->path('/')
             ->font('Inter', asset('fonts/inter.css'), LocalFontProvider::class)
+            ->brandName(Config::string('app.name'))
+            // An Htmlable rather than an image path: a path renders the bare
+            // mark, and the top-left needs the wordmark beside it to actually
+            // name the application. Filament only skips its own <img> wrapper
+            // for Htmlable, so the view is rendered here rather than returned.
+            ->brandLogo(static fn (): Htmlable => new HtmlString(
+                view('filament.brand.logo')->render(),
+            ))
+            // Filament boxes the logo at this height; the default 1.5rem would
+            // clip the mark.
+            ->brandLogoHeight('2rem')
             ->login($this->loginPage())
             ->profile(Profile::class)
             ->routes(static function (): void {

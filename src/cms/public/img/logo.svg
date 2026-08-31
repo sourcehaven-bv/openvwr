@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40" role="img" aria-label="OpenVWR">
+  <title>OpenVWR</title>
+  <path d="M20 2.5 34.5 7.4v13.1c0 8.2-5.6 14.4-14.5 17-8.9-2.6-14.5-8.8-14.5-17V7.4Z" fill="#F84F39"/>
+  <path d="M13.4 25.6V14.9c2.5-1.1 4.6-1.1 6.6.6 2-1.7 4.1-1.7 6.6-.6v10.7c-2.5-1.1-4.6-1.1-6.6.6-2-1.7-4.1-1.7-6.6-.6Z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M20 15.5v10.4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+</svg>
