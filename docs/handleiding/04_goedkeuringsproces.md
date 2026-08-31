@@ -24,19 +24,19 @@ Voor alle entiteiten in de registers en voor alle gerelateerde entiteiten is het
 
 Een nieuwe versie kan aangemaakt worden door een entiteit te openen en op de knop "Versie aanmaken" te klikken (Figuur \ref{fig:versie_aanmaken}, rechtsbovenin):
 
-![Versie aanmaken\label{fig:versie_aanmaken}](./imgs/03_goedkeuringsproces/01_avg-responsible-processing-records_edit_versie.png)
+![Versie aanmaken\label{fig:versie_aanmaken}](./imgs/04_goedkeuringsproces/01_avg-responsible-processing-records_edit_versie.png)
 
 Een (nieuwe) versie is te vinden onderaan de pagina bij de tabellen op het eerste tabblad "Versies". De nieuw aangemaakte versie zal de status "In review" hebben (Figuur \ref{fig:versie_selecteren}):
 
-![Versie selecteren\label{fig:versie_selecteren}](./imgs/03_goedkeuringsproces/02_avg-responsible-processing-records_edit_versie_select.png)
+![Versie selecteren\label{fig:versie_selecteren}](./imgs/04_goedkeuringsproces/02_avg-responsible-processing-records_edit_versie_select.png)
 
 Een klik op de versie zal de detailpagina van deze versie tonen. Hier kunnen Mandaathouders worden toegevoegd aan een versie door op "Ondertekeningen" te klikken (Figuur \ref{fig:ondertekeningen_selecteren}):
 
-![Ondertekeningen selecteren\label{fig:ondertekeningen_selecteren}](./imgs/03_goedkeuringsproces/03_snapshots_ondertekeningen.png)
+![Ondertekeningen selecteren\label{fig:ondertekeningen_selecteren}](./imgs/04_goedkeuringsproces/03_snapshots_ondertekeningen.png)
 
 De knop "Mandaathouders toevoegen" toont een lijst met Mandaathouders: deze zijn te selecteren en kunnen worden toegevoegd met de knop "Toevoegen".
 
-![Mandaathouder toevoegen\label{fig:ondertekeningen_mandaathouder}](./imgs/03_goedkeuringsproces/04_snapshots_mandaathouder.png)
+![Mandaathouder toevoegen\label{fig:ondertekeningen_mandaathouder}](./imgs/04_goedkeuringsproces/04_snapshots_mandaathouder.png)
 
 > **Hint**: Privacy Officers krijgen automatisch een e-mail als er een nieuwe versie is aangemaakt. Wilt u die e-mails niet ontvangen, dan zet u ze uit op uw eigen profielpagina (zie \ref{sec:notificaties}). Wilt u één specifieke versie onder de aandacht brengen, gebruik dan de "Ondertekeningen" hieronder: dat legt het verzoek vast in het portaal in plaats van alleen in iemands mailbox.
 
@@ -52,7 +52,7 @@ Er is een overicht van alle versies te vinden in het navigatiemenu links (Figuur
 
 De filter kan ingesteld worden rechtsboven in de tabel (Figuur \ref{fig:versie_overzicht}).
 
-![Versie overzicht\label{fig:versie_overzicht}](./imgs/03_goedkeuringsproces/05_organisation-snapshots.png)
+![Versie overzicht\label{fig:versie_overzicht}](./imgs/04_goedkeuringsproces/05_organisation-snapshots.png)
 
 > **Hint**: Dit overzicht kan gebruikt worden als To Do lijst. Filter op alle versies die de status "In review" hebben: dit geeft een overzicht van alle nieuw aangemaakte versies waarop nog een goedkeuring wordt verwacht.
 
@@ -64,7 +64,7 @@ Is eenmaal een versie geselecteerd, dan kan een versie met de status "In review"
 
 Deze stap is alleen aan de orde als uw organisatie met Mandaathouders werkt en er Mandaathouders aan de versie zijn gekoppeld.
 
-![Akkoord geven\label{fig:akkoord_geven}](./imgs/03_goedkeuringsproces/07_personal-snapshot-approvals_akkoord_geven.png)
+![Akkoord geven\label{fig:akkoord_geven}](./imgs/04_goedkeuringsproces/07_personal-snapshot-approvals_akkoord_geven.png)
 
 Een Mandaathouder kan akkoord geven op een versie door op de versie detailpagina onderaan op "Akkoord" te klikken (Figuur \ref{fig:akkoord_geven}). De Mandaathouder kan hier ook op "Niet akkoord" drukken, wat de mogelijkheid biedt om een notitie achter te laten.
 

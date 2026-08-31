@@ -29,7 +29,7 @@ header-includes:
 
 <!--
 OpenVWR huisstijl: accent #F84F39 (zie FilamentServiceProvider en openvwr.nl).
-De overige kleuren zijn statuskleuren, gebruikt in 03_goedkeuringsproces.
+De overige kleuren zijn statuskleuren, gebruikt in 04_goedkeuringsproces.
 -->
 \definecolor{accent}{RGB}{248, 79, 57}
 \definecolor{blue}{RGB}{37, 99, 235}

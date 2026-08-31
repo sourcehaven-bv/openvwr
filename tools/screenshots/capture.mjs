@@ -117,7 +117,7 @@ const FIGURES = [
   },
   {
     name: 'export',
-    file: '05_overige_functies/01_avg-responsible-processing-records_export.png',
+    file: '06_overige_functies/01_avg-responsible-processing-records_export.png',
     auth: true,
     // Matches the original crop: topbar + heading + first rows, no full sidebar.
     clip: '.fi-main',
@@ -134,7 +134,7 @@ const FIGURES = [
   },
   {
     name: 'export-complete',
-    file: '05_overige_functies/02_avg-responsible-processing-records_export_complete.png',
+    file: '06_overige_functies/02_avg-responsible-processing-records_export_complete.png',
     auth: true,
     // Requires QUEUE_CONNECTION=database and a running `php artisan queue:work`
     // (see the README): on the sync queue the completion notice is a session
@@ -195,8 +195,65 @@ const FIGURES = [
     },
   },
   {
+    name: 'dpia-prescan-start',
+    file: '03_dpia/01_dpia-prescan-records_edit.png',
+    auth: true,
+    // Top of the edit page: heading plus the "DPIA starten" action. This
+    // header action is visible regardless of which wizard step is open (it is
+    // a page-level action, not part of a step), so no step navigation needed -
+    // matches the "record-version" figure below.
+    clip: '.fi-header',
+    pad: 90,
+    async shoot(page) {
+      await gotoSeededDpiaPrescan(page);
+      await page.evaluate(() => {
+        // Only appears once the computed outcome requires or recommends a
+        // DPIA; ScreenshotSeeder gives the pre-scan one AP-criterion, which on
+        // its own is already enough (see PrescanEvaluator).
+        const btn = [...document.querySelectorAll('button, a')].find((b) =>
+          /DPIA starten/i.test(b.textContent || ''),
+        );
+        if (!btn) throw new Error('"DPIA starten" button not found');
+        window.__annotate.arrow(btn, { side: 'top', length: 70, gap: 10 });
+      });
+    },
+  },
+  {
+    name: 'dpia-personal-data',
+    file: '03_dpia/02_dpia-records_edit_personal-data.png',
+    auth: true,
+    // .fi-active, not the bare class: every step renders in the DOM at once
+    // (only the active one is visible), and the first match in DOM order is
+    // always "Algemeen" regardless of which step is open - see step.blade.php
+    // in vendor/filament/forms. Unlike "labels-field" below, this figure needs
+    // a later step, so the bare class would silently crop the wrong content.
+    clip: '.fi-fo-wizard-step.fi-active',
+    pad: 12,
+    maxHeight: 900,
+    async shoot(page) {
+      await gotoSeededDpia(page);
+      await page.evaluate(() => {
+        const step = [...document.querySelectorAll('button')].find((b) =>
+          /Persoonsgegevens/i.test(b.textContent || ''),
+        );
+        if (!step) throw new Error('"Persoonsgegevens" step button not found');
+        step.click();
+      });
+      await page.waitForTimeout(400);
+      await page.evaluate(() => {
+        const label = [...document.querySelectorAll('label')].find((l) =>
+          /^\s*Bewaartermijn\s*$/i.test(l.textContent || ''),
+        );
+        if (!label) throw new Error('Bewaartermijn field not found');
+        // From the right: the field spans the full width of the wizard step,
+        // matching "labels-field" below.
+        window.__annotate.arrow(label, { side: 'right', length: 110 });
+      });
+    },
+  },
+  {
     name: 'record-version',
-    file: '03_goedkeuringsproces/01_avg-responsible-processing-records_edit_versie.png',
+    file: '04_goedkeuringsproces/01_avg-responsible-processing-records_edit_versie.png',
     auth: true,
     // Top of the edit page: heading plus the "Versie aanmaken" action. Extra
     // padding leaves room for the arrow above the button.
@@ -217,7 +274,7 @@ const FIGURES = [
   },
   {
     name: 'version-select',
-    file: '03_goedkeuringsproces/02_avg-responsible-processing-records_edit_versie_select.png',
+    file: '04_goedkeuringsproces/02_avg-responsible-processing-records_edit_versie_select.png',
     auth: true,
     clip: '.fi-ta',
     pad: 12,
@@ -238,7 +295,7 @@ const FIGURES = [
   },
   {
     name: 'snapshot-signatures',
-    file: '03_goedkeuringsproces/03_snapshots_ondertekeningen.png',
+    file: '04_goedkeuringsproces/03_snapshots_ondertekeningen.png',
     auth: true,
     clip: '.fi-page',
     pad: 12,
@@ -255,7 +312,7 @@ const FIGURES = [
   },
   {
     name: 'snapshot-mandateholder',
-    file: '03_goedkeuringsproces/04_snapshots_mandaathouder.png',
+    file: '04_goedkeuringsproces/04_snapshots_mandaathouder.png',
     auth: true,
     // .fi-page, not .fi-main: the latter is full viewport height and leaves
     // most of the image empty below the short approvals table.
@@ -274,7 +331,7 @@ const FIGURES = [
   },
   {
     name: 'snapshot-notify',
-    file: '03_goedkeuringsproces/06_snapshots_mandaathouders_uitnodigen.png',
+    file: '04_goedkeuringsproces/06_snapshots_mandaathouders_uitnodigen.png',
     auth: true,
     clip: '.fi-main',
     // CANNOT BE REPRODUCED - the feature no longer exists.
@@ -303,7 +360,7 @@ const FIGURES = [
   },
   {
     name: 'organisation-snapshots',
-    file: '03_goedkeuringsproces/05_organisation-snapshots.png',
+    file: '04_goedkeuringsproces/05_organisation-snapshots.png',
     auth: true,
     // The whole layout, not .fi-main: the text points at the overview "in het
     // navigatiemenu links", so the sidebar has to be in frame for that arrow to
@@ -342,7 +399,7 @@ const FIGURES = [
   },
   {
     name: 'personal-approvals',
-    file: '03_goedkeuringsproces/07_personal-snapshot-approvals_akkoord_geven.png',
+    file: '04_goedkeuringsproces/07_personal-snapshot-approvals_akkoord_geven.png',
     auth: true,
     // ScreenshotSeeder assigns the pending approval to the mandate holder, so
     // only they see the Akkoord / Niet akkoord pair.
@@ -375,7 +432,7 @@ const FIGURES = [
   },
   {
     name: 'labels',
-    file: '06_labels/01_tags.png',
+    file: '07_labels/01_tags.png',
     auth: true,
     clip: '.fi-main',
     async shoot(page) {
@@ -385,7 +442,7 @@ const FIGURES = [
   },
   {
     name: 'labels-field',
-    file: '06_labels/02_avg-responsible-processing-records_edit_labels.png',
+    file: '07_labels/02_avg-responsible-processing-records_edit_labels.png',
     auth: true,
     // The record form is a wizard; the Labels field lives in its first step.
     // Clip to that step - .fi-section no longer wraps the field - and trim the
@@ -411,7 +468,7 @@ const FIGURES = [
   },
   {
     name: 'labels-filter',
-    file: '06_labels/03_avg-responsible-processing-records_filter_labels.png',
+    file: '07_labels/03_avg-responsible-processing-records_filter_labels.png',
     auth: true,
     // The panel is taller than the narrowed table, so crop to the page rather
     // than the table; maxHeight trims the empty area below both.
@@ -446,7 +503,7 @@ const FIGURES = [
   },
   {
     name: 'labels-system',
-    file: '06_labels/04_systems_labels.png',
+    file: '07_labels/04_systems_labels.png',
     auth: true,
     // Labels are not limited to the verwerkingsregisters. This figure shows the
     // same field on Systemen/Applicaties, which is what the chapter claims.
@@ -479,7 +536,7 @@ const FIGURES = [
   },
   {
     name: 'users',
-    file: '04_beheer/01_users_edit.png',
+    file: '05_beheer/01_users_edit.png',
     auth: true,
     // The whole layout, matching the original: the surrounding text places user
     // management "in het navigatiemenu onder Organisaties", so the sidebar is
@@ -612,6 +669,46 @@ async function gotoSeededRecord(page) {
   // Wait for the record heading rather than a bare `form`: the page renders
   // several forms and the first can be present before the record has loaded.
   await page.waitForSelector('text=/Afhandelen burgervragen/i', { timeout: 30000 });
+}
+
+/** Open the edit page of the Pre-scan DPIA ScreenshotSeeder creates. */
+async function gotoSeededDpiaPrescan(page) {
+  const id = tinker(`
+    echo App\\Models\\Dpia\\DpiaPrescanRecord::query()
+      ->whereHas("organisation", fn($q) => $q->where("slug", "nipg"))
+      ->where("name", "Pre-scan cameratoezicht toegangsbeveiliging")
+      ->firstOrFail()->id;
+  `);
+  await page.goto(`${BASE}/${tenantOf(page)}/dpia-prescan-records/${id}/edit`, {
+    waitUntil: 'networkidle',
+  });
+  // The name lives in a text input Livewire hydrates client-side (the server
+  // markup has no `value=` attribute, just `wire:model="data.name"`), and the
+  // page heading is the generic "Pre-scan DPIA bewerken" for every record -
+  // unlike the AVG record edit page, which does put the name in visible text.
+  // So wait on the live DOM property instead of an attribute or rendered text.
+  await page.waitForFunction(
+    () => document.getElementById('data.name')?.value.includes('Pre-scan cameratoezicht'),
+    { timeout: 30000 },
+  );
+}
+
+/** Open the edit page of the DPIA ScreenshotSeeder creates. */
+async function gotoSeededDpia(page) {
+  const id = tinker(`
+    echo App\\Models\\Dpia\\DpiaRecord::query()
+      ->whereHas("organisation", fn($q) => $q->where("slug", "nipg"))
+      ->where("name", "DPIA cameratoezicht toegangsbeveiliging")
+      ->firstOrFail()->id;
+  `);
+  await page.goto(`${BASE}/${tenantOf(page)}/dpia-records/${id}/edit`, {
+    waitUntil: 'networkidle',
+  });
+  // See gotoSeededDpiaPrescan: wait on the live DOM property, not an attribute.
+  await page.waitForFunction(
+    () => document.getElementById('data.name')?.value.includes('DPIA cameratoezicht'),
+    { timeout: 30000 },
+  );
 }
 
 /** Open the edit page of a seeded record, resolved by name rather than id. */

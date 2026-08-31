@@ -14,11 +14,11 @@ Met de "import" functionaliteit leest u een bestaand register in. Komt uw regist
 
 OpenVWR biedt de mogelijkheid om registers te exporteren naar een `.csv` of `.xlsx` bestand. De knop voor het exporteren zit boven de overzichtstabel van ieder register (Figuur \ref{fig:export}).
 
-![Exporteren\label{fig:export}](./imgs/05_overige_functies/01_avg-responsible-processing-records_export.png)
+![Exporteren\label{fig:export}](./imgs/06_overige_functies/01_avg-responsible-processing-records_export.png)
 
 Is de export voltooid, dan zal er een notificatie getoond worden in het scherm rechts bovenin. De links naar de files zijn te vinden in het notificatie-overzicht (Figuur \ref{fig:export_complete}).
 
-![Exporteren voltooid\label{fig:export_complete}](./imgs/05_overige_functies/02_avg-responsible-processing-records_export_complete.png)
+![Exporteren voltooid\label{fig:export_complete}](./imgs/06_overige_functies/02_avg-responsible-processing-records_export_complete.png)
 
 ## Notificaties\label{sec:notificaties}
 
@@ -28,7 +28,7 @@ Het portaal stuurt e-mails op basis van de rollen die u heeft: een Privacy Offic
 
 Deze instellingen staan onder "Profiel" > "Instellingen", in het blok "Notificaties" (Figuur \ref{fig:profiel_notificaties}).
 
-![Notificatie-instellingen\label{fig:profiel_notificaties}](./imgs/05_overige_functies/05_profile_settings_notifications.png)
+![Notificatie-instellingen\label{fig:profiel_notificaties}](./imgs/06_overige_functies/05_profile_settings_notifications.png)
 
 Alle notificaties staan standaard aan. Vink een notificatie uit om er geen e-mail meer over te ontvangen; de wijziging geldt voor al uw organisaties. U ziet alleen de notificaties die bij uw eigen rollen horen: een notificatie die u toch niet zou ontvangen, wordt niet getoond.
 
@@ -40,11 +40,11 @@ Alle notificaties staan standaard aan. Vink een notificatie uit om er geen e-mai
 
 In het systeem zijn er meerdere velden waar er slechts een keuze mogelijk is uit een beperkte set opties. Onder "Opzoeklijsten" zijn deze velden te vinden en zijn hun opties aan te passen (Figuur \ref{fig:opzoeklijst_overzicht}).
 
-![Overzicht van een opzoeklijst\label{fig:opzoeklijst_overzicht}](./imgs/05_overige_functies/03_lookup_list_overview.png)
+![Overzicht van een opzoeklijst\label{fig:opzoeklijst_overzicht}](./imgs/06_overige_functies/03_lookup_list_overview.png)
 
 In deze opzoeklijsten zijn nieuwe waardes aan te maken, opties in of uit te schakelen en opties te verwijderen (Figuur \ref{fig:opzoeklijst_bewerken}). Op de detailpagina van een optie is een tabel te vinden van alle entiteiten waar deze optie is geselecteerd.
 
-![Een waarde in een opzoeklijst bewerken\label{fig:opzoeklijst_bewerken}](./imgs/05_overige_functies/04_lookup_list_edit.png)
+![Een waarde in een opzoeklijst bewerken\label{fig:opzoeklijst_bewerken}](./imgs/06_overige_functies/04_lookup_list_edit.png)
 
 Met de tabs boven de tabel wisselt u tussen ingeschakelde en uitgeschakelde waarden. Alleen ingeschakelde waarden verschijnen in de keuzelijsten bij het invoeren.
 

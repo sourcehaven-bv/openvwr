@@ -24,7 +24,7 @@ Een onderdeel kan meerdere labels tegelijk hebben en een label kan aan onbeperkt
 
 ## Labels toekennen
 
-![Labels op de detailpagina van een verwerking\label{fig:labels_veld}](./imgs/06_labels/02_avg-responsible-processing-records_edit_labels.png)
+![Labels op de detailpagina van een verwerking\label{fig:labels_veld}](./imgs/07_labels/02_avg-responsible-processing-records_edit_labels.png)
 
 Op de detailpagina van een verwerking staat het veld "Labels" in het eerste blok, onder de naam van de verwerking (Figuur \ref{fig:labels_veld}). Klik op het veld om een lijst met bestaande labels te openen, of typ om te zoeken. Klik op het kruisje achter een label om het van de verwerking te verwijderen. Vergeet niet de verwerking op te slaan.
 
@@ -38,13 +38,13 @@ Labels zijn beschikbaar bij alle registers en bij de onderdelen onder "Beheer":
 
 Het veld werkt overal hetzelfde (Figuur \ref{fig:labels_systeem}). Zo kunt u dezelfde indeling - bijvoorbeeld een afdeling of een locatie - door de hele registratie heen doorvoeren, en niet alleen bij de verwerkingen.
 
-![Hetzelfde labelveld bij Systemen/Applicaties\label{fig:labels_systeem}](./imgs/06_labels/04_systems_labels.png)
+![Hetzelfde labelveld bij Systemen/Applicaties\label{fig:labels_systeem}](./imgs/07_labels/04_systems_labels.png)
 
 > **Hint**: Gebruikt u hetzelfde label bij een verwerking én bij het systeem waarin die verwerking plaatsvindt, dan ziet u op de detailpagina van dat label beide onderdelen bij elkaar staan. Dat maakt het makkelijk om te overzien wat er allemaal bij een afdeling of locatie hoort.
 
 ## Filteren op labels
 
-![Filteren op labels in het register\label{fig:labels_filter}](./imgs/06_labels/03_avg-responsible-processing-records_filter_labels.png)
+![Filteren op labels in het register\label{fig:labels_filter}](./imgs/07_labels/03_avg-responsible-processing-records_filter_labels.png)
 
 In elk overzicht met labels zit rechtsboven de tabel een filterknop. Onder "Labels" selecteert u een of meer labels, waarna de tabel alleen nog de regels met die labels toont (Figuur \ref{fig:labels_filter}). Met "Resetten" haalt u het filter weer weg. Het filter werkt in alle overzichten die labels kennen, dus ook bij bijvoorbeeld Systemen/Applicaties of Documenten.
 
@@ -54,7 +54,7 @@ In elk overzicht met labels zit rechtsboven de tabel een filterknop. Onder "Labe
 
 **Beschikbaar voor**: (Chief) Privacy Officer
 
-![Labeloverzicht\label{fig:labels_overzicht}](./imgs/06_labels/01_tags.png)
+![Labeloverzicht\label{fig:labels_overzicht}](./imgs/07_labels/01_tags.png)
 
 In het navigatiemenu staat onder "Beheer" het onderdeel "Labels". Hier ziet u alle labels van de organisatie (Figuur \ref{fig:labels_overzicht}). Met de knop "Label aanmaken" rechtsboven voegt u een label toe; met het potloodje achter een regel wijzigt u de naam of de kleur van een bestaand label.
 

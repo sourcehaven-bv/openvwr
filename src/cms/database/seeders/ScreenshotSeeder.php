@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Enums\Authorization\Role;
+use App\Enums\Dpia\DpiaSubjectType;
+use App\Enums\Dpia\PersonalDataType;
 use App\Enums\RegisterLayout;
 use App\Enums\Snapshot\SnapshotApprovalStatus;
 use App\Models\Algorithm\AlgorithmRecord;
@@ -12,6 +14,8 @@ use App\Models\Avg\AvgGoal;
 use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecordService;
+use App\Models\Dpia\DpiaPrescanRecord;
+use App\Models\Dpia\DpiaRecord;
 use App\Models\Organisation;
 use App\Models\Receiver;
 use App\Models\Snapshot;
@@ -32,6 +36,7 @@ use function array_keys;
 use function count;
 use function intdiv;
 use function is_string;
+use function now;
 use function sprintf;
 
 /**
@@ -164,6 +169,7 @@ class ScreenshotSeeder extends Seeder
         $this->renameRelatedEntities($organisation);
         $this->createVersionHistory($organisation);
         $this->applyTags($organisation);
+        $this->seedDpia($organisation);
     }
 
     /**
@@ -465,5 +471,74 @@ class ScreenshotSeeder extends Seeder
         }
 
         return $ids;
+    }
+
+    /**
+     * A Pre-scan DPIA and DPIA for the hoofdstuk "DPIA" figures, tied to the
+     * existing camera-surveillance record: a single AP-criterion
+     * ("cameratoezicht") already makes a DPIA mandatory on its own, which is
+     * the outcome the "Uitkomst" figure shows, and the record's own theme
+     * doubles as a plausible personal-data example for the DPIA figure.
+     *
+     * Only runs once TestDataSeeder plus renameRecords() have named that
+     * record; skips quietly otherwise so this seeder still works against an
+     * older fixture set.
+     */
+    private function seedDpia(Organisation $organisation): void
+    {
+        $processingRecord = AvgResponsibleProcessingRecord::query()
+            ->where('organisation_id', $organisation->id)
+            ->where('name', 'Cameratoezicht toegangsbeveiliging')
+            ->first();
+
+        if ($processingRecord === null) {
+            return;
+        }
+
+        $prescan = DpiaPrescanRecord::query()
+            ->where('organisation_id', $organisation->id)
+            ->where('name', 'Pre-scan cameratoezicht toegangsbeveiliging')
+            ->first();
+
+        if ($prescan === null) {
+            $prescan = DpiaPrescanRecord::factory()->create([
+                'organisation_id' => $organisation->id,
+                'name' => 'Pre-scan cameratoezicht toegangsbeveiliging',
+                'description' => 'Beoordeling of voor het cameratoezicht bij de toegangen een DPIA nodig is.',
+                'ap_criteria' => ['cameratoezicht'],
+                'assessed_at' => now()->format('Y-m-d'),
+            ]);
+            $prescan->avgResponsibleProcessingRecords()->sync([$processingRecord->id->toString()]);
+        }
+
+        $dpia = DpiaRecord::query()
+            ->where('organisation_id', $organisation->id)
+            ->where('name', 'DPIA cameratoezicht toegangsbeveiliging')
+            ->first();
+
+        if ($dpia !== null) {
+            return;
+        }
+
+        $dpia = DpiaRecord::factory()->create([
+            'organisation_id' => $organisation->id,
+            'name' => 'DPIA cameratoezicht toegangsbeveiliging',
+            'subject_type' => DpiaSubjectType::PROCESSING,
+            'dpia_prescan_record_id' => $prescan->id,
+            'proposal_description' => 'Cameratoezicht bij de toegangen van het hoofdkantoor en Terminal Noord.',
+            'assessed_at' => now()->format('Y-m-d'),
+            'review_at' => now()->addYears(3)->format('Y-m-d'),
+        ]);
+        $dpia->avgResponsibleProcessingRecords()->sync([$processingRecord->id->toString()]);
+
+        $dpia->personalData()->create([
+            'organisation_id' => $organisation->id,
+            'description' => 'Camerabeelden van medewerkers en bezoekers bij de toegangen',
+            'type' => PersonalDataType::ORDINARY,
+            'data_subject_category' => 'Medewerkers en bezoekers',
+            'source' => "Beveiligingscamera's bij de toegangen",
+            'retention_period' => '4 weken, tenzij noodzakelijk voor een lopend onderzoek',
+            'order_column' => 0,
+        ]);
     }
 }
