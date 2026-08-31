@@ -2,7 +2,6 @@
     use App\Manual\TaskCapability;
 
     $manual = $this->manual();
-    $roles = $this->roles();
 @endphp
 
 <x-filament-panels::page>
