@@ -44,7 +44,6 @@ final class RollenEnRechten
                 heeft ingericht. Rollen die uw organisatie niet toekent, komt u in de praktijk
                 dan ook niet tegen.
                 MARKDOWN . self::rolbeschrijvingen(),
-
         );
     }
 
