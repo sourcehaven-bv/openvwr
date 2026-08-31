@@ -7,10 +7,9 @@ return [
     'login_subheading' => 'Vul uw e-mailadres in. U ontvangt een e-mail met een link waarmee u direct inlogt; een wachtwoord heeft u niet nodig.',
     'login_sent' => 'Login-informatie verzonden',
 
-    // Het onderwerp krijgt via Mailable al een "[OpenVWR]: "-prefix, dus de
-    // applicatienaam staat hier niet nog een keer. Ook zonder het woord
-    // "link": mailfilters wegen dat mee, en een loginmail die in de spambox
-    // belandt blokkeert de enige manier om binnen te komen.
+    // Zonder het woord "link": mailfilters wegen dat mee, en een loginmail
+    // die in de spambox belandt blokkeert de enige manier om binnen te komen.
+    // De afzender noemt de applicatie al, dus het onderwerp doet dat niet.
     'passwordless_login_subject' => 'Uw inlogmail',
     'passwordless_login_greeting' => 'Hallo :userName,',
     'passwordless_login_text' => 'U heeft een inlogmail aangevraagd voor :appName. Klik op de knop hieronder om in te loggen.',

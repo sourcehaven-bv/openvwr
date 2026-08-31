@@ -36,7 +36,7 @@ it('has the correct content', function (): void {
 
     $mailable = new BatchSignRequest($user, $organisation, $snapshotApprovalsNew, $snapshotApprovalsExisting);
     $mailable->assertHasSubject(
-        sprintf('[%s]: %s', $appName, __('snapshot_approval.mail_batch_sign_request_subject', ['organisationName' => $organisation->name])),
+        __('snapshot_approval.mail_batch_sign_request_subject', ['organisationName' => $organisation->name]),
     );
     $mailable->assertSeeInHtml(__('snapshot_approval.mail_batch_sign_request_text'));
 });

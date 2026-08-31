@@ -7,10 +7,9 @@ return [
     'login_subheading' => 'Enter your email address. You will receive an email with a link that logs you straight in; no password needed.',
     'login_sent' => 'Login information sent',
 
-    // Mailable already prefixes the subject with "[OpenVWR]: ", so the
-    // application name is not repeated here. Also without the word "link":
-    // mail filters weigh that, and a login email that lands in the spam
-    // folder blocks the only way in.
+    // Without the word "link": mail filters weigh that, and a login email
+    // that lands in the spam folder blocks the only way in. The sender
+    // already names the application, so the subject does not.
     'passwordless_login_subject' => 'Your login email',
     'passwordless_login_greeting' => 'Hello :userName,',
     'passwordless_login_text' => 'You requested a login email for :appName. Use the button below to log in.',

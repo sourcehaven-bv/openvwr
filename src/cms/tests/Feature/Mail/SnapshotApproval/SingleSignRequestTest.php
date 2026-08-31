@@ -7,14 +7,13 @@ use App\Models\SnapshotApproval;
 use App\Models\SnapshotApprovalLog;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
-use Tests\Helpers\ConfigTestHelper;
 
 it('has the correct content', function (): void {
     $snapshotApproval = SnapshotApproval::factory()->create();
 
     $mailable = new SingleSignRequest($snapshotApproval);
     $mailable->assertHasSubject(
-        sprintf('[%s]: %s', ConfigTestHelper::get('app.name'), __('snapshot_approval.mail_single_sign_request_subject')),
+        __('snapshot_approval.mail_single_sign_request_subject'),
     );
     $mailable->assertSeeInHtml(__('snapshot_approval.mail_single_sign_request_text'));
 });

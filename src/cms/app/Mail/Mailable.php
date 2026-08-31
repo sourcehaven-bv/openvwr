@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Mail;
 
-use App\Config\Config;
 use App\Models\User;
 use Illuminate\Contracts\Mail\Factory;
 use Illuminate\Contracts\Mail\Mailer;
@@ -17,7 +16,6 @@ use Webmozart\Assert\Assert;
 
 use function array_map;
 use function array_merge;
-use function sprintf;
 
 abstract class Mailable extends IlluminateMailable
 {
@@ -25,7 +23,10 @@ abstract class Mailable extends IlluminateMailable
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: sprintf('[%s]: %s', Config::string('app.name'), $this->getSubject()));
+        // No "[OpenVWR]: " prefix: mail clients already show the sender
+        // prominently, so it only ate into the subject line -- which is what
+        // gets truncated first on a phone.
+        return new Envelope(subject: $this->getSubject());
     }
 
     /**

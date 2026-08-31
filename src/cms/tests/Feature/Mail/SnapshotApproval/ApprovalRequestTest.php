@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\Filament\Resources\SnapshotResource\Pages\ViewSnapshot;
 use App\Mail\SnapshotApproval\ApprovalRequest;
 use App\Models\Snapshot;
-use Tests\Helpers\ConfigTestHelper;
 
 it('has the correct content', function (): void {
     $snapshot = Snapshot::factory()->create();
@@ -18,7 +17,7 @@ it('has the correct content', function (): void {
     ]);
 
     $mailable->assertHasSubject(
-        sprintf('[%s]: %s', ConfigTestHelper::get('app.name'), __('snapshot_approval.mail_approval_request_subject')),
+        __('snapshot_approval.mail_approval_request_subject'),
     );
     $mailable->assertSeeInHtml(__('snapshot_approval.mail_approval_request_text'));
     $mailable->assertSeeInHtml($link);

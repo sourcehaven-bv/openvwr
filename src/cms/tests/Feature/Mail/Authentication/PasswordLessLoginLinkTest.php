@@ -33,15 +33,16 @@ it('contains the correct expiry time', function (): void {
         ->toBe(CarbonImmutable::now()->timestamp + $tokenExpiryInMinutes * 60);
 });
 
-it('has a subject that does not repeat the application name', function (): void {
+it('has a subject without a bracketed application name', function (): void {
     $userLoginToken = UserLoginToken::factory()->create();
     $appName = ConfigTestHelper::get('app.name');
 
     $mailable = new PasswordLessLoginLink($userLoginToken);
 
-    // Mailable already prefixes the subject, so the name must appear once.
-    $mailable->assertHasSubject(sprintf('[%s]: %s', $appName, __('auth.passwordless_login_subject')));
-    expect(substr_count(__('auth.passwordless_login_subject'), (string) $appName))->toBe(0);
+    // The sender already identifies us, so the subject carries no prefix.
+    $mailable->assertHasSubject(__('auth.passwordless_login_subject'));
+    expect(__('auth.passwordless_login_subject'))
+        ->not()->toContain(sprintf('[%s]', $appName));
 });
 
 it('addresses the recipient and explains what to do', function (): void {
