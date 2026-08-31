@@ -147,6 +147,19 @@ class FilamentServiceProvider extends PanelProvider
     }
 
     /**
+     * The brand lockup shown in the sidebar header and above the login card.
+     *
+     * Rendered to an Htmlable rather than passed as an image path: a path
+     * renders the bare mark, and the top-left needs the wordmark beside it to
+     * name the application. Filament only skips its own <img> wrapper for
+     * Htmlable, so the view is rendered here rather than returned.
+     */
+    private function brandLogo(): Htmlable
+    {
+        return new HtmlString(view('filament.brand.logo')->render());
+    }
+
+    /**
      * @throws Exception
      */
     public function panel(Panel $panel): Panel
@@ -157,13 +170,7 @@ class FilamentServiceProvider extends PanelProvider
             ->path('/')
             ->font('Inter', asset('fonts/inter.css'), LocalFontProvider::class)
             ->brandName(Config::string('app.name'))
-            // An Htmlable rather than an image path: a path renders the bare
-            // mark, and the top-left needs the wordmark beside it to actually
-            // name the application. Filament only skips its own <img> wrapper
-            // for Htmlable, so the view is rendered here rather than returned.
-            ->brandLogo(static fn (): Htmlable => new HtmlString(
-                view('filament.brand.logo')->render(),
-            ))
+            ->brandLogo($this->brandLogo(...))
             // Filament boxes the logo at this height; the default 1.5rem would
             // clip the mark.
             ->brandLogoHeight('2rem')
