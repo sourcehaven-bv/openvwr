@@ -1,0 +1,194 @@
+/* The manual. Its body is rendered from markdown, so the elements cannot carry
+   utility classes and are styled here instead. */
+
+.manual-prose {
+    font-size: 0.875rem;
+    line-height: 1.65;
+    color: rgb(75 85 99);
+}
+
+.dark .manual-prose {
+    color: rgb(156 163 175);
+}
+
+.manual-prose > * + * {
+    margin-top: 0.75rem;
+}
+
+.manual-prose h3 {
+    margin-top: 1.25rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: rgb(3 7 18);
+}
+
+.dark .manual-prose h3 {
+    color: rgb(255 255 255);
+}
+
+.manual-prose ul,
+.manual-prose ol {
+    padding-left: 1.25rem;
+}
+
+.manual-prose ul {
+    list-style-type: disc;
+}
+
+.manual-prose ol {
+    list-style-type: decimal;
+}
+
+.manual-prose li + li {
+    margin-top: 0.25rem;
+}
+
+.manual-prose a {
+    color: rgb(220 63 41);
+    text-decoration: underline;
+}
+
+.dark .manual-prose a {
+    color: rgb(248 113 90);
+}
+
+.manual-prose code {
+    border-radius: 0.25rem;
+    background-color: rgb(243 244 246);
+    padding: 0.1em 0.35em;
+    font-size: 0.85em;
+}
+
+.dark .manual-prose code {
+    background-color: rgb(255 255 255 / 0.1);
+}
+
+.manual-prose blockquote {
+    border-left: 3px solid rgb(229 231 235);
+    padding-left: 0.75rem;
+}
+
+.dark .manual-prose blockquote {
+    border-left-color: rgb(255 255 255 / 0.15);
+}
+
+/* Figures: the screenshots of the manual, with their caption underneath. */
+.manual-figure {
+    margin: 1rem 0;
+}
+
+.manual-figure img {
+    border-radius: 0.5rem;
+    border: 1px solid rgb(229 231 235);
+    max-width: 100%;
+    height: auto;
+}
+
+.dark .manual-figure img {
+    border-color: rgb(255 255 255 / 0.1);
+}
+
+.manual-figure figcaption {
+    margin-top: 0.375rem;
+    font-size: 0.8125rem;
+    color: rgb(107 114 128);
+}
+
+/* Callouts: the "Hint" and "Let op" blocks from the source text. */
+.manual-callout {
+    border-radius: 0.5rem;
+    border-left-width: 3px;
+    border-left-style: solid;
+    padding: 0.75rem;
+}
+
+.manual-callout > * + * {
+    margin-top: 0.5rem;
+}
+
+.manual-callout__title {
+    font-weight: 600;
+}
+
+.manual-callout--hint {
+    border-left-color: rgb(217 172 63);
+    background-color: rgb(254 252 232);
+}
+
+.manual-callout--hint .manual-callout__title {
+    color: rgb(133 100 20);
+}
+
+.dark .manual-callout--hint {
+    background-color: rgb(66 55 20 / 0.5);
+}
+
+.dark .manual-callout--hint .manual-callout__title {
+    color: rgb(231 203 132);
+}
+
+.manual-callout--warning {
+    border-left-color: rgb(220 63 41);
+    background-color: rgb(254 242 240);
+}
+
+.manual-callout--warning .manual-callout__title {
+    color: rgb(153 45 25);
+}
+
+.dark .manual-callout--warning {
+    background-color: rgb(69 26 21 / 0.5);
+}
+
+.dark .manual-callout--warning .manual-callout__title {
+    color: rgb(242 167 148);
+}
+
+/* Version statuses, which the pdf drew with \textcolor. */
+.manual-status {
+    display: inline-block;
+    border-radius: 0.375rem;
+    padding: 0.05em 0.45em;
+    font-size: 0.8125rem;
+    font-weight: 600;
+}
+
+.manual-status--review {
+    background-color: rgb(219 234 254);
+    color: rgb(30 64 175);
+}
+
+.manual-status--approved {
+    background-color: rgb(254 236 214);
+    color: rgb(146 64 14);
+}
+
+.manual-status--established {
+    background-color: rgb(220 243 230);
+    color: rgb(22 101 62);
+}
+
+.manual-status--expired {
+    background-color: rgb(233 235 238);
+    color: rgb(75 85 99);
+}
+
+.dark .manual-status--review {
+    background-color: rgb(30 58 138 / 0.4);
+    color: rgb(147 197 253);
+}
+
+.dark .manual-status--approved {
+    background-color: rgb(120 53 15 / 0.4);
+    color: rgb(253 200 138);
+}
+
+.dark .manual-status--established {
+    background-color: rgb(20 83 45 / 0.4);
+    color: rgb(134 217 170);
+}
+
+.dark .manual-status--expired {
+    background-color: rgb(255 255 255 / 0.1);
+    color: rgb(156 163 175);
+}
