@@ -1,4 +1,7 @@
 @import '/vendor/filament/filament/resources/css/theme.css';
+/* De handleiding wordt binnen het paneel getoond, dus haar stijlen moeten
+   in het paneelthema meekomen. */
+@import '../../app.css';
 
 @config 'tailwind.config.js';
 
