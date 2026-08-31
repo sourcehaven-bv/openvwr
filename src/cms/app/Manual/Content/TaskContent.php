@@ -8,6 +8,7 @@ use App\Enums\Authorization\Role;
 use App\Manual\FeatureGate;
 use App\Manual\Step;
 use App\Manual\Task;
+use App\Manual\TaskRoles;
 
 /**
  * The task layer: "wat wilt u doen?".
@@ -92,8 +93,10 @@ final class TaskContent
                     topicIds: ['labels-toekennen'],
                 ),
             ],
-            roles: [Role::INPUT_PROCESSOR, Role::CHIEF_PRIVACY_OFFICER, Role::PRIVACY_OFFICER],
-            readerRoles: [Role::COUNSELOR, Role::DATA_PROTECTION_OFFICIAL, Role::MANDATE_HOLDER],
+            roles: new TaskRoles(
+                performers: [Role::INPUT_PROCESSOR, Role::CHIEF_PRIVACY_OFFICER, Role::PRIVACY_OFFICER],
+                readers: [Role::COUNSELOR, Role::DATA_PROTECTION_OFFICIAL, Role::MANDATE_HOLDER],
+            ),
             done: 'De verwerking staat in het register en kan worden aangevuld. Is hij compleet, '
                 . 'maak dan een versie aan.',
         );
@@ -126,8 +129,10 @@ final class TaskContent
                     topicIds: ['versie-aanmaken'],
                 ),
             ],
-            roles: [Role::INPUT_PROCESSOR, Role::CHIEF_PRIVACY_OFFICER, Role::PRIVACY_OFFICER],
-            readerRoles: [Role::COUNSELOR, Role::DATA_PROTECTION_OFFICIAL, Role::MANDATE_HOLDER],
+            roles: new TaskRoles(
+                performers: [Role::INPUT_PROCESSOR, Role::CHIEF_PRIVACY_OFFICER, Role::PRIVACY_OFFICER],
+                readers: [Role::COUNSELOR, Role::DATA_PROTECTION_OFFICIAL, Role::MANDATE_HOLDER],
+            ),
             gate: FeatureGate::WPG,
             done: 'De Wpg-verwerking staat in het register.',
         );
@@ -161,12 +166,14 @@ final class TaskContent
                     topicIds: ['datalekken', 'notificaties'],
                 ),
             ],
-            roles: [
-                Role::INPUT_PROCESSOR_DATABREACH,
-                Role::CHIEF_PRIVACY_OFFICER,
-                Role::PRIVACY_OFFICER,
-            ],
-            readerRoles: [Role::COUNSELOR, Role::DATA_PROTECTION_OFFICIAL],
+            roles: new TaskRoles(
+                performers: [
+                    Role::INPUT_PROCESSOR_DATABREACH,
+                    Role::CHIEF_PRIVACY_OFFICER,
+                    Role::PRIVACY_OFFICER,
+                ],
+                readers: [Role::COUNSELOR, Role::DATA_PROTECTION_OFFICIAL],
+            ),
             done: 'Het datalek staat in het register en de betrokkenen zijn op de hoogte.',
         );
     }
@@ -206,12 +213,14 @@ final class TaskContent
                     topicIds: ['vaststellen', 'versiestatussen'],
                 ),
             ],
-            roles: [Role::INPUT_PROCESSOR, Role::CHIEF_PRIVACY_OFFICER, Role::PRIVACY_OFFICER],
-            readerRoles: [
-                Role::MANDATE_HOLDER,
-                Role::COUNSELOR,
-                Role::DATA_PROTECTION_OFFICIAL,
-            ],
+            roles: new TaskRoles(
+                performers: [Role::INPUT_PROCESSOR, Role::CHIEF_PRIVACY_OFFICER, Role::PRIVACY_OFFICER],
+                readers: [
+                    Role::MANDATE_HOLDER,
+                    Role::COUNSELOR,
+                    Role::DATA_PROTECTION_OFFICIAL,
+                ],
+            ),
             done: 'De versie is vastgesteld en geldt als de geldende versie van de verwerking.',
         );
     }
@@ -252,13 +261,15 @@ final class TaskContent
                     topicIds: ['filteren-op-labels'],
                 ),
             ],
-            roles: [
-                Role::INPUT_PROCESSOR,
-                Role::INPUT_PROCESSOR_DATABREACH,
-                Role::CHIEF_PRIVACY_OFFICER,
-                Role::PRIVACY_OFFICER,
-            ],
-            readerRoles: [Role::COUNSELOR, Role::DATA_PROTECTION_OFFICIAL, Role::MANDATE_HOLDER],
+            roles: new TaskRoles(
+                performers: [
+                    Role::INPUT_PROCESSOR,
+                    Role::INPUT_PROCESSOR_DATABREACH,
+                    Role::CHIEF_PRIVACY_OFFICER,
+                    Role::PRIVACY_OFFICER,
+                ],
+                readers: [Role::COUNSELOR, Role::DATA_PROTECTION_OFFICIAL, Role::MANDATE_HOLDER],
+            ),
             done: 'De registratie is ingedeeld op uw eigen organisatiekenmerken.',
         );
     }
@@ -292,12 +303,14 @@ final class TaskContent
                     topicIds: ['export'],
                 ),
             ],
-            roles: [
-                Role::CHIEF_PRIVACY_OFFICER,
-                Role::PRIVACY_OFFICER,
-                Role::DATA_PROTECTION_OFFICIAL,
-            ],
-            readerRoles: [Role::COUNSELOR, Role::INPUT_PROCESSOR, Role::MANDATE_HOLDER],
+            roles: new TaskRoles(
+                performers: [
+                    Role::CHIEF_PRIVACY_OFFICER,
+                    Role::PRIVACY_OFFICER,
+                    Role::DATA_PROTECTION_OFFICIAL,
+                ],
+                readers: [Role::COUNSELOR, Role::INPUT_PROCESSOR, Role::MANDATE_HOLDER],
+            ),
             done: 'Het overzicht staat als bestand klaar in uw notificaties.',
         );
     }
@@ -329,8 +342,10 @@ final class TaskContent
                     topicIds: ['publiceren'],
                 ),
             ],
-            roles: [Role::CHIEF_PRIVACY_OFFICER, Role::PRIVACY_OFFICER],
-            readerRoles: [Role::COUNSELOR, Role::DATA_PROTECTION_OFFICIAL],
+            roles: new TaskRoles(
+                performers: [Role::CHIEF_PRIVACY_OFFICER, Role::PRIVACY_OFFICER],
+                readers: [Role::COUNSELOR, Role::DATA_PROTECTION_OFFICIAL],
+            ),
             gate: FeatureGate::PUBLISHING,
             done: 'De verwerking is zichtbaar op de openbare website.',
         );
@@ -364,8 +379,10 @@ final class TaskContent
                     topicIds: ['gebruikers', 'rollen'],
                 ),
             ],
-            roles: [Role::CHIEF_PRIVACY_OFFICER, Role::PRIVACY_OFFICER],
-            readerRoles: [Role::COUNSELOR, Role::DATA_PROTECTION_OFFICIAL],
+            roles: new TaskRoles(
+                performers: [Role::CHIEF_PRIVACY_OFFICER, Role::PRIVACY_OFFICER],
+                readers: [Role::COUNSELOR, Role::DATA_PROTECTION_OFFICIAL],
+            ),
             done: 'De collega kan inloggen en ziet de onderdelen die bij de toegekende rollen '
                 . 'horen.',
         );

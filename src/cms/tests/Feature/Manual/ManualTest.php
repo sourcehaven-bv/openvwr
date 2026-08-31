@@ -9,6 +9,7 @@ use App\Manual\Manual;
 use App\Manual\Step;
 use App\Manual\Task;
 use App\Manual\TaskCapability;
+use App\Manual\TaskRoles;
 use App\Manual\Topic;
 use Tests\Helpers\ConfigTestHelper;
 
@@ -94,7 +95,7 @@ it('lists the topics of a task once, in order of first use', function (): void {
             new Step('a', 'b', ['export', 'export']),
             new Step('c', 'd', ['import']),
         ],
-        roles: [],
+        roles: new TaskRoles(performers: []),
     );
 
     $ids = array_map(
@@ -115,7 +116,7 @@ it('skips a topic of a task that a flag has hidden', function (): void {
         summary: 's',
         intro: 'i',
         steps: [new Step('a', 'b', ['wpg-register', 'export'])],
-        roles: [],
+        roles: new TaskRoles(performers: []),
     );
 
     $ids = array_map(
@@ -157,8 +158,10 @@ it('tells which roles can perform, read along, or neither', function (): void {
         summary: 's',
         intro: 'i',
         steps: [],
-        roles: [Role::INPUT_PROCESSOR],
-        readerRoles: [Role::COUNSELOR],
+        roles: new TaskRoles(
+            performers: [Role::INPUT_PROCESSOR],
+            readers: [Role::COUNSELOR],
+        ),
     );
 
     expect($task->capabilityFor([Role::INPUT_PROCESSOR]))->toBe(TaskCapability::PERFORM)
@@ -175,8 +178,10 @@ it('prefers performing over reading when a user holds both roles', function (): 
         summary: 's',
         intro: 'i',
         steps: [],
-        roles: [Role::INPUT_PROCESSOR],
-        readerRoles: [Role::COUNSELOR],
+        roles: new TaskRoles(
+            performers: [Role::INPUT_PROCESSOR],
+            readers: [Role::COUNSELOR],
+        ),
     );
 
     expect($task->capabilityFor([Role::COUNSELOR, Role::INPUT_PROCESSOR]))
@@ -207,7 +212,7 @@ it('follows the publishing flag for a gated task', function (): void {
         summary: 's',
         intro: 'i',
         steps: [],
-        roles: [],
+        roles: new TaskRoles(performers: []),
         gate: FeatureGate::PUBLISHING,
     );
 
@@ -251,7 +256,7 @@ it('includes the steps in the search text of a task', function (): void {
         summary: 'Samenvatting',
         intro: 'Inleiding',
         steps: [new Step('Stap', 'Uitleg')],
-        roles: [],
+        roles: new TaskRoles(performers: []),
     );
 
     expect($task->searchText())
@@ -260,4 +265,12 @@ it('includes the steps in the search text of a task', function (): void {
         ->toContain('Inleiding')
         ->toContain('Stap')
         ->toContain('Uitleg');
+});
+
+it('defaults a task with no reader roles to an empty reader list', function (): void {
+    $roles = new TaskRoles(performers: [Role::INPUT_PROCESSOR]);
+
+    expect($roles->readers)->toBe([])
+        ->and($roles->capabilityFor([Role::COUNSELOR]))->toBe(TaskCapability::NONE)
+        ->and($roles->capabilityFor([Role::INPUT_PROCESSOR]))->toBe(TaskCapability::PERFORM);
 });

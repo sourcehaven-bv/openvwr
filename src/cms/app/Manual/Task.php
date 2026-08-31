@@ -8,7 +8,6 @@ use App\Enums\Authorization\Role;
 
 use function array_map;
 use function implode;
-use function in_array;
 
 /**
  * One task: something a user wants to get done, in a few steps.
@@ -22,8 +21,6 @@ readonly class Task
     /**
      * @param non-empty-string $id
      * @param array<Step> $steps
-     * @param array<Role> $roles roles that can carry out this task themselves
-     * @param array<Role> $readerRoles roles that can only follow along
      */
     public function __construct(
         public string $id,
@@ -32,8 +29,7 @@ readonly class Task
         public string $summary,
         public string $intro,
         public array $steps,
-        public array $roles,
-        public array $readerRoles = [],
+        public TaskRoles $roles,
         public ?FeatureGate $gate = null,
         public ?string $done = null,
     ) {
@@ -45,26 +41,14 @@ readonly class Task
     }
 
     /**
-     * Whether the given role can carry out this task, can only read along, or
-     * has nothing to do with it.
+     * Whether the given roles can carry out this task, can only read along, or
+     * have nothing to do with it.
      *
      * @param array<Role> $roles
      */
     public function capabilityFor(array $roles): TaskCapability
     {
-        foreach ($roles as $role) {
-            if (in_array($role, $this->roles, true)) {
-                return TaskCapability::PERFORM;
-            }
-        }
-
-        foreach ($roles as $role) {
-            if (in_array($role, $this->readerRoles, true)) {
-                return TaskCapability::READ;
-            }
-        }
-
-        return TaskCapability::NONE;
+        return $this->roles->capabilityFor($roles);
     }
 
     /**
