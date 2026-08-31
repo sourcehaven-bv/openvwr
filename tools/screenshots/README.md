@@ -43,7 +43,7 @@ optioneel op welk element wordt bijgesneden.
 ```js
 {
   name: 'export',
-  file: '05_overige_functies/01_avg-responsible-processing-records_export.png',
+  file: '06_overige_functies/01_avg-responsible-processing-records_export.png',
   auth: true,
   clip: '.fi-main',          // knip bij op dit element, niet op pixelcoördinaten
   async shoot(page) { ... }, // breng de app in de juiste toestand, plaats annotaties
