@@ -1,6 +1,6 @@
 # Screenshots voor de handleiding
 
-Genereert de afbeeldingen in `docs/handleiding/imgs/` door de applicatie met
+Genereert de afbeeldingen in `src/cms/public/handleiding/` door de applicatie met
 Playwright te bedienen. Bedoeld om vaker te draaien: na een UI-wijziging
 regenereer je de figuren in plaats van ze met de hand opnieuw te maken.
 
@@ -26,7 +26,7 @@ Daarna:
 cd tools/screenshots
 npm install && npx playwright install chromium
 
-CMS_DIR=../../src/cms npm run capture                 # alles, naar docs/handleiding/imgs
+CMS_DIR=../../src/cms npm run capture                 # alles, naar src/cms/public/handleiding
 CMS_DIR=../../src/cms npm run capture -- --only login # één figuur
 CMS_DIR=../../src/cms npm run capture -- --out ./preview  # eerst bekijken
 ```
