@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages;
 
-use App\Filament\Actions\CreateSnapshotAction;
 use App\Filament\Actions\GoToPublicPageAction;
 use App\Filament\Actions\ToggleRegisterLayoutAction;
 use App\Filament\Pages\ProcessingRecordViewRecord;
@@ -20,7 +19,6 @@ class ViewAvgResponsibleProcessingRecord extends ProcessingRecordViewRecord
         return [
             ToggleRegisterLayoutAction::make(),
             GoToPublicPageAction::make(),
-            CreateSnapshotAction::make(),
             DeleteAction::make(),
         ];
     }

@@ -153,7 +153,7 @@ it('renders the callouts of the source text', function (): void {
     $organisation = OrganisationTestHelper::create();
 
     $this->asFilamentOrganisationUser($organisation)
-        ->get(manualUrl($organisation->slug, '/naslag/versie-aanmaken'))
+        ->get(manualUrl($organisation->slug, '/naslag/versie-indienen'))
         ->assertOk()
         ->assertSee('manual-callout', escape: false);
 });

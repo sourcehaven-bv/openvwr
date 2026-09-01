@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ReceiverResource\Pages;
 
-use App\Filament\Actions\CreateSnapshotAction;
 use App\Filament\Resources\ReceiverResource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -17,7 +16,6 @@ class ViewReceiver extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            CreateSnapshotAction::make(),
             EditAction::make(),
             DeleteAction::make(),
         ];

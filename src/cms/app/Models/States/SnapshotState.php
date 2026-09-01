@@ -9,11 +9,13 @@ use App\Enums\StateColor;
 use App\Filament\Actions\SnapshotTransition\SnapshotTransitionAction;
 use App\Models\Snapshot;
 use App\Models\States\Snapshot\Approved;
+use App\Models\States\Snapshot\Concept;
 use App\Models\States\Snapshot\Established;
 use App\Models\States\Snapshot\InReview;
 use App\Models\States\Snapshot\Obsolete;
 use App\Models\States\Transitions\ApprovedTransition;
 use App\Models\States\Transitions\EstablishedTransition;
+use App\Models\States\Transitions\InReviewTransition;
 use App\Models\States\Transitions\ObsoleteTransition;
 use Spatie\ModelStates\Exceptions\InvalidConfig;
 use Spatie\ModelStates\State;
@@ -28,7 +30,8 @@ use const PHP_INT_MAX;
  */
 abstract class SnapshotState extends State
 {
-    public const DEFAULT_STATE = InReview::class;
+    public const DEFAULT_STATE = Concept::class;
+    public const REVIEW_STATE = InReview::class;
     public const OBSOLETE_STATE = Obsolete::class;
 
     /**
@@ -37,6 +40,7 @@ abstract class SnapshotState extends State
      * a branch shown after the line, from any non-obsolete state.
      */
     public const FORWARD_LINE = [
+        Concept::class,
         InReview::class,
         Approved::class,
         Established::class,
@@ -93,12 +97,18 @@ abstract class SnapshotState extends State
     {
         $config = parent::config()
             ->default(self::DEFAULT_STATE)
+            ->registerState(Concept::class)
             ->registerState(InReview::class)
             ->registerState(Approved::class)
             ->registerState(Established::class)
             ->registerState(Obsolete::class);
 
         $config->ignoreSameState();
+        // Nothing transitions *into* concept: a concept is written by saving the entity,
+        // not by moving a snapshot back. Once it leaves, that concept is spent and the
+        // next save starts a new one.
+        $config->allowTransition(Concept::class, InReview::class, InReviewTransition::class);
+        $config->allowTransition(Concept::class, Obsolete::class, ObsoleteTransition::class);
         $config->allowTransition(InReview::class, Approved::class, ApprovedTransition::class);
         $config->allowTransition(Approved::class, Established::class, EstablishedTransition::class);
         // Direct skip: an authorised user may establish straight from review,

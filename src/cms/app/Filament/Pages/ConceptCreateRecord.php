@@ -6,6 +6,8 @@ namespace App\Filament\Pages;
 
 use App\Filament\Forms\DraftableForm;
 use App\Filament\Pages\Concerns\CoercesClearedRequiredFields;
+use App\Filament\Pages\Concerns\EnforcesRequiredFieldsWhenSubmitting;
+use App\Filament\Pages\Concerns\StoresConceptSnapshot;
 use App\Filament\Pages\Contracts\SavesConcepts;
 use Filament\Forms\Form;
 
@@ -16,7 +18,7 @@ use Filament\Forms\Form;
  * the reasoning that a record needs a name to exist, but a user who starts a record
  * and only knows part of the answers has the same problem there as on edit: the wizard
  * is skippable, yet the final button refuses. So creating no longer enforces required
- * fields either; they are enforced when a version (snapshot) is created.
+ * fields either; they are enforced when the concept is sent to review.
  *
  * Only the record types that already have concept editing use this base class. The
  * shared {@see CreateRecord} base is deliberately left alone, because plain lookup
@@ -25,6 +27,8 @@ use Filament\Forms\Form;
 abstract class ConceptCreateRecord extends CreateRecord implements SavesConcepts
 {
     use CoercesClearedRequiredFields;
+    use EnforcesRequiredFieldsWhenSubmitting;
+    use StoresConceptSnapshot;
 
     protected function makeForm(): Form
     {
@@ -39,5 +43,10 @@ abstract class ConceptCreateRecord extends CreateRecord implements SavesConcepts
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         return $this->coerceClearedRequiredFields($this->form, parent::mutateFormDataBeforeCreate($data));
+    }
+
+    protected function afterCreate(): void
+    {
+        $this->storeConceptSnapshot();
     }
 }

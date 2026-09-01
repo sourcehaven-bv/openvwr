@@ -49,7 +49,7 @@ final class TaskContent
             self::verwerkingVastleggen(),
             self::wpgVerwerkingVastleggen(),
             self::datalekMelden(),
-            self::versieAanmakenEnLatenGoedkeuren(),
+            self::versieIndienenEnLatenGoedkeuren(),
             self::labelsGebruiken(),
             self::overzichtOpvragen(),
             self::verwerkingPubliceren(),
@@ -124,9 +124,9 @@ final class TaskContent
                     topicIds: ['wpg-register', 'verwerkingsregisters'],
                 ),
                 new Step(
-                    title: 'Maak een versie aan',
+                    title: 'Dien de conceptversie in',
                     body: 'Ook het goedkeuringsproces is hetzelfde als bij de andere registers.',
-                    topicIds: ['versie-aanmaken'],
+                    topicIds: ['versie-indienen'],
                 ),
             ],
             roles: new TaskRoles(
@@ -178,28 +178,28 @@ final class TaskContent
         );
     }
 
-    private static function versieAanmakenEnLatenGoedkeuren(): Task
+    private static function versieIndienenEnLatenGoedkeuren(): Task
     {
         return new Task(
             id: 'versie-laten-vaststellen',
             group: self::GROUP_VASTSTELLEN,
-            title: 'Een versie aanmaken en laten goedkeuren',
+            title: 'Een versie indienen en laten goedkeuren',
             summary: 'Een verwerking door het goedkeuringsproces leiden.',
-            intro: 'Is een verwerking compleet, dan maakt u er een versie van. Die versie gaat '
+            intro: 'Is een verwerking compleet, dan dient u de conceptversie in. Die versie gaat '
                 . 'langs een Privacy Officer en wordt vastgesteld, eventueel nadat Mandaathouders '
                 . 'akkoord hebben gegeven.',
             steps: [
                 new Step(
-                    title: 'Maak een versie aan',
-                    body: 'Klik rechtsbovenin op "Versie aanmaken". Ontbreken er verplichte '
-                        . 'velden, dan ziet u nu welke.',
-                    topicIds: ['versie-aanmaken'],
+                    title: 'Dien de conceptversie in',
+                    body: 'Klik rechtsbovenin op "Start vaststellen". Die knop slaat eerst op. '
+                        . 'Ontbreken er verplichte velden, dan ziet u dat nu bij het veld zelf.',
+                    topicIds: ['versie-indienen'],
                 ),
                 new Step(
                     title: 'Koppel eventueel Mandaathouders',
                     body: 'Werkt uw organisatie met Mandaathouders, voeg ze dan toe onder '
                         . '"Ondertekeningen".',
-                    topicIds: ['versie-aanmaken', 'akkoord-geven'],
+                    topicIds: ['versie-indienen', 'akkoord-geven'],
                 ),
                 new Step(
                     title: 'Laat de versie goedkeuren',

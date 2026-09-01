@@ -9,6 +9,7 @@ use App\Models\Dpia\DpiaMeasure;
 use App\Models\Dpia\DpiaPersonalData;
 use App\Models\Dpia\DpiaRecord;
 use App\Models\Dpia\DpiaRisk;
+use App\Models\States\Snapshot\Concept;
 use App\Models\States\Snapshot\Established;
 use App\Models\States\Snapshot\InReview;
 use App\Models\User;
@@ -52,7 +53,7 @@ it('captures the whole DPIA in a snapshot', function (): void {
         ->toContain('17. Maatregelen');
 });
 
-it('starts a DPIA snapshot in review', function (): void {
+it('starts a DPIA snapshot as a concept', function (): void {
     $organisation = OrganisationTestHelper::create();
     $this->be(User::factory()->create());
 
@@ -60,7 +61,7 @@ it('starts a DPIA snapshot in review', function (): void {
 
     $snapshot = app(SnapshotFactory::class)->fromSnapshotSource($dpiaRecord);
 
-    expect($snapshot->state)->toBeInstanceOf(InReview::class);
+    expect($snapshot->state)->toBeInstanceOf(Concept::class);
 });
 
 // A DPIA can be vastgesteld like a register, which is what lets an FG or CPO
@@ -70,7 +71,7 @@ it('can be established so it is vastgesteld', function (): void {
     $this->be(User::factory()->create());
 
     $dpiaRecord = DpiaRecord::factory()->recycle($organisation)->create();
-    $snapshot = app(SnapshotFactory::class)->fromSnapshotSource($dpiaRecord);
+    $snapshot = app(SnapshotFactory::class)->fromSnapshotSource($dpiaRecord, InReview::class);
 
     $snapshot->state->transitionTo(Established::class);
 
@@ -85,7 +86,7 @@ it('does not rebuild the static website when a DPIA is established', function ()
     $this->be(User::factory()->create());
 
     $dpiaRecord = DpiaRecord::factory()->recycle($organisation)->create();
-    $snapshot = app(SnapshotFactory::class)->fromSnapshotSource($dpiaRecord);
+    $snapshot = app(SnapshotFactory::class)->fromSnapshotSource($dpiaRecord, InReview::class);
 
     Event::fake(BuildEvent::class);
 

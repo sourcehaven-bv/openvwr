@@ -13,6 +13,7 @@ use App\Facades\Authorization;
 use App\Facades\DateFormat;
 use App\Filament\Infolists\Components\DateTimeEntry;
 use App\Filament\Infolists\Components\SnapshotStateEntry;
+use App\Filament\Infolists\Components\SnapshotStatusChangeAction;
 use App\Filament\Infolists\Components\SnapshotStatusFlow;
 use App\Filament\Infolists\Components\SnapshotUrlEntry;
 use App\Filament\Resources\SnapshotResource\Pages\ViewSnapshot;
@@ -41,6 +42,8 @@ use function view;
 
 class ViewInfoTab extends Tab
 {
+    public const string SECTION_KEY_STATUS_FLOW = 'status_flow_section';
+
     public static function make(string $label): static
     {
         return parent::make($label)
@@ -58,6 +61,12 @@ class ViewInfoTab extends Tab
     private static function getStatusFlowSection(): Section
     {
         return Section::make(__('snapshot.status_flow'))
+            ->key(self::SECTION_KEY_STATUS_FLOW)
+            // Beside the flow rather than in the page header: the button changes exactly
+            // what the flow shows, so it belongs next to it.
+            ->headerActions([
+                SnapshotStatusChangeAction::make(),
+            ])
             ->schema([
                 SnapshotStatusFlow::make(),
             ]);

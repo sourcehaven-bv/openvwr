@@ -6,6 +6,8 @@ namespace App\Filament\Pages;
 
 use App\Filament\Forms\DraftableForm;
 use App\Filament\Pages\Concerns\CoercesClearedRequiredFields;
+use App\Filament\Pages\Concerns\EnforcesRequiredFieldsWhenSubmitting;
+use App\Filament\Pages\Concerns\StoresConceptSnapshot;
 use App\Filament\Pages\Contracts\SavesConcepts;
 use Filament\Forms\Form;
 use Filament\Resources\Pages\EditRecord;
@@ -18,11 +20,13 @@ use Filament\Resources\Pages\EditRecord;
  * that were passed long ago. Saving half-finished is an intentional, documented feature
  * (the "Verwerkingsregisters" topic in App\Manual\Content\ReferenceContent), so save
  * no longer enforces required fields.
- * They are enforced when a version (snapshot) is created instead.
+ * They are enforced when the concept is sent to review instead.
  */
 abstract class ConceptEditRecord extends EditRecord implements SavesConcepts
 {
     use CoercesClearedRequiredFields;
+    use EnforcesRequiredFieldsWhenSubmitting;
+    use StoresConceptSnapshot;
 
     protected function makeForm(): Form
     {
@@ -37,5 +41,10 @@ abstract class ConceptEditRecord extends EditRecord implements SavesConcepts
     protected function mutateFormDataBeforeSave(array $data): array
     {
         return $this->coerceClearedRequiredFields($this->form, parent::mutateFormDataBeforeSave($data));
+    }
+
+    protected function afterSave(): void
+    {
+        $this->storeConceptSnapshot();
     }
 }

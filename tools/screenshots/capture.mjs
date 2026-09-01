@@ -199,7 +199,7 @@ const FIGURES = [
     name: 'record-version',
     file: '03_goedkeuringsproces/01_avg-responsible-processing-records_edit_versie.png',
     auth: true,
-    // Top of the edit page: heading plus the "Versie aanmaken" action. Extra
+    // Top of the edit page: heading plus the "Start vaststellen" action. Extra
     // padding leaves room for the arrow above the button.
     clip: '.fi-header',
     pad: 90,
@@ -207,9 +207,9 @@ const FIGURES = [
       await gotoSeededRecord(page);
       await page.evaluate(() => {
         const btn = [...document.querySelectorAll('button, a')].find((b) =>
-          /Versie aanmaken/i.test(b.textContent || ''),
+          /Start vaststellen/i.test(b.textContent || ''),
         );
-        if (!btn) throw new Error('"Versie aanmaken" button not found');
+        if (!btn) throw new Error('"Start vaststellen" button not found');
         // From above: pointing from the left would cross the "Dupliceren"
         // button that sits immediately beside it.
         window.__annotate.arrow(btn, { side: 'top', length: 70, gap: 10 });
