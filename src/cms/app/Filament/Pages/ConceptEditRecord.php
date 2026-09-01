@@ -16,7 +16,8 @@ use Filament\Resources\Pages\EditRecord;
  * The tester feedback this addresses: stepping through the wizard with `->skippable()`
  * never complains, but pressing save suddenly reports required fields — often on steps
  * that were passed long ago. Saving half-finished is an intentional, documented feature
- * (docs/handleiding/02_registers.md), so save no longer enforces required fields.
+ * (the "Verwerkingsregisters" topic in App\Manual\Content\ReferenceContent), so save
+ * no longer enforces required fields.
  * They are enforced when a version (snapshot) is created instead.
  */
 abstract class ConceptEditRecord extends EditRecord implements SavesConcepts

@@ -11,6 +11,7 @@ use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\OnePageLayoutRenderHooks;
 use App\Filament\Pages\DevLogin;
 use App\Filament\Pages\Login;
+use App\Filament\Pages\Manual\Handleiding;
 use App\Filament\Pages\Profile;
 use App\Filament\SimpleAvatarProvider;
 use App\Http\Controllers\HealthController;
@@ -160,6 +161,32 @@ class FilamentServiceProvider extends PanelProvider
     }
 
     /**
+     * The manual, which lives in the panel itself so it can follow the same
+     * feature flags as the rest of the interface.
+     */
+    private function manualMenuItem(): MenuItem
+    {
+        return MenuItem::make()
+            ->url(static function (): string {
+                $panel = Filament::getCurrentPanel();
+                Assert::isInstanceOf($panel, Panel::class);
+
+                $route = request()->route();
+                Assert::isInstanceOf($route, Route::class);
+
+                try {
+                    $tenant = Organisation::where(['slug' => $route->parameter('tenant')])->firstOrFail();
+                } catch (ModelNotFoundException) {
+                    abort(404);
+                }
+
+                return Handleiding::getUrl(panel: $panel->getId(), tenant: $tenant);
+            })
+            ->icon('heroicon-o-book-open')
+            ->label(__('general.manual'));
+    }
+
+    /**
      * @throws Exception
      */
     public function panel(Panel $panel): Panel
@@ -249,10 +276,7 @@ class FilamentServiceProvider extends PanelProvider
 
                         return Profile::getUrl(panel: $panel->getId(), tenant: $tenant);
                     }),
-                'manual' => MenuItem::make()
-                    ->url(asset('pdf/openvwr_handleiding.pdf'), true)
-                    ->icon('heroicon-o-document-check')
-                    ->label(__('general.manual')),
+                'manual' => $this->manualMenuItem(),
             ])
             ->maxContentWidth('screen-2xl')
             ->sidebarWidth('25rem')
