@@ -527,6 +527,17 @@ const FIGURES = [
     // with them instead of silently capturing whichever block sits there.
     clip: '.filament-breezy-grid-section:has(.filament-breezy-grid-title:text-is("Tweefactorauthenticatie"))',
     pad: 16,
+    // The figure necessarily renders a scannable QR code and the matching key
+    // in plain text, and this image ships in the manual PDF, which sits under
+    // the Laravel document root and is served without authentication. The
+    // captured secret is faker output from a dev database, so nothing real
+    // leaks today - but the mechanism publishes whatever the database holds at
+    // capture time, so scrub it here rather than relying on that staying true.
+    postprocess(outPath) {
+      execFileSync('python3', [join(here, 'redact-otp.py'), outPath], {
+        stdio: 'inherit',
+      });
+    },
     async shoot(page) {
       // The seeded user already has a confirmed factor, so the gate would never
       // fire. Roll it back to "enrolled but not confirmed" - the state a real
@@ -791,6 +802,10 @@ for (const fig of todo) {
         : {}),
     });
     await page.evaluate(() => window.__annotate?.clear());
+    // Runs on the written file, after the clip has been applied - a figure that
+    // must not ship what it renders (see otp-setup) is scrubbed here rather
+    // than left to a manual step someone has to remember.
+    if (fig.postprocess) fig.postprocess(outPath);
     console.log(`✓ ${fig.name} -> ${fig.file}`);
   } catch (e) {
     // Keep going: one broken figure should not block regenerating the rest.
