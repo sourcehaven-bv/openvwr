@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProcessorResource;
 
-use Filament\Schemas\Schema;
 use App\Filament\Forms\Components\Repeater\AddressRepeater;
 use App\Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Schema;
 
 use function __;
 
@@ -20,7 +21,7 @@ class ProcessorResourceForm
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getSchema(): array
     {

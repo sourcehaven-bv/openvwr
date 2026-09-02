@@ -9,8 +9,6 @@
 
 declare(strict_types=1);
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
 use App\Documentation\FieldDescriber;
 use App\Documentation\FormEnvironment;
 use App\Documentation\RegisterRenderer;
@@ -19,6 +17,8 @@ use App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 use App\Filament\Resources\ContactPersonResource;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\File;
 use Tests\Fixtures\Documentation\BrokenRegisterResource;
 

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AvgProcessorProcessingRecordResource;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Tabs\Tab;
-use Filament\Schemas\Components\Section;
 use App\Filament\Infolists\Components\ProcessingRecordTabs;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Schema;
 
 use function __;
 

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrganisationSnapshotApprovalResource\Pages;
 
-use Filament\Schemas\Components\Tabs\Tab;
 use App\Filament\Resources\OrganisationSnapshotApprovalResource;
 use App\Filament\Resources\Pages\Concerns\PersistsFiltersInSession;
 use App\Models\Builders\SnapshotBuilder;
@@ -13,6 +12,7 @@ use App\Models\States\Snapshot\Established;
 use App\Models\States\Snapshot\InReview;
 use App\Models\States\Snapshot\Obsolete;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Schemas\Components\Tabs\Tab;
 
 use function __;
 

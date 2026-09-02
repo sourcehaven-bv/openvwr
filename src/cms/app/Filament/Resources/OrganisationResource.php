@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\RelationManagers\UsersRelationManager;
 use App\Filament\Resources\OrganisationResource\OrganisationResourceForm;
@@ -15,6 +14,8 @@ use App\Filament\Resources\OrganisationResource\Pages\EditOrganisation;
 use App\Filament\Resources\OrganisationResource\Pages\ListOrganisations;
 use App\Filament\Resources\OrganisationResource\Pages\ViewOrganisation;
 use App\Models\Organisation;
+use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 
 use function __;
@@ -23,7 +24,7 @@ class OrganisationResource extends Resource
 {
     protected static bool $isScopedToTenant = false;
     protected static ?string $model = Organisation::class;
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-building-office';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-building-office';
     protected static ?int $navigationSort = 1;
 
     public static function getNavigationGroup(): ?string

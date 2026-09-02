@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms;
 
-use Filament\Schemas\Components\Utilities\Get;
 use App\Facades\Authentication;
 use Closure;
+use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Throwable;

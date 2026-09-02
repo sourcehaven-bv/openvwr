@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DpiaPrescanRecordResource;
 
-use Filament\Actions\EditAction;
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\EntityNumber;
 use App\Filament\Tables\Columns\TagsColumn;
@@ -12,6 +11,7 @@ use App\Filament\Tables\Columns\UpdatedAtColumn;
 use App\Models\Dpia\DpiaPrescanRecord;
 use App\Services\DateFormatService;
 use App\Services\Dpia\PrescanEvaluator;
+use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 

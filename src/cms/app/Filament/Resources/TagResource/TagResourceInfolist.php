@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\TagResource;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
 use App\Enums\LabelColor;
 use App\Filament\LabelSwatch;
 use App\Models\Tag;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 
 use function __;
 
@@ -26,7 +27,7 @@ class TagResourceInfolist
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getSchema(): array
     {

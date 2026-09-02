@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\TagResource;
 
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteBulkAction;
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
 use App\Models\Tag;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;

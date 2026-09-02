@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
-use Filament\Schemas\Schema;
 use App\Config\Feature;
 use App\Enums\Authorization\Permission;
 use App\Facades\Authorization;
@@ -12,11 +11,13 @@ use App\Filament\Forms\Components\MarkdownEditor\MarkdownEditor;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Models\PublicWebsite as PublicWebsiteModel;
 use App\Repositories\PublicWebsiteRepository;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Schema;
 use Webmozart\Assert\Assert;
 
 use function __;
@@ -25,7 +26,7 @@ class PublicWebsite extends Page implements HasForms
 {
     use InteractsWithForms;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-home';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-home';
     protected static ?int $navigationSort = 6;
     protected static ?string $slug = 'public-website';
     protected string $view = 'filament.pages.public_website';

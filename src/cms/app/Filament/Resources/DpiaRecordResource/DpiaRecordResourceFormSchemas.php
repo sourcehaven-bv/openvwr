@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DpiaRecordResource;
 
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Utilities\Get;
-use Filament\Schemas\Components\Component;
 use App\Enums\Dpia\DpiaSubjectType;
 use App\Filament\Forms\Components\RelationTable;
 use App\Filament\Forms\Components\RelationTableColumns;
@@ -27,6 +24,9 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Support\HtmlString;
 
 use function __;
@@ -39,7 +39,7 @@ use function __;
 class DpiaRecordResourceFormSchemas
 {
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getGeneral(): array
     {
@@ -74,7 +74,7 @@ class DpiaRecordResourceFormSchemas
     /**
      * 1. Voorstel
      *
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getProposal(): array
     {
@@ -96,7 +96,7 @@ class DpiaRecordResourceFormSchemas
     /**
      * 4. Technieken en methoden
      *
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getTechniques(): array
     {
@@ -138,7 +138,7 @@ class DpiaRecordResourceFormSchemas
     /**
      * 5. Verwerkingsdoeleinden
      *
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getPurposes(): array
     {
@@ -154,7 +154,7 @@ class DpiaRecordResourceFormSchemas
     /**
      * 6. Betrokken partijen
      *
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getParties(): array
     {
@@ -175,7 +175,7 @@ class DpiaRecordResourceFormSchemas
     /**
      * 7. Belangen
      *
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getInterests(): array
     {
@@ -196,7 +196,7 @@ class DpiaRecordResourceFormSchemas
     /**
      * 8. Verwerkingslocaties
      *
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getLocations(): array
     {
@@ -227,7 +227,7 @@ class DpiaRecordResourceFormSchemas
     /**
      * 9. Juridisch en beleidsmatig kader
      *
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getLegalFramework(): array
     {
@@ -243,7 +243,7 @@ class DpiaRecordResourceFormSchemas
     /**
      * 10. Bewaartermijnen
      *
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getRetention(): array
     {
@@ -269,7 +269,7 @@ class DpiaRecordResourceFormSchemas
     /**
      * 11. Rechtsgrond
      *
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getLegalBasis(): array
     {
@@ -291,7 +291,7 @@ class DpiaRecordResourceFormSchemas
     /**
      * 12. Bijzondere persoonsgegevens
      *
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getSpecialCategories(): array
     {
@@ -315,7 +315,7 @@ class DpiaRecordResourceFormSchemas
     /**
      * 13. Doelbinding
      *
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getPurposeLimitation(): array
     {
@@ -336,7 +336,7 @@ class DpiaRecordResourceFormSchemas
     /**
      * 14. Noodzaak en evenredigheid
      *
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getNecessity(): array
     {
@@ -357,7 +357,7 @@ class DpiaRecordResourceFormSchemas
     /**
      * 15. Rechten van de betrokkenen
      *
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getRights(): array
     {
@@ -382,7 +382,7 @@ class DpiaRecordResourceFormSchemas
     /**
      * Koppelingen naar verwerkingen en systemen.
      *
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getRelations(): array
     {
@@ -413,7 +413,7 @@ class DpiaRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getAttachments(): array
     {
@@ -431,7 +431,7 @@ class DpiaRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getRemarks(): array
     {

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DataBreachRecord;
 
-use Filament\Actions\EditAction;
 use App\Filament\Actions\TransferCopyBulkAction;
 use App\Filament\Actions\TransferExportBulkAction;
 use App\Filament\Tables\Columns\CreatedAtColumn;
@@ -18,6 +17,7 @@ use App\Filament\Tables\ResponsibleFilter;
 use App\Filament\Tables\TagFilter;
 use App\Models\States\DataBreachRecordState;
 use App\Services\DateFormatService;
+use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;

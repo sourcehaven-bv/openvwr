@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms\Components\Group;
 
-use Filament\Schemas\Components\Group;
 use App\Facades\Authentication;
 use App\Filament\Forms\Components\RelationTable;
 use App\Filament\Forms\Components\RelationTableColumns;
@@ -13,6 +12,7 @@ use App\Models\ContactPerson;
 use App\Models\OrganisationUser;
 use App\Models\User;
 use App\Rules\CurrentOrganisation;
+use Filament\Schemas\Components\Group;
 use Illuminate\Database\Eloquent\Builder;
 
 use function __;

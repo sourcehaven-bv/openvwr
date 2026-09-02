@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
-use App\Filament\Resources\DpiaPrescanRecordResource\Pages\ListDpiaPrescanRecords;
-use App\Filament\Resources\DpiaPrescanRecordResource\Pages\CreateDpiaPrescanRecord;
-use App\Filament\Resources\DpiaPrescanRecordResource\Pages\EditDpiaPrescanRecord;
 use App\Enums\RegisterLayout;
 use App\Facades\Authentication;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\Resources\DpiaPrescanRecordResource\DpiaPrescanRecordResourceForm;
 use App\Filament\Resources\DpiaPrescanRecordResource\DpiaPrescanRecordResourceTable;
-use App\Filament\Resources\DpiaPrescanRecordResource\Pages;
+use App\Filament\Resources\DpiaPrescanRecordResource\Pages\CreateDpiaPrescanRecord;
+use App\Filament\Resources\DpiaPrescanRecordResource\Pages\EditDpiaPrescanRecord;
+use App\Filament\Resources\DpiaPrescanRecordResource\Pages\ListDpiaPrescanRecords;
 use App\Models\Dpia\DpiaPrescanRecord;
+use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 
 use function __;
@@ -22,7 +22,7 @@ use function __;
 class DpiaPrescanRecordResource extends Resource
 {
     protected static ?string $model = DpiaPrescanRecord::class;
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-clipboard-document-check';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-check';
 
     // Sorted before the DPIA itself: the pre-scan is what you fill in first.
     protected static ?int $navigationSort = 1;

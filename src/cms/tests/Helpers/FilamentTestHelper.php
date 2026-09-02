@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Helpers;
 
-use Filament\Schemas\Schema;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Schemas\Schema;
 
 class FilamentTestHelper
 {

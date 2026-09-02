@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\Resources\LookupListResource\LookupListResourceForm;
 use App\Filament\Resources\LookupListResource\LookupListResourceInfolist;
 use App\Filament\Resources\LookupListResource\LookupListResourceTable;
+use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Webmozart\Assert\Assert;
@@ -17,7 +18,7 @@ use function __;
 
 abstract class LookupListResource extends Resource
 {
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-magnifying-glass';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-magnifying-glass';
 
     abstract public static function getEmptyStateHeading(): string;
 

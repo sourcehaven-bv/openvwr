@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrganisationUserResource;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
 use App\Enums\Authorization\Permission;
 use App\Enums\Authorization\Role;
 use App\Facades\Authorization;
@@ -14,6 +12,8 @@ use App\Models\OrganisationUserRole;
 use App\Models\User;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 
 use function __;
 
@@ -42,7 +42,7 @@ class OrganisationUserResourceForm
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Section>
+     * @return array<Section>
      */
     private static function getOrganisationRoleToggles(): array
     {

@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ContactPersonPositionResource\Pages\ListContactPersonPositions;
+use App\Filament\RelationManagers\ContactPersonRelationManager;
 use App\Filament\Resources\ContactPersonPositionResource\Pages\CreateContactPersonPosition;
 use App\Filament\Resources\ContactPersonPositionResource\Pages\EditContactPersonPosition;
+use App\Filament\Resources\ContactPersonPositionResource\Pages\ListContactPersonPositions;
 use App\Filament\Resources\ContactPersonPositionResource\Pages\ViewContactPersonPosition;
-use App\Filament\RelationManagers\ContactPersonRelationManager;
-use App\Filament\Resources\ContactPersonPositionResource\Pages;
 use App\Models\ContactPersonPosition;
 
 use function __;

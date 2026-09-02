@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ResponsibleResource;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Grid;
 use App\Filament\Infolists\Components\AddressRepeatableEntry;
 use App\Filament\Infolists\Components\TagsEntry;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 
 use function __;
 
@@ -26,7 +27,7 @@ class ResponsibleResourceInfolist
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getSchema(): array
     {

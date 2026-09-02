@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms\Components\TextInput;
 
-use Filament\Actions\Action;
-use Filament\Schemas\Components\Utilities\Set;
 use App\Enums\EntityNumberType;
 use App\Models\EntityNumberCounter;
 use App\Models\Organisation;
+use Filament\Actions\Action;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Utilities\Set;
 use Webmozart\Assert\Assert;
 
 use function __;

@@ -4,11 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
-use App\Filament\Resources\TagResource\Pages\ListTags;
-use App\Filament\Resources\TagResource\Pages\CreateTag;
-use App\Filament\Resources\TagResource\Pages\EditTag;
-use App\Filament\Resources\TagResource\Pages\ViewTag;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\RelationManagers\AlgorithmRecordRelationManager;
 use App\Filament\RelationManagers\AvgProcessorProcessingRecordRelationManager;
@@ -18,11 +13,16 @@ use App\Filament\RelationManagers\DataBreachRecordRelationManager;
 use App\Filament\RelationManagers\DocumentRelationManager;
 use App\Filament\RelationManagers\ResponsibleRelationManager;
 use App\Filament\RelationManagers\WpgProcessingRecordRelationManager;
-use App\Filament\Resources\TagResource\Pages;
+use App\Filament\Resources\TagResource\Pages\CreateTag;
+use App\Filament\Resources\TagResource\Pages\EditTag;
+use App\Filament\Resources\TagResource\Pages\ListTags;
+use App\Filament\Resources\TagResource\Pages\ViewTag;
 use App\Filament\Resources\TagResource\TagResourceForm;
 use App\Filament\Resources\TagResource\TagResourceInfolist;
 use App\Filament\Resources\TagResource\TagResourceTable;
 use App\Models\Tag;
+use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 
 use function __;
@@ -30,7 +30,7 @@ use function __;
 class TagResource extends Resource
 {
     protected static ?string $model = Tag::class;
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-tag';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-tag';
     protected static ?int $navigationSort = 12;
 
     public static function getNavigationGroup(): ?string

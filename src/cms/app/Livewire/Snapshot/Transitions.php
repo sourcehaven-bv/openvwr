@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Livewire\Snapshot;
 
-use Filament\Actions\Concerns\InteractsWithActions;
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\SnapshotStateColumn;
 use App\Models\Snapshot;
 use App\Models\SnapshotTransition;
+use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Columns\TextColumn;

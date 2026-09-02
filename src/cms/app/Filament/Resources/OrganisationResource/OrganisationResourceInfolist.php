@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrganisationResource;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
 use App\Config\Feature;
 use App\Filament\Infolists\Components\DateTimeEntry;
 use App\Filament\Infolists\Components\EntityNumberPrefixEntry;
 use App\Filament\Infolists\Components\TextareaEntry;
 use App\Models\Organisation;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Illuminate\Support\HtmlString;
 
 use function __;
@@ -27,7 +28,7 @@ class OrganisationResourceInfolist
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getSchema(): array
     {

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
-use Filament\Schemas\Schema;
 use App\Components\Uuid\Uuid;
 use App\Enums\Authorization\Permission;
 use App\Facades\Authentication;
@@ -16,12 +15,14 @@ use App\Transfer\Import\BundleReader;
 use App\Transfer\Import\PreviewBuilder;
 use App\Transfer\TransferBundleStorage;
 use App\Transfer\TransferException;
+use BackedEnum;
 use Carbon\CarbonImmutable;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Locked;
@@ -46,7 +47,7 @@ class TransferImport extends Page implements HasForms
     protected static ?string $slug = 'transfer-import';
     protected static ?int $navigationSort = 4;
     protected string $view = 'filament.pages.transfer-import';
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-archive-box';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-archive-box';
 
     /** @var ?array<TemporaryUploadedFile> $files */
     public ?array $files = null;

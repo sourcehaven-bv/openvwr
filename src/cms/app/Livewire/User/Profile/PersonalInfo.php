@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Livewire\User\Profile;
 
-use Filament\Schemas\Components\Group;
-use Filament\Schemas\Schema;
 use App\Facades\Authentication;
 use App\Models\User;
 use Filament\Actions\Concerns\InteractsWithActions;
@@ -14,6 +12,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 use Livewire\Exceptions\PropertyNotFoundException;
@@ -54,7 +54,7 @@ class PersonalInfo extends Component implements HasActions, HasForms
     }
 
     /**
-     * @return array<array-key, \Filament\Schemas\Components\Group>
+     * @return array<array-key, Group>
      */
     protected function getPersonalInfoFormSchema(): array
     {

@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\TagResource;
 
-use Filament\Schemas\Schema;
 use App\Enums\LabelColor;
 use App\Filament\LabelSwatch;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Schema;
 
 use function __;
 
@@ -21,7 +22,7 @@ class TagResourceForm
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getSchema(): array
     {

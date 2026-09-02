@@ -13,6 +13,7 @@ use App\Filament\TenantScoped;
 use App\Models\Tag;
 use App\Rules\CurrentOrganisation;
 use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Component;
 use Webmozart\Assert\Assert;
 
 use function __;
@@ -101,7 +102,7 @@ class TagsInput extends Select
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     private static function createTagOptionsForm(): array
     {

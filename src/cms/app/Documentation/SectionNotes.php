@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Documentation;
 
-use Filament\Schemas\Components\Component;
 use Filament\Forms\Components\Field;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Component;
 use ReflectionClass;
 use ReflectionMethod;
 use Throwable;
@@ -83,7 +83,7 @@ class SectionNotes
     /**
      * The note belonging to a section, found through the first field inside it.
      *
-     * @param array<int, \Filament\Schemas\Components\Component> $sectionComponents
+     * @param array<int, Component> $sectionComponents
      */
     public function forSection(array $sectionComponents): ?string
     {
@@ -132,7 +132,7 @@ class SectionNotes
      * A component's children, or an empty list when those can only be resolved
      * while filling in the form.
      *
-     * @return array<int, \Filament\Schemas\Components\Component>
+     * @return array<int, Component>
      */
     public function childrenOf(Component $component): array
     {

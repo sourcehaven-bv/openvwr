@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DpiaPrescanRecordResource;
 
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Component;
-use Filament\Schemas\Components\Utilities\Get;
-use Filament\Actions\Action;
 use App\Filament\Forms\Components\DatePicker\DatePicker;
 use App\Filament\Forms\Components\RelationTable;
 use App\Filament\Forms\Components\RelationTableColumns;
@@ -21,12 +17,16 @@ use App\Models\Document;
 use App\Services\Dpia\PrescanCriteria;
 use App\Services\Dpia\PrescanLiveStatus;
 use App\Services\Dpia\PrescanOutcomeSummary;
+use Filament\Actions\Action;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Support\HtmlString;
 
 use function __;
@@ -38,7 +38,7 @@ use function today;
 class DpiaPrescanRecordResourceFormSchemas
 {
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getGeneral(): array
     {
@@ -71,7 +71,7 @@ class DpiaPrescanRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getGrounds(): array
     {
@@ -129,7 +129,7 @@ class DpiaPrescanRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getApCriteria(): array
     {
@@ -150,7 +150,7 @@ class DpiaPrescanRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getEdpbCriteria(): array
     {
@@ -170,7 +170,7 @@ class DpiaPrescanRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getTransfer(): array
     {
@@ -201,7 +201,7 @@ class DpiaPrescanRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getOther(): array
     {
@@ -270,7 +270,7 @@ class DpiaPrescanRecordResourceFormSchemas
     /**
      * The verdicts, recomputed live from the answers.
      *
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getOutcome(): array
     {
@@ -298,7 +298,7 @@ class DpiaPrescanRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getRelations(): array
     {
@@ -315,7 +315,7 @@ class DpiaPrescanRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getAttachments(): array
     {

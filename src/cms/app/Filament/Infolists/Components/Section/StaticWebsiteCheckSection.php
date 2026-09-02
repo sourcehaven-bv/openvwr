@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Infolists\Components\Section;
 
-use Filament\Schemas\Components\Section;
 use App\Config\Feature;
 use App\Models\Contracts\Publishable;
 use App\Services\DateFormatService;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Section;
 use Illuminate\Support\Collection;
 use Webmozart\Assert\Assert;
 
@@ -27,7 +28,7 @@ class StaticWebsiteCheckSection extends Section
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     private static function getSchema(Publishable $record): array
     {

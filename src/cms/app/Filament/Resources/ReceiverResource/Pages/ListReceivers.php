@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ReceiverResource\Pages;
 
-use Filament\Actions\CreateAction;
 use App\Filament\Resources\Pages\Concerns\PersistsFiltersInSession;
 use App\Filament\Resources\ReceiverResource;
-use Filament\Actions;
+use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListReceivers extends ListRecords

@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\WpgProcessingRecordServiceResource\Pages\ListWpgProcessingRecordServices;
-use App\Filament\Resources\WpgProcessingRecordServiceResource\Pages\CreateWpgProcessingRecordService;
-use App\Filament\Resources\WpgProcessingRecordServiceResource\Pages\EditWpgProcessingRecordService;
-use App\Filament\Resources\WpgProcessingRecordServiceResource\Pages\ViewWpgProcessingRecordService;
 use App\Config\Feature;
 use App\Filament\RelationManagers\WpgProcessingRecordRelationManager;
-use App\Filament\Resources\WpgProcessingRecordServiceResource\Pages;
+use App\Filament\Resources\WpgProcessingRecordServiceResource\Pages\CreateWpgProcessingRecordService;
+use App\Filament\Resources\WpgProcessingRecordServiceResource\Pages\EditWpgProcessingRecordService;
+use App\Filament\Resources\WpgProcessingRecordServiceResource\Pages\ListWpgProcessingRecordServices;
+use App\Filament\Resources\WpgProcessingRecordServiceResource\Pages\ViewWpgProcessingRecordService;
 use App\Models\Wpg\WpgProcessingRecordService;
 use Illuminate\Database\Eloquent\Model;
 

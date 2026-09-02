@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Pages;
 
-use Filament\Schemas\Components\Tabs\Tab;
 use App\Filament\Resources\Pages\Concerns\PersistsFiltersInSession;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Schemas\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
 use function __;

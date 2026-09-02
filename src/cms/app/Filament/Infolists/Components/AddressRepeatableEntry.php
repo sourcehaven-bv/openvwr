@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Infolists\Components;
 
-use Filament\Schemas\Components\Section;
 use Closure;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Section;
 use Illuminate\Contracts\Support\Htmlable;
 
 use function __;

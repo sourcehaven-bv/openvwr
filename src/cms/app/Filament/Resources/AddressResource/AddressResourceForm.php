@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AddressResource;
 
-use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Section;
 
 use function __;
 
 class AddressResourceForm
 {
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getSchema(): array
     {

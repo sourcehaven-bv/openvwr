@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Livewire\User\Profile;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
 use App\Enums\Authorization\Permission;
 use App\Enums\Authorization\Role;
 use App\Enums\Notification\NotificationStream;
@@ -23,6 +21,8 @@ use Filament\Forms\Components\Radio;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 use Livewire\Exceptions\PropertyNotFoundException;

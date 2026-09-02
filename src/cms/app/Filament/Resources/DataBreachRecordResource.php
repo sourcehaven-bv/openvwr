@@ -4,11 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
-use App\Filament\Resources\DataBreachRecord\Pages\ListDataBreachRecords;
-use App\Filament\Resources\DataBreachRecord\Pages\CreateDataBreachRecord;
-use App\Filament\Resources\DataBreachRecord\Pages\EditDataBreachRecord;
-use App\Filament\Resources\DataBreachRecord\Pages\ApReportDataBreachRecord;
 use App\Enums\RegisterLayout;
 use App\Facades\Authentication;
 use App\Filament\NavigationGroups\NavigationGroup;
@@ -19,8 +14,13 @@ use App\Filament\RelationManagers\ResponsibleRelationManager;
 use App\Filament\RelationManagers\WpgProcessingRecordRelationManager;
 use App\Filament\Resources\DataBreachRecord\DataBreachRecordResourceForm;
 use App\Filament\Resources\DataBreachRecord\DataBreachRecordResourceTable;
-use App\Filament\Resources\DataBreachRecord\Pages;
+use App\Filament\Resources\DataBreachRecord\Pages\ApReportDataBreachRecord;
+use App\Filament\Resources\DataBreachRecord\Pages\CreateDataBreachRecord;
+use App\Filament\Resources\DataBreachRecord\Pages\EditDataBreachRecord;
+use App\Filament\Resources\DataBreachRecord\Pages\ListDataBreachRecords;
 use App\Models\DataBreachRecord;
+use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 
 use function __;
@@ -29,7 +29,7 @@ class DataBreachRecordResource extends Resource
 {
     protected static bool $hasNavigationBadge = true;
     protected static ?string $model = DataBreachRecord::class;
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-megaphone';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-megaphone';
     protected static ?int $navigationSort = 5;
 
     public static function getNavigationGroup(): ?string

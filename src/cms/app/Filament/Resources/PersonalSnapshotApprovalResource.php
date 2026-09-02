@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\PersonalSnapshotApprovalResource\Pages\ListPersonalSnapshotApprovalItems;
 use App\Enums\Authorization\Permission;
 use App\Facades\Authentication;
 use App\Facades\Authorization;
 use App\Filament\NavigationGroups\NavigationGroup;
-use App\Filament\Resources\PersonalSnapshotApprovalResource\Pages;
+use App\Filament\Resources\PersonalSnapshotApprovalResource\Pages\ListPersonalSnapshotApprovalItems;
 use App\Filament\Resources\PersonalSnapshotApprovalResource\PersonalSnapshotApprovalResourceTable;
 use App\Filament\Resources\SnapshotResource\Pages\ViewSnapshot;
 use App\Models\Snapshot;
+use BackedEnum;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -22,7 +22,7 @@ use function __;
 class PersonalSnapshotApprovalResource extends Resource
 {
     protected static ?string $model = Snapshot::class;
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-clipboard-document-check';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-check';
     protected static bool $hasNavigationBadge = true;
     protected static ?int $navigationSort = 1;
 

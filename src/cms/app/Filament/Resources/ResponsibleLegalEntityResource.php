@@ -4,27 +4,26 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
-use Filament\Tables\Table;
+use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\Resources\ResponsibleLegalEntityResource\Pages\CreateResponsibleLegalEntity;
 use App\Filament\Resources\ResponsibleLegalEntityResource\Pages\EditResponsibleLegalEntity;
-use App\Filament\Resources\ResponsibleLegalEntityResource\Pages\ViewResponsibleLegalEntity;
-use App\Filament\NavigationGroups\NavigationGroup;
-use App\Filament\Resources\ResponsibleLegalEntityResource\Pages;
 use App\Filament\Resources\ResponsibleLegalEntityResource\Pages\ListResponsibleLegalEnties;
+use App\Filament\Resources\ResponsibleLegalEntityResource\Pages\ViewResponsibleLegalEntity;
 use App\Filament\Resources\ResponsibleLegalEntityResource\ResponsibleLegalEntityResourceForm;
 use App\Filament\Resources\ResponsibleLegalEntityResource\ResponsibleLegalEntityResourceInfolist;
 use App\Filament\Resources\ResponsibleLegalEntityResource\ResponsibleLegalEntityResourceTable;
 use App\Models\ResponsibleLegalEntity;
+use BackedEnum;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Schemas\Schema;
+use Filament\Tables\Table;
 
 use function __;
 
 class ResponsibleLegalEntityResource extends Resource
 {
     protected static ?string $model = ResponsibleLegalEntity::class;
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-academic-cap';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-academic-cap';
     protected static ?int $navigationSort = 5;
     protected static bool $isScopedToTenant = false;
 

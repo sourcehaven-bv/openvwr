@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\RelationManagers;
 
+use App\Filament\Resources\UserResource;
 use Filament\Actions\AttachAction;
 use Filament\Actions\DetachAction;
-use App\Filament\Resources\UserResource;
 use Filament\Tables\Table;
 
 use function __;

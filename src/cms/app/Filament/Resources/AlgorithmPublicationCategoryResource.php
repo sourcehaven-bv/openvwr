@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\AlgorithmPublicationCategoryResource\Pages\ListAlgorithmPublicationCategories;
+use App\Filament\RelationManagers\AlgorithmRecordRelationManager;
 use App\Filament\Resources\AlgorithmPublicationCategoryResource\Pages\CreateAlgorithmPublicationCategory;
 use App\Filament\Resources\AlgorithmPublicationCategoryResource\Pages\EditAlgorithmPublicationCategory;
+use App\Filament\Resources\AlgorithmPublicationCategoryResource\Pages\ListAlgorithmPublicationCategories;
 use App\Filament\Resources\AlgorithmPublicationCategoryResource\Pages\ViewAlgorithmPublicationCategory;
-use App\Filament\RelationManagers\AlgorithmRecordRelationManager;
-use App\Filament\Resources\AlgorithmPublicationCategoryResource\Pages;
 use App\Models\Algorithm\AlgorithmPublicationCategory;
 
 use function __;

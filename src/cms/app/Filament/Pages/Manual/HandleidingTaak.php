@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Manual;
 
-use Filament\Panel;
 use App\Manual\Manual;
 use App\Manual\Task;
 use App\Manual\TaskCapability;
 use App\Manual\Topic;
+use Filament\Panel;
 use Webmozart\Assert\Assert;
 
 use function abort;

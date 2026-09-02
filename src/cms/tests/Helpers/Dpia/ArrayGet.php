@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Helpers\Dpia;
 
-use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Utilities\Get;
 
 use function is_string;
 

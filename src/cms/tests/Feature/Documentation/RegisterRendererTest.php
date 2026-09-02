@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
 use App\Documentation\FieldDescriber;
 use App\Documentation\FormEnvironment;
 use App\Documentation\RegisterRenderer;
@@ -12,6 +10,8 @@ use App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 
 beforeEach(function (): void {
     $this->environment = new FormEnvironment();

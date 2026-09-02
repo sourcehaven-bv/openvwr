@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
 use App\Enums\Authorization\Permission;
 use App\Enums\Authorization\Role;
 use App\Facades\Authorization;
@@ -17,6 +16,8 @@ use App\Filament\Resources\OrganisationUserResource\Pages\EditOrganisationUser;
 use App\Filament\Resources\OrganisationUserResource\Pages\ListOrganisationUsers;
 use App\Filament\Resources\OrganisationUserResource\Pages\ViewOrganisationUser;
 use App\Models\User;
+use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -27,7 +28,7 @@ class OrganisationUserResource extends Resource
 {
     protected static bool $isScopedToTenant = true;
     protected static ?string $model = User::class;
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-user';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-user';
     protected static ?int $navigationSort = 1;
     protected static ?string $tenantOwnershipRelationshipName = 'organisations';
 

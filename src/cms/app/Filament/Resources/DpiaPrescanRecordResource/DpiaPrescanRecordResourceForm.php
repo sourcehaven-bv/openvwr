@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DpiaPrescanRecordResource;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Wizard\Step;
-use Filament\Schemas\Components\Section;
 use App\Filament\Forms\Components\ProcessingRecordWizard;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Wizard\Step;
+use Filament\Schemas\Schema;
 
 use function __;
 
 class DpiaPrescanRecordResourceForm
 {
     /**
-     * @return array<string, array<\Filament\Schemas\Components\Component>>
+     * @return array<string, array<Component>>
      */
     private static function sections(): array
     {

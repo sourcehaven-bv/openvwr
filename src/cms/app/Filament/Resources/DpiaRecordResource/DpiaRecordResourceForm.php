@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DpiaRecordResource;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Wizard\Step;
-use Filament\Schemas\Components\Section;
 use App\Filament\Forms\Components\ProcessingRecordWizard;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Wizard\Step;
+use Filament\Schemas\Schema;
 
 use function __;
 
@@ -27,7 +28,7 @@ class DpiaRecordResourceForm
      * The sections, in order. Keyed by the step key used for the one-page
      * anchors so both layouts cannot drift apart.
      *
-     * @return array<string, array<\Filament\Schemas\Components\Component>>
+     * @return array<string, array<Component>>
      */
     private static function sections(): array
     {

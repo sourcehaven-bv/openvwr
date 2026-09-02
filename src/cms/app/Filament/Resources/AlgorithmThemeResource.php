@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\AlgorithmThemeResource\Pages\ListAlgorithmThemes;
+use App\Filament\RelationManagers\AlgorithmRecordRelationManager;
 use App\Filament\Resources\AlgorithmThemeResource\Pages\CreateAlgorithmTheme;
 use App\Filament\Resources\AlgorithmThemeResource\Pages\EditAlgorithmTheme;
+use App\Filament\Resources\AlgorithmThemeResource\Pages\ListAlgorithmThemes;
 use App\Filament\Resources\AlgorithmThemeResource\Pages\ViewAlgorithmTheme;
-use App\Filament\RelationManagers\AlgorithmRecordRelationManager;
-use App\Filament\Resources\AlgorithmThemeResource\Pages;
 use App\Models\Algorithm\AlgorithmTheme;
 
 use function __;

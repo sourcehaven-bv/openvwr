@@ -4,11 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
-use App\Filament\Resources\AlgorithmRecordResource\Pages\ListAlgorithmRecords;
-use App\Filament\Resources\AlgorithmRecordResource\Pages\CreateAlgorithmRecord;
-use App\Filament\Resources\AlgorithmRecordResource\Pages\ViewAlgorithmRecord;
-use App\Filament\Resources\AlgorithmRecordResource\Pages\EditAlgorithmRecord;
 use App\Enums\RegisterLayout;
 use App\Facades\Authentication;
 use App\Filament\NavigationGroups\NavigationGroup;
@@ -22,8 +17,13 @@ use App\Filament\RelationManagers\WpgProcessingRecordRelationManager;
 use App\Filament\Resources\AlgorithmRecordResource\AlgorithmRecordResourceForm;
 use App\Filament\Resources\AlgorithmRecordResource\AlgorithmRecordResourceInfolist;
 use App\Filament\Resources\AlgorithmRecordResource\AlgorithmRecordResourceTable;
-use App\Filament\Resources\AlgorithmRecordResource\Pages;
+use App\Filament\Resources\AlgorithmRecordResource\Pages\CreateAlgorithmRecord;
+use App\Filament\Resources\AlgorithmRecordResource\Pages\EditAlgorithmRecord;
+use App\Filament\Resources\AlgorithmRecordResource\Pages\ListAlgorithmRecords;
+use App\Filament\Resources\AlgorithmRecordResource\Pages\ViewAlgorithmRecord;
 use App\Models\Algorithm\AlgorithmRecord;
+use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 
 use function __;
@@ -32,7 +32,7 @@ class AlgorithmRecordResource extends Resource
 {
     protected static bool $hasNavigationBadge = true;
     protected static ?string $model = AlgorithmRecord::class;
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-calculator';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-calculator';
     protected static ?int $navigationSort = 4;
 
     public static function getNavigationGroup(): ?string

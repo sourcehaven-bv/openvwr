@@ -27,6 +27,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Component;
 use Illuminate\Support\Arr;
 use Webmozart\Assert\Assert;
 
@@ -35,7 +36,7 @@ use function __;
 class DataBreachRecordResourceFormSchemas
 {
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getName(): array
     {
@@ -71,7 +72,7 @@ class DataBreachRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getResponsible(): array
     {
@@ -94,7 +95,7 @@ class DataBreachRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getDates(): array
     {
@@ -123,7 +124,7 @@ class DataBreachRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getIncident(): array
     {
@@ -203,7 +204,7 @@ class DataBreachRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getNotification(): array
     {
@@ -223,7 +224,7 @@ class DataBreachRecordResourceFormSchemas
      * Questions 4 and 5 of the AP form: how the breach came to light and what
      * kind of breach it was.
      *
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     private static function getNotificationBreach(): array
     {
@@ -252,7 +253,7 @@ class DataBreachRecordResourceFormSchemas
     /**
      * Question 7 of the AP form: who was hit, and how many of them.
      *
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     private static function getNotificationAffectedPeople(): array
     {
@@ -292,7 +293,7 @@ class DataBreachRecordResourceFormSchemas
      * Questions 8, 9 and 10 of the AP form: what protected the data beforehand,
      * what the fallout is and how severe that is.
      *
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     private static function getNotificationConsequences(): array
     {
@@ -350,7 +351,7 @@ class DataBreachRecordResourceFormSchemas
      * Questions 1.3 and 2 of the AP form: other supervisors and the countries
      * this breach reaches into.
      *
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     private static function getNotificationOtherAuthorities(): array
     {
@@ -382,7 +383,7 @@ class DataBreachRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getProcessingRecords(): array
     {
@@ -412,7 +413,7 @@ class DataBreachRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getAttachments(): array
     {

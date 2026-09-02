@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms\Components\TextInput;
 
-use Filament\Schemas\Components\Utilities\Get;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Utilities\Get;
 
 use function __;
 use function filled;

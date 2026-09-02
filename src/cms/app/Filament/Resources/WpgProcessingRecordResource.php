@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
-use App\Filament\Resources\WpgProcessingRecordResource\Pages\ListWpgProcessingRecords;
-use App\Filament\Resources\WpgProcessingRecordResource\Pages\CreateWpgProcessingRecord;
-use App\Filament\Resources\WpgProcessingRecordResource\Pages\ViewWpgProcessingRecord;
-use App\Filament\Resources\WpgProcessingRecordResource\Pages\EditWpgProcessingRecord;
 use App\Config\Feature;
 use App\Enums\RegisterLayout;
 use App\Facades\Authentication;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\RelationManagers\SnapshotsRelationManager;
-use App\Filament\Resources\WpgProcessingRecordResource\Pages;
+use App\Filament\Resources\WpgProcessingRecordResource\Pages\CreateWpgProcessingRecord;
+use App\Filament\Resources\WpgProcessingRecordResource\Pages\EditWpgProcessingRecord;
+use App\Filament\Resources\WpgProcessingRecordResource\Pages\ListWpgProcessingRecords;
+use App\Filament\Resources\WpgProcessingRecordResource\Pages\ViewWpgProcessingRecord;
 use App\Filament\Resources\WpgProcessingRecordResource\WpgProcessingRecordResourceForm;
 use App\Filament\Resources\WpgProcessingRecordResource\WpgProcessingRecordResourceInfolist;
 use App\Filament\Resources\WpgProcessingRecordResource\WpgProcessingRecordResourceTable;
 use App\Models\Wpg\WpgProcessingRecord;
+use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 
@@ -28,7 +28,7 @@ class WpgProcessingRecordResource extends Resource
 {
     protected static bool $hasNavigationBadge = true;
     protected static ?string $model = WpgProcessingRecord::class;
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-document-magnifying-glass';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-magnifying-glass';
     protected static ?int $navigationSort = 3;
 
     public static function getNavigationGroup(): ?string

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrganisationUserResource\Pages;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
 use App\Enums\Authorization\Permission;
 use App\Enums\Authorization\Role;
 use App\Facades\Authentication;
@@ -17,6 +15,8 @@ use App\Models\OrganisationUserRole;
 use App\Models\User;
 use Closure;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -86,7 +86,7 @@ class CreateOrganisationUser extends CreateRecord
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Section>
+     * @return array<Section>
      */
     private static function getOrganisationRoleToggles(): array
     {

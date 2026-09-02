@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DocumentResource;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Grid;
 use App\Filament\Infolists\Components\AttachmentFileEntry;
 use App\Filament\Infolists\Components\DateEntry;
 use App\Filament\Infolists\Components\ExternalLinkEntry;
 use App\Filament\Infolists\Components\TagsEntry;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 
 use function __;
 
@@ -27,7 +28,7 @@ class DocumentResourceInfolist
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getSchema(): array
     {

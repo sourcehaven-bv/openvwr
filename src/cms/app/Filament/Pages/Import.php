@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
-use Filament\Schemas\Schema;
 use App\Enums\Authorization\Permission;
 use App\Events\StaticWebsite\BuildEvent;
 use App\Facades\Authentication;
@@ -14,11 +13,13 @@ use App\Import\ImportFailedException;
 use App\Import\ZipImporter;
 use App\Rules\Virusscanner;
 use App\Services\BuildContextService;
+use BackedEnum;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Log;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Webmozart\Assert\Assert;
@@ -33,7 +34,7 @@ class Import extends Page implements HasForms
     protected static ?string $slug = 'import';
     protected static ?int $navigationSort = 3;
     protected string $view = 'filament.pages.import';
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-document-plus';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-plus';
 
     /** @var ?array<TemporaryUploadedFile> $files */
     public ?array $files;

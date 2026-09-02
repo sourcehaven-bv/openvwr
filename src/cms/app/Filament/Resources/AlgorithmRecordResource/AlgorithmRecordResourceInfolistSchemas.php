@@ -12,13 +12,14 @@ use App\Filament\Infolists\Components\SelectMultipleEntry;
 use App\Filament\Infolists\Components\TagsEntry;
 use App\Filament\Infolists\Components\TextareaEntry;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Component;
 
 use function __;
 
 class AlgorithmRecordResourceInfolistSchemas
 {
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getProcessingName(): array
     {
@@ -54,7 +55,7 @@ class AlgorithmRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getResponsibleUse(): array
     {
@@ -87,7 +88,7 @@ class AlgorithmRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getMechanics(): array
     {
@@ -110,7 +111,7 @@ class AlgorithmRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getMeta(): array
     {
@@ -135,7 +136,7 @@ class AlgorithmRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getImpact(): array
     {
@@ -151,7 +152,7 @@ class AlgorithmRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getValidation(): array
     {
@@ -165,7 +166,7 @@ class AlgorithmRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getAttachments(): array
     {

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DocumentResource;
 
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteBulkAction;
 use App\Facades\Authentication;
 use App\Filament\Resources\DocumentResource;
 use App\Filament\Tables\Columns\CreatedAtColumn;
@@ -15,6 +13,8 @@ use App\Filament\Tables\Columns\UpdatedAtColumn;
 use App\Filament\Tables\DateWindowFilter;
 use App\Filament\Tables\TagFilter;
 use App\Models\Document;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;

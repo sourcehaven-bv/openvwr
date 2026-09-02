@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ContactPersonResource;
 
-use Filament\Schemas\Schema;
 use App\Filament\Forms\Components\Repeater\AddressRepeater;
 use App\Filament\Forms\Components\Select\SelectSingleWithLookup;
 use App\Filament\Forms\Components\TagsInput;
 use App\Models\ContactPersonPosition;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Schema;
 
 use function __;
 
@@ -22,7 +23,7 @@ class ContactPersonResourceForm
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getSchema(): array
     {

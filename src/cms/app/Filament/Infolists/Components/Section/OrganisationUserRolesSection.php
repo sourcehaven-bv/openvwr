@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Infolists\Components\Section;
 
-use Filament\Schemas\Components\Section;
 use App\Filament\Infolists\Components\OrganisationUserRoleRepeaterEntry;
 use App\Models\User;
+use Filament\Schemas\Components\Section;
 
 use function __;
 

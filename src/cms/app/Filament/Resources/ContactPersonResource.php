@@ -4,11 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
-use App\Filament\Resources\ContactPersonResource\Pages\ListContactPersons;
-use App\Filament\Resources\ContactPersonResource\Pages\CreateContactPerson;
-use App\Filament\Resources\ContactPersonResource\Pages\ViewContactPerson;
-use App\Filament\Resources\ContactPersonResource\Pages\EditContactPerson;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\RelationManagers\AvgProcessorProcessingRecordRelationManager;
 use App\Filament\RelationManagers\AvgResponsibleProcessingRecordRelationManager;
@@ -18,8 +13,13 @@ use App\Filament\RelationManagers\WpgProcessingRecordRelationManager;
 use App\Filament\Resources\ContactPersonResource\ContactPersonResourceForm;
 use App\Filament\Resources\ContactPersonResource\ContactPersonResourceInfolist;
 use App\Filament\Resources\ContactPersonResource\ContactPersonResourceTable;
-use App\Filament\Resources\ContactPersonResource\Pages;
+use App\Filament\Resources\ContactPersonResource\Pages\CreateContactPerson;
+use App\Filament\Resources\ContactPersonResource\Pages\EditContactPerson;
+use App\Filament\Resources\ContactPersonResource\Pages\ListContactPersons;
+use App\Filament\Resources\ContactPersonResource\Pages\ViewContactPerson;
 use App\Models\ContactPerson;
+use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 
 use function __;
@@ -27,7 +27,7 @@ use function __;
 class ContactPersonResource extends Resource
 {
     protected static ?string $model = ContactPerson::class;
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-chat-bubble-left';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-chat-bubble-left';
     protected static ?int $navigationSort = 10;
     protected static ?string $tenantRelationshipName = 'contactPersons';
 

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
-use Filament\Panel;
 use App\Config\Config;
 use App\Livewire\User\Profile\OneTimePassword;
 use App\Livewire\User\Profile\PersonalInfo;
@@ -12,6 +11,7 @@ use App\Livewire\User\Profile\Settings;
 use App\Services\Authentication\AuthenticationStrategyFactory;
 use App\Services\AuthenticationService;
 use Filament\Pages\Page;
+use Filament\Panel;
 use Illuminate\Contracts\View\View;
 use InvalidArgumentException;
 

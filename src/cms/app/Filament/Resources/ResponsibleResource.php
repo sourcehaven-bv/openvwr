@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
-use App\Filament\Resources\ResponsibleResource\Pages\ListResponsibles;
-use App\Filament\Resources\ResponsibleResource\Pages\CreateResponsible;
-use App\Filament\Resources\ResponsibleResource\Pages\ViewResponsible;
-use App\Filament\Resources\ResponsibleResource\Pages\EditResponsible;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\RelationManagers\AvgProcessorProcessingRecordRelationManager;
 use App\Filament\RelationManagers\AvgResponsibleProcessingRecordRelationManager;
 use App\Filament\RelationManagers\DataBreachRecordRelationManager;
 use App\Filament\RelationManagers\SnapshotsRelationManager;
 use App\Filament\RelationManagers\WpgProcessingRecordRelationManager;
-use App\Filament\Resources\ResponsibleResource\Pages;
+use App\Filament\Resources\ResponsibleResource\Pages\CreateResponsible;
+use App\Filament\Resources\ResponsibleResource\Pages\EditResponsible;
+use App\Filament\Resources\ResponsibleResource\Pages\ListResponsibles;
+use App\Filament\Resources\ResponsibleResource\Pages\ViewResponsible;
 use App\Filament\Resources\ResponsibleResource\ResponsibleResourceForm;
 use App\Filament\Resources\ResponsibleResource\ResponsibleResourceInfolist;
 use App\Filament\Resources\ResponsibleResource\ResponsibleResourceTable;
 use App\Models\Responsible;
+use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 
 use function __;
@@ -27,7 +27,7 @@ use function __;
 class ResponsibleResource extends Resource
 {
     protected static ?string $model = Responsible::class;
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-user-group';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-user-group';
     protected static ?int $navigationSort = 1;
 
     public static function getNavigationGroup(): ?string

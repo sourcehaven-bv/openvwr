@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SystemResource;
 
-use Filament\Schemas\Schema;
 use App\Facades\Authentication;
 use App\Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Schema;
 use Illuminate\Validation\Rules\Unique;
 
 use function __;
@@ -21,7 +22,7 @@ class SystemResourceForm
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getSchema(): array
     {

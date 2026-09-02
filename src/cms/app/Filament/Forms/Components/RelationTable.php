@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms\Components;
 
-use Filament\Actions\Action;
-use Filament\Schemas\Schema;
 use App\Components\Uuid\UuidInterface;
 use App\Facades\Authentication;
 use App\Filament\TenantScoped;
 use App\Rules\CurrentOrganisation;
 use Closure;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -55,7 +56,7 @@ class RelationTable extends Select
     /**
      * @param class-string<Model> $model
      * @param array<int, array{label: string, get: Closure(Model): (string|null), href?: Closure(Model): (string|null), download?: Closure(Model): (string|null)}> $columns
-     * @param array<\Filament\Schemas\Components\Component> $createForm the schema for the inline "create new" modal
+     * @param array<Component> $createForm the schema for the inline "create new" modal
      * @param (Closure(Builder<Model>): void)|null $scope tenant scope for the search and render queries;
      *        defaults to the organisation_id column scope, override for models
      *        that relate to the organisation differently (e.g. via a pivot)

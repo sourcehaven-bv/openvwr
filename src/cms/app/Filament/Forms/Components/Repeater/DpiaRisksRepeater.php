@@ -4,20 +4,21 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms\Components\Repeater;
 
-use Filament\Actions\Action;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Utilities\Get;
-use Filament\Schemas\Components\Utilities\Set;
 use App\Enums\Dpia\RiskLevel;
 use App\Facades\Authentication;
 use App\Filament\TenantScoped;
 use Closure;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Illuminate\Support\HtmlString;
 
 use function __;
@@ -56,7 +57,7 @@ class DpiaRisksRepeater extends Repeater
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     private static function getRiskSchema(): array
     {

@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\RetentionPeriodResource\Pages\ListRetentionPeriods;
 use App\Filament\Resources\RetentionPeriodResource\Pages\CreateRetentionPeriod;
 use App\Filament\Resources\RetentionPeriodResource\Pages\EditRetentionPeriod;
+use App\Filament\Resources\RetentionPeriodResource\Pages\ListRetentionPeriods;
 use App\Filament\Resources\RetentionPeriodResource\Pages\ViewRetentionPeriod;
-use App\Filament\Resources\RetentionPeriodResource\Pages;
 use App\Models\RetentionPeriod;
 
 use function __;

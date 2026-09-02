@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\DocumentTypeResource\Pages\ListDocumentTypes;
+use App\Filament\RelationManagers\DocumentRelationManager;
 use App\Filament\Resources\DocumentTypeResource\Pages\CreateDocumentType;
 use App\Filament\Resources\DocumentTypeResource\Pages\EditDocumentType;
+use App\Filament\Resources\DocumentTypeResource\Pages\ListDocumentTypes;
 use App\Filament\Resources\DocumentTypeResource\Pages\ViewDocumentType;
-use App\Filament\RelationManagers\DocumentRelationManager;
-use App\Filament\Resources\DocumentTypeResource\Pages;
 use App\Models\DocumentType;
 
 use function __;

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DpiaRecordResource;
 
-use Filament\Schemas\Components\Utilities\Get;
-use Filament\Schemas\Components\Grid;
 use App\Filament\Forms\Components\DatePicker\DatePicker;
 use App\Filament\Forms\Components\Repeater\DpiaMeasuresRepeater;
 use App\Filament\Forms\Components\Repeater\DpiaPersonalDataRepeater;
@@ -16,6 +14,9 @@ use App\Services\Dpia\DpiaSectionNotice;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Support\HtmlString;
 
 use function __;
@@ -38,7 +39,7 @@ class DpiaRecordResourceAssessmentSchemas
     /**
      * 2. Persoonsgegevens
      *
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getPersonalData(): array
     {
@@ -60,7 +61,7 @@ class DpiaRecordResourceAssessmentSchemas
     /**
      * 3. Gegevensverwerkingen
      *
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getProcessing(): array
     {
@@ -76,7 +77,7 @@ class DpiaRecordResourceAssessmentSchemas
     /**
      * 16. Risico's voor betrokkenen
      *
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getRisks(): array
     {
@@ -105,7 +106,7 @@ class DpiaRecordResourceAssessmentSchemas
     /**
      * 17. Maatregelen
      *
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getMeasures(): array
     {
@@ -137,7 +138,7 @@ class DpiaRecordResourceAssessmentSchemas
     /**
      * Consultatie en advies (proceskader, deel I).
      *
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getConsultation(): array
     {
@@ -200,7 +201,7 @@ class DpiaRecordResourceAssessmentSchemas
     /**
      * Vaststelling en herziening.
      *
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getReview(): array
     {

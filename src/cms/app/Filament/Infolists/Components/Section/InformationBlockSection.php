@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Infolists\Components\Section;
 
-use Filament\Schemas\Components\Section;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Section;
 use Illuminate\Support\HtmlString;
 
 class InformationBlockSection extends Section

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ResponsibleLegalEntityResource;
 
-use Filament\Actions\EditAction;
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
+use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 

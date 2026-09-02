@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Documentation;
 
-use Filament\Actions\Concerns\InteractsWithActions;
 use App\Components\Uuid\Uuid;
 use App\Enums\RegisterLayout;
 use App\Models\Organisation;
 use App\Models\User;
+use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Facades\Filament;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;

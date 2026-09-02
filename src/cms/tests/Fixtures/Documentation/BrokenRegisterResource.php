@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Fixtures\Documentation;
 
-use Filament\Schemas\Schema;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use RuntimeException;
 
 use function __;

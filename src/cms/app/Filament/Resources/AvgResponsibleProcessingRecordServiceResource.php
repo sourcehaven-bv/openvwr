@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\AvgResponsibleProcessingRecordServiceResource\Pages\ListAvgResponsibleProcessingRecordServices;
+use App\Filament\RelationManagers\AvgResponsibleProcessingRecordRelationManager;
 use App\Filament\Resources\AvgResponsibleProcessingRecordServiceResource\Pages\CreateAvgResponsibleProcessingRecordService;
 use App\Filament\Resources\AvgResponsibleProcessingRecordServiceResource\Pages\EditAvgResponsibleProcessingRecordService;
+use App\Filament\Resources\AvgResponsibleProcessingRecordServiceResource\Pages\ListAvgResponsibleProcessingRecordServices;
 use App\Filament\Resources\AvgResponsibleProcessingRecordServiceResource\Pages\ViewAvgResponsibleProcessingRecordService;
-use App\Filament\RelationManagers\AvgResponsibleProcessingRecordRelationManager;
-use App\Filament\Resources\AvgResponsibleProcessingRecordServiceResource\Pages;
 use App\Models\Avg\AvgResponsibleProcessingRecordService;
 
 use function __;

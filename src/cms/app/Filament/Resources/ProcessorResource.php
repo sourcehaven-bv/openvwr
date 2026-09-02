@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
-use App\Filament\Resources\ProcessorResource\Pages\ListProcessors;
-use App\Filament\Resources\ProcessorResource\Pages\CreateProcessor;
-use App\Filament\Resources\ProcessorResource\Pages\ViewProcessor;
-use App\Filament\Resources\ProcessorResource\Pages\EditProcessor;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\RelationManagers\AvgProcessorProcessingRecordRelationManager;
 use App\Filament\RelationManagers\AvgResponsibleProcessingRecordRelationManager;
 use App\Filament\RelationManagers\SnapshotsRelationManager;
 use App\Filament\RelationManagers\WpgProcessingRecordRelationManager;
-use App\Filament\Resources\ProcessorResource\Pages;
+use App\Filament\Resources\ProcessorResource\Pages\CreateProcessor;
+use App\Filament\Resources\ProcessorResource\Pages\EditProcessor;
+use App\Filament\Resources\ProcessorResource\Pages\ListProcessors;
+use App\Filament\Resources\ProcessorResource\Pages\ViewProcessor;
 use App\Filament\Resources\ProcessorResource\ProcessorResourceForm;
 use App\Filament\Resources\ProcessorResource\ProcessorResourceInfolist;
 use App\Filament\Resources\ProcessorResource\ProcessorResourceTable;
 use App\Models\Processor;
+use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 
 use function __;
@@ -26,7 +26,7 @@ use function __;
 class ProcessorResource extends Resource
 {
     protected static ?string $model = Processor::class;
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-users';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-users';
     protected static ?int $navigationSort = 2;
 
     public static function getNavigationGroup(): ?string

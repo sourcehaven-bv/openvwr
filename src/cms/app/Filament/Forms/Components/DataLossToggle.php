@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms\Components;
 
-use Filament\Schemas\Components\Utilities\Get;
-use Filament\Schemas\Components\Utilities\Set;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Livewire\Component;
 
 use function __;

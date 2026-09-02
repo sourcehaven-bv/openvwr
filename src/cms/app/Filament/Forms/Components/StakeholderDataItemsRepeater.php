@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms\Components;
 
-use Filament\Actions\Action;
 use App\Facades\Authentication;
 use App\Filament\Forms\FormHelper;
 use App\Filament\TenantScoped;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Component;
 use Webmozart\Assert\Assert;
 
 use function __;
@@ -40,7 +41,7 @@ class StakeholderDataItemsRepeater extends Repeater
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     private static function getStakeholderDataItemSchema(): array
     {

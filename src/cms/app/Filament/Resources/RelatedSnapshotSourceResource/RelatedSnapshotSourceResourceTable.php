@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\RelatedSnapshotSourceResource;
 
-use Filament\Actions\ViewAction;
 use App\Filament\Resources\Resource;
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Models\Contracts\SnapshotSource;
@@ -17,6 +16,7 @@ use App\Models\States\Snapshot\Obsolete;
 use App\Services\DateFormatService;
 use Carbon\CarbonInterface;
 use Closure;
+use Filament\Actions\ViewAction;
 use Filament\Facades\Filament;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Grouping\Group;

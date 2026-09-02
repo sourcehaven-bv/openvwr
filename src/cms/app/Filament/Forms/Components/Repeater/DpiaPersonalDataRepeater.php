@@ -4,19 +4,20 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms\Components\Repeater;
 
-use Filament\Actions\Action;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Utilities\Get;
 use App\Enums\Dpia\PersonalDataType;
 use App\Facades\Authentication;
 use App\Filament\Forms\Components\RetentionPeriodInput;
 use App\Filament\TenantScoped;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Support\HtmlString;
 
 use function __;
@@ -58,7 +59,7 @@ class DpiaPersonalDataRepeater extends Repeater
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     private static function getPersonalDataSchema(): array
     {

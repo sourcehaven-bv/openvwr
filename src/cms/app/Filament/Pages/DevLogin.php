@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
-use Filament\Auth\Pages\Login;
-use Filament\Schemas\Schema;
-use Filament\Auth\Http\Responses\LoginResponse;
 use App\Models\User;
 use App\Services\Authentication\AuthenticationStrategyFactory;
+use Filament\Auth\Http\Responses\LoginResponse;
+use Filament\Auth\Pages\Login;
 use Filament\Forms\Components\Select;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 use RuntimeException;
 use Webmozart\Assert\Assert;

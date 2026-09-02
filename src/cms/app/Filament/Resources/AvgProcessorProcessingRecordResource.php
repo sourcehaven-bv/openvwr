@@ -4,11 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
-use App\Filament\Resources\AvgProcessorProcessingRecordResource\Pages\ListAvgProcessorProcessingRecords;
-use App\Filament\Resources\AvgProcessorProcessingRecordResource\Pages\CreateAvgProcessorProcessingRecord;
-use App\Filament\Resources\AvgProcessorProcessingRecordResource\Pages\ViewAvgProcessorProcessingRecord;
-use App\Filament\Resources\AvgProcessorProcessingRecordResource\Pages\EditAvgProcessorProcessingRecord;
 use App\Enums\RegisterLayout;
 use App\Facades\Authentication;
 use App\Filament\NavigationGroups\NavigationGroup;
@@ -16,8 +11,13 @@ use App\Filament\RelationManagers\SnapshotsRelationManager;
 use App\Filament\Resources\AvgProcessorProcessingRecordResource\AvgProcessorProcessingRecordResourceForm;
 use App\Filament\Resources\AvgProcessorProcessingRecordResource\AvgProcessorProcessingRecordResourceInfolist;
 use App\Filament\Resources\AvgProcessorProcessingRecordResource\AvgProcessorProcessingRecordResourceTable;
-use App\Filament\Resources\AvgProcessorProcessingRecordResource\Pages;
+use App\Filament\Resources\AvgProcessorProcessingRecordResource\Pages\CreateAvgProcessorProcessingRecord;
+use App\Filament\Resources\AvgProcessorProcessingRecordResource\Pages\EditAvgProcessorProcessingRecord;
+use App\Filament\Resources\AvgProcessorProcessingRecordResource\Pages\ListAvgProcessorProcessingRecords;
+use App\Filament\Resources\AvgProcessorProcessingRecordResource\Pages\ViewAvgProcessorProcessingRecord;
 use App\Models\Avg\AvgProcessorProcessingRecord;
+use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 
 use function __;
@@ -26,7 +26,7 @@ class AvgProcessorProcessingRecordResource extends Resource
 {
     protected static bool $hasNavigationBadge = true;
     protected static ?string $model = AvgProcessorProcessingRecord::class;
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-document-chart-bar';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-chart-bar';
     protected static ?int $navigationSort = 2;
 
     public static function getNavigationGroup(): ?string

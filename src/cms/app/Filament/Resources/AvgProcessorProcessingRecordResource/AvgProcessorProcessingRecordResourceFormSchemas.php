@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AvgProcessorProcessingRecordResource;
 
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Group;
-use Filament\Schemas\Components\Section;
 use App\Filament\Forms\Components\ChildrenRelationTable;
 use App\Filament\Forms\Components\Group\ProcessingRecordContactPersons;
 use App\Filament\Forms\Components\OutsideEuCountryInputGroup;
@@ -42,13 +39,17 @@ use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
 
 use function __;
 
 class AvgProcessorProcessingRecordResourceFormSchemas
 {
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getProcessingName(): array
     {
@@ -86,7 +87,7 @@ class AvgProcessorProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getResponsible(): array
     {
@@ -111,7 +112,7 @@ class AvgProcessorProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getProcessors(): array
     {
@@ -141,7 +142,7 @@ class AvgProcessorProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getReceiver(): array
     {
@@ -165,7 +166,7 @@ class AvgProcessorProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getProcessingGoal(): array
     {
@@ -186,7 +187,7 @@ class AvgProcessorProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getInvolvedData(): array
     {
@@ -208,7 +209,7 @@ class AvgProcessorProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getDecisionMaking(): array
     {
@@ -241,7 +242,7 @@ class AvgProcessorProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getSystem(): array
     {
@@ -293,7 +294,7 @@ class AvgProcessorProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getSecurity(): array
     {
@@ -344,7 +345,7 @@ class AvgProcessorProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getPassthrough(): array
     {
@@ -384,7 +385,7 @@ class AvgProcessorProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getGebPia(): array
     {
@@ -401,7 +402,7 @@ class AvgProcessorProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getContactPerson(): array
     {
@@ -415,7 +416,7 @@ class AvgProcessorProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getAttachments(): array
     {
@@ -437,7 +438,7 @@ class AvgProcessorProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getRemarks(): array
     {

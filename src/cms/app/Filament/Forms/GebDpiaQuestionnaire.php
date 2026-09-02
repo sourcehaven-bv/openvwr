@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms;
 
-use Filament\Actions\Action;
-use Filament\Schemas\Components\Utilities\Get;
 use Closure;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Support\HtmlString;
 
 use function __;

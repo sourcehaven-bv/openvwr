@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\PublicWebsiteTreeResource;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Utilities\Set;
 use App\Components\Uuid\UuidInterface;
 use App\Enums\Media\MediaGroup;
 use App\Filament\Forms\Components\MarkdownEditor\MarkdownEditor;
@@ -15,6 +13,8 @@ use App\Models\Organisation;
 use App\Models\PublicWebsiteTree;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
 
 use function __;

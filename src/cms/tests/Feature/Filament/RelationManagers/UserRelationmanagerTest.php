@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use Filament\Actions\DetachAction;
 use App\Filament\RelationManagers\UsersRelationManager;
 use App\Filament\Resources\OrganisationResource\Pages\EditOrganisation;
 use App\Models\Organisation;
 use App\Models\User;
+use Filament\Actions\DetachAction;
 
 it('loads the table', function (): void {
     $user = User::factory()

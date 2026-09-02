@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SnapshotResource\Pages;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Tabs;
 use App\Enums\Authorization\Permission;
 use App\Enums\Snapshot\SnapshotApprovalStatus;
 use App\Facades\Authentication;
@@ -20,6 +18,8 @@ use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\On;

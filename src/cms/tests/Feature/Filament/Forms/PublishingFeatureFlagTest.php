@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Filament\Resources\AvgResponsibleProcessingRecordResource\AvgResponsibleProcessingRecordResourceForm;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Wizard;
-use App\Filament\Resources\AvgResponsibleProcessingRecordResource\AvgResponsibleProcessingRecordResourceForm;
 use Tests\Helpers\FilamentTestHelper;
 
 beforeEach(function (): void {

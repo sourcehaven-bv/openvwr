@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AvgProcessorProcessingRecordResource;
 
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Group;
-use Filament\Schemas\Components\Section;
 use App\Filament\Infolists\Components\AvgGoalsRepeatableEntry;
 use App\Filament\Infolists\Components\DateEntry;
 use App\Filament\Infolists\Components\EntityNumberEntry;
@@ -22,13 +19,17 @@ use App\Filament\Infolists\Components\ToggleEntry;
 use App\Filament\Infolists\Group\ProcessingRecordContactPersons;
 use App\Filament\Infolists\InfolistHelper;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
 
 use function __;
 
 class AvgProcessorProcessingRecordResourceInfolistSchemas
 {
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getProcessingName(): array
     {
@@ -59,7 +60,7 @@ class AvgProcessorProcessingRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getResponsible(): array
     {
@@ -75,7 +76,7 @@ class AvgProcessorProcessingRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getProcessors(): array
     {
@@ -94,7 +95,7 @@ class AvgProcessorProcessingRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getReceiver(): array
     {
@@ -110,7 +111,7 @@ class AvgProcessorProcessingRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getProcessingGoal(): array
     {
@@ -127,7 +128,7 @@ class AvgProcessorProcessingRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getInvolvedData(): array
     {
@@ -145,7 +146,7 @@ class AvgProcessorProcessingRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getDecisionMaking(): array
     {
@@ -169,7 +170,7 @@ class AvgProcessorProcessingRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getSystem(): array
     {
@@ -192,7 +193,7 @@ class AvgProcessorProcessingRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getSecurity(): array
     {
@@ -230,7 +231,7 @@ class AvgProcessorProcessingRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getPassthrough(): array
     {
@@ -261,7 +262,7 @@ class AvgProcessorProcessingRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getGebPia(): array
     {
@@ -277,7 +278,7 @@ class AvgProcessorProcessingRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getContactPerson(): array
     {
@@ -291,7 +292,7 @@ class AvgProcessorProcessingRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getAttachments(): array
     {
@@ -306,7 +307,7 @@ class AvgProcessorProcessingRecordResourceInfolistSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getRemarks(): array
     {

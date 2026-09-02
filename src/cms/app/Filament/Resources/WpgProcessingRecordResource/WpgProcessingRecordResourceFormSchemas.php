@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\WpgProcessingRecordResource;
 
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Group;
 use App\Filament\Forms\Components\ChildrenRelationTable;
 use App\Filament\Forms\Components\Group\ProcessingRecordContactPersons;
 use App\Filament\Forms\Components\PeriodicReviewField;
@@ -38,13 +35,17 @@ use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
 
 use function __;
 
 class WpgProcessingRecordResourceFormSchemas
 {
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getProcessingName(): array
     {
@@ -83,7 +84,7 @@ class WpgProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getResponsible(): array
     {
@@ -107,7 +108,7 @@ class WpgProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getProcessor(): array
     {
@@ -138,7 +139,7 @@ class WpgProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getReceiver(): array
     {
@@ -198,7 +199,7 @@ class WpgProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getProcessingGoal(): array
     {
@@ -212,7 +213,7 @@ class WpgProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getSpecialPoliceData(): array
     {
@@ -244,7 +245,7 @@ class WpgProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getDecisionMaking(): array
     {
@@ -280,7 +281,7 @@ class WpgProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getSystems(): array
     {
@@ -332,7 +333,7 @@ class WpgProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getSecurity(): array
     {
@@ -381,7 +382,7 @@ class WpgProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getGebDpia(): array
     {
@@ -398,7 +399,7 @@ class WpgProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getContactPersons(): array
     {
@@ -412,7 +413,7 @@ class WpgProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getAttachments(): array
     {
@@ -434,7 +435,7 @@ class WpgProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getRemarks(): array
     {
@@ -451,7 +452,7 @@ class WpgProcessingRecordResourceFormSchemas
     }
 
     /**
-     * @return array<\Filament\Schemas\Components\Component>
+     * @return array<Component>
      */
     public static function getCategoriesInvolved(): array
     {

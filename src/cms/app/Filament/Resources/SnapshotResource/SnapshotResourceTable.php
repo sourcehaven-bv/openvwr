@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SnapshotResource;
 
-use Filament\Actions\ViewAction;
 use App\Filament\Resources\SnapshotResource\Pages\ViewSnapshot;
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\SnapshotStateColumn;
@@ -12,6 +11,7 @@ use App\Models\Builders\SnapshotBuilder;
 use App\Models\Snapshot;
 use App\Models\States\Snapshot\Concept;
 use App\Services\DateFormatService;
+use Filament\Actions\ViewAction;
 use Filament\Facades\Filament;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
