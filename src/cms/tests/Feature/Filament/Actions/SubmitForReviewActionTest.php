@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Filament\Actions;
 
+use App\Enums\Authorization\Permission;
 use App\Filament\Infolists\Tabs\Snapshot\ViewInfoTab;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\EditAvgResponsibleProcessingRecord;
 use App\Filament\Resources\SnapshotResource;
@@ -13,6 +14,7 @@ use App\Models\States\Snapshot\Established;
 use App\Models\States\Snapshot\InReview;
 use App\Models\States\Snapshot\Obsolete;
 use Tests\Helpers\Model\OrganisationTestHelper;
+use Tests\Helpers\Model\UserTestHelper;
 
 use function expect;
 use function it;
@@ -270,4 +272,33 @@ it('does not offer a status change on a concept version', function (): void {
 
     $test->createLivewireTestable(ViewSnapshot::class, ['record' => $snapshot->id])
         ->assertInfolistActionHidden(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_status_change');
+});
+
+// The permission is checked in visible(), and that is enough to be a control rather
+// than a courtesy: Filament's isDisabled() is `disabled || hidden`, and both mountAction
+// and callMountedAction refuse a disabled action. A forged Livewire call that skips the
+// button therefore never reaches the action closure. Pinned here because the whole
+// authorization of this action rests on that being true.
+it('refuses a forged submit from a user without the create permission', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->withValidState()
+        ->create();
+
+    $user = UserTestHelper::createForOrganisationWithPermissions($organisation, [
+        Permission::CORE_ENTITY_VIEW,
+        Permission::CORE_ENTITY_UPDATE,
+    ]);
+
+    // Deliberately not callAction(): that helper asserts the button is visible first,
+    // which is exactly the step an attacker skips. These are the raw Livewire calls.
+    $this->withFilamentSession($user, $organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->id,
+        ])
+        ->call('mountAction', 'snapshot_submit_for_review')
+        ->call('callMountedAction');
+
+    expect($avgResponsibleProcessingRecord->refresh()->snapshots)->toBeEmpty();
 });

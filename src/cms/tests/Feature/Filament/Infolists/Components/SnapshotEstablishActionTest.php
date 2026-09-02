@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\Authorization\Permission;
 use App\Enums\Snapshot\SnapshotApprovalStatus;
 use App\Filament\Infolists\Components\SnapshotEstablishAction;
 use App\Filament\Infolists\Tabs\Snapshot\ViewInfoTab;
@@ -15,6 +16,7 @@ use App\Models\States\Snapshot\Established;
 use App\Models\States\Snapshot\InReview;
 use App\Models\States\Snapshot\Obsolete;
 use Tests\Helpers\Model\OrganisationTestHelper;
+use Tests\Helpers\Model\UserTestHelper;
 
 /**
  * The colour the establish button resolves to for this snapshot, which is how it signals
@@ -143,4 +145,30 @@ it('stays amber while a related entity is not established', function (): void {
     ]);
 
     expect(establishActionColor($snapshot))->toBe('warning');
+});
+
+// The permission is checked in visible(), and that is enough to be a control rather
+// than a courtesy: Filament's isDisabled() is `disabled || hidden`, and both
+// mountInfolistAction and callMountedInfolistAction refuse a disabled action. A forged
+// Livewire call that skips the button therefore never reaches the action closure.
+// Pinned here because establishing is what fixes a version as the official one.
+it('refuses a forged establish from a user without the permission', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create(['state' => Approved::class]);
+
+    $user = UserTestHelper::createForOrganisationWithPermissions($organisation, [
+        Permission::CORE_ENTITY_VIEW,
+        Permission::SNAPSHOT_VIEW,
+    ]);
+
+    // Deliberately not callInfolistAction(): that helper asserts the button is visible
+    // first, which is exactly the step an attacker skips. These are the raw calls.
+    $this->withFilamentSession($user, $organisation)
+        ->createLivewireTestable(ViewSnapshot::class, ['record' => $snapshot->id])
+        ->call('mountInfolistAction', 'snapshot_establish', ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'infolist')
+        ->call('callMountedInfolistAction');
+
+    expect($snapshot->refresh()->state)->toBeInstanceOf(Approved::class);
 });
