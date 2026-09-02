@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\Enums\RegisterLayout;
-use App\Filament\RelationManagers\SnapshotsRelationManager;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\ViewAvgResponsibleProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
@@ -32,23 +31,16 @@ it('can load the page with all layouts', function (RegisterLayout $registerLayou
         ->assertSuccessful();
 })->with(RegisterLayout::cases());
 
-it('can create a snapshot', function (): void {
+// Versions are no longer made by hand, so the view page has no button for it.
+it('does not offer a version button', function (): void {
     $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
         ->recycle($organisation)
         ->create();
 
-    expect($avgResponsibleProcessingRecord->snapshots->count())
-        ->toBe(0);
-
     $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(ViewAvgResponsibleProcessingRecord::class, ['record' => $avgResponsibleProcessingRecord->id])
-        ->callAction('snapshot_create')
-        ->assertNotified(__('snapshot.created'))
-        ->assertDispatched(SnapshotsRelationManager::REFRESH_TABLE_EVENT);
-
-    expect($avgResponsibleProcessingRecord->refresh()->snapshots->count())
-        ->toBe(1);
+        ->assertActionDoesNotExist('snapshot_create');
 });
 
 it('shows the link to the static-website page when the record is published', function (): void {

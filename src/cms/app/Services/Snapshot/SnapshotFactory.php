@@ -52,20 +52,56 @@ readonly class SnapshotFactory
                 'state' => $snapshotStateClass,
             ]);
 
-            $this->snapshotDataFactory->createDataForSnapshot($snapshot);
-            foreach ($snapshotSource->getRelatedSnapshotSources() as $relatedSnapshotSourceClass => $relatedSnapshotSourceCollection) {
-                foreach ($relatedSnapshotSourceCollection as $relatedSnapshotSource) {
-                    Assert::isInstanceOf($relatedSnapshotSource, Model::class);
-
-                    $snapshot->relatedSnapshotSources()->create([
-                        'snapshot_id' => $snapshot->id,
-                        'snapshot_source_type' => $relatedSnapshotSourceClass,
-                        'snapshot_source_id' => $relatedSnapshotSource->getKey(),
-                    ]);
-                }
-            }
+            $this->fillSnapshot($snapshot, $snapshotSource);
 
             return $snapshot;
         });
+    }
+
+    /**
+     * Rewrites an existing snapshot to match its source again, as if it had just been
+     * created. Used for the concept snapshot, which follows the entity on every save
+     * rather than freezing a moment: keeping the same row keeps its place in the
+     * version list and its recorded transitions intact.
+     *
+     * @param Model&SnapshotSource $snapshotSource
+     *
+     * @throws Throwable
+     */
+    public function refreshSnapshot(Snapshot $snapshot, SnapshotSource $snapshotSource): Snapshot
+    {
+        return DB::transaction(function () use ($snapshot, $snapshotSource): Snapshot {
+            $snapshot->name = Str::take($snapshotSource->getDisplayName(), 255);
+            $snapshot->save();
+
+            $snapshot->snapshotData()->delete();
+            $snapshot->relatedSnapshotSources()->delete();
+            $snapshot->unsetRelation('snapshotData');
+            $snapshot->unsetRelation('relatedSnapshotSources');
+
+            $this->fillSnapshot($snapshot, $snapshotSource);
+
+            return $snapshot;
+        });
+    }
+
+    /**
+     * @param Model&SnapshotSource $snapshotSource
+     */
+    private function fillSnapshot(Snapshot $snapshot, SnapshotSource $snapshotSource): void
+    {
+        $this->snapshotDataFactory->createDataForSnapshot($snapshot);
+
+        foreach ($snapshotSource->getRelatedSnapshotSources() as $relatedSnapshotSourceClass => $relatedSnapshotSourceCollection) {
+            foreach ($relatedSnapshotSourceCollection as $relatedSnapshotSource) {
+                Assert::isInstanceOf($relatedSnapshotSource, Model::class);
+
+                $snapshot->relatedSnapshotSources()->create([
+                    'snapshot_id' => $snapshot->id,
+                    'snapshot_source_type' => $relatedSnapshotSourceClass,
+                    'snapshot_source_id' => $relatedSnapshotSource->getKey(),
+                ]);
+            }
+        }
     }
 }

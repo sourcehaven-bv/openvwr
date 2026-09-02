@@ -68,7 +68,7 @@ final class RollenEnRechten
 
                 ### Goedkeuringsproces
 
-                - *Versie aanmaken*: Invoerder, (Chief) Privacy Officer;
+                - *Start vaststellen (versie indienen)*: Invoerder, (Chief) Privacy Officer;
                 - *Goedkeuren en vaststellen*: (Chief) Privacy Officer;
                 - *Akkoord geven*: Mandaathouder.
 

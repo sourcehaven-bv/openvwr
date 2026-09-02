@@ -153,6 +153,11 @@
     font-weight: 600;
 }
 
+.manual-status--concept {
+    background-color: rgb(254 243 199);
+    color: rgb(146 64 14);
+}
+
 .manual-status--review {
     background-color: rgb(219 234 254);
     color: rgb(30 64 175);
@@ -171,6 +176,11 @@
 .manual-status--expired {
     background-color: rgb(233 235 238);
     color: rgb(75 85 99);
+}
+
+.dark .manual-status--concept {
+    background-color: rgb(120 53 15 / 0.4);
+    color: rgb(253 224 138);
 }
 
 .dark .manual-status--review {

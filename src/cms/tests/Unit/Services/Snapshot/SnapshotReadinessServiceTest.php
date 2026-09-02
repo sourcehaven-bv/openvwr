@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Services\Snapshot;
 
 use App\Filament\Forms\DraftableForm;
+use App\Filament\Pages\Concerns\EnforcesRequiredFieldsWhenSubmitting;
 use App\Filament\Pages\Contracts\SavesConcepts;
 use App\Services\Snapshot\SnapshotReadinessService;
 use Filament\Forms\Components\CheckboxList;
@@ -71,6 +72,7 @@ $readinessForm = static function (array $state = []): Form {
 $conceptForm = static function (array $schema): Form {
     $livewire = new class extends Component implements HasForms, SavesConcepts
     {
+        use EnforcesRequiredFieldsWhenSubmitting;
         use InteractsWithForms;
 
         /** @var array<string, mixed> */

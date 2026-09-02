@@ -6,6 +6,8 @@ namespace App\Filament\Pages;
 
 use App\Filament\Forms\DraftableForm;
 use App\Filament\Pages\Concerns\CoercesClearedRequiredFields;
+use App\Filament\Pages\Concerns\EnforcesRequiredFieldsWhenSubmitting;
+use App\Filament\Pages\Concerns\StoresConceptSnapshot;
 use App\Filament\Pages\Contracts\SavesConcepts;
 use Filament\Forms\Form;
 
@@ -22,6 +24,8 @@ use Filament\Forms\Form;
 abstract class ConceptEntityNumberCreateRecord extends EntityNumberCreateRecord implements SavesConcepts
 {
     use CoercesClearedRequiredFields;
+    use EnforcesRequiredFieldsWhenSubmitting;
+    use StoresConceptSnapshot;
 
     protected function makeForm(): Form
     {
@@ -36,5 +40,10 @@ abstract class ConceptEntityNumberCreateRecord extends EntityNumberCreateRecord 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         return $this->coerceClearedRequiredFields($this->form, parent::mutateFormDataBeforeCreate($data));
+    }
+
+    protected function afterCreate(): void
+    {
+        $this->storeConceptSnapshot();
     }
 }

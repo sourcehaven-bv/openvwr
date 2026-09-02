@@ -8,18 +8,18 @@ use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\CreateAv
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\EditAvgResponsibleProcessingRecord;
 use App\Filament\Resources\SystemResource\Pages\CreateSystem;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
+use App\Models\States\Snapshot\Concept;
 use App\Models\System;
 use Tests\Helpers\Model\OrganisationTestHelper;
 
-use function __;
 use function expect;
 use function it;
 use function str_repeat;
 
 // Follow-up to the concept saving on the edit pages: creating enforced required fields
 // too, so a user who only knew part of the answers could not even start the record.
-// Creating now stores a concept as well; required fields are enforced when a version
-// (snapshot) is created.
+// Creating now stores a concept as well; required fields are enforced when the concept
+// is sent to review.
 
 it('creates a concept when a required field is empty', function (): void {
     $organisation = OrganisationTestHelper::create();
@@ -96,8 +96,8 @@ it('still rejects a filled in value that is invalid, even while saving a concept
 });
 
 // Relaxing create must not weaken the gate: a record created as an empty concept is
-// still incomplete, so it cannot become a version until it is filled in.
-it('blocks creating a version for a record that was created as an empty concept', function (): void {
+// still incomplete, so submitting it for review reports the empty fields on the form.
+it('blocks submitting for review a record that was created as an empty concept', function (): void {
     $organisation = OrganisationTestHelper::create();
     $test = $this->asFilamentOrganisationUser($organisation);
 
@@ -110,9 +110,9 @@ it('blocks creating a version for a record that was created as an empty concept'
     $test->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
         'record' => $avgResponsibleProcessingRecord->id,
     ])
-        ->callAction('snapshot_create')
-        ->assertNotified(__('snapshot.incomplete'));
+        ->callAction('snapshot_submit_for_review')
+        ->assertHasFormErrors(['name']);
 
-    expect($avgResponsibleProcessingRecord->refresh()->snapshots)
-        ->toHaveCount(0);
+    expect($avgResponsibleProcessingRecord->snapshots->sole()->state)
+        ->toBeInstanceOf(Concept::class);
 });

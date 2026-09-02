@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ReceiverResource\Pages;
 
-use App\Filament\Actions\CreateSnapshotAction;
+use App\Filament\Actions\SubmitForReviewAction;
 use App\Filament\Pages\ConceptEditRecord;
 use App\Filament\Resources\ReceiverResource;
 use Filament\Actions\DeleteAction;
@@ -16,7 +16,7 @@ class EditReceiver extends ConceptEditRecord
     protected function getHeaderActions(): array
     {
         return [
-            CreateSnapshotAction::makeWithChangesCheck($this->data, $this->savedDataHash),
+            SubmitForReviewAction::make(),
             DeleteAction::make(),
         ];
     }

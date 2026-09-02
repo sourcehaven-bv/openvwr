@@ -32,7 +32,8 @@ use function is_string;
  * which is the whole point: what has not been filled in yet is not yet judged.
  *
  * Whether to relax it is read from the owning page rather than from global state, so
- * there is no flag that can leak across requests.
+ * there is no flag that can leak across requests. The page turns the relaxation off
+ * while submitting for review, which is the moment the record must be complete.
  */
 class DraftableForm extends Form
 {
@@ -43,7 +44,9 @@ class DraftableForm extends Form
     {
         $rules = parent::getValidationRules();
 
-        if (!$this->getLivewire() instanceof SavesConcepts) {
+        $livewire = $this->getLivewire();
+
+        if (!$livewire instanceof SavesConcepts || $livewire->enforcesRequiredFields()) {
             return $rules;
         }
 

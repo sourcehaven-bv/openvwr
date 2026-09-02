@@ -61,13 +61,16 @@ final class Registers
                 navigatiemenu voor de verschillende domeinen van gegevensinvoer.
 
                 > **Hint**: U kunt een verwerking opslaan zonder dat alle informatie is
-                > ingevoerd. Verplichte velden worden pas gecontroleerd op het moment dat u
-                > een versie aanmaakt; ontbreekt er dan nog iets, dan ziet u welke velden dat
-                > zijn en bij welke stap ze horen. Als een verwerking eenmaal klaar is voor
-                > het goedkeuringsproces kunt u een versie aanmaken die via dat proces
-                > vastgesteld kan worden, afhankelijk van de inrichting bij uw organisatie
-                > eventueel nadat Mandaathouders akkoord hebben gegeven. Voor meer
-                > informatie: zie [Versie aanmaken](#versie-aanmaken).
+                > ingevoerd. Elke keer dat u opslaat legt het portaal de verwerking vast als
+                > versie met de status "Concept"; slaat u opnieuw op, dan wordt diezelfde
+                > conceptversie bijgewerkt. Verplichte velden worden pas gecontroleerd op het
+                > moment dat u op "Start vaststellen" drukt; ontbreekt er dan nog iets, dan
+                > ziet u dat bij het veld zelf en in de stappenlijst. Als een verwerking
+                > eenmaal klaar is voor het goedkeuringsproces drukt u op "Start
+                > vaststellen", waarna deze via dat proces vastgesteld kan worden,
+                > afhankelijk van de inrichting bij uw organisatie eventueel nadat
+                > Mandaathouders akkoord hebben gegeven. Voor meer informatie: zie
+                > [Versie indienen](#versie-indienen).
 
                 Eenmaal opgeslagen in het systeem zullen relaties met andere entiteiten
                 zichtbaar zijn in de tabellen onderaan in het scherm. Hiermee kunt u snel
