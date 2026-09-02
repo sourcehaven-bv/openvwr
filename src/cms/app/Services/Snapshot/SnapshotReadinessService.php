@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Services\Snapshot;
 
 use App\ValueObjects\Snapshot\MissingRequiredField;
-use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Field;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Wizard\Step;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Wizard\Step;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 
 use function __;
@@ -38,7 +38,7 @@ class SnapshotReadinessService
     /**
      * @return array<int, MissingRequiredField>
      */
-    public function getMissingRequiredFields(Form $form): array
+    public function getMissingRequiredFields(Schema $form): array
     {
         $missingRequiredFields = [];
 
@@ -49,7 +49,7 @@ class SnapshotReadinessService
         return $missingRequiredFields;
     }
 
-    public function isReadyForSnapshot(Form $form): bool
+    public function isReadyForSnapshot(Schema $form): bool
     {
         return $this->getMissingRequiredFields($form) === [];
     }
