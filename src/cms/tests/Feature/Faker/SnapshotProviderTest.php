@@ -7,6 +7,7 @@ namespace Tests\Feature\Faker;
 use App\Models\ContactPerson;
 use App\Models\Snapshot;
 use App\Models\States\Snapshot\Approved;
+use App\Models\States\Snapshot\Concept;
 use App\Models\States\Snapshot\Established;
 use App\Models\States\Snapshot\InReview;
 use App\Models\States\Snapshot\Obsolete;
@@ -44,8 +45,9 @@ it('each state can only occur once, except obsolete', function (): void {
         return $snapshot->state->getValue();
     })->toArray();
 
-    expect($snapshotStateCount[InReview::$name])->toBe(1)
+    expect($snapshotStateCount[Concept::$name])->toBe(1)
+        ->and($snapshotStateCount[InReview::$name])->toBe(1)
         ->and($snapshotStateCount[Established::$name])->toBe(1)
         ->and($snapshotStateCount[Approved::$name])->toBe(1)
-        ->and($snapshotStateCount[Obsolete::$name])->toBe($amountOfSnapshots - 3);
+        ->and($snapshotStateCount[Obsolete::$name])->toBe($amountOfSnapshots - 4);
 });

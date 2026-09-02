@@ -24,6 +24,7 @@ use App\Models\Responsible;
 use App\Services\Snapshot\SnapshotSource\ResponsibleDataFactory;
 use App\Models\System;
 use App\Services\Snapshot\SnapshotSource\SystemDataFactory;
+use App\Config\Feature;
 use App\Models;
 use App\Models\Snapshot;
 use App\Models\SnapshotData;
@@ -37,11 +38,18 @@ class SnapshotDataFactory
     {
         $snapshotDataFactory = $this->getSnapshotDataFactory($snapshot);
 
+        // Without publishing a snapshot only has a private part. Keeping the
+        // rule here rather than in the individual templates puts it in one
+        // place and makes the null explicit: a null public_markdown is what
+        // OrganisationPublishableRecordsService already reads as "not
+        // publishable", so an empty rendered string would not do.
+        $publishingEnabled = Feature::publishingEnabled();
+
         return SnapshotData::create([
             'snapshot_id' => $snapshot->id,
             'private_markdown' => $snapshotDataFactory->generatePrivateMarkdown($snapshot),
-            'public_frontmatter' => $snapshotDataFactory->generatePublicFrontmatter($snapshot),
-            'public_markdown' => $snapshotDataFactory->generatePublicMarkdown($snapshot),
+            'public_frontmatter' => $publishingEnabled ? $snapshotDataFactory->generatePublicFrontmatter($snapshot) : [],
+            'public_markdown' => $publishingEnabled ? $snapshotDataFactory->generatePublicMarkdown($snapshot) : null,
         ]);
     }
 

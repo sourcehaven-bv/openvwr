@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\DpiaRecordResource\Pages;
 
 use App\Filament\Actions\ToggleRegisterLayoutAction;
-use App\Filament\Pages\EntityNumberCreateRecord;
+use App\Filament\Pages\ConceptEntityNumberCreateRecord;
 use App\Filament\Resources\DpiaRecordResource;
 use App\Models\Dpia\DpiaRecord;
 use App\Services\Dpia\DpiaMeasureRiskLinker;
@@ -13,7 +13,7 @@ use Illuminate\Contracts\Support\Arrayable;
 
 use function app;
 
-class CreateDpiaRecord extends EntityNumberCreateRecord
+class CreateDpiaRecord extends ConceptEntityNumberCreateRecord
 {
     protected static string $resource = DpiaRecordResource::class;
 

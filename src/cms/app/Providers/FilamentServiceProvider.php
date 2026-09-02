@@ -11,6 +11,7 @@ use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\OnePageLayoutRenderHooks;
 use App\Filament\Pages\DevLogin;
 use App\Filament\Pages\Login;
+use App\Filament\Pages\Manual\Handleiding;
 use App\Filament\Pages\Profile;
 use App\Filament\SimpleAvatarProvider;
 use App\Http\Controllers\HealthController;
@@ -33,6 +34,7 @@ use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Facades\FilamentColor;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -42,6 +44,7 @@ use Illuminate\Routing\Route;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Route as RouteFacade;
+use Illuminate\Support\HtmlString;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Illuminate\View\View;
 use Spatie\Csp\AddCspHeaders;
@@ -145,6 +148,45 @@ class FilamentServiceProvider extends PanelProvider
     }
 
     /**
+     * The brand lockup shown in the sidebar header and above the login card.
+     *
+     * Rendered to an Htmlable rather than passed as an image path: a path
+     * renders the bare mark, and the top-left needs the wordmark beside it to
+     * name the application. Filament only skips its own <img> wrapper for
+     * Htmlable, so the view is rendered here rather than returned.
+     */
+    private function brandLogo(): Htmlable
+    {
+        return new HtmlString(view('filament.brand.logo')->render());
+    }
+
+    /**
+     * The manual, which lives in the panel itself so it can follow the same
+     * feature flags as the rest of the interface.
+     */
+    private function manualMenuItem(): MenuItem
+    {
+        return MenuItem::make()
+            ->url(static function (): string {
+                $panel = Filament::getCurrentPanel();
+                Assert::isInstanceOf($panel, Panel::class);
+
+                $route = request()->route();
+                Assert::isInstanceOf($route, Route::class);
+
+                try {
+                    $tenant = Organisation::where(['slug' => $route->parameter('tenant')])->firstOrFail();
+                } catch (ModelNotFoundException) {
+                    abort(404);
+                }
+
+                return Handleiding::getUrl(panel: $panel->getId(), tenant: $tenant);
+            })
+            ->icon('heroicon-o-book-open')
+            ->label(__('general.manual'));
+    }
+
+    /**
      * @throws Exception
      */
     public function panel(Panel $panel): Panel
@@ -154,6 +196,11 @@ class FilamentServiceProvider extends PanelProvider
             ->id('admin')
             ->path('/')
             ->font('Inter', asset('fonts/inter.css'), LocalFontProvider::class)
+            ->brandName(Config::string('app.name'))
+            ->brandLogo($this->brandLogo(...))
+            // Filament boxes the logo at this height; the default 1.5rem would
+            // clip the mark.
+            ->brandLogoHeight('2rem')
             ->login($this->loginPage())
             ->profile(Profile::class)
             ->routes(static function (): void {
@@ -229,10 +276,7 @@ class FilamentServiceProvider extends PanelProvider
 
                         return Profile::getUrl(panel: $panel->getId(), tenant: $tenant);
                     }),
-                'manual' => MenuItem::make()
-                    ->url(asset('pdf/openvwr_handleiding.pdf'), true)
-                    ->icon('heroicon-o-document-check')
-                    ->label(__('general.manual')),
+                'manual' => $this->manualMenuItem(),
             ])
             ->maxContentWidth('screen-2xl')
             ->sidebarWidth('25rem')

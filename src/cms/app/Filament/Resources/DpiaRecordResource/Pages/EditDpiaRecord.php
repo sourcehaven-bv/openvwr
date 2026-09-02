@@ -5,28 +5,28 @@ declare(strict_types=1);
 namespace App\Filament\Resources\DpiaRecordResource\Pages;
 
 use App\Filament\Actions\CloneAction;
-use App\Filament\Actions\CreateSnapshotAction;
+use App\Filament\Actions\SubmitForReviewAction;
 use App\Filament\Actions\ToggleRegisterLayoutAction;
 use App\Filament\Notifications\DpiaQualityNotification;
+use App\Filament\Pages\ConceptEditRecord;
 use App\Filament\Resources\DpiaRecordResource;
 use App\Models\Dpia\DpiaRecord;
 use App\Services\Dpia\DpiaMeasureRiskLinker;
 use Filament\Actions\DeleteAction;
-use Filament\Resources\Pages\EditRecord;
 use Illuminate\Contracts\Support\Arrayable;
 
 use function app;
 
-class EditDpiaRecord extends EditRecord
+class EditDpiaRecord extends ConceptEditRecord
 {
     protected static string $resource = DpiaRecordResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
+            SubmitForReviewAction::make(),
             ToggleRegisterLayoutAction::make(),
             CloneAction::make(),
-            CreateSnapshotAction::makeWithChangesCheck($this->data, $this->savedDataHash),
             DeleteAction::make(),
         ];
     }

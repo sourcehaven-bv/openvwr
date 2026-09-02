@@ -9,6 +9,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Group;
 use Filament\Actions\Action;
 use Filament\Support\Enums\Width;
+use App\Config\Feature;
 use App\Enums\Authorization\Permission;
 use App\Enums\Snapshot\SnapshotApprovalStatus;
 use App\Enums\Snapshot\SnapshotDataSection;
@@ -16,7 +17,9 @@ use App\Facades\Authentication;
 use App\Facades\Authorization;
 use App\Facades\DateFormat;
 use App\Filament\Infolists\Components\DateTimeEntry;
+use App\Filament\Infolists\Components\SnapshotEstablishAction;
 use App\Filament\Infolists\Components\SnapshotStateEntry;
+use App\Filament\Infolists\Components\SnapshotStatusChangeAction;
 use App\Filament\Infolists\Components\SnapshotStatusFlow;
 use App\Filament\Infolists\Components\SnapshotUrlEntry;
 use App\Filament\Resources\SnapshotResource\Pages\ViewSnapshot;
@@ -40,6 +43,8 @@ use function view;
 
 class ViewInfoTab extends Tab
 {
+    public const string SECTION_KEY_STATUS_FLOW = 'status_flow_section';
+
     public static function make(string $label): static
     {
         return parent::make($label)
@@ -57,6 +62,13 @@ class ViewInfoTab extends Tab
     private static function getStatusFlowSection(): Section
     {
         return Section::make(__('snapshot.status_flow'))
+            ->key(self::SECTION_KEY_STATUS_FLOW)
+            // Beside the flow rather than in the page header: the button changes exactly
+            // what the flow shows, so it belongs next to it.
+            ->headerActions([
+                SnapshotEstablishAction::make(),
+                SnapshotStatusChangeAction::make(),
+            ])
             ->schema([
                 SnapshotStatusFlow::make(),
             ]);
@@ -94,6 +106,7 @@ class ViewInfoTab extends Tab
     {
         return Section::make(__('snapshot.public_data'))
             ->description(new HtmlString(view('filament.infolists.components.entries.snapshot_data_description')->render()))
+            ->visible(Feature::publishingEnabled())
             ->schema([
                 TextEntry::make('snapshotData.public_markdown')
                     ->label('')
@@ -115,7 +128,13 @@ class ViewInfoTab extends Tab
 
     private static function getPrivateDataSection(): Section
     {
-        return Section::make(__('snapshot.private_data'))
+        // Without publishing there is no public counterpart, so the section is
+        // simply "the data" instead of "the private data".
+        $heading = Feature::publishingEnabled()
+            ? __('snapshot.private_data')
+            : __('snapshot.data');
+
+        return Section::make($heading)
             ->description(new HtmlString(view('filament.infolists.components.entries.snapshot_data_description')->render()))
             ->schema([
                 TextEntry::make('snapshotData.private_markdown')

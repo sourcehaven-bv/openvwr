@@ -8,6 +8,7 @@ use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use App\Components\Uuid\UuidInterface;
+use App\Config\Feature;
 use App\Enums\Authorization\Permission;
 use App\Enums\Media\MediaGroup;
 use App\Facades\Authentication;
@@ -112,8 +113,14 @@ class OrganisationResourceForm
 
     private static function publicSection(): Section
     {
+        // Without publishing only the access related fields remain, so the
+        // section is no longer about the public website.
+        $heading = Feature::publishingEnabled()
+            ? __('organisation.section_public')
+            : __('organisation.section_access');
+
         return Section::make()
-            ->heading(__('organisation.section_public'))
+            ->heading($heading)
             ->columns()
             ->schema([
                 TextInput::make('slug')
@@ -149,14 +156,16 @@ class OrganisationResourceForm
                 MarkdownEditor::make('public_website_content')
                     ->label(__('organisation.public_website_content'))
                     ->helperText(__('organisation.help_public_website_content'))
-                    ->columnSpan(2),
+                    ->columnSpan(2)
+                    ->visible(Feature::publishingEnabled()),
                 PosterFileField::make('poster')
                     ->label(__('organisation.poster'))
                     ->helperText(__('organisation.help_poster'))
                     ->properties([
                         'organisation_id' => Authentication::organisation()->id->toString(),
                     ])
-                    ->collection(MediaGroup::ORGANISATION_POSTERS->value),
+                    ->collection(MediaGroup::ORGANISATION_POSTERS->value)
+                    ->visible(Feature::publishingEnabled()),
             ]);
     }
 }

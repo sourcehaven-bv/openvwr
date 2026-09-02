@@ -6,6 +6,7 @@ namespace App\Filament\Resources\OrganisationResource;
 
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
+use App\Config\Feature;
 use App\Filament\Infolists\Components\DateTimeEntry;
 use App\Filament\Infolists\Components\EntityNumberPrefixEntry;
 use App\Filament\Infolists\Components\TextareaEntry;
@@ -53,7 +54,8 @@ class OrganisationResourceInfolist
                     TextEntry::make('slug')
                         ->label(__('organisation.slug')),
                     DateTimeEntry::make('public_from')
-                        ->label(__('general.public_from')),
+                        ->label(__('general.public_from'))
+                        ->visible(Feature::publishingEnabled()),
                     TextareaEntry::make('allowed_ips')
                         ->label(__('organisation.allowed_ips')),
                     TextareaEntry::make('public_website_content')

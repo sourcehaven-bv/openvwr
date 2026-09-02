@@ -3,10 +3,20 @@
 declare(strict_types=1);
 
 return [
+    'login_heading' => 'Log in',
+    'login_subheading' => 'Enter your email address. You will receive an email with a link that logs you straight in; no password needed.',
     'login_sent' => 'Login information sent',
-    'passwordless_login_subject' => 'Login link',
-    'passwordless_login_text' => 'Use this button to log in',
-    'passwordless_login_button_text' => 'Login',
+
+    // Without the word "link": mail filters weigh that, and a login email
+    // that lands in the spam folder blocks the only way in. The sender
+    // already names the application, so the subject does not.
+    'passwordless_login_subject' => 'Your login email',
+    'passwordless_login_greeting' => 'Hello :userName,',
+    'passwordless_login_text' => 'You requested a login email for :appName. Use the button below to log in.',
+    'passwordless_login_button_text' => 'Log in to :appName',
+    'passwordless_login_expiry' => 'This link is valid until :validUntil and can be used once.',
+    'passwordless_login_ignore' => 'Did you not request a login email? Then no action is needed: without using the button above, nobody gains access to your account.',
+    'passwordless_login_fallback' => 'Button not working? Copy this link into your browser:',
     'email_sent' => 'Email sent',
 
     'login_link_expired' => 'This login link has expired. Request a new login email to log in.',

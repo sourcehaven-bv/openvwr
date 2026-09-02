@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use App\Enums\Authorization\Permission;
 use App\Enums\Snapshot\SnapshotApprovalStatus;
+use App\Filament\Infolists\Components\SnapshotStatusChangeAction;
+use App\Filament\Infolists\Tabs\Snapshot\ViewInfoTab;
 use App\Filament\Resources\SnapshotResource;
 use App\Filament\Resources\SnapshotResource\Pages\ViewSnapshot;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
@@ -15,6 +17,7 @@ use App\Models\SnapshotApprovalLog;
 use App\Models\SnapshotData;
 use App\Models\SnapshotTransition;
 use App\Models\States\Snapshot\Approved;
+use App\Models\States\Snapshot\Concept;
 use App\Models\States\Snapshot\Established;
 use App\Models\States\Snapshot\InReview;
 use App\Models\States\Snapshot\Obsolete;
@@ -22,6 +25,22 @@ use App\Models\User;
 use App\Models\Wpg\WpgProcessingRecord;
 use Tests\Helpers\Model\OrganisationTestHelper;
 use Tests\Helpers\Model\UserTestHelper;
+
+/**
+ * The states the single "Status aanpassen" button offers, which is where the
+ * per-state permission gating now lives.
+ *
+ * @return array<string, string>
+ */
+function transitionOptions(Snapshot $snapshot): array
+{
+    $method = new ReflectionMethod(SnapshotStatusChangeAction::class, 'getTransitionableStates');
+
+    /** @var array<string, string> $options */
+    $options = $method->invoke(null, $snapshot);
+
+    return $options;
+}
 
 it('loads the snapshot', function (): void {
     $organisation = OrganisationTestHelper::create();
@@ -257,7 +276,9 @@ it('can transition to a new state with all approved', function (): void {
         ->createLivewireTestable(ViewSnapshot::class, [
             'record' => $snapshot->getRouteKey(),
         ])
-        ->callAction('snapshot_transition_to_approved');
+        ->callInfolistAction(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_status_change', data: [
+            'state' => Approved::$name,
+        ]);
 
     $this->assertDatabaseHas(Snapshot::class, [
         'state' => Approved::$name,
@@ -284,14 +305,18 @@ it('can transition to a new state with not all approved', function (): void {
         ->createLivewireTestable(ViewSnapshot::class, [
             'record' => $snapshot->getRouteKey(),
         ])
-        ->callAction('snapshot_transition_to_approved');
+        ->callInfolistAction(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_status_change', data: [
+            'state' => Approved::$name,
+        ]);
 
     $this->assertDatabaseHas(Snapshot::class, [
         'state' => Approved::$name,
     ]);
 });
 
-it('shows the transition button for all states', function (string $currentState, string $expectedState): void {
+// One button now, next to the status flow: the reachable states are the options it
+// offers rather than separate buttons in the page header.
+it('offers every reachable state as an option', function (string $currentState, string $expectedState): void {
     $organisation = OrganisationTestHelper::create();
     $snapshot = Snapshot::factory()
         ->recycle($organisation)
@@ -303,14 +328,51 @@ it('shows the transition button for all states', function (string $currentState,
         ->createLivewireTestable(ViewSnapshot::class, [
             'record' => $snapshot->getRouteKey(),
         ])
-        ->assertActionExists(sprintf('snapshot_transition_to_%s', $expectedState));
+        ->assertInfolistActionVisible(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_status_change');
+
+    expect(transitionOptions($snapshot))
+        ->toHaveKey($expectedState);
 })->with([
     [InReview::$name, Approved::$name],
-    [Approved::$name, Established::$name],
     [InReview::$name, Obsolete::$name],
     [Approved::$name, Obsolete::$name],
     [Established::$name, Obsolete::$name],
 ]);
+
+// Vaststellen is the exception: it has its own button, because it first walks the user
+// through the related entities and the approvals. Offering it here too would be a second
+// route that skips those checks.
+it('leaves established out of the status change options', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create([
+            'state' => Approved::$name,
+        ]);
+
+    expect(transitionOptions($snapshot))
+        ->not->toHaveKey(Established::$name);
+});
+
+// A concept is not moved along from here: it is submitted from the record's own form,
+// which is the only place its required fields can be filled in.
+it('offers no status change on a concept', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create([
+            'state' => Concept::class,
+        ]);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshot->getRouteKey(),
+        ])
+        ->assertInfolistActionHidden(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_status_change');
+
+    expect(transitionOptions($snapshot))
+        ->toBe([]);
+});
 
 it('does not display approval-data if none given', function (): void {
     $organisation = OrganisationTestHelper::create();
@@ -724,7 +786,7 @@ it('offers a forward skip transition when the user has the target permission', f
         ->createLivewireTestable(ViewSnapshot::class, [
             'record' => $snapshot->getRouteKey(),
         ])
-        ->assertActionExists(sprintf('snapshot_transition_to_%s', Established::$name));
+        ->assertInfolistActionVisible(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_establish');
 });
 
 it('hides a forward skip transition when the user lacks the target permission', function (): void {
@@ -743,7 +805,7 @@ it('hides a forward skip transition when the user lacks the target permission', 
         ->createLivewireTestable(ViewSnapshot::class, [
             'record' => $snapshot->getRouteKey(),
         ])
-        ->assertActionHidden(sprintf('snapshot_transition_to_%s', Established::$name));
+        ->assertInfolistActionHidden(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_establish');
 });
 
 it('establishes straight from review when the skip transition is triggered from the page', function (): void {
@@ -764,7 +826,7 @@ it('establishes straight from review when the skip transition is triggered from 
         ->createLivewireTestable(ViewSnapshot::class, [
             'record' => $snapshot->getRouteKey(),
         ])
-        ->callAction(sprintf('snapshot_transition_to_%s', Established::$name));
+        ->callInfolistAction(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_establish');
 
     expect($snapshot->refresh()->state)->toBeInstanceOf(Established::class);
 
@@ -790,22 +852,26 @@ it('replaces the transition button with the next one after transitioning', funct
         'status' => SnapshotApprovalStatus::APPROVED,
     ]);
 
-    // The transition action dispatches the refresh event that re-renders the
-    // page, so the header rebuilds itself against the new state instead of
-    // keeping the stale "Goedkeuren" button.
-    $component = $this->asFilamentOrganisationUser($organisation)
-        ->createLivewireTestable(ViewSnapshot::class, [
-            'record' => $snapshot->getRouteKey(),
+    // The status action dispatches the refresh event that re-renders the page, so
+    // the button offers the onward states instead of the spent "Goedkeuren".
+    $test = $this->asFilamentOrganisationUser($organisation);
+
+    expect(transitionOptions($snapshot))
+        ->toHaveKey(Approved::$name);
+
+    $test->createLivewireTestable(ViewSnapshot::class, [
+        'record' => $snapshot->getRouteKey(),
+    ])
+        ->callInfolistAction(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_status_change', data: [
+            'state' => Approved::$name,
         ])
-        ->assertActionExists(sprintf('snapshot_transition_to_%s', Approved::$name))
-        ->callAction(sprintf('snapshot_transition_to_%s', Approved::$name))
         ->assertDispatched(ViewSnapshot::REFRESH_LIVEWIRE_COMPONENT);
 
-    // After the re-render the approve transition is gone (no longer valid from
-    // the approved state), while the onward transitions remain.
-    $component->dispatch(ViewSnapshot::REFRESH_LIVEWIRE_COMPONENT)
-        ->assertActionDoesNotExist(sprintf('snapshot_transition_to_%s', Approved::$name))
-        ->assertActionExists(sprintf('snapshot_transition_to_%s', Established::$name));
+    // The spent "Goedkeuren" is gone and what remains is what an approved version can
+    // still be moved to from this list; vaststellen has its own button.
+    expect(transitionOptions($snapshot->refresh()))
+        ->not->toHaveKey(Approved::$name)
+        ->toHaveKey(Obsolete::$name);
 });
 
 it('marks a bypassed station as skipped in the status flow', function (): void {

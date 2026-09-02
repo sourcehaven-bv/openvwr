@@ -3,8 +3,9 @@
  *
  * Designed to be re-run: every figure is declarative, anchored to CSS
  * selectors rather than pixel coordinates, and writes straight into
- * docs/handleiding/imgs/. Re-running after a UI change regenerates the manual's
- * figures; a moved element throws instead of silently producing a wrong image.
+ * src/cms/public/handleiding/, where the application serves them. Re-running
+ * after a UI change regenerates the manual's figures; a moved element throws
+ * instead of silently producing a wrong image.
  *
  * The app is passwordless: login is email -> signed magic link. Rather than
  * scrape mail, we mint a signed URL through artisan.
@@ -13,7 +14,7 @@
  * ScreenshotSeeder. See tools/screenshots/README.md.
  *
  * Usage:
- *   node capture.mjs                     # all figures, into docs/handleiding/imgs
+ *   node capture.mjs                     # all figures, into src/cms/public/handleiding
  *   node capture.mjs --only login,export # a subset
  *   node capture.mjs --out ./preview     # elsewhere, to compare before replacing
  */
@@ -37,7 +38,7 @@ const ONLY = (arg('only', '') || '').split(',').filter(Boolean);
 const EMAIL = process.env.ADMIN_EMAIL || 'admin@example.com';
 const CMS_DIR = resolve(process.env.CMS_DIR || join(here, '../../src/cms'));
 const PHP = process.env.PHP_BIN || 'php';
-const OUT = resolve(arg('out', join(here, '../../docs/handleiding/imgs')));
+const OUT = resolve(arg('out', join(here, '../../src/cms/public/handleiding')));
 
 const tinker = (code) =>
   execFileSync(PHP, ['artisan', 'tinker', '--execute', code], {
@@ -81,7 +82,7 @@ function totp(secret, when = Date.now()) {
 /**
  * Figure definitions.
  *
- *   file     - path under docs/handleiding/imgs, so the mapping to the manual is explicit
+ *   file     - path under src/cms/public/handleiding, matching the image url in the manual
  *   clip     - CSS selector to crop to. Element-based rather than a pixel box: a
  *              container survives layout changes, a coordinate rectangle does not.
  *              Omit for a full-viewport shot.
@@ -198,7 +199,7 @@ const FIGURES = [
     name: 'record-version',
     file: '03_goedkeuringsproces/01_avg-responsible-processing-records_edit_versie.png',
     auth: true,
-    // Top of the edit page: heading plus the "Versie aanmaken" action. Extra
+    // Top of the edit page: heading plus the "Start vaststellen" action. Extra
     // padding leaves room for the arrow above the button.
     clip: '.fi-header',
     pad: 90,
@@ -206,9 +207,9 @@ const FIGURES = [
       await gotoSeededRecord(page);
       await page.evaluate(() => {
         const btn = [...document.querySelectorAll('button, a')].find((b) =>
-          /Versie aanmaken/i.test(b.textContent || ''),
+          /Start vaststellen/i.test(b.textContent || ''),
         );
-        if (!btn) throw new Error('"Versie aanmaken" button not found');
+        if (!btn) throw new Error('"Start vaststellen" button not found');
         // From above: pointing from the left would cross the "Dupliceren"
         // button that sits immediately beside it.
         window.__annotate.arrow(btn, { side: 'top', length: 70, gap: 10 });

@@ -11,6 +11,7 @@ use App\Filament\Resources\PublicWebsiteTreeResource\Pages\ListPublicWebsiteTree
 use App\Filament\Resources\PublicWebsiteTreeResource\PublicWebsiteTreeResourceForm;
 use App\Models\PublicWebsiteTree;
 use Filament\Resources\Resource;
+use Illuminate\Database\Eloquent\Model;
 
 use function __;
 
@@ -29,7 +30,32 @@ class PublicWebsiteTreeResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return Feature::publishingEnabled();
+        return Feature::publishingEnabled() && parent::shouldRegisterNavigation();
+    }
+
+    /**
+     * Filament checks this before it renders the resource page, so switching the
+     * feature off also makes the url unreachable instead of only hiding the menu
+     * entry.
+     */
+    public static function canViewAny(): bool
+    {
+        return Feature::publishingEnabled() && parent::canViewAny();
+    }
+
+    public static function canCreate(): bool
+    {
+        return Feature::publishingEnabled() && parent::canCreate();
+    }
+
+    public static function canView(Model $record): bool
+    {
+        return Feature::publishingEnabled() && parent::canView($record);
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return Feature::publishingEnabled() && parent::canEdit($record);
     }
 
     public static function form(Schema $schema): Schema

@@ -9,9 +9,12 @@ return [
     'markdown_replacement_help' => 'The content of sections with a coloured border contains established information from related entities. This information may change in the future if a new version of the related entity is established by a privacy officer of this organisation.',
     'export_to_pdf' => 'Download PDF',
 
-    'create' => 'Create version',
-    'created' => 'Version created',
-    'unsaved_changes' => 'Version not created, there are still unsaved changes',
+    'submit_for_review' => 'Start establishing',
+    'submitted_for_review' => 'Version submitted for review',
+
+    'incomplete' => 'Status not changed, required fields are still missing',
+    'incomplete_step' => 'step :step',
+    'incomplete_and_more' => 'and :count more required fields.',
 
     'compare' => 'Compare',
     'compare_title' => 'Compare versions: :name',
@@ -36,9 +39,13 @@ return [
     'back_to' => 'Back to :resource',
     'status_flow' => 'Status progression',
     'status_flow_skipped' => 'Skipped',
+    'status_change' => 'Change status',
+    'status_change_target' => 'New status',
+    'status_change_confirm' => 'Change status',
     'properties' => 'Details',
     'public_data' => 'Public data',
     'private_data' => 'Private data',
+    'data' => 'Record data',
     'related_snapshot_sources' => 'Related entities',
 
     'latest' => 'Latest version',

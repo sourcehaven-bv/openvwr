@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\Filament\Resources\SnapshotResource\Pages\ViewSnapshot;
 use App\Mail\SnapshotApproval\ApprovalNotification;
 use App\Models\SnapshotApproval;
-use Tests\Helpers\ConfigTestHelper;
 
 it('has the correct content', function (): void {
     $snapshotApproval = SnapshotApproval::factory()->create();
@@ -20,7 +19,7 @@ it('has the correct content', function (): void {
     $status = __(sprintf('snapshot_approval_status.%s', $snapshotApproval->status->value));
     $subject = __('snapshot_approval.mail_approval_notification_subject', ['status' => $status]);
 
-    $mailable->assertHasSubject(sprintf('[%s]: %s', ConfigTestHelper::get('app.name'), $subject));
+    $mailable->assertHasSubject($subject);
     $mailable->assertSeeInHtml(__('snapshot_approval.mail_approval_notification_text'));
     $mailable->assertSeeInHtml($link);
 });

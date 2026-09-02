@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages;
 
 use App\Filament\Actions\ToggleRegisterLayoutAction;
-use App\Filament\Pages\EntityNumberCreateRecord;
+use App\Filament\Pages\ConceptEntityNumberCreateRecord;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 
-class CreateAvgResponsibleProcessingRecord extends EntityNumberCreateRecord
+class CreateAvgResponsibleProcessingRecord extends ConceptEntityNumberCreateRecord
 {
     protected static string $resource = AvgResponsibleProcessingRecordResource::class;
 

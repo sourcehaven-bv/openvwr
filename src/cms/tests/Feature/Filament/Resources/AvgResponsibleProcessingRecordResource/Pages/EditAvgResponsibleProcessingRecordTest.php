@@ -39,7 +39,7 @@ it('loads the edit page with all layouts', function (RegisterLayout $registerLay
         ->assertSuccessful();
 })->with(RegisterLayout::cases());
 
-it('can create a snapshot', function (): void {
+it('creates a concept snapshot when saved', function (): void {
     $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
         ->recycle($organisation)
@@ -51,8 +51,8 @@ it('can create a snapshot', function (): void {
 
     $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, ['record' => $avgResponsibleProcessingRecord->id])
-        ->callAction('snapshot_create')
-        ->assertNotified(__('snapshot.created'))
+        ->call('save')
+        ->assertHasNoFormErrors()
         ->assertDispatched(SnapshotsRelationManager::REFRESH_TABLE_EVENT);
 
     expect($avgResponsibleProcessingRecord->refresh()->snapshots->count())
@@ -351,7 +351,9 @@ it('does not show a parent record from another organisation', function (): void 
         });
 });
 
-it('does not create a snapshot on unsaved changes', function (): void {
+// The concept follows the saved record, never the unsaved form: a change that was
+// typed but not saved must not end up in the version.
+it('does not put unsaved changes in the concept snapshot', function (): void {
     $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
         ->recycle($organisation)
@@ -364,10 +366,10 @@ it('does not create a snapshot on unsaved changes', function (): void {
         ])
         ->fillForm([
             'name' => 'unsaved change',
-        ])
-        ->callAction('snapshot_create')
-        ->assertNotified(__('snapshot.unsaved_changes'))
-        ->assertNotNotified(__('snapshot.created'));
+        ]);
+
+    expect($avgResponsibleProcessingRecord->refresh()->snapshots)
+        ->toHaveCount(0);
 });
 
 it('can be attached to a tag', function (): void {

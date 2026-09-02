@@ -16,20 +16,16 @@ use App\Filament\Infolists\Tabs\Snapshot\ViewHistoryTab;
 use App\Filament\Infolists\Tabs\Snapshot\ViewInfoTab;
 use App\Filament\Resources\SnapshotResource;
 use App\Models\Snapshot;
-use App\Models\States\SnapshotState;
 use Filament\Actions\Action;
-use Filament\Actions\ActionGroup;
 use Filament\Facades\Filament;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Resources\Resource;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\On;
-use Spatie\ModelStates\Exceptions\InvalidConfig;
 use Webmozart\Assert\Assert;
 
 use function __;
-use function sprintf;
 
 class ViewSnapshot extends ViewRecord
 {
@@ -64,9 +60,6 @@ class ViewSnapshot extends ViewRecord
         ];
     }
 
-    /**
-     * @throws InvalidConfig
-     */
     protected function getHeaderActions(): array
     {
         return [
@@ -103,7 +96,6 @@ class ViewSnapshot extends ViewRecord
                     return SnapshotResource::getUrl('compare', ['record' => $record]);
                 }),
             ExportToPdfAction::make(),
-            ...$this->getSnapshotWorkflowActions(),
         ];
     }
 
@@ -130,43 +122,6 @@ class ViewSnapshot extends ViewRecord
                     ->persistTabInQueryString(),
             ])
             ->columns(1);
-    }
-
-    /**
-     * A single dropdown grouping every reachable transition. The trigger is
-     * labelled with the snapshot's current state; opening it lists the possible
-     * transitions, including forward states that skip intermediate steps (each
-     * item is only shown when the user has the target state's permission).
-     *
-     * @return array<Action|ActionGroup>
-     *
-     * @throws InvalidConfig
-     */
-    private function getSnapshotWorkflowActions(): array
-    {
-        /** @var Snapshot $snapshot */
-        $snapshot = $this->record;
-        $currentState = $snapshot->state;
-
-        $actions = [];
-        foreach ($currentState->orderedTransitionableStates() as $transitionableState) {
-            /** @var SnapshotState $snapshotState */
-            $snapshotState = SnapshotState::make($transitionableState, $snapshot);
-            $action = $snapshotState::getAction();
-
-            $actions[] = $action::makeForSnapshotState($snapshot, $snapshotState);
-        }
-
-        if ($actions === []) {
-            return [];
-        }
-
-        return [
-            ActionGroup::make($actions)
-                ->label(__(sprintf('snapshot_state.label.%s', $currentState::$name)))
-                ->color($currentState::$color->value)
-                ->button(),
-        ];
     }
 
     public static function getSourceUrl(Snapshot $snapshot): ?string

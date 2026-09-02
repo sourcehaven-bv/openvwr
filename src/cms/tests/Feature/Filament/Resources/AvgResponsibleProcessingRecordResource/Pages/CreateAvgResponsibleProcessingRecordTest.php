@@ -288,7 +288,10 @@ it('can save the measures decription', function (): void {
     ]);
 });
 
-it('requires the outside_eu_protection_level_description if outside_eu_protection_level is false', function (): void {
+// The outside_eu_protection_level_description is still declared required, but creating
+// stores a concept: required fields are enforced when a version is created, not here.
+// See ConceptEntityNumberCreateRecord and SnapshotReadinessService.
+it('stores a concept without the outside_eu_protection_level_description', function (): void {
     $this->asFilamentUser()
         ->createLivewireTestable(CreateAvgResponsibleProcessingRecord::class)
         ->fillForm([
@@ -296,7 +299,11 @@ it('requires the outside_eu_protection_level_description if outside_eu_protectio
             'outside_eu_protection_level' => false,
         ])
         ->call('create')
-        ->assertHasFormErrors(['outside_eu_protection_level_description' => 'required']);
+        ->assertHasNoFormErrors();
+
+    $this->assertDatabaseHas(AvgResponsibleProcessingRecord::class, [
+        'outside_eu_protection_level_description' => '',
+    ]);
 });
 
 it('can create an entry using form components', function (): void {

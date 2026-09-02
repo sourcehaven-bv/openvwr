@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" fill="none" role="img" aria-label="OpenVWR">
+  <title>OpenVWR</title>
+  <line x1="12.4943" y1="14.0723" x2="31.6142" y2="13.9999" stroke="#F84F39" stroke-width="3"/>
+  <line x1="12.4943" y1="21.0723" x2="24.6142" y2="21.0264" stroke="#F84F39" stroke-width="3"/>
+  <path d="M46.5 24C46.5 28.4501 45.1804 32.8002 42.7081 36.5003C40.2357 40.2004 36.7217 43.0843 32.6104 44.7873C28.499 46.4903 23.975 46.9358 19.6105 46.0677C15.2459 45.1995 11.2368 43.0566 8.0901 39.9099C4.94342 36.7632 2.8005 32.7541 1.93233 28.3895C1.06416 24.025 1.50974 19.501 3.21271 15.3896C4.91568 11.2783 7.79956 7.76427 11.4997 5.29193C15.1998 2.8196 19.5499 1.5 24 1.5" stroke="#F84F39" stroke-width="3" stroke-linecap="round"/>
+  <path d="M13.3573 29.1147L21.9619 37.6501L37.1054 21.5266" stroke="#ffffff" stroke-width="3.9" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
