@@ -8,15 +8,17 @@ use App\Enums\Authorization\Permission;
 use App\Facades\Authorization;
 use App\Facades\Snapshot as SnapshotFacade;
 use App\Models\Snapshot;
+use Closure;
 use Filament\Infolists\Components\ViewEntry;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Tabs\Tab;
+use Illuminate\Contracts\Support\Htmlable;
 
 use function sprintf;
 
 class ViewApprovalTab extends Tab
 {
-    public static function make(string $label): static
+    public static function make(Htmlable|Closure|string|null $label = null): static
     {
         return parent::make($label)
             ->icon('heroicon-o-check-circle')

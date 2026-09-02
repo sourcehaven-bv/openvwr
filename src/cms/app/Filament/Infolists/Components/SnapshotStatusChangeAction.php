@@ -11,9 +11,8 @@ use App\Models\States\Snapshot\Concept;
 use App\Models\States\Snapshot\Established;
 use App\Models\States\SnapshotState;
 use App\Services\Snapshot\SnapshotStateTransitionService;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Radio;
-use Filament\Infolists\Components\Actions\Action;
-use Filament\Support\Enums\MaxWidth;
 use Livewire\Component;
 use Webmozart\Assert\Assert;
 

@@ -22,6 +22,7 @@ use App\Models\Snapshot;
 use App\Models\SnapshotApproval;
 use App\Services\Snapshot\SnapshotApprovalService;
 use App\Services\Snapshot\SnapshotDataMarkdownRenderer;
+use Closure;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
 use Filament\Infolists\Components\TextEntry;
@@ -30,6 +31,7 @@ use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Support\Enums\Width;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Livewire\Component;
@@ -45,7 +47,7 @@ class ViewInfoTab extends Tab
 {
     public const string SECTION_KEY_STATUS_FLOW = 'status_flow_section';
 
-    public static function make(string $label): static
+    public static function make(Htmlable|Closure|string|null $label = null): static
     {
         return parent::make($label)
             ->icon('heroicon-o-information-circle')

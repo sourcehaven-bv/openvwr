@@ -14,9 +14,8 @@ use App\Filament\Resources\PublicWebsiteTreeResource\Pages\ListPublicWebsiteTree
 use App\Models\Organisation;
 use App\Models\PublicWebsiteTree;
 use Filament\Facades\Filament;
-use Filament\Forms\Form;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Infolist;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Tests\Helpers\LivewireTestHelper;
 use Tests\TestCase;
 use Throwable;
@@ -41,7 +40,7 @@ beforeEach(function (): void {
  */
 function snapshotSectionHeadings(): array
 {
-    $infolist = Infolist::make(LivewireTestHelper::createTestFormComponent())
+    $infolist = Schema::make(LivewireTestHelper::createTestFormComponent())
         ->schema([ViewInfoTab::make('info')]);
 
     $tab = $infolist->getComponents()[0];
@@ -84,7 +83,7 @@ function organisationFormHeadings(): array
     Filament::setTenant($organisation, isQuiet: true);
 
     $form = OrganisationResourceForm::form(
-        Form::make(LivewireTestHelper::createTestFormComponent()),
+        Schema::make(LivewireTestHelper::createTestFormComponent()),
     );
 
     $headings = [];
@@ -111,7 +110,12 @@ function treeRecordIcon(PublicWebsiteTree $tree): string
  */
 function organisationInfolistSection(string $heading): ?Section
 {
-    foreach (OrganisationResourceInfolist::getSchema() as $component) {
+    // v4 resolves a component's state through its container, so the schema is
+    // hung on a Livewire host rather than inspected as a bare array.
+    $schema = Schema::make(LivewireTestHelper::createTestFormComponent())
+        ->schema(OrganisationResourceInfolist::getSchema());
+
+    foreach ($schema->getComponents() as $component) {
         if (!$component instanceof Section) {
             continue;
         }

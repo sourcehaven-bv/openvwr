@@ -1,5 +1,5 @@
 @php
-    use Filament\Support\Enums\MaxWidth;
+    use Filament\Support\Enums\Width;
 
     $livewire ??= null;
 @endphp

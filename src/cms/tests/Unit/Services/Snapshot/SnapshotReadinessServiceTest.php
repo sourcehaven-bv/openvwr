@@ -9,13 +9,13 @@ use App\Filament\Pages\Concerns\EnforcesRequiredFieldsWhenSubmitting;
 use App\Filament\Pages\Contracts\SavesConcepts;
 use App\Services\Snapshot\SnapshotReadinessService;
 use Filament\Forms\Components\CheckboxList;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Wizard;
-use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Wizard;
+use Filament\Schemas\Components\Wizard\Step;
+use Filament\Schemas\Schema;
 use Illuminate\Support\HtmlString;
 use Livewire\Component;
 use Tests\Helpers\LivewireTestHelper;
@@ -36,7 +36,7 @@ uses(TestCase::class);
  *
  * @param array<string, mixed> $state
  */
-$readinessForm = static function (array $state = []): Form {
+$readinessForm = static function (array $state = []): Schema {
     $livewire = LivewireTestHelper::createTestFormComponent();
     $livewire->data = $state;
 
@@ -69,7 +69,7 @@ $readinessForm = static function (array $state = []): Form {
  *
  * @param array<int, mixed> $schema
  */
-$conceptForm = static function (array $schema): Form {
+$conceptForm = static function (array $schema): Schema {
     $livewire = new class extends Component implements HasForms, SavesConcepts
     {
         use EnforcesRequiredFieldsWhenSubmitting;
