@@ -34,7 +34,7 @@ class SnapshotStatusChangeAction extends Action
             ->label(__('snapshot.status_change'))
             ->icon('heroicon-o-arrow-path')
             ->modalHeading(__('snapshot.status_change'))
-            ->modalWidth(MaxWidth::Large)
+            ->modalWidth(Width::Large)
             ->modalSubmitActionLabel(__('snapshot.status_change_confirm'))
             ->visible(static function (Snapshot $record): bool {
                 return self::getTransitionableStates($record) !== [];
