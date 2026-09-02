@@ -9,7 +9,6 @@ use App\Models\SnapshotApproval;
 use App\Models\SnapshotApprovalLog;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
-use Tests\Helpers\ConfigTestHelper;
 
 it('has the correct content', function (): void {
     $organisation = Organisation::factory()->create();
@@ -32,11 +31,9 @@ it('has the correct content', function (): void {
             'notified_at' => fake()->dateTime(),
         ]);
 
-    $appName = ConfigTestHelper::get('app.name');
-
     $mailable = new BatchSignRequest($user, $organisation, $snapshotApprovalsNew, $snapshotApprovalsExisting);
     $mailable->assertHasSubject(
-        sprintf('[%s]: %s', $appName, __('snapshot_approval.mail_batch_sign_request_subject', ['organisationName' => $organisation->name])),
+        __('snapshot_approval.mail_batch_sign_request_subject', ['organisationName' => $organisation->name]),
     );
     $mailable->assertSeeInHtml(__('snapshot_approval.mail_batch_sign_request_text'));
 });

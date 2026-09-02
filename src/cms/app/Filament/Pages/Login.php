@@ -94,7 +94,12 @@ class Login extends FilamentLogin
 
     public function getHeading(): string
     {
-        return '';
+        return __('auth.login_heading');
+    }
+
+    public function getSubheading(): string
+    {
+        return __('auth.login_subheading');
     }
 
     private function sendNotification(): void
