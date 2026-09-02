@@ -8,6 +8,9 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Schemas\Components\Section;
 use Illuminate\Support\HtmlString;
 
+use function md5;
+use function sprintf;
+
 class InformationBlockSection extends Section
 {
     public static function makeCollapsible(string $heading, string $info, ?string $extraInfo = null): static
@@ -33,9 +36,15 @@ class InformationBlockSection extends Section
             ]);
     }
 
+    /**
+     * The name only has to be unique within the schema, and never reaches the
+     * user: the label is hidden and the content carries the text. v4 rejects an
+     * empty name, so it is derived from the content rather than invented, which
+     * keeps two blocks in one section apart.
+     */
     private static function makePlaceholderWithHtmlString(string $info): Placeholder
     {
-        return Placeholder::make('')
+        return Placeholder::make(sprintf('information_block_%s', md5($info)))
             ->hiddenLabel()
             ->content(self::makeHtmlString($info));
     }
