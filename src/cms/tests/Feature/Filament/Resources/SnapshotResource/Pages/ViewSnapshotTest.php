@@ -334,11 +334,25 @@ it('offers every reachable state as an option', function (string $currentState, 
         ->toHaveKey($expectedState);
 })->with([
     [InReview::$name, Approved::$name],
-    [Approved::$name, Established::$name],
     [InReview::$name, Obsolete::$name],
     [Approved::$name, Obsolete::$name],
     [Established::$name, Obsolete::$name],
 ]);
+
+// Vaststellen is the exception: it has its own button, because it first walks the user
+// through the related entities and the approvals. Offering it here too would be a second
+// route that skips those checks.
+it('leaves established out of the status change options', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create([
+            'state' => Approved::$name,
+        ]);
+
+    expect(transitionOptions($snapshot))
+        ->not->toHaveKey(Established::$name);
+});
 
 // A concept is not moved along from here: it is submitted from the record's own form,
 // which is the only place its required fields can be filled in.
@@ -772,10 +786,7 @@ it('offers a forward skip transition when the user has the target permission', f
         ->createLivewireTestable(ViewSnapshot::class, [
             'record' => $snapshot->getRouteKey(),
         ])
-        ->assertInfolistActionVisible(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_status_change');
-
-    expect(transitionOptions($snapshot))
-        ->toHaveKey(Established::$name);
+        ->assertInfolistActionVisible(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_establish');
 });
 
 it('hides a forward skip transition when the user lacks the target permission', function (): void {
@@ -793,10 +804,8 @@ it('hides a forward skip transition when the user lacks the target permission', 
     $this->withFilamentSession($user, $organisation)
         ->createLivewireTestable(ViewSnapshot::class, [
             'record' => $snapshot->getRouteKey(),
-        ]);
-
-    expect(transitionOptions($snapshot))
-        ->not->toHaveKey(Established::$name);
+        ])
+        ->assertInfolistActionHidden(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_establish');
 });
 
 it('establishes straight from review when the skip transition is triggered from the page', function (): void {
@@ -817,9 +826,7 @@ it('establishes straight from review when the skip transition is triggered from 
         ->createLivewireTestable(ViewSnapshot::class, [
             'record' => $snapshot->getRouteKey(),
         ])
-        ->callInfolistAction(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_status_change', data: [
-            'state' => Established::$name,
-        ]);
+        ->callInfolistAction(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_establish');
 
     expect($snapshot->refresh()->state)->toBeInstanceOf(Established::class);
 
@@ -860,9 +867,11 @@ it('replaces the transition button with the next one after transitioning', funct
         ])
         ->assertDispatched(ViewSnapshot::REFRESH_LIVEWIRE_COMPONENT);
 
+    // The spent "Goedkeuren" is gone and what remains is what an approved version can
+    // still be moved to from this list; vaststellen has its own button.
     expect(transitionOptions($snapshot->refresh()))
         ->not->toHaveKey(Approved::$name)
-        ->toHaveKey(Established::$name);
+        ->toHaveKey(Obsolete::$name);
 });
 
 it('marks a bypassed station as skipped in the status flow', function (): void {

@@ -8,6 +8,7 @@ use App\Facades\Authorization;
 use App\Filament\Resources\SnapshotResource\Pages\ViewSnapshot;
 use App\Models\Snapshot;
 use App\Models\States\Snapshot\Concept;
+use App\Models\States\Snapshot\Established;
 use App\Models\States\SnapshotState;
 use App\Services\Snapshot\SnapshotStateTransitionService;
 use Filament\Forms\Components\Radio;
@@ -55,6 +56,12 @@ class SnapshotStatusChangeAction extends Action
                 $stateName = $data['state'];
                 Assert::string($stateName);
 
+                // Checked again here rather than trusted from the form: the options are
+                // what the page offers, not what a request has to contain. Establishing
+                // has its own button with two checks in front of it, and this is the
+                // list's only way to reach a state, so it may not slip through here.
+                Assert::keyExists(self::getTransitionableStates($record), $stateName);
+
                 $snapshotStateTransitionService->transitionToSnapshotState(
                     $record,
                     self::resolveState($record, $stateName),
@@ -92,6 +99,13 @@ class SnapshotStatusChangeAction extends Action
         $options = [];
 
         foreach ($snapshot->state->orderedTransitionableStates() as $transitionableState) {
+            // Vaststellen has its own button (SnapshotEstablishAction), because it first
+            // walks the user through the related entities and the approvals. Offering it
+            // here as well would be a second, unchecked way to do the same thing.
+            if ($transitionableState === Established::$name) {
+                continue;
+            }
+
             $snapshotState = self::resolveState($snapshot, $transitionableState);
 
             if (!Authorization::hasPermission($snapshotState::$requiredPermission)) {

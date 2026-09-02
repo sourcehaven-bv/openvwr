@@ -6,7 +6,6 @@ namespace App\Models\States;
 
 use App\Enums\Authorization\Permission;
 use App\Enums\StateColor;
-use App\Filament\Actions\SnapshotTransition\SnapshotTransitionAction;
 use App\Models\Snapshot;
 use App\Models\States\Snapshot\Approved;
 use App\Models\States\Snapshot\Concept;
@@ -49,11 +48,6 @@ abstract class SnapshotState extends State
     public static StateColor $color = StateColor::GRAY;
     public static string $name = 'none';
     public static Permission $requiredPermission = Permission::SNAPSHOT_CREATE;
-
-    /**
-     * @return class-string<SnapshotTransitionAction>
-     */
-    abstract public static function getAction(): string;
 
     /**
      * The states this snapshot may transition to, ordered for the transition

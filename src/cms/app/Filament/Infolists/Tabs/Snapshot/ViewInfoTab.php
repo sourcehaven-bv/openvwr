@@ -12,6 +12,7 @@ use App\Facades\Authentication;
 use App\Facades\Authorization;
 use App\Facades\DateFormat;
 use App\Filament\Infolists\Components\DateTimeEntry;
+use App\Filament\Infolists\Components\SnapshotEstablishAction;
 use App\Filament\Infolists\Components\SnapshotStateEntry;
 use App\Filament\Infolists\Components\SnapshotStatusChangeAction;
 use App\Filament\Infolists\Components\SnapshotStatusFlow;
@@ -65,6 +66,7 @@ class ViewInfoTab extends Tab
             // Beside the flow rather than in the page header: the button changes exactly
             // what the flow shows, so it belongs next to it.
             ->headerActions([
+                SnapshotEstablishAction::make(),
                 SnapshotStatusChangeAction::make(),
             ])
             ->schema([

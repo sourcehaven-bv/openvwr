@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Tests\Feature\Models\Concerns;
 
 use App\Enums\Authorization\Role;
-use App\Filament\Actions\SnapshotTransition\ApproveAction;
-use App\Filament\Actions\SnapshotTransition\ConceptAction;
-use App\Filament\Actions\SnapshotTransition\EstablishAction;
-use App\Filament\Actions\SnapshotTransition\InReviewAction;
-use App\Filament\Actions\SnapshotTransition\ObsoleteAction;
 use App\Models\Organisation;
 use App\Models\Snapshot;
 use App\Models\SnapshotTransition;
@@ -23,19 +18,6 @@ use Spatie\ModelStates\Exceptions\TransitionNotFound;
 
 use function expect;
 use function it;
-
-it('returns the correct action', function (string $state, string $expectedAction): void {
-    $snapshot = Snapshot::factory()->create(['state' => $state]);
-
-    expect($snapshot->state->getAction())
-        ->toBe($expectedAction);
-})->with([
-    [Approved::class, ApproveAction::class],
-    [Concept::class, ConceptAction::class],
-    [Established::class, EstablishAction::class],
-    [InReview::class, InReviewAction::class],
-    [Obsolete::class, ObsoleteAction::class],
-]);
 
 it('allows the transitions', function (string $state, string $newState): void {
     $snapshot = Snapshot::factory()->create(['state' => $state]);
