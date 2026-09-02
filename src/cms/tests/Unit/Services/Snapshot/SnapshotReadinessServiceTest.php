@@ -213,7 +213,7 @@ it('reads a label that renders as html', function (): void {
         ->toBe('Naam');
 });
 
-it('falls back to the field name when it has no label', function (): void {
+it('falls back to the generated label when the field has none', function (): void {
     $livewire = LivewireTestHelper::createTestFormComponent();
     $livewire->data = [];
 
@@ -227,8 +227,10 @@ it('falls back to the field name when it has no label', function (): void {
 
     $missingRequiredFields = (new SnapshotReadinessService())->getMissingRequiredFields($form);
 
+    // v4 generates a label from the field name ("name" -> "Name") rather than
+    // leaving it empty, so the message names the field the way the form does.
     expect($missingRequiredFields[0]->label)
-        ->toBe('name');
+        ->toBe('Name');
 });
 
 it('summarises the remainder when many required fields are missing', function (): void {
