@@ -332,11 +332,12 @@ it('sends the heading and the recent records to the javascript control', functio
         ])
         ->assertFormFieldExists('systems', static function (RelationTable $field): bool {
             // choices.js draws the heading from this shape; without the
-            // nesting the ordering would look arbitrary to the user.
+            // nesting the ordering would look arbitrary to the user. v5 names
+            // the nested list 'options' where v4 called it 'choices'.
             $forJs = $field->getOptionsForJs();
 
             return count($forJs) === 1
                 && ($forJs[0]['label'] ?? null) === __('general.picker_recent')
-                && count($forJs[0]['choices'] ?? []) === RecentFirstOptions::RECENT_COUNT;
+                && count($forJs[0]['options'] ?? []) === RecentFirstOptions::RECENT_COUNT;
         });
 });

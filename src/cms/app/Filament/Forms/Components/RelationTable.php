@@ -109,7 +109,7 @@ class RelationTable extends Select
                         return;
                     }
 
-                    $component = $action->getComponent();
+                    $component = $action->getSchemaComponent();
 
                     // @codeCoverageIgnoreStart
                     if (!$component instanceof self) {
