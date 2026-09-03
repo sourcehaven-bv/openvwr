@@ -260,7 +260,11 @@ class FilamentServiceProvider extends PanelProvider
             ], isPersistent: true)
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->userMenuItems([
-                'account' => MenuItem::make()
+                // Deliberately not keyed 'account' or 'profile': v5 rewrites those
+                // two into its own profile item, which links via getProfileUrl()
+                // and therefore to the panel's auth profile route. Ours is a
+                // tenant page, so it builds its own url below.
+                'my_profile' => MenuItem::make()
                     ->url(static function (): string {
                         $panel = Filament::getCurrentOrDefaultPanel();
                         Assert::isInstanceOf($panel, Panel::class);
@@ -275,7 +279,12 @@ class FilamentServiceProvider extends PanelProvider
                         }
 
                         return Profile::getUrl(panel: $panel->getId(), tenant: $tenant);
-                    }),
+                    })
+                    // Label and icon came from Filament's own profile item as long
+                    // as this was keyed 'account'; under our own key they are ours
+                    // to give.
+                    ->icon('heroicon-o-user-circle')
+                    ->label(Profile::getLabel()),
                 'manual' => $this->manualMenuItem(),
             ])
             ->maxContentWidth('screen-2xl')
