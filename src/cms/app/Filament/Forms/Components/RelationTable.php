@@ -9,11 +9,11 @@ use App\Facades\Authentication;
 use App\Filament\TenantScoped;
 use App\Rules\CurrentOrganisation;
 use Closure;
-use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\Component;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -109,7 +109,7 @@ class RelationTable extends Select
                         return;
                     }
 
-                    $component = $action->getComponent();
+                    $component = $action->getSchemaComponent();
 
                     // @codeCoverageIgnoreStart
                     if (!$component instanceof self) {
@@ -136,14 +136,14 @@ class RelationTable extends Select
                     Hidden::make('organisation_id')
                         ->default(Authentication::organisation()->id->toString()),
                 ]))
-                ->createOptionUsing(static function (Select $component, array $data, Form $form): string {
+                ->createOptionUsing(static function (Select $component, array $data, Schema $schema): string {
                     Assert::isMap($data);
 
                     $record = self::getEloquentRelationship($component)->getRelated();
                     $record->fill($data);
                     $record->save();
 
-                    $form->model($record)->saveRelationships();
+                    $schema->model($record)->saveRelationships();
 
                     $key = $record->getKey();
                     Assert::isInstanceOf($key, UuidInterface::class);

@@ -8,7 +8,7 @@ use App\Filament\Actions\ExportAction;
 use App\Filament\Exports\AlgorithmRecordExporter;
 use App\Filament\Resources\AlgorithmRecordResource;
 use App\Filament\Resources\Pages\Concerns\PersistsFiltersInSession;
-use Filament\Actions;
+use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
 use function __;
@@ -30,7 +30,7 @@ class ListAlgorithmRecords extends ListRecords
             ExportAction::make()
                 ->exporter(AlgorithmRecordExporter::class)
                 ->pluralModelLabel(__('algorithm_record.model_plural')),
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

@@ -11,15 +11,15 @@ use Symfony\Component\Mime\MimeTypesInterface;
 
 class PosterFileField extends SpatieMediaLibraryFileUpload
 {
-    public static function make(string $name): static
+    public static function make(?string $name = null): static
     {
         return parent::make($name)
             ->imageEditor()
             ->imagePreviewHeight('295')
-            ->imageResizeMode('cover')
+            ->automaticallyResizeImagesMode('cover')
             ->imageCropAspectRatio('33:8')
-            ->imageResizeTargetWidth('1920')
-            ->imageResizeTargetHeight('480')
+            ->automaticallyResizeImagesToWidth('1920')
+            ->automaticallyResizeImagesToHeight('480')
             ->panelAspectRatio('33:8')
             ->panelLayout('integrated')
             ->columnSpanFull()

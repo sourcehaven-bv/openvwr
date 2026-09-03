@@ -6,7 +6,10 @@ namespace App\Filament\Resources;
 
 use App\Config\Feature;
 use App\Filament\RelationManagers\WpgProcessingRecordRelationManager;
-use App\Filament\Resources\WpgProcessingRecordServiceResource\Pages;
+use App\Filament\Resources\WpgProcessingRecordServiceResource\Pages\CreateWpgProcessingRecordService;
+use App\Filament\Resources\WpgProcessingRecordServiceResource\Pages\EditWpgProcessingRecordService;
+use App\Filament\Resources\WpgProcessingRecordServiceResource\Pages\ListWpgProcessingRecordServices;
+use App\Filament\Resources\WpgProcessingRecordServiceResource\Pages\ViewWpgProcessingRecordService;
 use App\Models\Wpg\WpgProcessingRecordService;
 use Illuminate\Database\Eloquent\Model;
 
@@ -50,10 +53,10 @@ class WpgProcessingRecordServiceResource extends LookupListResource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListWpgProcessingRecordServices::route('/'),
-            'create' => Pages\CreateWpgProcessingRecordService::route('/create'),
-            'edit' => Pages\EditWpgProcessingRecordService::route('/{record}/edit'),
-            'view' => Pages\ViewWpgProcessingRecordService::route('/{record}'),
+            'index' => ListWpgProcessingRecordServices::route('/'),
+            'create' => CreateWpgProcessingRecordService::route('/create'),
+            'edit' => EditWpgProcessingRecordService::route('/{record}/edit'),
+            'view' => ViewWpgProcessingRecordService::route('/{record}'),
         ];
     }
 

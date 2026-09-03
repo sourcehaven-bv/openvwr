@@ -15,13 +15,14 @@ use App\Transfer\Import\BundleReader;
 use App\Transfer\Import\PreviewBuilder;
 use App\Transfer\TransferBundleStorage;
 use App\Transfer\TransferException;
+use BackedEnum;
 use Carbon\CarbonImmutable;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Locked;
@@ -45,8 +46,8 @@ class TransferImport extends Page implements HasForms
 
     protected static ?string $slug = 'transfer-import';
     protected static ?int $navigationSort = 4;
-    protected static string $view = 'filament.pages.transfer-import';
-    protected static ?string $navigationIcon = 'heroicon-o-archive-box';
+    protected string $view = 'filament.pages.transfer-import';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-archive-box';
 
     /** @var ?array<TemporaryUploadedFile> $files */
     public ?array $files = null;
@@ -93,9 +94,9 @@ class TransferImport extends Page implements HasForms
         return app(TransferBundleStorage::class);
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->components([
             FileUpload::make('files')
                 ->required()
                 ->label(__('transfer.import_file'))

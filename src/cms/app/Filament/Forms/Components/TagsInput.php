@@ -12,8 +12,8 @@ use App\Filament\Resources\TagResource\TagResourceForm;
 use App\Filament\TenantScoped;
 use App\Models\Tag;
 use App\Rules\CurrentOrganisation;
-use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Component;
 use Webmozart\Assert\Assert;
 
 use function __;
@@ -21,7 +21,7 @@ use function array_merge;
 
 class TagsInput extends Select
 {
-    public static function make(string $name = 'tags'): static
+    public static function make(?string $name = 'tags'): static
     {
         return parent::make($name)
             ->label(__('tag.model_plural'))

@@ -8,6 +8,7 @@ use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\Resources\AdminLogEntryResource\AdminLogEntryResourceTable;
 use App\Filament\Resources\AdminLogEntryResource\Pages\ListAdminLogEntries;
 use App\Models\AdminLogEntry;
+use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 
@@ -16,7 +17,7 @@ use function __;
 class AdminLogEntryResource extends Resource
 {
     protected static ?string $model = AdminLogEntry::class;
-    protected static ?string $navigationIcon = 'heroicon-o-command-line';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-command-line';
     protected static ?int $navigationSort = 4;
     protected static bool $isScopedToTenant = false;
 

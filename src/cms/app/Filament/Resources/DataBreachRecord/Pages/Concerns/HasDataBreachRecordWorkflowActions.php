@@ -28,7 +28,7 @@ trait HasDataBreachRecordWorkflowActions
         $dataBreachRecord->refresh();
 
         $this->cachedHeaderActions = [];
-        $this->cacheHeaderActions();
+        $this->cacheInteractsWithHeaderActions();
     }
 
     /**

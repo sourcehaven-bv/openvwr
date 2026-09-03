@@ -10,7 +10,7 @@ use function __;
 
 class RemarksEntry extends RepeatableEntry
 {
-    public static function make(string $name = 'remarks'): static
+    public static function make(?string $name = 'remarks'): static
     {
         return parent::make($name)
             ->label(__('remark.model_plural'))

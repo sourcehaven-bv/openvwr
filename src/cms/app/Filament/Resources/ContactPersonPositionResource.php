@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\RelationManagers\ContactPersonRelationManager;
-use App\Filament\Resources\ContactPersonPositionResource\Pages;
+use App\Filament\Resources\ContactPersonPositionResource\Pages\CreateContactPersonPosition;
+use App\Filament\Resources\ContactPersonPositionResource\Pages\EditContactPersonPosition;
+use App\Filament\Resources\ContactPersonPositionResource\Pages\ListContactPersonPositions;
+use App\Filament\Resources\ContactPersonPositionResource\Pages\ViewContactPersonPosition;
 use App\Models\ContactPersonPosition;
 
 use function __;
@@ -25,10 +28,10 @@ class ContactPersonPositionResource extends LookupListResource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListContactPersonPositions::route('/'),
-            'create' => Pages\CreateContactPersonPosition::route('/create'),
-            'edit' => Pages\EditContactPersonPosition::route('/{record}/edit'),
-            'view' => Pages\ViewContactPersonPosition::route('/{record}'),
+            'index' => ListContactPersonPositions::route('/'),
+            'create' => CreateContactPersonPosition::route('/create'),
+            'edit' => EditContactPersonPosition::route('/{record}/edit'),
+            'view' => ViewContactPersonPosition::route('/{record}'),
         ];
     }
 

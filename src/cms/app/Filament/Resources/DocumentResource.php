@@ -13,10 +13,13 @@ use App\Filament\RelationManagers\WpgProcessingRecordRelationManager;
 use App\Filament\Resources\DocumentResource\DocumentResourceForm;
 use App\Filament\Resources\DocumentResource\DocumentResourceInfolist;
 use App\Filament\Resources\DocumentResource\DocumentResourceTable;
-use App\Filament\Resources\DocumentResource\Pages;
+use App\Filament\Resources\DocumentResource\Pages\CreateDocument;
+use App\Filament\Resources\DocumentResource\Pages\EditDocument;
+use App\Filament\Resources\DocumentResource\Pages\ListDocuments;
+use App\Filament\Resources\DocumentResource\Pages\ViewDocument;
 use App\Models\Document;
-use Filament\Forms\Form;
-use Filament\Infolists\Infolist;
+use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 
 use function __;
@@ -24,7 +27,7 @@ use function __;
 class DocumentResource extends Resource
 {
     protected static ?string $model = Document::class;
-    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document';
     protected static ?int $navigationSort = 13;
 
     public static function getNavigationGroup(): ?string
@@ -32,14 +35,14 @@ class DocumentResource extends Resource
         return __(NavigationGroup::MANAGEMENT->value);
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return DocumentResourceForm::form($form);
+        return DocumentResourceForm::form($schema);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return DocumentResourceInfolist::infolist($infolist);
+        return DocumentResourceInfolist::infolist($schema);
     }
 
     public static function table(Table $table): Table
@@ -50,10 +53,10 @@ class DocumentResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDocuments::route('/'),
-            'create' => Pages\CreateDocument::route('/create'),
-            'view' => Pages\ViewDocument::route('/{record}'),
-            'edit' => Pages\EditDocument::route('/{record}/edit'),
+            'index' => ListDocuments::route('/'),
+            'create' => CreateDocument::route('/create'),
+            'view' => ViewDocument::route('/{record}'),
+            'edit' => EditDocument::route('/{record}/edit'),
         ];
     }
 

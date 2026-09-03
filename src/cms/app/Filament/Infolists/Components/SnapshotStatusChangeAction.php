@@ -11,9 +11,9 @@ use App\Models\States\Snapshot\Concept;
 use App\Models\States\Snapshot\Established;
 use App\Models\States\SnapshotState;
 use App\Services\Snapshot\SnapshotStateTransitionService;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Radio;
-use Filament\Infolists\Components\Actions\Action;
-use Filament\Support\Enums\MaxWidth;
+use Filament\Support\Enums\Width;
 use Livewire\Component;
 use Webmozart\Assert\Assert;
 
@@ -35,7 +35,7 @@ class SnapshotStatusChangeAction extends Action
             ->label(__('snapshot.status_change'))
             ->icon('heroicon-o-arrow-path')
             ->modalHeading(__('snapshot.status_change'))
-            ->modalWidth(MaxWidth::Large)
+            ->modalWidth(Width::Large)
             ->modalSubmitActionLabel(__('snapshot.status_change_confirm'))
             ->visible(static function (Snapshot $record): bool {
                 return self::getTransitionableStates($record) !== [];

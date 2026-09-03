@@ -9,8 +9,8 @@ use App\Filament\Pages\Concerns\CoercesClearedRequiredFields;
 use App\Filament\Pages\Concerns\EnforcesRequiredFieldsWhenSubmitting;
 use App\Filament\Pages\Concerns\StoresConceptSnapshot;
 use App\Filament\Pages\Contracts\SavesConcepts;
-use Filament\Forms\Form;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Schemas\Schema;
 
 /**
  * An edit page whose record may be saved as a concept, even half-finished.
@@ -28,7 +28,7 @@ abstract class ConceptEditRecord extends EditRecord implements SavesConcepts
     use EnforcesRequiredFieldsWhenSubmitting;
     use StoresConceptSnapshot;
 
-    protected function makeForm(): Form
+    protected function makeSchema(): Schema
     {
         return DraftableForm::make($this);
     }

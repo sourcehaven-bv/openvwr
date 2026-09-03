@@ -6,7 +6,7 @@ namespace App\Services\Dpia;
 
 use App\Enums\Dpia\PrescanOutcome;
 use App\Models\Dpia\DpiaPrescanRecord;
-use Filament\Forms\Get;
+use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Support\HtmlString;
 
 use function __;

@@ -31,7 +31,7 @@ class OverdueItemsWidget extends Widget
 
     protected static ?int $sort = 2;
     protected int|string|array $columnSpan = 'full';
-    protected static string $view = 'filament.widgets.overdue-items';
+    protected string $view = 'filament.widgets.overdue-items';
 
     /** @var array<string, array<int, OverdueItem>> */
     private static array $items = [];

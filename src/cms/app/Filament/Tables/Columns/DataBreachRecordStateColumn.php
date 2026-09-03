@@ -12,7 +12,7 @@ use function sprintf;
 
 class DataBreachRecordStateColumn extends TextColumn
 {
-    public static function make(string $name = 'state'): static
+    public static function make(?string $name = 'state'): static
     {
         return parent::make($name)
             ->label(__('data_breach_record.state'))

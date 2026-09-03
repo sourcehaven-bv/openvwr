@@ -7,6 +7,7 @@ namespace App\Filament\Pages\Manual;
 use App\Manual\Chapter;
 use App\Manual\Task;
 use App\Manual\Topic;
+use Filament\Panel;
 
 use function abort;
 
@@ -20,13 +21,13 @@ use function abort;
 class HandleidingOnderwerp extends ManualDetailPage
 {
     protected static ?string $slug = 'handleiding/naslag';
-    protected static string $view = 'filament.manual.onderwerp';
+    protected string $view = 'filament.manual.onderwerp';
 
     public string $onderwerp = '';
 
     private Topic $topic;
 
-    public static function getRoutePath(): string
+    public static function getRoutePath(Panel $panel): string
     {
         return '/' . static::getSlug() . '/{onderwerp}';
     }

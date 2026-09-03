@@ -9,8 +9,8 @@ use App\Filament\Resources\Pages\Concerns\PersistsFiltersInSession;
 use App\Filament\Resources\PersonalSnapshotApprovalResource;
 use App\Models\Builders\SnapshotApprovalBuilder;
 use App\Models\Builders\SnapshotBuilder;
-use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Schemas\Components\Tabs\Tab;
 
 use function __;
 

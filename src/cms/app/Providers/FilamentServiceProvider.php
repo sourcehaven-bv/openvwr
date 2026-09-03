@@ -20,12 +20,12 @@ use App\Http\Middleware\IPAllowFilter;
 use App\Models\Organisation;
 use App\Services\Authentication\AuthenticationStrategyFactory;
 use Exception;
+use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\FontProviders\LocalFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\MenuItem;
 use Filament\Navigation\NavigationGroup as FilamentNavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -164,9 +164,9 @@ class FilamentServiceProvider extends PanelProvider
      * The manual, which lives in the panel itself so it can follow the same
      * feature flags as the rest of the interface.
      */
-    private function manualMenuItem(): MenuItem
+    private function manualMenuItem(): Action
     {
-        return MenuItem::make()
+        return Action::make('manual')
             ->url(static function (): string {
                 $panel = Filament::getCurrentPanel();
                 Assert::isInstanceOf($panel, Panel::class);
@@ -206,6 +206,14 @@ class FilamentServiceProvider extends PanelProvider
             ->routes(static function (): void {
                 RouteFacade::get('/health', HealthController::class);
                 RouteFacade::get('/up', HealthController::class . '@up');
+
+                // v5 builds the profile item of the user menu through
+                // Filament::getProfileUrl(), which resolves the panel's
+                // `auth.profile` route. Our profile is a tenant page and
+                // registers as `pages.profile`, so that name would not exist and
+                // rendering any page with a user menu would fail. This alias
+                // gives the name something to point at without moving the page.
+                RouteFacade::redirect('/auth-profile', '/profile')->name('auth.profile');
             })
             ->colors([
                 'primary' => '#F84F39',
@@ -260,9 +268,14 @@ class FilamentServiceProvider extends PanelProvider
             ], isPersistent: true)
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->userMenuItems([
-                'account' => MenuItem::make()
+                // Keyed 'profile' on purpose. v5 adds a profile item of its own
+                // when the menu has none, and that one links through
+                // getProfileUrl() to the panel's auth profile route, which a
+                // tenant page like ours never registers. Claiming the key keeps
+                // our own tenant-aware url instead.
+                'profile' => Action::make('profile')
                     ->url(static function (): string {
-                        $panel = Filament::getCurrentPanel();
+                        $panel = Filament::getCurrentOrDefaultPanel();
                         Assert::isInstanceOf($panel, Panel::class);
 
                         $route = request()->route();
@@ -275,7 +288,12 @@ class FilamentServiceProvider extends PanelProvider
                         }
 
                         return Profile::getUrl(panel: $panel->getId(), tenant: $tenant);
-                    }),
+                    })
+                    // Label and icon came from Filament's own profile item as long
+                    // as this was keyed 'account'; under our own key they are ours
+                    // to give.
+                    ->icon('heroicon-o-user-circle')
+                    ->label(Profile::getLabel()),
                 'manual' => $this->manualMenuItem(),
             ])
             ->maxContentWidth('screen-2xl')

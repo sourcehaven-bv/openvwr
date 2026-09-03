@@ -17,7 +17,7 @@ use App\Filament\Tables\ResponsibleFilter;
 use App\Filament\Tables\TagFilter;
 use App\Models\States\DataBreachRecordState;
 use App\Services\DateFormatService;
-use Filament\Tables\Actions\EditAction;
+use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -55,13 +55,13 @@ class DataBreachRecordResourceTable
             ->defaultSort('data_breach_records.updated_at', 'desc')
             ->emptyStateHeading(__('data_breach_record.table_empty_heading'))
             ->emptyStateDescription(null)
-            ->actionsColumnLabel(__('general.edit'))
-            ->actions([
+            ->recordActionsColumnLabel(__('general.edit'))
+            ->recordActions([
                 EditAction::make()
                     ->hiddenLabel()
                     ->tooltip(static fn (EditAction $action) => $action->getLabel()),
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 TransferExportBulkAction::make(),
                 TransferCopyBulkAction::make(),
             ])

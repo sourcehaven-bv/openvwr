@@ -11,12 +11,12 @@ use App\Filament\Forms\Components\Repeater\DpiaRisksRepeater;
 use App\Filament\Forms\Components\Section\InformationBlockSection;
 use App\Filament\Forms\FormHelper;
 use App\Services\Dpia\DpiaSectionNotice;
-use Filament\Forms\Components\Component;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Get;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Support\HtmlString;
 
 use function __;

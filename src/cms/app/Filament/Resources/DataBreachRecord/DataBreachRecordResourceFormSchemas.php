@@ -22,12 +22,12 @@ use App\Models\Document;
 use App\Models\Responsible;
 use App\Models\Wpg\WpgProcessingRecord;
 use App\Rules\CurrentOrganisation;
-use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Component;
 use Illuminate\Support\Arr;
 use Webmozart\Assert\Assert;
 

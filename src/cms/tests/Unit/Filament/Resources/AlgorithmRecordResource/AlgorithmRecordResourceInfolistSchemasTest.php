@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Filament\Resources\AlgorithmRecordResource\AlgorithmRecordResourceInfolistSchemas;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Schema;
 use Tests\TestCase;
 
 uses(TestCase::class);
@@ -11,6 +12,7 @@ uses(TestCase::class);
 it('formats nullable impact boolean entries', function (?bool $state, ?string $expectedTranslationKey): void {
     $impactSchema = AlgorithmRecordResourceInfolistSchemas::getImpact();
     $impactEntry = $impactSchema[0];
+    $impactEntry->container(Schema::make());
 
     expect($impactSchema)
         ->toHaveCount(4)

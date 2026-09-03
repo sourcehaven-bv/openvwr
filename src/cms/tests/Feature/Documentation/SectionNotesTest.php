@@ -7,10 +7,10 @@ use App\Documentation\FormEnvironment;
 use App\Documentation\SectionNotes;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 use App\Filament\Resources\DocumentResource;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Grid;
 use Tests\Fixtures\Documentation\AwkwardNotesResource;
 
 beforeEach(function (): void {

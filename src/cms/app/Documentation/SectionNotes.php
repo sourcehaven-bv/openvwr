@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Documentation;
 
-use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Field;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Component;
 use ReflectionClass;
 use ReflectionMethod;
 use Throwable;
@@ -137,7 +137,7 @@ class SectionNotes
     public function childrenOf(Component $component): array
     {
         try {
-            return array_values($component->getChildComponents());
+            return array_values($component->getDefaultChildComponents());
         } catch (Throwable) {
             return [];
         }

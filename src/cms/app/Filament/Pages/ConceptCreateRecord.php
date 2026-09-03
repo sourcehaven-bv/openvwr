@@ -9,7 +9,7 @@ use App\Filament\Pages\Concerns\CoercesClearedRequiredFields;
 use App\Filament\Pages\Concerns\EnforcesRequiredFieldsWhenSubmitting;
 use App\Filament\Pages\Concerns\StoresConceptSnapshot;
 use App\Filament\Pages\Contracts\SavesConcepts;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 
 /**
  * A create page whose record may be stored as a concept, even half-finished.
@@ -30,7 +30,7 @@ abstract class ConceptCreateRecord extends CreateRecord implements SavesConcepts
     use EnforcesRequiredFieldsWhenSubmitting;
     use StoresConceptSnapshot;
 
-    protected function makeForm(): Form
+    protected function makeSchema(): Schema
     {
         return DraftableForm::make($this);
     }

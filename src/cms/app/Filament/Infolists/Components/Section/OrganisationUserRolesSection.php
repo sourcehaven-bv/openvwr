@@ -6,7 +6,7 @@ namespace App\Filament\Infolists\Components\Section;
 
 use App\Filament\Infolists\Components\OrganisationUserRoleRepeaterEntry;
 use App\Models\User;
-use Filament\Infolists\Components\Section;
+use Filament\Schemas\Components\Section;
 
 use function __;
 

@@ -11,6 +11,7 @@ use App\Livewire\User\Profile\Settings;
 use App\Services\Authentication\AuthenticationStrategyFactory;
 use App\Services\AuthenticationService;
 use Filament\Pages\Page;
+use Filament\Panel;
 use Illuminate\Contracts\View\View;
 use InvalidArgumentException;
 
@@ -20,7 +21,7 @@ use function abort;
 class Profile extends Page
 {
     protected static ?string $slug = 'my-profile';
-    protected static string $view = 'filament.pages.my-profile';
+    protected string $view = 'filament.pages.my-profile';
     private AuthenticationService $authenticationService;
 
     public function boot(AuthenticationService $authenticationService): void
@@ -43,7 +44,7 @@ class Profile extends Page
         return __('user.profile.my_profile');
     }
 
-    public static function getSlug(): string
+    public static function getSlug(?Panel $panel = null): string
     {
         return 'profile';
     }

@@ -6,13 +6,13 @@ namespace App\Filament\Forms\Components;
 
 use App\Facades\Authentication;
 use App\Filament\TenantScoped;
-use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\Component;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Get;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Utilities\Get;
 use Webmozart\Assert\Assert;
 
 use function __;
@@ -22,7 +22,7 @@ use function sprintf;
 
 class WpgGoalsRepeater extends Repeater
 {
-    public static function make(string $name = 'wpgGoals'): static
+    public static function make(?string $name = 'wpgGoals'): static
     {
         return parent::make($name)
             ->label(__('wpg_goal.model_plural'))

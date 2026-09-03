@@ -7,7 +7,7 @@ namespace App\Filament\Resources\LookupListResource;
 use App\Filament\Actions\DeleteBulkActionWithRelationChecks;
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
-use Filament\Tables\Actions\EditAction;
+use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -38,13 +38,13 @@ class LookupListResourceTable
             ->defaultSort(sprintf('%s.updated_at', $model::getModel()->getTable()), 'desc')
             ->emptyStateHeading($emptyStateHeading)
             ->emptyStateDescription(null)
-            ->actionsColumnLabel(__('general.edit'))
-            ->actions([
+            ->recordActionsColumnLabel(__('general.edit'))
+            ->recordActions([
                 EditAction::make()
                     ->hiddenLabel()
                     ->tooltip(static fn (EditAction $action) => $action->getLabel()),
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 DeleteBulkActionWithRelationChecks::make(),
             ]);
     }

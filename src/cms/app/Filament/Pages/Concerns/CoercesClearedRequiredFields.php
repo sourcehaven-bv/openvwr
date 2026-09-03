@@ -7,7 +7,7 @@ namespace App\Filament\Pages\Concerns;
 use Filament\Forms\Components\Field;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 
 use function array_key_exists;
 
@@ -33,7 +33,7 @@ trait CoercesClearedRequiredFields
      *
      * @return array<string, mixed>
      */
-    final protected function coerceClearedRequiredFields(Form $form, array $data): array
+    final protected function coerceClearedRequiredFields(Schema $form, array $data): array
     {
         foreach ($form->getFlatFields() as $statePath => $field) {
             if (!$this->storesEmptyStringWhenCleared($field)) {

@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Services\Snapshot;
 
 use App\ValueObjects\Snapshot\MissingRequiredField;
-use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Field;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Wizard\Step;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Wizard\Step;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 
 use function __;
@@ -38,18 +38,24 @@ class SnapshotReadinessService
     /**
      * @return array<int, MissingRequiredField>
      */
-    public function getMissingRequiredFields(Form $form): array
+    public function getMissingRequiredFields(Schema $form): array
     {
         $missingRequiredFields = [];
 
+        // v5 returns actions alongside components; only real components can
+        // hold a required field.
         foreach ($form->getComponents(withHidden: false) as $component) {
+            if (!$component instanceof Component) {
+                continue;
+            }
+
             $this->collectMissingRequiredFields($component, null, $missingRequiredFields);
         }
 
         return $missingRequiredFields;
     }
 
-    public function isReadyForSnapshot(Form $form): bool
+    public function isReadyForSnapshot(Schema $form): bool
     {
         return $this->getMissingRequiredFields($form) === [];
     }
@@ -84,9 +90,16 @@ class SnapshotReadinessService
     ): void {
         $stepLabel = $this->resolveStepLabel($component) ?? $stepLabel;
 
-        if ($component instanceof Field && $component->isRequired() && $this->isBlank($component)) {
+        // A field is only reportable when it has a state path: that is what the
+        // message points the user at. v5 allows it to be null.
+        if (
+            $component instanceof Field
+            && $component->isRequired()
+            && $this->isBlank($component)
+            && is_string($statePath = $component->getStatePath())
+        ) {
             $missingRequiredFields[] = new MissingRequiredField(
-                statePath: $component->getStatePath(),
+                statePath: $statePath,
                 label: $this->resolveFieldLabel($component),
                 stepLabel: $stepLabel,
             );
@@ -94,6 +107,10 @@ class SnapshotReadinessService
 
         foreach ($component->getChildComponentContainers(withHidden: false) as $childComponentContainer) {
             foreach ($childComponentContainer->getComponents(withHidden: false) as $childComponent) {
+                if (!$childComponent instanceof Component) {
+                    continue;
+                }
+
                 $this->collectMissingRequiredFields($childComponent, $stepLabel, $missingRequiredFields);
             }
         }

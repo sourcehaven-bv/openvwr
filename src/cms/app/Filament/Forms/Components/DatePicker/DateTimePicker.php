@@ -10,7 +10,7 @@ use Filament\Forms\Components\DateTimePicker as FilamentDateTimePicker;
 
 class DateTimePicker extends FilamentDateTimePicker
 {
-    public static function make(string $name): static
+    public static function make(?string $name = null): static
     {
         return parent::make($name)
             ->displayFormat(DateFormatService::FORMAT_DATE_TIME)

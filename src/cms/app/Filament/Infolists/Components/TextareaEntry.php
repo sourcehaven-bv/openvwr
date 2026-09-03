@@ -10,7 +10,7 @@ use function nl2br;
 
 class TextareaEntry extends TextEntry
 {
-    public static function make(string $name): static
+    public static function make(?string $name = null): static
     {
         return parent::make($name)
             ->html()

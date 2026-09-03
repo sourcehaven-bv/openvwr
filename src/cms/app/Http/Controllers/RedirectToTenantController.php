@@ -49,7 +49,7 @@ class RedirectToTenantController
 
     private function redirectToOrganisation(Organisation $organisation): RedirectResponse
     {
-        $panel = Filament::getCurrentPanel();
+        $panel = Filament::getCurrentOrDefaultPanel();
         Assert::isInstanceOf($panel, Panel::class);
 
         $url = $panel->getUrl($organisation);

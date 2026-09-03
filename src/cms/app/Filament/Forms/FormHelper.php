@@ -6,7 +6,7 @@ namespace App\Filament\Forms;
 
 use App\Facades\Authentication;
 use Closure;
-use Filament\Forms\Get;
+use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Throwable;

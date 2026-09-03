@@ -7,7 +7,7 @@ namespace App\Filament\Infolists\Components\Section;
 use App\Enums\Authorization\Role;
 use App\Filament\Infolists\Components\UserGlobalRoleEntry;
 use Closure;
-use Filament\Infolists\Components\Section;
+use Filament\Schemas\Components\Section;
 use Illuminate\Contracts\Support\Htmlable;
 use Webmozart\Assert\Assert;
 

@@ -11,7 +11,7 @@ use App\Models\Organisation;
 use App\Models\User;
 use App\Transfer\Export\BundleExporter;
 use App\Transfer\TransferEntityType;
-use Filament\Notifications\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

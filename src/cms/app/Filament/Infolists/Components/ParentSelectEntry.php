@@ -10,7 +10,7 @@ use function __;
 
 class ParentSelectEntry extends TextEntry
 {
-    public static function make(string $name = 'parent.name'): static
+    public static function make(?string $name = 'parent.name'): static
     {
         return parent::make($name)
             ->label(__('general.parent'))

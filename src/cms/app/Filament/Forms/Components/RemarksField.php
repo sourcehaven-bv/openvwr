@@ -11,7 +11,7 @@ use function __;
 
 class RemarksField extends Repeater
 {
-    public static function make(string $name = 'remarks'): static
+    public static function make(?string $name = 'remarks'): static
     {
         return parent::make($name)
             ->schema([

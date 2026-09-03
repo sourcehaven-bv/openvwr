@@ -6,7 +6,7 @@ use App\Filament\RelationManagers\OrganisationRelationManager;
 use App\Filament\Resources\UserResource\Pages\EditUser;
 use App\Models\Organisation;
 use App\Models\User;
-use Filament\Tables\Actions\DetachAction;
+use Filament\Actions\DetachAction;
 
 it('loads the table', function (): void {
     $organisation = Organisation::factory()

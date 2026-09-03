@@ -8,6 +8,7 @@ use App\Components\Uuid\Uuid;
 use App\Enums\RegisterLayout;
 use App\Models\Organisation;
 use App\Models\User;
+use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Facades\Filament;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -98,6 +99,7 @@ class FormEnvironment
     {
         return new class extends LivewireComponent implements HasForms
         {
+            use InteractsWithActions;
             use InteractsWithForms;
 
             public function render(): string

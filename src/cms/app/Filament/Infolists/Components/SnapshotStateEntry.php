@@ -12,7 +12,7 @@ use function sprintf;
 
 class SnapshotStateEntry extends TextEntry
 {
-    public static function make(string $name = 'state'): static
+    public static function make(?string $name = 'state'): static
     {
         return parent::make($name)
             ->label(__('snapshot.state'))

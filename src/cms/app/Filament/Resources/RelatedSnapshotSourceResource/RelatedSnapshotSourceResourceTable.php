@@ -16,8 +16,8 @@ use App\Models\States\Snapshot\Obsolete;
 use App\Services\DateFormatService;
 use Carbon\CarbonInterface;
 use Closure;
+use Filament\Actions\ViewAction;
 use Filament\Facades\Filament;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
@@ -74,7 +74,7 @@ class RelatedSnapshotSourceResourceTable
             ->defaultSort('created_at', 'desc')
             ->emptyStateHeading(__('snapshot.table_empty_heading'))
             ->emptyStateDescription(null)
-            ->actions([
+            ->recordActions([
                 ViewAction::make()
                     ->visible(static function (RelatedSnapshotSource $relatedSnapshotSource): bool {
                         $source = $relatedSnapshotSource->snapshotSource;

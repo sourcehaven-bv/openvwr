@@ -28,7 +28,7 @@ class MyApprovalsWidget extends Widget
 
     protected static ?int $sort = 0;
     protected int|string|array $columnSpan = 'full';
-    protected static string $view = 'filament.widgets.my-approvals';
+    protected string $view = 'filament.widgets.my-approvals';
 
     /** @var array<string, SnapshotApprovalCollection> */
     private static array $approvals = [];
