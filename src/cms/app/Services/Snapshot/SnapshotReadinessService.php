@@ -42,7 +42,13 @@ class SnapshotReadinessService
     {
         $missingRequiredFields = [];
 
+        // v5 returns actions alongside components; only real components can
+        // hold a required field.
         foreach ($form->getComponents(withHidden: false) as $component) {
+            if (!$component instanceof Component) {
+                continue;
+            }
+
             $this->collectMissingRequiredFields($component, null, $missingRequiredFields);
         }
 
@@ -84,9 +90,16 @@ class SnapshotReadinessService
     ): void {
         $stepLabel = $this->resolveStepLabel($component) ?? $stepLabel;
 
-        if ($component instanceof Field && $component->isRequired() && $this->isBlank($component)) {
+        // A field is only reportable when it has a state path: that is what the
+        // message points the user at. v5 allows it to be null.
+        if (
+            $component instanceof Field
+            && $component->isRequired()
+            && $this->isBlank($component)
+            && is_string($statePath = $component->getStatePath())
+        ) {
             $missingRequiredFields[] = new MissingRequiredField(
-                statePath: $component->getStatePath(),
+                statePath: $statePath,
                 label: $this->resolveFieldLabel($component),
                 stepLabel: $stepLabel,
             );
@@ -94,6 +107,10 @@ class SnapshotReadinessService
 
         foreach ($component->getChildComponentContainers(withHidden: false) as $childComponentContainer) {
             foreach ($childComponentContainer->getComponents(withHidden: false) as $childComponent) {
+                if (!$childComponent instanceof Component) {
+                    continue;
+                }
+
                 $this->collectMissingRequiredFields($childComponent, $stepLabel, $missingRequiredFields);
             }
         }
