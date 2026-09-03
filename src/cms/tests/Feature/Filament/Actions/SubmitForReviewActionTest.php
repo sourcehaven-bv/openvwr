@@ -16,9 +16,13 @@ use App\Models\States\Snapshot\Concept;
 use App\Models\States\Snapshot\Established;
 use App\Models\States\Snapshot\InReview;
 use App\Models\States\Snapshot\Obsolete;
+use App\Models\States\SnapshotState;
+use App\Services\Snapshot\SnapshotStateTransitionService;
+use App\ValueObjects\CalendarDate;
 use Tests\Helpers\Model\OrganisationTestHelper;
 
 use function __;
+use function app;
 use function expect;
 use function it;
 
@@ -473,4 +477,183 @@ it('submits when the versions table asks the page to', function (): void {
     $snapshot = $avgResponsibleProcessingRecord->refresh()->snapshots->sole();
 
     expect($snapshot->state)->toBeInstanceOf(InReview::class);
+});
+
+// Submitting an unchanged registration would make a version that says exactly what the
+// last one says, which is not a version anyone wants to review or establish. It is
+// reported instead of being made.
+it('reports that nothing changed instead of submitting an identical version', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    // review_at is optional in the factory and gets defaulted on save, so it is pinned
+    // here: an unpinned one would differ between the stored version and the fresh concept
+    // and read as a change of its own.
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->withValidState()
+        ->create(['review_at' => CalendarDate::parse('2027-01-01')]);
+
+    $test = $this->asFilamentOrganisationUser($organisation);
+
+    // Saved through the form first, so the version established below holds exactly what
+    // pressing the button again produces — including the fields a save fills in itself.
+    $test->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+        'record' => $avgResponsibleProcessingRecord->id,
+    ])->call('save');
+
+    $test->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+        'record' => $avgResponsibleProcessingRecord->id,
+    ])->callAction('snapshot_submit_for_review');
+
+    $avgResponsibleProcessingRecord->refresh()->snapshots->sole()->state->transitionTo(Established::class);
+
+    // Pressed again without touching a thing.
+    $component = $test->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+        'record' => $avgResponsibleProcessingRecord->id,
+    ])->mountAction('snapshot_submit_for_review');
+
+    expect($component->instance()->getMountedAction()->getModalHeading())
+        ->toBe(__('snapshot.submit_for_review_unchanged_heading'));
+
+    // Reported, not submitted: the established version is still the only one there is.
+    $submittedSnapshots = $avgResponsibleProcessingRecord->refresh()->snapshots
+        ->reject(static fn (Snapshot $snapshot): bool => $snapshot->state instanceof Concept);
+
+    expect($submittedSnapshots)->toHaveCount(1)
+        ->and($submittedSnapshots->sole()->state)->toBeInstanceOf(Established::class);
+});
+
+// The modal reports a fact rather than asking a question, so there must be nothing to
+// press that would submit the identical version anyway.
+it('offers no way to submit an identical version from the modal', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->withValidState()
+        ->create(['review_at' => CalendarDate::parse('2027-01-01')]);
+
+    $test = $this->asFilamentOrganisationUser($organisation);
+
+    $test->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+        'record' => $avgResponsibleProcessingRecord->id,
+    ])->call('save');
+
+    $test->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+        'record' => $avgResponsibleProcessingRecord->id,
+    ])->callAction('snapshot_submit_for_review');
+
+    $avgResponsibleProcessingRecord->refresh()->snapshots->sole()->state->transitionTo(Established::class);
+
+    $component = $test->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+        'record' => $avgResponsibleProcessingRecord->id,
+    ])->mountAction('snapshot_submit_for_review');
+
+    $mountedAction = $component->instance()->getMountedAction();
+
+    // Nothing to press that would submit the identical version; only a way out.
+    expect($mountedAction->getModalSubmitAction())->toBeNull();
+    expect($mountedAction->getModalCancelActionLabel())->toBe(__('general.close'));
+});
+
+// A real edit is what the check must not get in the way of: changed content submits
+// normally, without the "geen wijzigingen" modal.
+it('submits normally when the registration was changed', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->withValidState()
+        ->create();
+
+    $test = $this->asFilamentOrganisationUser($organisation);
+
+    $test->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+        'record' => $avgResponsibleProcessingRecord->id,
+    ])->callAction('snapshot_submit_for_review');
+
+    $avgResponsibleProcessingRecord->refresh()->snapshots->sole()->state->transitionTo(Established::class);
+
+    $test->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+        'record' => $avgResponsibleProcessingRecord->id,
+    ])
+        ->fillForm(['name' => 'Wel degelijk gewijzigd'])
+        ->callAction('snapshot_submit_for_review')
+        ->assertHasNoFormErrors();
+
+    $snapshots = $avgResponsibleProcessingRecord->refresh()->snapshots->sortBy('version')->values();
+
+    expect($snapshots)->toHaveCount(2)
+        ->and($snapshots->last()->state)->toBeInstanceOf(InReview::class)
+        ->and($snapshots->last()->name)->toBe('Wel degelijk gewijzigd');
+});
+
+// A version that was withdrawn does not hold the line: going back to what it said is a
+// real change against the version that is actually in force, so it must be submittable.
+it('still submits when the registration matches only an obsolete version', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->withValidState()
+        ->create();
+
+    $test = $this->asFilamentOrganisationUser($organisation);
+
+    $test->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+        'record' => $avgResponsibleProcessingRecord->id,
+    ])->callAction('snapshot_submit_for_review');
+
+    $firstSnapshot = $avgResponsibleProcessingRecord->refresh()->snapshots->sole();
+    $originalName = $firstSnapshot->name;
+    $firstSnapshot->state->transitionTo(Established::class);
+
+    // Change it, establish that, then change it back to what the first version said.
+    $test->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+        'record' => $avgResponsibleProcessingRecord->id,
+    ])
+        ->fillForm(['name' => 'Tussentijds gewijzigd'])
+        ->callAction('snapshot_submit_for_review');
+
+    $secondSnapshot = $avgResponsibleProcessingRecord->refresh()->snapshots
+        ->sortByDesc('version')
+        ->first();
+
+    // Through the service, so the first established version is superseded rather than
+    // colliding with the second on the unique (source, state) index.
+    app(SnapshotStateTransitionService::class)->transitionToSnapshotState(
+        $secondSnapshot,
+        SnapshotState::make(Established::$name, $secondSnapshot),
+    );
+
+    $test->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+        'record' => $avgResponsibleProcessingRecord->id,
+    ])
+        ->fillForm(['name' => $originalName])
+        ->callAction('snapshot_submit_for_review')
+        ->assertHasNoFormErrors();
+
+    $submittedSnapshots = $avgResponsibleProcessingRecord->refresh()->snapshots
+        ->reject(static fn (Snapshot $snapshot): bool => $snapshot->state instanceof Concept)
+        ->sortBy('version')
+        ->values();
+
+    expect($submittedSnapshots)->toHaveCount(3)
+        ->and($submittedSnapshots->last()->state)->toBeInstanceOf(InReview::class)
+        ->and($submittedSnapshots->last()->name)->toBe($originalName);
+});
+
+// Nothing to compare against on a first submission, so the check must not mistake "no
+// earlier version" for "no changes".
+it('submits the first version even though there is nothing to compare it to', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->withValidState()
+        ->create();
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->id,
+        ])
+        ->mountAction('snapshot_submit_for_review');
+
+    expect($avgResponsibleProcessingRecord->refresh()->snapshots->sole()->state)
+        ->toBeInstanceOf(InReview::class);
 });

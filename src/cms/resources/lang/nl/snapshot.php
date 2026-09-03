@@ -14,6 +14,8 @@ return [
     'submit_for_review_pending_heading' => 'Er loopt al een vaststelling',
     'submit_for_review_pending_description' => 'Versie :version staat op ":state". Als u doorgaat, vervalt die versie en begint het vaststellen opnieuw met de versie die u nu indient.',
     'submit_for_review_pending_confirm' => 'Toch doorgaan',
+    'submit_for_review_unchanged_heading' => 'Geen wijzigingen',
+    'submit_for_review_unchanged_description' => 'Deze registratie is niet gewijzigd ten opzichte van versie :version. Er is daarom geen nieuwe versie aangemaakt.',
 
     'incomplete' => 'Status niet aangepast, er ontbreken nog verplichte velden',
     'incomplete_step' => 'stap :step',
