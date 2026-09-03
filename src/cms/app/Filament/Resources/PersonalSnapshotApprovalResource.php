@@ -21,6 +21,9 @@ use UnitEnum;
 
 use function __;
 
+/**
+ * @extends Resource<Snapshot>
+ */
 class PersonalSnapshotApprovalResource extends Resource
 {
     protected static ?string $model = Snapshot::class;

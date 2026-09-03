@@ -20,6 +20,9 @@ use Illuminate\Database\Eloquent\Builder;
 
 use function __;
 
+/**
+ * @extends Resource<DpiaRecord>
+ */
 class DpiaRecordResource extends Resource
 {
     protected static ?string $model = DpiaRecord::class;

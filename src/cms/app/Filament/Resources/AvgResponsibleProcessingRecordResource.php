@@ -22,6 +22,9 @@ use Illuminate\Database\Eloquent\Builder;
 
 use function __;
 
+/**
+ * @extends Resource<AvgResponsibleProcessingRecord>
+ */
 class AvgResponsibleProcessingRecordResource extends Resource
 {
     protected static bool $hasNavigationBadge = true;
