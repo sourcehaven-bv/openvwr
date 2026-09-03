@@ -657,3 +657,77 @@ it('submits the first version even though there is nothing to compare it to', fu
     expect($avgResponsibleProcessingRecord->refresh()->snapshots->sole()->state)
         ->toBeInstanceOf(InReview::class);
 });
+
+// Confirming is still refused when nothing changed. The modal for that case carries no
+// submit button, but the action must not depend on the modal to decide what happens: a
+// confirmation that arrives anyway may not produce a version that says nothing new.
+it('does not submit an identical version even when the action is called directly', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->withValidState()
+        ->create(['review_at' => CalendarDate::parse('2027-01-01')]);
+
+    $test = $this->asFilamentOrganisationUser($organisation);
+
+    $test->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+        'record' => $avgResponsibleProcessingRecord->id,
+    ])->call('save');
+
+    $test->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+        'record' => $avgResponsibleProcessingRecord->id,
+    ])->callAction('snapshot_submit_for_review');
+
+    $avgResponsibleProcessingRecord->refresh()->snapshots->sole()->state->transitionTo(Established::class);
+
+    // Mounted and then confirmed, without touching the form in between.
+    $test->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+        'record' => $avgResponsibleProcessingRecord->id,
+    ])
+        ->mountAction('snapshot_submit_for_review')
+        ->callMountedAction();
+
+    $submittedSnapshots = $avgResponsibleProcessingRecord->refresh()->snapshots
+        ->reject(static fn (Snapshot $snapshot): bool => $snapshot->state instanceof Concept);
+
+    expect($submittedSnapshots)->toHaveCount(1)
+        ->and($submittedSnapshots->sole()->state)->toBeInstanceOf(Established::class);
+});
+
+// Submitting moves the concept to review, and the modal's heading and buttons are
+// resolved again while that same request renders. By then there is no concept left, which
+// has to read as "nothing to compare" rather than fail on a missing one.
+it('survives the modal being resolved again after the concept has been submitted', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->withValidState()
+        ->create(['review_at' => CalendarDate::parse('2027-01-01')]);
+
+    $test = $this->asFilamentOrganisationUser($organisation);
+
+    $test->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+        'record' => $avgResponsibleProcessingRecord->id,
+    ])->callAction('snapshot_submit_for_review');
+
+    // Changed, so this is a real submission, and a version is already under review — the
+    // modal is shown, confirmed, and then re-resolved with the concept already consumed.
+    $component = $test->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+        'record' => $avgResponsibleProcessingRecord->id,
+    ])
+        ->fillForm(['name' => 'Tweede ronde'])
+        ->mountAction('snapshot_submit_for_review')
+        ->callMountedAction();
+
+    $mountedAction = $component->instance()->getMountedAction();
+
+    if ($mountedAction !== null) {
+        expect($mountedAction->getModalHeading())->toBeString();
+    }
+
+    $snapshots = $avgResponsibleProcessingRecord->refresh()->snapshots->sortBy('version')->values();
+
+    expect($snapshots)->toHaveCount(2)
+        ->and($snapshots->first()->state)->toBeInstanceOf(Obsolete::class)
+        ->and($snapshots->last()->state)->toBeInstanceOf(InReview::class);
+});

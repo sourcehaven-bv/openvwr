@@ -7,6 +7,7 @@ use App\Models\States\Snapshot\Obsolete;
 use App\Models\System;
 use App\Services\Snapshot\SnapshotComparisonService;
 use App\Services\Snapshot\SnapshotFactory;
+use App\ValueObjects\CalendarDate;
 
 it('reports no changes between two captures of an untouched record', function (): void {
     $record = AvgResponsibleProcessingRecord::factory()->create();
@@ -33,6 +34,24 @@ it('reports a change when the stored content differs', function (): void {
 // The many-to-many links live outside the stored markdown, which only holds an inert
 // placeholder tag — so comparing the markdown alone would miss a whole system being
 // attached.
+// The private part is compared separately from the public one, so a field that only
+// appears in the private markdown has to be caught on its own. review_at is such a field:
+// it is on the private template and absent from the public one.
+it('reports a change when only the private part differs', function (): void {
+    $record = AvgResponsibleProcessingRecord::factory()->create([
+        'review_at' => CalendarDate::parse('2027-01-01'),
+    ]);
+
+    $first = app(SnapshotFactory::class)->fromSnapshotSource($record->refresh(), Obsolete::class);
+
+    $record->review_at = CalendarDate::parse('2028-06-30');
+    $record->save();
+
+    $second = app(SnapshotFactory::class)->fromSnapshotSource($record->refresh(), Obsolete::class);
+
+    expect(app(SnapshotComparisonService::class)->hasChanges($first, $second))->toBeTrue();
+});
+
 it('reports a change when a related entity is added', function (): void {
     $record = AvgResponsibleProcessingRecord::factory()->create();
 
