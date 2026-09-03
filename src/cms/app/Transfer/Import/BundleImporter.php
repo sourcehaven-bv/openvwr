@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Transfer\Import;
 
+use App\Components\Uuid\UuidInterface;
 use App\Models\Document;
 use App\Models\Organisation;
 use App\Models\User;
@@ -427,7 +428,9 @@ class BundleImporter
         // the organisation set above, which would write the copy straight back
         // into the source. Only that one column is put back; switching the
         // events off wholesale would also skip our own observers.
-        if ($organisation->id->equals($model->getAttribute('organisation_id'))) {
+        $current = $model->getAttribute('organisation_id');
+
+        if ($current instanceof UuidInterface && $organisation->id->equals($current)) {
             return;
         }
 
