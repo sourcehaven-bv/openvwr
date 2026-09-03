@@ -85,10 +85,8 @@ class SubmitForReviewAction extends Action
             // through on the single press.
             ->requiresConfirmation()
             ->modalHidden(static function (Component $livewire): bool {
-                $record = self::resolveRecord($livewire);
-
-                return self::findUnchangedSnapshot($record) === null
-                    && self::getPendingSnapshots($record)->isEmpty();
+                return !self::isUnchanged($livewire)
+                    && self::getPendingSnapshots(self::resolveRecord($livewire))->isEmpty();
             })
             ->modalIcon(static function (Component $livewire): string {
                 return self::isUnchanged($livewire)
@@ -102,9 +100,18 @@ class SubmitForReviewAction extends Action
             })
             ->modalDescription(static function (Component $livewire): string {
                 $record = self::resolveRecord($livewire);
-                $unchangedSnapshot = self::findUnchangedSnapshot($record);
 
-                if ($unchangedSnapshot !== null) {
+                if (self::isUnchanged($livewire)) {
+                    // The version the record is identical to. findUnchangedSnapshot names
+                    // it when a concept was compared against it; without a concept the save
+                    // already decided the record matches its latest version, so that is the
+                    // one to name.
+                    $unchangedSnapshot = self::findUnchangedSnapshot($record) ?? $record->getLatestSnapshot();
+
+                    if ($unchangedSnapshot === null) {
+                        return __('snapshot.submit_for_review_unchanged_without_version_description');
+                    }
+
                     return __('snapshot.submit_for_review_unchanged_description', [
                         'version' => $unchangedSnapshot->version,
                     ]);
@@ -204,18 +211,36 @@ class SubmitForReviewAction extends Action
     /**
      * The concept that the save above just wrote.
      *
-     * Saving a concept page always stores one (see StoresConceptSnapshot), so its absence
-     * would mean that contract is broken rather than that this record has nothing to
-     * submit — hence an assertion instead of a fallback that would quietly paper over it.
+     * Submitting is guarded by isUnchanged(), which already returns for a record without
+     * one, so getting here without a concept would mean that guard is broken rather than
+     * that this record has nothing to submit — hence an assertion instead of a fallback
+     * that would quietly paper over it.
      *
      * @param Model&SnapshotSource $record
      */
     private static function resolveConcept(SnapshotSource $record): Snapshot
     {
-        $concept = $record->getSnapshotsWithState(Concept::class)->first();
+        $concept = self::findConcept($record);
         Assert::isInstanceOf($concept, Snapshot::class);
 
         return $concept;
+    }
+
+    /**
+     * The record's concept, if it has one.
+     *
+     * Read rather than asserted, because the modal's heading and buttons are resolved on
+     * every render of the page — including after this action submitted the concept and
+     * moved it out of that state, and for a record whose save wrote no concept because
+     * nothing changed.
+     *
+     * @param Model&SnapshotSource $record
+     */
+    private static function findConcept(SnapshotSource $record): ?Snapshot
+    {
+        $concept = $record->getSnapshotsWithState(Concept::class)->first();
+
+        return $concept instanceof Snapshot ? $concept : null;
     }
 
     /**
@@ -232,11 +257,21 @@ class SubmitForReviewAction extends Action
     }
 
     /**
-     * Whether the concept just saved says the same as the version it would follow.
+     * Whether there is nothing to submit: no concept, or one that says the same as the
+     * version it would follow.
+     *
+     * The save during mounting writes no concept when the record is identical to its
+     * latest version (see ConceptSnapshotService), so a missing concept is the ordinary
+     * way "niets gewijzigd" arrives here rather than an anomaly. It also covers the case
+     * the comparison below cannot see: a record identical to a withdrawn version, where
+     * the save left no concept and there is no counting version to compare against.
      */
     private static function isUnchanged(Component $livewire): bool
     {
-        return self::findUnchangedSnapshot(self::resolveRecord($livewire)) !== null;
+        $record = self::resolveRecord($livewire);
+
+        return self::findConcept($record) === null
+            || self::findUnchangedSnapshot($record) !== null;
     }
 
     /**
@@ -251,13 +286,9 @@ class SubmitForReviewAction extends Action
      */
     private static function findUnchangedSnapshot(SnapshotSource $record): ?Snapshot
     {
-        // Read rather than asserted, because the modal's heading and buttons are resolved
-        // on every render of the page — including after this action submitted the concept
-        // and moved it out of that state. No concept simply means there is nothing to
-        // compare, which is what "not unchanged" says.
-        $concept = $record->getSnapshotsWithState(Concept::class)->first();
+        $concept = self::findConcept($record);
 
-        if (!$concept instanceof Snapshot) {
+        if ($concept === null) {
             return null;
         }
 
