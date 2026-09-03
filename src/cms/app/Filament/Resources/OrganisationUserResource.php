@@ -21,6 +21,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use UnitEnum;
 
 use function __;
 
@@ -32,7 +33,7 @@ class OrganisationUserResource extends Resource
     protected static ?int $navigationSort = 1;
     protected static ?string $tenantOwnershipRelationshipName = 'organisations';
 
-    public static function can(string $action, ?Model $record = null): bool
+    public static function can(string|UnitEnum $action, ?Model $record = null): bool
     {
         return Authorization::hasPermission(Permission::USER_ROLE_ORGANISATION_MANAGE);
     }

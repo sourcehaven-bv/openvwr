@@ -14,6 +14,7 @@ use App\Models\Snapshot;
 use BackedEnum;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use UnitEnum;
 
 use function __;
 
@@ -24,7 +25,7 @@ class OrganisationSnapshotApprovalResource extends Resource
     protected static bool $hasNavigationBadge = true;
     protected static ?int $navigationSort = 2;
 
-    public static function can(string $action, ?Model $record = null): bool
+    public static function can(string|UnitEnum $action, ?Model $record = null): bool
     {
         return Authorization::hasPermission(Permission::SNAPSHOT_APPROVAL_ORGANISATION_OVERVIEW);
     }

@@ -45,7 +45,7 @@
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
         "doctrine/sql-formatter": "^1.5",
         "fakerphp/faker": "^1.9.1",
-        "filament/upgrade": "^4.0",
+        "filament/upgrade": "^5.0",
         "larastan/larastan": "^3.6",
         "laravel/sail": "^1.18",
         "mockery/mockery": "^1.4.4",

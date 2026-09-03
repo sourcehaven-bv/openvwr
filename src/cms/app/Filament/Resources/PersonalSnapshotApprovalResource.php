@@ -16,6 +16,7 @@ use BackedEnum;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use UnitEnum;
 
 use function __;
 
@@ -26,7 +27,7 @@ class PersonalSnapshotApprovalResource extends Resource
     protected static bool $hasNavigationBadge = true;
     protected static ?int $navigationSort = 1;
 
-    public static function can(string $action, ?Model $record = null): bool
+    public static function can(string|UnitEnum $action, ?Model $record = null): bool
     {
         return Authorization::hasPermission(Permission::SNAPSHOT_APPROVAL_UPDATE_PERSONAL);
     }
