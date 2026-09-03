@@ -43,12 +43,6 @@ parameters:
 			path: app/Filament/Actions/Exports/SnapshotLatestStatusColumn.php
 
 		-
-			message: '#^Parameter \#1 \$query \(Illuminate\\Database\\Eloquent\\Builder\<TModel of Illuminate\\Database\\Eloquent\\Model\>\) of method App\\Filament\\Exports\\Exporter\:\:modifyQuery\(\) should be contravariant with parameter \$query \(Illuminate\\Database\\Eloquent\\Builder\) of method Filament\\Actions\\Exports\\Exporter\:\:modifyQuery\(\)$#'
-			identifier: method.childParameterType
-			count: 1
-			path: app/Filament/Exports/Exporter.php
-
-		-
 			message: '#^Dynamic call to static method App\\Models\\Builders\\SnapshotBuilder\:\:whereIn\(\)\.$#'
 			identifier: staticMethod.dynamicCall
 			count: 2
@@ -67,22 +61,10 @@ parameters:
 			path: app/Filament/Resources/OrganisationUserResource/Pages/EditOrganisationUser.php
 
 		-
-			message: '#^Parameter \#2 \$callback of method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Snapshot\>\:\:whereHas\(\) expects \(Closure\(Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\SnapshotApproval\>\)\: mixed\)\|null, Closure\(App\\Models\\Builders\\SnapshotApprovalBuilder\)\: void given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/Filament/Resources/PersonalSnapshotApprovalResource/Pages/ListPersonalSnapshotApprovalItems.php
-
-		-
 			message: '#^Dynamic call to static method App\\Models\\Builders\\SnapshotApprovalBuilder\:\:exists\(\)\.$#'
 			identifier: staticMethod.dynamicCall
 			count: 1
 			path: app/Filament/Resources/PersonalSnapshotApprovalResource/PersonalSnapshotApprovalResourceTable.php
-
-		-
-			message: '#^Dynamic call to static method App\\Models\\Builders\\SnapshotApprovalBuilder\:\:whereNotIn\(\)\.$#'
-			identifier: staticMethod.dynamicCall
-			count: 1
-			path: app/Filament/Resources/SnapshotResource/Pages/ViewSnapshot.php
 
 		-
 			message: '#^Dynamic call to static method App\\Models\\Builders\\UserBuilder\:\:whereNotIn\(\)\.$#'
