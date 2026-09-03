@@ -22,8 +22,9 @@ it('narrows the register to records whose review date has passed', function (): 
     $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(
             ListAvgResponsibleProcessingRecords::class,
-            queryParameters: ['tableFilters' => ['review_at' => ['value' => DateWindowFilter::OVERDUE]]],
         )
+        ->set('tableFilters.review_at.value', DateWindowFilter::OVERDUE)
+        ->call('applyTableFilters')
         ->assertCanSeeTableRecords([$overdue])
         ->assertCanNotSeeTableRecords([$upcoming]);
 });
@@ -44,8 +45,9 @@ it('narrows the register to records coming up for review', function (): void {
     $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(
             ListAvgResponsibleProcessingRecords::class,
-            queryParameters: ['tableFilters' => ['review_at' => ['value' => DateWindowFilter::SOON]]],
         )
+        ->set('tableFilters.review_at.value', DateWindowFilter::SOON)
+        ->call('applyTableFilters')
         ->assertCanSeeTableRecords([$upcoming])
         ->assertCanNotSeeTableRecords([$overdue, $distant]);
 });
@@ -60,8 +62,9 @@ it('excludes records without a review date from both windows', function (string 
     $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(
             ListAvgResponsibleProcessingRecords::class,
-            queryParameters: ['tableFilters' => ['review_at' => ['value' => $window]]],
         )
+        ->set('tableFilters.review_at.value', $window)
+        ->call('applyTableFilters')
         ->assertCanNotSeeTableRecords([$withoutReviewDate]);
 })->with([
     DateWindowFilter::OVERDUE,
@@ -83,8 +86,9 @@ it('leaves the register untouched when no window is chosen', function (): void {
     $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(
             ListAvgResponsibleProcessingRecords::class,
-            queryParameters: ['tableFilters' => ['review_at' => ['value' => '']]],
         )
+        ->set('tableFilters.review_at.value', '')
+        ->call('applyTableFilters')
         ->assertCanSeeTableRecords([$overdue, $upcoming]);
 });
 
