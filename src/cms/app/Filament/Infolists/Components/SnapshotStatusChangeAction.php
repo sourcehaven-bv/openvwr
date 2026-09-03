@@ -13,6 +13,7 @@ use App\Models\States\SnapshotState;
 use App\Services\Snapshot\SnapshotStateTransitionService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Radio;
+use Filament\Support\Enums\Width;
 use Livewire\Component;
 use Webmozart\Assert\Assert;
 

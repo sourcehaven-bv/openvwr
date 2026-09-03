@@ -13,6 +13,7 @@ use App\Filament\Resources\OrganisationResource\OrganisationResourceInfolist;
 use App\Filament\Resources\PublicWebsiteTreeResource\Pages\ListPublicWebsiteTrees;
 use App\Models\Organisation;
 use App\Models\PublicWebsiteTree;
+use App\Models\Snapshot;
 use Filament\Facades\Filament;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -40,7 +41,11 @@ beforeEach(function (): void {
  */
 function snapshotSectionHeadings(): array
 {
+    // v5 resolves the sections' closures while walking the tree, so the schema
+    // needs the record those closures ask for. An unsaved model is enough: the
+    // publishing sections only look at the feature flag.
     $infolist = Schema::make(LivewireTestHelper::createTestFormComponent())
+        ->record(new Snapshot())
         ->schema([ViewInfoTab::make('info')]);
 
     $tab = $infolist->getComponents()[0];
@@ -52,19 +57,19 @@ function snapshotSectionHeadings(): array
             continue;
         }
 
-        // Sections whose visibility depends on the snapshot record cannot be
-        // evaluated without one; the publishing sections do not need it.
+        // Sections whose visibility or heading depends on the snapshot record
+        // cannot be evaluated without one; the publishing sections do not need
+        // it. v5 resolves those closures eagerly, so the heading is read inside
+        // the same guard as the visibility.
         try {
-            $hidden = $component->isHidden();
+            if ($component->isHidden()) {
+                continue;
+            }
+
+            $headings[] = (string) $component->getHeading();
         } catch (Throwable) {
             continue;
         }
-
-        if ($hidden) {
-            continue;
-        }
-
-        $headings[] = (string) $component->getHeading();
     }
 
     return $headings;
