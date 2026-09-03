@@ -12,6 +12,7 @@ use App\Models\ContactPerson;
 use App\Models\OrganisationUser;
 use App\Models\User;
 use App\Rules\CurrentOrganisation;
+use Filament\Facades\Filament;
 use Filament\Schemas\Components\Group;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -36,7 +37,14 @@ class ProcessingRecordContactPersons extends Group
                 rules: [CurrentOrganisation::forModel(OrganisationUser::class, 'user_id')],
             )
                 ->preload()
-                ->default([Authentication::user()->id->toString()])
+                // Resolved lazily: the schema is also built where nobody is
+                // acting (the queued export job rebuilds the resource to read
+                // its columns), and a default contact means nothing there.
+                ->default(static function (): array {
+                    $user = Filament::auth()->user();
+
+                    return $user instanceof User ? [$user->getKey()->toString()] : [];
+                })
                 ->label(__('contact_person.form_title_users'))
                 ->helperText(__('contact_person.help_form_title_users')),
             RelationTable::makeForRelationship(

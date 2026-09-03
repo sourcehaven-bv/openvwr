@@ -6,7 +6,6 @@ namespace App\Filament\Resources;
 
 use App\Config\Feature;
 use App\Enums\RegisterLayout;
-use App\Facades\Authentication;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\RelationManagers\SnapshotsRelationManager;
 use App\Filament\Resources\WpgProcessingRecordResource\Pages\CreateWpgProcessingRecord;
@@ -68,7 +67,7 @@ class WpgProcessingRecordResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return match (Authentication::user()->register_layout) {
+        return match (RegisterLayout::forActingUser()) {
             RegisterLayout::STEPS => WpgProcessingRecordResourceForm::stepsForm($schema),
             RegisterLayout::ONE_PAGE => WpgProcessingRecordResourceForm::onePageForm($schema),
         };
@@ -76,7 +75,7 @@ class WpgProcessingRecordResource extends Resource
 
     public static function infolist(Schema $schema): Schema
     {
-        return match (Authentication::user()->register_layout) {
+        return match (RegisterLayout::forActingUser()) {
             RegisterLayout::STEPS => WpgProcessingRecordResourceInfolist::stepsInfolist($schema),
             RegisterLayout::ONE_PAGE => WpgProcessingRecordResourceInfolist::onePageInfolist($schema),
         };

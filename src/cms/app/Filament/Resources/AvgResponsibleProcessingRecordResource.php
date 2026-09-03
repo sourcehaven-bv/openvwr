@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Enums\RegisterLayout;
-use App\Facades\Authentication;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\RelationManagers\SnapshotsRelationManager;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource\AvgResponsibleProcessingRecordResourceForm;
@@ -37,7 +36,7 @@ class AvgResponsibleProcessingRecordResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return match (Authentication::user()->register_layout) {
+        return match (RegisterLayout::forActingUser()) {
             RegisterLayout::STEPS => AvgResponsibleProcessingRecordResourceForm::stepsForm($schema),
             RegisterLayout::ONE_PAGE => AvgResponsibleProcessingRecordResourceForm::onePageForm($schema),
         };
@@ -45,7 +44,7 @@ class AvgResponsibleProcessingRecordResource extends Resource
 
     public static function infolist(Schema $schema): Schema
     {
-        return match (Authentication::user()->register_layout) {
+        return match (RegisterLayout::forActingUser()) {
             RegisterLayout::STEPS => AvgResponsibleProcessingRecordResourceInfolist::stepsInfolist($schema),
             RegisterLayout::ONE_PAGE => AvgResponsibleProcessingRecordResourceInfolist::onePageInfolist($schema),
         };

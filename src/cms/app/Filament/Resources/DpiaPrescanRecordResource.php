@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Enums\RegisterLayout;
-use App\Facades\Authentication;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\Resources\DpiaPrescanRecordResource\DpiaPrescanRecordResourceForm;
 use App\Filament\Resources\DpiaPrescanRecordResource\DpiaPrescanRecordResourceTable;
@@ -34,7 +33,7 @@ class DpiaPrescanRecordResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return match (Authentication::user()->register_layout) {
+        return match (RegisterLayout::forActingUser()) {
             RegisterLayout::STEPS => DpiaPrescanRecordResourceForm::stepsForm($schema),
             RegisterLayout::ONE_PAGE => DpiaPrescanRecordResourceForm::onePageForm($schema),
         };
