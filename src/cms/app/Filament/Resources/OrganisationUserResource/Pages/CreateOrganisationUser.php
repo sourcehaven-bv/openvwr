@@ -115,7 +115,10 @@ class CreateOrganisationUser extends CreateRecord
         ], [
             'name' => $data['email'],
         ]);
-        $user->organisations()->attach($organisation);
+        // The key rather than the model: our ids are Uuid value objects, and
+        // since Laravel 12.69 the pivot builder uses whatever it is handed as an
+        // array key, which a value object cannot be.
+        $user->organisations()->attach($organisation->getKey()->toString());
         $user->save();
         $organisationRoles = OrganisationUserResource::getOrganisationUserRoleOptions();
 
