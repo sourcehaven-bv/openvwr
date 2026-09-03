@@ -48,9 +48,9 @@ it('reloads the snapshots-table', function (): void {
         ->assertCanSeeTableRecords([$snapshot]);
 });
 
-// The concept row links to the owner's edit page, so a user who may look but not edit
-// gets no link at all rather than one to a page they cannot open.
-it('offers no submit link to a user who may not edit the record', function (): void {
+// Away from the form the row can only link, so a user who may look but not edit gets no
+// action at all rather than one pointing at a page they cannot open.
+it('hides the row action from a user who may not edit the record', function (): void {
     $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
         ->recycle($organisation)
@@ -69,8 +69,28 @@ it('offers no submit link to a user who may not edit the record', function (): v
 
     $this->createLivewireTestable(SnapshotsRelationManager::class, [
         'ownerRecord' => $avgResponsibleProcessingRecord,
-        'pageClass' => EditAvgResponsibleProcessingRecord::class,
+        'pageClass' => ViewAvgResponsibleProcessingRecord::class,
     ])
+        ->assertCanSeeTableRecords([$snapshot])
+        ->assertTableActionHidden('snapshot_submit_for_review', $snapshot);
+});
+
+// On the edit page the row submits rather than links, so there is no url to offer even
+// though the user is looking at the form.
+it('offers no submit link on the page that submits', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create();
+    $snapshot = Snapshot::factory()
+        ->for($avgResponsibleProcessingRecord, 'snapshotSource')
+        ->create(['state' => Concept::class]);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(SnapshotsRelationManager::class, [
+            'ownerRecord' => $avgResponsibleProcessingRecord,
+            'pageClass' => EditAvgResponsibleProcessingRecord::class,
+        ])
         ->assertCanSeeTableRecords([$snapshot])
         ->assertTableActionDoesNotHaveUrl('snapshot_submit_for_review', $snapshot);
 });
