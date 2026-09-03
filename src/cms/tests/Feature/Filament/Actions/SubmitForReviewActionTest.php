@@ -10,11 +10,15 @@ use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\EditAvgR
 use App\Filament\Resources\SnapshotResource;
 use App\Filament\Resources\SnapshotResource\Pages\ViewSnapshot;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
+use App\Models\Snapshot;
+use App\Models\States\Snapshot\Approved;
+use App\Models\States\Snapshot\Concept;
 use App\Models\States\Snapshot\Established;
 use App\Models\States\Snapshot\InReview;
 use App\Models\States\Snapshot\Obsolete;
 use Tests\Helpers\Model\OrganisationTestHelper;
 
+use function __;
 use function expect;
 use function it;
 
@@ -137,6 +141,182 @@ it('supersedes a pending version when submitted again', function (): void {
         ->and($snapshots->last()->name)->toBe('Tweede ronde');
 });
 
+// Superseding a pending version throws away review work that has already been done, so
+// the user is asked first rather than finding out afterwards.
+it('asks before superseding a version under review', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->withValidState()
+        ->create();
+
+    $test = $this->asFilamentOrganisationUser($organisation);
+
+    $test->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+        'record' => $avgResponsibleProcessingRecord->id,
+    ])->callAction('snapshot_submit_for_review');
+
+    $test->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+        'record' => $avgResponsibleProcessingRecord->id,
+    ])
+        ->fillForm(['name' => 'Tweede ronde'])
+        ->mountAction('snapshot_submit_for_review')
+        ->assertSee(__('snapshot.submit_for_review_pending_heading'));
+
+    // Only asked, not confirmed: the pending version is untouched and nothing new has been
+    // sent in. Saving the concept during the mount is expected, so it is the version under
+    // review that must still be there and still be the only submitted one.
+    $submittedSnapshots = $avgResponsibleProcessingRecord->refresh()->snapshots
+        ->reject(static fn (Snapshot $snapshot): bool => $snapshot->state instanceof Concept);
+
+    expect($submittedSnapshots)->toHaveCount(1)
+        ->and($submittedSnapshots->sole()->state)->toBeInstanceOf(InReview::class);
+});
+
+// An approved version is even further along than one in review, so it warrants the same
+// question before it is thrown away.
+it('asks before superseding an approved version', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->withValidState()
+        ->create();
+
+    $test = $this->asFilamentOrganisationUser($organisation);
+
+    $test->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+        'record' => $avgResponsibleProcessingRecord->id,
+    ])->callAction('snapshot_submit_for_review');
+
+    $avgResponsibleProcessingRecord->refresh()->snapshots->sole()->state->transitionTo(Approved::class);
+
+    $test->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+        'record' => $avgResponsibleProcessingRecord->id,
+    ])
+        ->fillForm(['name' => 'Tweede ronde'])
+        ->mountAction('snapshot_submit_for_review')
+        ->assertSee(__('snapshot.submit_for_review_pending_heading'));
+
+    $submittedSnapshots = $avgResponsibleProcessingRecord->refresh()->snapshots
+        ->reject(static fn (Snapshot $snapshot): bool => $snapshot->state instanceof Concept);
+
+    expect($submittedSnapshots)->toHaveCount(1)
+        ->and($submittedSnapshots->sole()->state)->toBeInstanceOf(Approved::class);
+});
+
+// Confirming is what the question is for: the approved version becomes "vervallen" and
+// the newly submitted one takes its place in review.
+it('marks an approved version as obsolete once confirmed', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->withValidState()
+        ->create();
+
+    $test = $this->asFilamentOrganisationUser($organisation);
+
+    $test->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+        'record' => $avgResponsibleProcessingRecord->id,
+    ])->callAction('snapshot_submit_for_review');
+
+    $avgResponsibleProcessingRecord->refresh()->snapshots->sole()->state->transitionTo(Approved::class);
+
+    $test->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+        'record' => $avgResponsibleProcessingRecord->id,
+    ])
+        ->fillForm(['name' => 'Tweede ronde'])
+        ->callAction('snapshot_submit_for_review')
+        ->assertHasNoFormErrors();
+
+    $snapshots = $avgResponsibleProcessingRecord->refresh()->snapshots->sortBy('version')->values();
+
+    expect($snapshots)->toHaveCount(2)
+        ->and($snapshots->first()->state)->toBeInstanceOf(Obsolete::class)
+        ->and($snapshots->last()->state)->toBeInstanceOf(InReview::class)
+        ->and($snapshots->last()->name)->toBe('Tweede ronde');
+});
+
+// Cancelling has to leave everything as it was, otherwise the question is not a real
+// choice: the pending version stays in review and nothing new is submitted.
+it('leaves the pending version alone when the question is cancelled', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->withValidState()
+        ->create();
+
+    $test = $this->asFilamentOrganisationUser($organisation);
+
+    $test->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+        'record' => $avgResponsibleProcessingRecord->id,
+    ])->callAction('snapshot_submit_for_review');
+
+    $test->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+        'record' => $avgResponsibleProcessingRecord->id,
+    ])
+        ->fillForm(['name' => 'Tweede ronde'])
+        ->mountAction('snapshot_submit_for_review')
+        ->unmountAction();
+
+    $submittedSnapshots = $avgResponsibleProcessingRecord->refresh()->snapshots
+        ->reject(static fn (Snapshot $snapshot): bool => $snapshot->state instanceof Concept);
+
+    expect($submittedSnapshots)->toHaveCount(1)
+        ->and($submittedSnapshots->sole()->state)->toBeInstanceOf(InReview::class);
+});
+
+// Nothing is pending on a first submission, so there is nothing to warn about: asking
+// anyway would put a modal in front of the ordinary path for no reason.
+it('does not ask when no version is pending', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->withValidState()
+        ->create();
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->id,
+        ])
+        ->mountAction('snapshot_submit_for_review')
+        ->assertDontSee(__('snapshot.submit_for_review_pending_heading'));
+
+    // Straight through, without a question: the concept was submitted by the same press.
+    expect($avgResponsibleProcessingRecord->refresh()->snapshots->sole()->state)
+        ->toBeInstanceOf(InReview::class);
+});
+
+// An established version is the one in force and stays in force until its successor is
+// established, so it is not something this submission supersedes — no question needed.
+it('does not ask when the previous version is established', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->withValidState()
+        ->create();
+
+    $test = $this->asFilamentOrganisationUser($organisation);
+
+    $test->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+        'record' => $avgResponsibleProcessingRecord->id,
+    ])->callAction('snapshot_submit_for_review');
+
+    $avgResponsibleProcessingRecord->refresh()->snapshots->sole()->state->transitionTo(Established::class);
+
+    $test->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+        'record' => $avgResponsibleProcessingRecord->id,
+    ])
+        ->fillForm(['name' => 'Volgende ronde'])
+        ->mountAction('snapshot_submit_for_review')
+        ->assertDontSee(__('snapshot.submit_for_review_pending_heading'));
+
+    $snapshots = $avgResponsibleProcessingRecord->refresh()->snapshots->sortBy('version')->values();
+
+    expect($snapshots)->toHaveCount(2)
+        ->and($snapshots->first()->state)->toBeInstanceOf(Established::class)
+        ->and($snapshots->last()->state)->toBeInstanceOf(InReview::class);
+});
+
 // The case the button exists for: an unsaved edit made after submitting. There is no
 // concept in the database at this point, so any state-based condition would hide it.
 it('stays visible on an unsaved edit made after submitting', function (): void {
@@ -196,9 +376,10 @@ it('does not open the confirmation modal for an incomplete record', function ():
         ])
         ->fillForm(['name' => ''])
         // Validating during the mount is what keeps the modal shut: the errors land on the
-        // fields below and the action leaves nothing mounted to confirm.
-        ->callAction('snapshot_submit_for_review')
-        ->assertHasFormErrors(['name']);
+        // fields below and the mount is abandoned before anything can be confirmed.
+        ->mountAction('snapshot_submit_for_review')
+        ->assertHasFormErrors(['name'])
+        ->assertDontSee(__('snapshot.submit_for_review_pending_heading'));
 
     expect($avgResponsibleProcessingRecord->refresh()->snapshots)
         ->toHaveCount(0);

@@ -11,6 +11,9 @@ return [
 
     'submit_for_review' => 'Start vaststellen',
     'submitted_for_review' => 'Versie ingediend voor review',
+    'submit_for_review_pending_heading' => 'Er loopt al een vaststelling',
+    'submit_for_review_pending_description' => 'Versie :version staat op ":state". Als u doorgaat, vervalt die versie en begint het vaststellen opnieuw met de versie die u nu indient.',
+    'submit_for_review_pending_confirm' => 'Toch doorgaan',
 
     'incomplete' => 'Status niet aangepast, er ontbreken nog verplichte velden',
     'incomplete_step' => 'stap :step',
