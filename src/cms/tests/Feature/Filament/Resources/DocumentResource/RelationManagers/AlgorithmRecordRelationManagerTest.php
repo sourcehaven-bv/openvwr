@@ -12,7 +12,7 @@ it('loads the table', function (): void {
         ->create();
     $document->refresh();
 
-    $this->asFilamentUser()
+    $this->asFilamentOrganisationUser($document->organisation)
         ->createLivewireTestable(AlgorithmRecordRelationManager::class, [
             'ownerRecord' => $document,
             'pageClass' => EditDocument::class,
