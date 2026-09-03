@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Filament\Actions;
 
 use App\Filament\Infolists\Tabs\Snapshot\ViewInfoTab;
+use App\Filament\Pages\ConceptEditRecord;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\EditAvgResponsibleProcessingRecord;
 use App\Filament\Resources\SnapshotResource;
 use App\Filament\Resources\SnapshotResource\Pages\ViewSnapshot;
@@ -270,4 +271,25 @@ it('does not offer a status change on a concept version', function (): void {
 
     $test->createLivewireTestable(ViewSnapshot::class, ['record' => $snapshot->id])
         ->assertInfolistActionHidden(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_status_change');
+});
+
+// The versions table below the form asks the page to submit, because only the page can
+// save that form first. This is the other half of that hand-off: the page listens.
+it('submits when the versions table asks the page to', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->withValidState()
+        ->create();
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->id,
+        ])
+        ->fireEvent(ConceptEditRecord::SUBMIT_FOR_REVIEW_EVENT)
+        ->assertHasNoFormErrors();
+
+    $snapshot = $avgResponsibleProcessingRecord->refresh()->snapshots->sole();
+
+    expect($snapshot->state)->toBeInstanceOf(InReview::class);
 });
