@@ -20,12 +20,12 @@ use App\Http\Middleware\IPAllowFilter;
 use App\Models\Organisation;
 use App\Services\Authentication\AuthenticationStrategyFactory;
 use Exception;
+use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\FontProviders\LocalFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\MenuItem;
 use Filament\Navigation\NavigationGroup as FilamentNavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -164,9 +164,9 @@ class FilamentServiceProvider extends PanelProvider
      * The manual, which lives in the panel itself so it can follow the same
      * feature flags as the rest of the interface.
      */
-    private function manualMenuItem(): MenuItem
+    private function manualMenuItem(): Action
     {
-        return MenuItem::make()
+        return Action::make('manual')
             ->url(static function (): string {
                 $panel = Filament::getCurrentPanel();
                 Assert::isInstanceOf($panel, Panel::class);
@@ -273,7 +273,7 @@ class FilamentServiceProvider extends PanelProvider
                 // getProfileUrl() to the panel's auth profile route, which a
                 // tenant page like ours never registers. Claiming the key keeps
                 // our own tenant-aware url instead.
-                'profile' => MenuItem::make()
+                'profile' => Action::make('profile')
                     ->url(static function (): string {
                         $panel = Filament::getCurrentOrDefaultPanel();
                         Assert::isInstanceOf($panel, Panel::class);
