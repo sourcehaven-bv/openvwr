@@ -114,8 +114,8 @@ class SubmitForReviewAction extends Action
             })
             // Nothing to confirm when nothing changed: there is no new version to make, so
             // the modal only reports it and the submit button would be a button that must
-            // not be pressed. What is left is the close button, relabelled from "Nee" —
-            // there is no question to answer.
+            // not be pressed. What is left is the close button, relabelled from "Annuleren"
+            // — there is no question to answer.
             ->modalSubmitAction(static function (StaticAction $action, Component $livewire): StaticAction|bool {
                 return self::isUnchanged($livewire) ? false : $action;
             })
@@ -123,7 +123,7 @@ class SubmitForReviewAction extends Action
             ->modalCancelActionLabel(static function (Component $livewire): string {
                 return self::isUnchanged($livewire)
                     ? __('general.close')
-                    : __('general.no');
+                    : __('general.cancel');
             })
             ->action(static function (Component $livewire): void {
                 // Checked again here rather than trusted from the modal: the modal decides
