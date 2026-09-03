@@ -20,7 +20,7 @@ class UserResourceInfolist
     public static function infolist(Schema $schema): Schema
     {
         /** @var User $user */
-        $user = $schema->record;
+        $user = $schema->getRecord();
 
         return $schema
             ->columns(1)
