@@ -15,6 +15,7 @@ use Filament\Facades\Filament;
 use Filament\Forms\Components\TextInput;
 use Filament\Pages\Concerns\InteractsWithFormActions;
 use Filament\Pages\SimplePage;
+use Filament\Schemas\Schema;
 use Illuminate\Http\RedirectResponse;
 use Livewire\Attributes\Url;
 use Livewire\Features\SupportRedirects\Redirector;
@@ -77,15 +78,16 @@ class OneTimePasswordValidation extends SimplePage
         redirect()->to($homeUrl);
     }
 
-    protected function getFormSchema(): array
+    public function form(Schema $schema): Schema
     {
-        return [
-            TextInput::make('code')
-                ->label(__('user.one_time_password.code'))
-                ->required()
-                ->extraInputAttributes(['class' => 'text-center', 'autocomplete' => 'one-time-code'])
-                ->autofocus(),
-        ];
+        return $schema
+            ->components([
+                TextInput::make('code')
+                    ->label(__('user.one_time_password.code'))
+                    ->required()
+                    ->extraInputAttributes(['class' => 'text-center', 'autocomplete' => 'one-time-code'])
+                    ->autofocus(),
+            ]);
     }
 
     protected function hasFullWidthFormActions(): bool
