@@ -13,6 +13,7 @@ use App\Filament\Resources\SnapshotResource\Pages\ViewSnapshot;
 use App\Models\Snapshot;
 use BackedEnum;
 use Filament\Tables\Table;
+use Illuminate\Auth\Access\Response;
 use Illuminate\Database\Eloquent\Model;
 use UnitEnum;
 
@@ -25,9 +26,17 @@ class OrganisationSnapshotApprovalResource extends Resource
     protected static bool $hasNavigationBadge = true;
     protected static ?int $navigationSort = 2;
 
-    public static function can(string|UnitEnum $action, ?Model $record = null): bool
+    /**
+     * v5 routes every access check through getAuthorizationResponse():
+     * canCreate(), canEdit() and friends call it directly, and can() is
+     * only a thin wrapper around it. Overriding can() alone would leave
+     * those paths on the policy and lock the page behind a 403.
+     */
+    public static function getAuthorizationResponse(string|UnitEnum $action, ?Model $record = null): Response
     {
-        return Authorization::hasPermission(Permission::SNAPSHOT_APPROVAL_ORGANISATION_OVERVIEW);
+        return Authorization::hasPermission(Permission::SNAPSHOT_APPROVAL_ORGANISATION_OVERVIEW)
+            ? Response::allow()
+            : Response::deny();
     }
 
     public static function table(Table $table): Table

@@ -19,6 +19,7 @@ use App\Models\User;
 use BackedEnum;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Illuminate\Auth\Access\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use UnitEnum;
@@ -33,9 +34,18 @@ class OrganisationUserResource extends Resource
     protected static ?int $navigationSort = 1;
     protected static ?string $tenantOwnershipRelationshipName = 'organisations';
 
-    public static function can(string|UnitEnum $action, ?Model $record = null): bool
+
+    /**
+     * v5 routes every access check through getAuthorizationResponse():
+     * canCreate(), canEdit() and friends call it directly, and can() is
+     * only a thin wrapper around it. Overriding can() alone would leave
+     * those paths on the policy and lock the page behind a 403.
+     */
+    public static function getAuthorizationResponse(string|UnitEnum $action, ?Model $record = null): Response
     {
-        return Authorization::hasPermission(Permission::USER_ROLE_ORGANISATION_MANAGE);
+        return Authorization::hasPermission(Permission::USER_ROLE_ORGANISATION_MANAGE)
+            ? Response::allow()
+            : Response::deny();
     }
 
     public static function getNavigationGroup(): ?string

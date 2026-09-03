@@ -14,6 +14,7 @@ use App\Filament\Resources\SnapshotResource\Pages\ViewSnapshot;
 use App\Models\Snapshot;
 use BackedEnum;
 use Filament\Tables\Table;
+use Illuminate\Auth\Access\Response;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use UnitEnum;
@@ -27,9 +28,17 @@ class PersonalSnapshotApprovalResource extends Resource
     protected static bool $hasNavigationBadge = true;
     protected static ?int $navigationSort = 1;
 
-    public static function can(string|UnitEnum $action, ?Model $record = null): bool
+    /**
+     * v5 routes every access check through getAuthorizationResponse():
+     * canCreate(), canEdit() and friends call it directly, and can() is
+     * only a thin wrapper around it. Overriding can() alone would leave
+     * those paths on the policy and lock the page behind a 403.
+     */
+    public static function getAuthorizationResponse(string|UnitEnum $action, ?Model $record = null): Response
     {
-        return Authorization::hasPermission(Permission::SNAPSHOT_APPROVAL_UPDATE_PERSONAL);
+        return Authorization::hasPermission(Permission::SNAPSHOT_APPROVAL_UPDATE_PERSONAL)
+            ? Response::allow()
+            : Response::deny();
     }
 
     /**
