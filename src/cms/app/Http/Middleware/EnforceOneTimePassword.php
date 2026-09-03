@@ -20,7 +20,6 @@ use function is_string;
 use function redirect;
 use function request;
 use function route;
-use function sprintf;
 
 class EnforceOneTimePassword
 {

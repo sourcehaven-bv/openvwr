@@ -206,6 +206,14 @@ class FilamentServiceProvider extends PanelProvider
             ->routes(static function (): void {
                 RouteFacade::get('/health', HealthController::class);
                 RouteFacade::get('/up', HealthController::class . '@up');
+
+                // v5 builds the profile item of the user menu through
+                // Filament::getProfileUrl(), which resolves the panel's
+                // `auth.profile` route. Our profile is a tenant page and
+                // registers as `pages.profile`, so that name would not exist and
+                // rendering any page with a user menu would fail. This alias
+                // gives the name something to point at without moving the page.
+                RouteFacade::redirect('/auth-profile', '/profile')->name('auth.profile');
             })
             ->colors([
                 'primary' => '#F84F39',
@@ -260,11 +268,12 @@ class FilamentServiceProvider extends PanelProvider
             ], isPersistent: true)
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->userMenuItems([
-                // Deliberately not keyed 'account' or 'profile': v5 rewrites those
-                // two into its own profile item, which links via getProfileUrl()
-                // and therefore to the panel's auth profile route. Ours is a
-                // tenant page, so it builds its own url below.
-                'my_profile' => MenuItem::make()
+                // Keyed 'profile' on purpose. v5 adds a profile item of its own
+                // when the menu has none, and that one links through
+                // getProfileUrl() to the panel's auth profile route, which a
+                // tenant page like ours never registers. Claiming the key keeps
+                // our own tenant-aware url instead.
+                'profile' => MenuItem::make()
                     ->url(static function (): string {
                         $panel = Filament::getCurrentOrDefaultPanel();
                         Assert::isInstanceOf($panel, Panel::class);
