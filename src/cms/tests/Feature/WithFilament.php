@@ -44,6 +44,16 @@ trait WithFilament
         SessionTestHelper::setOtpValid();
 
         $this->be($user);
+
+        // v5 attaches the tenant to a new record from a `creating` observer that
+        // the panel registers when it boots, and that observer only fires while
+        // that same panel is the current one. Outside a request nothing sets
+        // either, so a plain setTenant() would leave organisation_id null and
+        // the insert would hit the not-null constraint.
+        $panel = Filament::getPanel('admin');
+        $panel->boot();
+        Filament::setCurrentPanel($panel);
+
         Filament::setTenant($organisation);
 
         return $this;
