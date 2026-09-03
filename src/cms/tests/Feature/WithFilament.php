@@ -44,25 +44,6 @@ trait WithFilament
         SessionTestHelper::setOtpValid();
 
         $this->be($user);
-
-        // v5 attaches the tenant to a new record from a `creating` observer that
-        // the panel registers, and that observer only fires while that same
-        // panel is the current one. Outside a request nothing sets either, so a
-        // plain setTenant() would leave organisation_id null and the insert
-        // would hit the not-null constraint.
-        //
-        // Only the tenancy registration is repeated here, not Panel::boot():
-        // boot() also re-registers the render hooks and the databaseTransaction
-        // callback every time, and it has no guard against running twice, so
-        // calling it per test piles those up across the suite.
-        $panel = Filament::getPanel('admin');
-        Filament::setCurrentPanel($panel);
-
-        foreach ($panel->getResources() as $resource) {
-            $resource::observeTenancyModelCreation($panel);
-            $resource::registerTenancyModelGlobalScope($panel);
-        }
-
         Filament::setTenant($organisation);
 
         return $this;
