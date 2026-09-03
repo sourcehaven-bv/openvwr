@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace App\Support;
 
+use App\Components\Uuid\UuidInterface;
 use App\Enums\LabelColor;
 use App\Models\Tag;
 use Filament\Facades\Filament;
 use Webmozart\Assert\Assert;
+
+use function is_string;
 
 /**
  * Picks the colour for a new label.
@@ -38,10 +41,15 @@ class LabelColorAssigner
         // label may not carry its organisation yet and the current tenant is
         // the same answer: a label is always created within the tenant that is
         // being worked in.
-        $organisationId = $tag->organisation_id?->toString()
-            ?? Filament::getTenant()?->getKey();
+        // Read through getAttribute: the property is typed non-nullable, but a
+        // label that has not been saved yet simply has no value there.
+        $organisation = $tag->getAttribute('organisation_id');
 
-        if ($organisationId === null) {
+        $organisationId = $organisation instanceof UuidInterface
+            ? $organisation->toString()
+            : Filament::getTenant()?->getKey();
+
+        if (!is_string($organisationId)) {
             return [];
         }
 
