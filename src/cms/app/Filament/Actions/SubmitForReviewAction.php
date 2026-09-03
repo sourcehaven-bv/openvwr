@@ -13,10 +13,8 @@ use App\Models\Contracts\SnapshotSource;
 use App\Models\Snapshot;
 use App\Models\States\Snapshot\Approved;
 use App\Models\States\Snapshot\Concept;
-use App\Models\States\Snapshot\Established;
 use App\Models\States\Snapshot\InReview;
 use App\Models\States\SnapshotState;
-use App\Services\Snapshot\SnapshotComparisonService;
 use App\Services\Snapshot\SnapshotStateTransitionService;
 use Filament\Actions\Action;
 use Filament\Actions\StaticAction;
@@ -250,14 +248,10 @@ class SubmitForReviewAction extends Action
             return self::describePendingSnapshots(self::getPendingSnapshots($record));
         }
 
-        // The version the record is identical to. findUnchangedSnapshot names it when a
-        // concept was compared against it; without a concept the save already decided the
-        // record matches its latest version, so that is the one to name.
-        $unchangedSnapshot = self::findUnchangedSnapshot($record) ?? $record->getLatestSnapshot();
-
-        if ($unchangedSnapshot === null) {
-            return __('snapshot.submit_for_review_unchanged_without_version_description');
-        }
+        // The version the record turned out to be identical to. The save left it as the
+        // newest one by not adding a concept on top of it, so that is the one to name.
+        $unchangedSnapshot = $record->getLatestSnapshot();
+        Assert::isInstanceOf($unchangedSnapshot, Snapshot::class);
 
         return __('snapshot.submit_for_review_unchanged_description', [
             'version' => $unchangedSnapshot->version,
@@ -265,59 +259,17 @@ class SubmitForReviewAction extends Action
     }
 
     /**
-     * Whether there is nothing to submit: no concept, or one that says the same as the
-     * version it would follow.
+     * Whether there is nothing to submit.
      *
-     * The save during mounting writes no concept when the record is identical to its
-     * latest version (see ConceptSnapshotService), so a missing concept is the ordinary
-     * way "niets gewijzigd" arrives here rather than an anomaly. It also covers the case
-     * the comparison below cannot see: a record identical to a withdrawn version, where
-     * the save left no concept and there is no counting version to compare against.
+     * Which is the same as having no concept. The save during mounting writes one unless
+     * the record says exactly what its latest version already says, and takes an existing
+     * one away when an edit is undone (see ConceptSnapshotService) — so "geen concept" is
+     * precisely "niets gewijzigd", and a concept that survived that save is by definition
+     * something to submit.
      */
     private static function isUnchanged(Component $livewire): bool
     {
-        $record = self::resolveRecord($livewire);
-
-        return self::findConcept($record) === null
-            || self::findUnchangedSnapshot($record) !== null;
-    }
-
-    /**
-     * The version this concept is identical to, if it is identical to one.
-     *
-     * Compared against the newest version that still counts — in review, approved or
-     * established — because that is the one a new version would follow. Versions already
-     * marked "vervallen" are not compared: returning to what a withdrawn version said is a
-     * real change, so it must be submittable.
-     *
-     * @param Model&SnapshotSource $record
-     */
-    private static function findUnchangedSnapshot(SnapshotSource $record): ?Snapshot
-    {
-        $concept = self::findConcept($record);
-
-        if ($concept === null) {
-            return null;
-        }
-
-        $latestSnapshot = $record->getLatestSnapshotWithState([
-            InReview::class,
-            Approved::class,
-            Established::class,
-        ]);
-
-        if ($latestSnapshot === null) {
-            return null;
-        }
-
-        /** @var SnapshotComparisonService $snapshotComparisonService */
-        $snapshotComparisonService = app(SnapshotComparisonService::class);
-
-        if ($snapshotComparisonService->hasChanges($latestSnapshot, $concept)) {
-            return null;
-        }
-
-        return $latestSnapshot;
+        return self::findConcept(self::resolveRecord($livewire)) === null;
     }
 
     /**
