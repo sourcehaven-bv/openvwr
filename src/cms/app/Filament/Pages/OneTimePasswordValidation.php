@@ -146,7 +146,7 @@ class OneTimePasswordValidation extends SimplePage
     private function getAuthenticateFormAction(): Action
     {
         return Action::make('authenticate')
-            ->label(__('filament-panels::pages/auth/login.form.actions.authenticate.label'))
+            ->label(__('filament-panels::auth/pages/login.multi_factor.form.actions.authenticate.label'))
             ->submit('authenticate');
     }
 }
