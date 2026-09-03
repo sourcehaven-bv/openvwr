@@ -99,25 +99,7 @@ class SubmitForReviewAction extends Action
                     : __('snapshot.submit_for_review_pending_heading');
             })
             ->modalDescription(static function (Component $livewire): string {
-                $record = self::resolveRecord($livewire);
-
-                if (self::isUnchanged($livewire)) {
-                    // The version the record is identical to. findUnchangedSnapshot names
-                    // it when a concept was compared against it; without a concept the save
-                    // already decided the record matches its latest version, so that is the
-                    // one to name.
-                    $unchangedSnapshot = self::findUnchangedSnapshot($record) ?? $record->getLatestSnapshot();
-
-                    if ($unchangedSnapshot === null) {
-                        return __('snapshot.submit_for_review_unchanged_without_version_description');
-                    }
-
-                    return __('snapshot.submit_for_review_unchanged_description', [
-                        'version' => $unchangedSnapshot->version,
-                    ]);
-                }
-
-                return self::describePendingSnapshots(self::getPendingSnapshots($record));
+                return self::describeModal($livewire);
             })
             // Nothing to confirm when nothing changed: there is no new version to make, so
             // the modal only reports it and the submit button would be a button that must
@@ -254,6 +236,32 @@ class SubmitForReviewAction extends Action
         Assert::isInstanceOf($record, SnapshotSource::class);
 
         return $record;
+    }
+
+    /**
+     * What the confirmation says: that nothing changed, or which pending version this
+     * submission would supersede.
+     */
+    private static function describeModal(Component $livewire): string
+    {
+        $record = self::resolveRecord($livewire);
+
+        if (!self::isUnchanged($livewire)) {
+            return self::describePendingSnapshots(self::getPendingSnapshots($record));
+        }
+
+        // The version the record is identical to. findUnchangedSnapshot names it when a
+        // concept was compared against it; without a concept the save already decided the
+        // record matches its latest version, so that is the one to name.
+        $unchangedSnapshot = self::findUnchangedSnapshot($record) ?? $record->getLatestSnapshot();
+
+        if ($unchangedSnapshot === null) {
+            return __('snapshot.submit_for_review_unchanged_without_version_description');
+        }
+
+        return __('snapshot.submit_for_review_unchanged_description', [
+            'version' => $unchangedSnapshot->version,
+        ]);
     }
 
     /**
