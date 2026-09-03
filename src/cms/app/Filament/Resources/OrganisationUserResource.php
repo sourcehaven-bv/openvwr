@@ -34,7 +34,6 @@ class OrganisationUserResource extends Resource
     protected static ?int $navigationSort = 1;
     protected static ?string $tenantOwnershipRelationshipName = 'organisations';
 
-
     /**
      * v5 routes every access check through getAuthorizationResponse():
      * canCreate(), canEdit() and friends call it directly, and can() is
