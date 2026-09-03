@@ -196,8 +196,7 @@ class BundleImporter
 
         $model = $type->modelClass()::query()->newModelInstance();
         $model->forceFill($attributes);
-        $model->setAttribute('organisation_id', $organisation->id->toString());
-        $model->save();
+        $this->saveInto($model, $organisation);
 
         return $model;
     }
@@ -295,8 +294,7 @@ class BundleImporter
 
         $model = $type->modelClass()::query()->newModelInstance();
         $model->forceFill($attributes);
-        $model->setAttribute('organisation_id', $organisation->id->toString());
-        $model->save();
+        $this->saveInto($model, $organisation);
         $this->markSynced($model);
 
         $this->idMap[$id] = $model;
@@ -405,5 +403,35 @@ class BundleImporter
         }
 
         $relation->updateOrCreate([], $type === TransferEntityType::ADDRESS ? $attributes : ['body' => $body]);
+    }
+
+    /**
+     * Save a record into the organisation it is being imported into.
+     *
+     * Filament v5 attaches the tenant to a new record from a `creating`
+     * observer, and that tenant is the organisation being worked in -- the
+     * source of a cross-organisation copy, not its destination. It would
+     * therefore silently overwrite the organisation set just above and write
+     * the copy straight back into the source. Filament's own observer is a
+     * model event, so it is switched off for this one save; the organisation
+     * is already decided by the caller.
+     */
+    private function saveInto(Model $model, Organisation $organisation): void
+    {
+        $model->setAttribute('organisation_id', $organisation->id->toString());
+        $model->save();
+
+        // Filament v5 attaches the tenant from a `creating` observer, and that
+        // tenant is the organisation being worked in -- the source of a
+        // cross-organisation copy, not its destination. It therefore overwrites
+        // the organisation set above, which would write the copy straight back
+        // into the source. Only that one column is put back; switching the
+        // events off wholesale would also skip our own observers.
+        if ($organisation->id->equals($model->getAttribute('organisation_id'))) {
+            return;
+        }
+
+        $model->setAttribute('organisation_id', $organisation->id->toString());
+        $model->saveQuietly();
     }
 }
