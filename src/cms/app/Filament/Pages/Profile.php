@@ -10,7 +10,6 @@ use App\Livewire\User\Profile\PersonalInfo;
 use App\Livewire\User\Profile\Settings;
 use App\Services\Authentication\AuthenticationStrategyFactory;
 use App\Services\AuthenticationService;
-use Filament\Facades\Filament;
 use Filament\Pages\Page;
 use Filament\Panel;
 use Illuminate\Contracts\View\View;
@@ -49,9 +48,6 @@ class Profile extends Page
     {
         return 'profile';
     }
-
-
-
 
     public static function shouldRegisterNavigation(): bool
     {
