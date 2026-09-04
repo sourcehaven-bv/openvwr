@@ -29,14 +29,49 @@ final class ManualMarkdown
     private const HINT = 'Hint';
     private const WARNING = 'Let op';
 
-    public static function render(string $markdown): string
+    /**
+     * @param callable(string): ?string $topicUrl resolves a topic id to its url
+     */
+    public static function render(string $markdown, ?callable $topicUrl = null): string
     {
         $html = Markdown::fromString($markdown)->toHtml();
 
         $html = self::callouts($html);
         $html = self::statuses($html);
+        $html = self::crossReferences($html, $topicUrl);
 
         return self::figures($html);
+    }
+
+    /**
+     * A link to `#some-topic` becomes a link to that topic's own page.
+     *
+     * The source keeps the anchor spelling the pdf used, because it reads well
+     * and stays meaningful when the markdown is read as plain text. On the web
+     * every topic is its own page, so a bare fragment would point at an anchor
+     * that is not on the current page and quietly do nothing when clicked.
+     *
+     * An anchor that names no known topic is left exactly as it is: it may be a
+     * genuine in-page anchor, and silently rewriting it to a broken url would
+     * be worse than leaving it alone.
+     *
+     * @param ?callable(string): ?string $topicUrl
+     */
+    private static function crossReferences(string $html, ?callable $topicUrl): string
+    {
+        if ($topicUrl === null) {
+            return $html;
+        }
+
+        return (string) preg_replace_callback(
+            '#href="\#([a-z0-9-]+)"#',
+            static function (array $matches) use ($topicUrl): string {
+                $url = $topicUrl($matches[1]);
+
+                return $url === null ? $matches[0] : 'href="' . $url . '"';
+            },
+            $html,
+        );
     }
 
     /**

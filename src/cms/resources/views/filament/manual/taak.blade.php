@@ -21,10 +21,12 @@
         'manual-rolegate--ok' => $capability === TaskCapability::PERFORM,
         'manual-rolegate--blocked' => $capability === TaskCapability::NONE,
     ])>
+        @php $roleName = $this->decidingRoleName(); @endphp
+
         @if ($capability === TaskCapability::PERFORM)
-            {{ __('manual.role_can_perform') }}
+            {{ __('manual.role_can_perform', ['role' => $roleName]) }}
         @elseif ($capability === TaskCapability::READ)
-            {{ __('manual.role_can_read') }}
+            {{ __('manual.role_can_read', ['role' => $roleName]) }}
         @else
             {{ __('manual.role_cannot') }}
             @php $roles = $this->manual()->topic('rollen'); @endphp

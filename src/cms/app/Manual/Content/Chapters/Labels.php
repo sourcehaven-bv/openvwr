@@ -41,6 +41,8 @@ final class Labels
                 van uw eigen organisatiekenmerken, of op een tijdelijk criterium zoals een
                 lopend project of een audit.
 
+                ![De kolom "Labels" in het verwerkingsoverzicht](/handleiding/06_labels/05_avg-responsible-processing-records_labels_kolom.png)
+
                 Een label is een trefwoord dat u zelf bedenkt en toekent aan onderdelen van de
                 registratie: aan verwerkingen, maar net zo goed aan algoritmes, datalekken,
                 systemen, verwerkers, contactpersonen en documenten. U bepaalt zelf welke
