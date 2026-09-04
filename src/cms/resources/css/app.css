@@ -969,9 +969,3 @@
     color: var(--m-accent-ink);
 }
 
-.manual-backlink__steps {
-    margin-left: auto;
-    flex: none;
-    font-size: 0.75rem;
-    color: var(--m-ink-3);
-}

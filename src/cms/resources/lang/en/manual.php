@@ -27,13 +27,11 @@ return [
     'search_clear' => 'Clear search',
     'search_empty' => 'Nothing found. Try another word.',
 
-    'capability_perform' => 'You can do this',
     'capability_read' => 'Read only',
     'capability_none' => 'Not for your role',
-    'step_count' => ':count steps',
 
-    'role_can_perform' => 'Your role allows you to carry out this task yourself.',
-    'role_can_read' => 'Your role lets you follow along, but not carry out this task. The steps '
+    'role_can_perform' => 'As :role you can carry out this task yourself.',
+    'role_can_read' => 'As :role you can follow along, but not carry out this task. The steps '
         . 'are here so you know what happens and who does it.',
     'role_cannot' => 'This task does not belong to your role. Who can do it is described in',
     'role_see_roles' => 'Roles and permissions.',
@@ -43,6 +41,4 @@ return [
 
     'available_for' => 'Available for',
     'used_in_tasks' => 'Used in these tasks',
-    'used_in_no_tasks' => 'This topic is reference without an associated task: you look it up '
-        . 'while doing something else.',
 ];

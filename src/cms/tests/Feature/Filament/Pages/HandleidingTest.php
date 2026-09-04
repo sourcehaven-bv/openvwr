@@ -105,13 +105,13 @@ it('links a topic back to the tasks that use it', function (): void {
         ->assertSee(manualUrl($organisation->slug, '/taken/overzicht-opvragen'), escape: false);
 });
 
-it('says so on a topic that no task uses', function (): void {
+it('leaves the backlink block out on a topic that no task uses', function (): void {
     $organisation = OrganisationTestHelper::create();
 
     $this->asFilamentOrganisationUser($organisation)
         ->get(manualUrl($organisation->slug, '/naslag/over-openvwr'))
         ->assertOk()
-        ->assertSee(__('manual.used_in_no_tasks'));
+        ->assertDontSee(__('manual.used_in_tasks'));
 });
 
 it('shows the availability of a topic that has one', function (): void {
@@ -156,6 +156,26 @@ it('renders the callouts of the source text', function (): void {
         ->get(manualUrl($organisation->slug, '/naslag/versie-indienen'))
         ->assertOk()
         ->assertSee('manual-callout', escape: false);
+});
+
+it('turns a cross reference into a link to the topic it names', function (): void {
+    // Topics are written with the anchor spelling the pdf used. Every topic is
+    // its own page here, so a bare "#gebruikers" would point at an anchor that
+    // is not on this page and do nothing at all when clicked.
+    $organisation = OrganisationTestHelper::create();
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->get(manualUrl($organisation->slug, '/naslag/rollen'))
+        ->assertOk()
+        ->assertSee(manualUrl($organisation->slug, '/naslag/gebruikers'), escape: false)
+        ->assertDontSee('href="#gebruikers"', escape: false);
+});
+
+it('leaves an anchor alone when no topic answers to it', function (): void {
+    $topic = new Topic(id: 'los', title: 'Los', body: 'Zie [ergens](#geen-onderwerp).');
+
+    expect($topic->html(static fn (): ?string => null))
+        ->toContain('href="#geen-onderwerp"');
 });
 
 it('404s on a task that does not exist', function (): void {
@@ -299,7 +319,9 @@ it('tells a user with the role that the task can be performed', function (): voi
     $this
         ->get(manualUrl($organisation->slug, '/taken/verwerking-vastleggen'))
         ->assertOk()
-        ->assertSee(__('manual.role_can_perform'));
+        ->assertSee(__('manual.role_can_perform', [
+            'role' => __('role.' . Role::INPUT_PROCESSOR->value),
+        ]));
 });
 
 it('tells a read only role that it can only follow along', function (): void {
@@ -311,7 +333,9 @@ it('tells a read only role that it can only follow along', function (): void {
     $this
         ->get(manualUrl($organisation->slug, '/taken/verwerking-vastleggen'))
         ->assertOk()
-        ->assertSee(__('manual.role_can_read'));
+        ->assertSee(__('manual.role_can_read', [
+            'role' => __('role.' . Role::COUNSELOR->value),
+        ]));
 });
 
 it('points a role the task is not for at the roles topic', function (): void {
@@ -327,7 +351,10 @@ it('points a role the task is not for at the roles topic', function (): void {
         ->assertSee(manualUrl($organisation->slug, '/naslag/rollen'), escape: false);
 });
 
-it('shows what each task is worth to the current role on the overview', function (): void {
+it('flags only the tasks the current role is limited on, on the overview', function (): void {
+    // An Invoerder performs some of the tasks and not others. Only the latter
+    // carry a badge: marking the ones that are simply available says nothing,
+    // and on an account holding every role it marked every card alike.
     $organisation = OrganisationTestHelper::create();
 
     $this->asFilamentOrganisationUser($organisation);
@@ -336,8 +363,24 @@ it('shows what each task is worth to the current role on the overview', function
     $this
         ->get(manualUrl($organisation->slug))
         ->assertOk()
-        ->assertSee(__('manual.capability_perform'))
-        ->assertSee(__('manual.capability_none'));
+        ->assertSee(__('manual.capability_none'))
+        ->assertSee(__('manual.capability_read'));
+});
+
+it('leaves the badge off a task the current role simply performs', function (): void {
+    // A Raadpleger reads along on every task, so nothing on the overview is
+    // marked "Niet voor uw rol"; a Chief Privacy Officer performs nearly all of
+    // them and should see an overview that is quiet rather than decorated.
+    $organisation = OrganisationTestHelper::create();
+
+    $this->asFilamentOrganisationUser($organisation);
+    RoleTestHelper::actAs([Role::CHIEF_PRIVACY_OFFICER]);
+
+    $this
+        ->get(manualUrl($organisation->slug, '/taken/verwerking-vastleggen'))
+        ->assertOk()
+        ->assertDontSee(__('manual.capability_read'))
+        ->assertDontSee(__('manual.capability_none'));
 });
 
 it('links every task step to a topic that exists', function (): void {

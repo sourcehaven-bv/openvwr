@@ -48,6 +48,22 @@ class HandleidingOnderwerp extends ManualDetailPage
         return $this->topic;
     }
 
+    /**
+     * The body, with cross references resolved to the pages they mean.
+     *
+     * A topic is written with `[Gebruikers](#gebruikers)`, the spelling the pdf
+     * used and the one that still reads well in the source. Here every topic is
+     * its own page, so those anchors have to become real urls.
+     */
+    public function body(): string
+    {
+        return $this->topic->html(function (string $id): ?string {
+            $topic = $this->manual()->topic($id);
+
+            return $topic === null ? null : ManualUrls::topic($topic);
+        });
+    }
+
     public function chapter(): ?Chapter
     {
         return $this->manual()->chapterOf($this->topic);

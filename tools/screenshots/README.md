@@ -34,6 +34,19 @@ CMS_DIR=../../src/cms npm run capture -- --out ./preview  # eerst bekijken
 Gebruik `--out ./preview` als je het resultaat wilt vergelijken voordat je de
 bestaande afbeeldingen overschrijft.
 
+Een volledige run duurt enkele minuten. Zet hem op een laptop achter
+`caffeinate`, anders valt de machine op accu tussentijds in slaap:
+
+```bash
+caffeinate -dimsu just screenshots
+```
+
+Slaapt hij toch, dan lopen de Playwright-timeouts door terwijl het proces
+bevroren is en faalt de rest van de run met timeouts die niets met de figuren
+te maken hebben. Losse figuren slagen dan nog wél, wat het spoor misleidend
+maakt: zoek in dat geval eerst naar gaten van een kwartier in het serverlog
+(`pmset -g log | grep Sleep`) voordat je de tooling verdenkt.
+
 ## Hoe het werkt
 
 `capture.mjs` bevat een lijst `FIGURES`; elke figuur beschrijft waar de

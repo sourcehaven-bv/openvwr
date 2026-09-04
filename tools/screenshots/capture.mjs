@@ -60,7 +60,15 @@ function loginUrl(email) {
     echo (new App\\Mail\\Authentication\\PasswordLessLoginLink($t))->link;
   `);
   if (!url.startsWith('http')) throw new Error(`could not mint login URL: ${url}`);
-  return url;
+  // artisan builds the link from APP_URL, which need not be the server we are
+  // driving - a stale APP_URL would log us in on a different origin and leave
+  // this one unauthenticated. The signature covers the query, not the host, so
+  // rebasing onto BASE keeps the link valid.
+  const minted = new URL(url);
+  const base = new URL(BASE);
+  minted.protocol = base.protocol;
+  minted.host = base.host;
+  return minted.toString();
 }
 
 /** RFC 6238 TOTP - verified against the spec's published test vectors. */
@@ -238,11 +246,50 @@ const FIGURES = [
     },
   },
   {
+    name: 'snapshot-statusflow',
+    file: '03_goedkeuringsproces/08_snapshots_statusverloop.png',
+    auth: true,
+    // The status flow itself, not the whole page: the paragraph around it lists
+    // the five statuses, so the figure only has to show where the reader sees
+    // them back. Anchored on the heading rather than the first .fi-section:
+    // the view page stacks several sections, and their order is not fixed.
+    clip: '.fi-section:has(h3:text-is("Statusverloop"))',
+    pad: 12,
+    async shoot(page) {
+      await gotoSeededSnapshot(page);
+      await page.waitForSelector('text=/Statusverloop/i', { timeout: 15000 });
+    },
+  },
+  {
+    name: 'snapshot-statuschange',
+    file: '03_goedkeuringsproces/09_snapshots_status_aanpassen.png',
+    auth: true,
+    // "Status aanpassen" is a header action of the Statusverloop *section*
+    // (see ViewInfoTab::getStatusFlowSection), not of the page - so clip to
+    // that section, not .fi-header, which carries "Alle versies" instead.
+    clip: '.fi-section:has(h3:text-is("Statusverloop"))',
+    // Enough headroom above the section for the arrow, which is drawn outside it.
+    pad: 56,
+    async shoot(page) {
+      await gotoSeededSnapshot(page);
+      await page.evaluate(() => {
+        const btn = [...document.querySelectorAll('button, a')].find((b) =>
+          /Status aanpassen/i.test(b.textContent || ''),
+        );
+        if (!btn) throw new Error('"Status aanpassen" button not found');
+        window.__annotate.arrow(btn, { side: 'top', length: 70, gap: 10 });
+      });
+    },
+  },
+  {
     name: 'snapshot-signatures',
     file: '03_goedkeuringsproces/03_snapshots_ondertekeningen.png',
     auth: true,
+    // Down to the tabs and the panel under them: the text is about clicking
+    // "Ondertekeningen", so the Gegevens panel below only pads the figure out.
     clip: '.fi-page',
     pad: 12,
+    maxHeight: 660,
     async shoot(page) {
       await gotoSeededSnapshot(page);
       await page.evaluate(() => {
@@ -411,14 +458,64 @@ const FIGURES = [
     },
   },
   {
+    name: 'labels-column',
+    file: '06_labels/05_avg-responsible-processing-records_labels_kolom.png',
+    auth: true,
+    // The table itself: the paragraph is about seeing at a glance where a
+    // record belongs, which is the Labels column, not the surrounding chrome.
+    clip: '.fi-ta',
+    pad: 12,
+    async shoot(page) {
+      await gotoRegister(page);
+      // TagsColumn is toggleable(isToggledHiddenByDefault: true), so the column
+      // is off until the reader turns it on - which is what the surrounding
+      // paragraph tells them to do. The choice lives in Livewire's component
+      // state, not on the user or in local storage, so it has to be clicked.
+      await page
+        .locator('.fi-dropdown-trigger')
+        .filter({ hasText: /Kolommen in-\/uitschakelen/i })
+        .first()
+        .click();
+      // Scope to the *visible* panel: the filter dropdown is also in the DOM
+      // and also carries a "Labels" row, so an unscoped lookup finds that one
+      // and waits forever for a hidden checkbox. The checkboxes have no
+      // accessible name either, hence the row-label detour.
+      await page
+        .locator('.fi-dropdown-panel:visible label')
+        .filter({ hasText: /^\s*Labels\s*$/i })
+        .first()
+        .locator('input[type=checkbox]')
+        .check();
+      await page.keyboard.press('Escape');
+      // Livewire re-renders the table after the toggle, so wait for the column
+      // to actually exist before annotating it.
+      await page
+        .locator('th')
+        .filter({ hasText: /^\s*Labels\s*$/i })
+        .first()
+        .waitFor({ timeout: 15000 });
+      await page.waitForTimeout(400);
+      await page.evaluate(() => {
+        const header = [...document.querySelectorAll('th')].find((th) =>
+          /^\s*Labels\s*$/i.test(th.textContent || ''),
+        );
+        if (!header) throw new Error('Labels column not found');
+        // From below, pointing up: the header sits just under the search bar,
+        // so a 'top' arrow is drawn over that bar instead of the column.
+        window.__annotate.arrow(header, { side: 'bottom', length: 60, gap: 8 });
+      });
+    },
+  },
+  {
     name: 'labels-filter',
     file: '06_labels/03_avg-responsible-processing-records_filter_labels.png',
     auth: true,
-    // The panel is taller than the narrowed table, so crop to the page rather
-    // than the table; maxHeight trims the empty area below both.
-    clip: '.fi-main',
-    maxHeight: 900,
+    // The filter panel is an overlay that hangs past the bottom of .fi-page and
+    // even .fi-layout - it is what defines the page height. No container clip
+    // can hold it, so give the viewport room instead and clip to the layout.
+    clip: '.fi-layout',
     async shoot(page) {
+      await page.setViewportSize({ width: 1680, height: 1250 });
       await gotoRegister(page);
       // The filter panel overlays the table, so the figure deliberately keeps
       // it open: it shows the Labels filter, the selected label and the
@@ -443,6 +540,19 @@ const FIGURES = [
       await page.waitForTimeout(1000);
       const rows = await page.locator('table tbody tr').count();
       if (rows === 0) throw new Error('label filter matched no rows');
+      // The feedback singled this button out as hard to find - it is a small
+      // funnel icon that all but disappears next to the open panel.
+      await page.evaluate(() => {
+        const btn = [...document.querySelectorAll('.fi-ta-header-toolbar button')].find((b) =>
+          /Filteren/i.test(b.textContent || ''),
+        );
+        if (!btn) throw new Error('filter button not found');
+        window.__annotate.arrow(btn, { side: 'left', length: 90, gap: 10 });
+      });
+    },
+    // Restore the shared viewport: every later figure is framed for 1000px.
+    async after(page) {
+      await page.setViewportSize({ width: 1680, height: 1000 });
     },
   },
   {
@@ -475,6 +585,30 @@ const FIGURES = [
         // left-side arrow is clipped by the page edge and one from above lands
         // on the field sitting directly overhead.
         window.__annotate.arrow(label, { side: 'right', length: 110 });
+      });
+    },
+  },
+  {
+    name: 'users-add',
+    file: '04_beheer/04_users_toevoegen.png',
+    auth: true,
+    // The list, not the edit page: this figure belongs to "Gebruikers
+    // toevoegen", and the button the text places "rechtsboven de
+    // gebruikerstabel" only exists here.
+    clip: '.fi-main',
+    maxHeight: 700,
+    async shoot(page) {
+      await page.goto(`${BASE}/${tenantOf(page)}/users`, { waitUntil: 'networkidle' });
+      await passOtp(page);
+      await page.locator('table:visible').first().waitFor({ timeout: 30000 });
+      await page.evaluate(() => {
+        const btn = [...document.querySelectorAll('button, a')].find((b) =>
+          /Gebruiker (aanmaken|toevoegen)|Nieuwe gebruiker/i.test(b.textContent || ''),
+        );
+        if (!btn) throw new Error('"Gebruiker aanmaken" button not found');
+        // From the left: the button sits at the right edge of the content area,
+        // so an arrow on its right would fall outside the clip.
+        window.__annotate.arrow(btn, { side: 'left', length: 150 });
       });
     },
   },
@@ -643,10 +777,29 @@ async function selectFirstRow(page) {
     .click();
 }
 
-/** Switch the record edit page to its "Versies" tab. */
+/**
+ * Bring the versions table on a record's edit page into view.
+ *
+ * ScreenshotSeeder pins register_layout=steps, and in that layout the versions
+ * table is not behind a tab: the relation managers render below the wizard,
+ * which is what the manual describes ("onderaan de pagina"). Clicking a
+ * "Versies" tab worked under the older tabbed layout only.
+ *
+ * They are also suppressed on the wizard's first step, where an edit page
+ * opens by default - the tables are in the DOM but none is visible. Any later
+ * step renders them, so move off step one before waiting.
+ */
 async function openVersionsTab(page) {
-  await page.getByRole('tab', { name: /Versies/i }).first().click();
-  await page.waitForSelector('table tbody tr');
+  const url = new URL(page.url());
+  url.searchParams.set('step', 'opmerkingen');
+  await page.goto(url.toString(), { waitUntil: 'networkidle' });
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  // Scope the row wait to the visible table. A bare 'table tbody tr' resolves
+  // against the hidden relation managers that also sit in the DOM here, and
+  // then waits forever for one of those rows to become visible.
+  const table = page.locator('table:visible').first();
+  await table.waitFor({ timeout: 30000 });
+  await table.locator('tbody tr').first().waitFor({ timeout: 30000 });
   await page.waitForTimeout(500);
 }
 
@@ -673,7 +826,10 @@ async function gotoRegister(page) {
   await page.goto(`${BASE}/${tenantOf(page)}/avg-responsible-processing-records`, {
     waitUntil: 'networkidle',
   });
-  await page.waitForSelector('table', { timeout: 15000 });
+  // This is typically the first protected page of the run, so the OTP gate
+  // fires here rather than at login.
+  await passOtp(page);
+  await page.locator('table:visible').first().waitFor({ timeout: 15000 });
 }
 
 /** Email of the seeded user a figure runs as. */
@@ -695,9 +851,30 @@ async function login(page, as) {
     throw new Error(`login did not complete, still at ${page.url()}`);
   }
 
-  // Second factor. With ONE_TIME_PASSWORD_DRIVER=fake any code is accepted;
-  // set OTP_FAKE=0 to compute a real TOTP from the seeded secret instead.
-  if (page.url().includes('two-factor-authentication')) {
+  await passOtp(page, email);
+}
+
+/**
+ * Clear the second-factor gate if it is showing.
+ *
+ * EnforceOneTimePassword only fires on the first *protected* page, so this is
+ * not necessarily right after login: landing on the tenant root passes, and the
+ * redirect appears when a register is opened. Every navigation to a protected
+ * page therefore has to be prepared to answer it, or the figure silently
+ * captures a login-gated shell instead of the page it names.
+ *
+ * With ONE_TIME_PASSWORD_DRIVER=fake any code is accepted; set OTP_FAKE=0 to
+ * compute a real TOTP from the seeded secret instead.
+ */
+async function passOtp(page, email = EMAIL) {
+  if (!page.url().includes('two-factor-authentication')) return;
+
+  // config/auth.php allows 3 validation attempts per 60s. A full run logs in
+  // once per user and re-logs in on every session switch, so a long run trips
+  // it. Retry here rather than at the call site: the gate fires on the first
+  // protected page, where a rejected code surfaces as a selector timeout in
+  // whichever helper navigated - not as an error the caller can recognise.
+  for (let attempt = 0; attempt < 2; attempt++) {
     const code =
       process.env.OTP_FAKE === '0'
         ? totp(tinker(`echo App\\Models\\User::where("email", "${email}")->firstOrFail()->otp_secret;`))
@@ -707,10 +884,18 @@ async function login(page, as) {
     await page.locator('#code').press('Enter');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(1500);
-    if (page.url().includes('two-factor-authentication')) {
-      throw new Error(`OTP step did not pass, still at ${page.url()}`);
+
+    if (!page.url().includes('two-factor-authentication')) return;
+
+    if (attempt === 0) {
+      console.log('  (OTP rate limit hit, waiting 61s)');
+      await page.waitForTimeout(61000);
+      await page.reload({ waitUntil: 'networkidle' });
+      if (!page.url().includes('two-factor-authentication')) return;
     }
   }
+
+  throw new Error(`OTP step did not pass, still at ${page.url()}`);
 }
 
 /** Crop to an element's box plus padding, clamped to the page. */
@@ -792,12 +977,26 @@ for (const fig of todo) {
         : {}),
     });
     await page.evaluate(() => window.__annotate?.clear());
+    if (fig.after) await fig.after(page);
     console.log(`✓ ${fig.name} -> ${fig.file}`);
   } catch (e) {
     // Keep going: one broken figure should not block regenerating the rest.
     failures.push({ name: fig.name, error: e.message.split('\n')[0] });
-    console.error(`✗ ${fig.name}: ${e.message.split('\n')[0]}`);
+    console.error(`✗ ${fig.name}: ${e.message.split("\n")[0]}`);
+    // A bare selector timeout says nothing about *why* the page was not what
+    // the figure expected - logged out, on the OTP gate, an error page. Record
+    // where we actually were, and dump the screen next to the figures.
+    try {
+      console.error(`   at ${page.url()}`);
+      const shot = join(OUT, '_failures', `${fig.name}.png`);
+      mkdirSync(dirname(shot), { recursive: true });
+      await page.screenshot({ path: shot });
+      console.error(`   screen: ${shot}`);
+    } catch {
+      console.error('   (could not capture failure state)');
+    }
     await page.evaluate(() => window.__annotate?.clear()).catch(() => {});
+    if (fig.after) await fig.after(page).catch(() => {});
   }
 }
 

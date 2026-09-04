@@ -33,9 +33,14 @@ readonly class Topic
         return $this->gate === null || $this->gate->enabled();
     }
 
-    public function html(): string
+    /**
+     * @param ?callable(string): ?string $topicUrl resolves a topic id to its
+     *        url, so a cross reference written as `#topic-id` lands on that
+     *        topic's page. Without it the anchors are left untouched.
+     */
+    public function html(?callable $topicUrl = null): string
     {
-        return ManualMarkdown::render($this->body);
+        return ManualMarkdown::render($this->body, $topicUrl);
     }
 
     /**

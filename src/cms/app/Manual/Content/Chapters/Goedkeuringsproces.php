@@ -35,26 +35,25 @@ final class Goedkeuringsproces
             id: 'versiestatussen',
             title: 'Het proces en de statussen',
             body: <<<'MARKDOWN'
-                Het portaal ondersteunt het goedkeuringsproces van verwerkingen middels
-                overzichten en automatisering:
+                Het portaal ondersteunt het goedkeuringsproces van verwerkingen door:
 
-                - het bijhouden van een conceptversie en het aanpassen van de status van een
-                  versie;
-                - het eventueel ophalen van een akkoord bij Mandaathouders op een goedgekeurde
-                  versie;
-                - het vaststellen van versies;
+                - het scheiden van een conceptversie en een workflow voor het vaststellen
+                  van een versie;
+                - het, indien gewenst, laten akkorderen door Mandaathouders;
                 - overzichten van openstaande acties.
 
                 Welke stappen uw organisatie daadwerkelijk doorloopt, en welke rollen daarbij
                 betrokken zijn, hangt af van de manier waarop uw organisatie het proces heeft
                 ingericht. Werkt uw organisatie bijvoorbeeld niet met Mandaathouders, dan
                 slaat u het ophalen van een akkoord over en stelt een Privacy Officer de
-                versie zelf vast.
+                versie direct zelf vast.
+
+                ![Het statusverloop op de detailpagina van een versie](/handleiding/03_goedkeuringsproces/08_snapshots_statusverloop.png)
 
                 Een versie heeft altijd een status uit de volgende lijst:
 
-                1. `status:concept:Concept`: deze versie wordt bijgewerkt elke keer dat u de
-                   entiteit opslaat en is nog niet ingediend.
+                1. `status:concept:Concept`: dit is een actieve werkversie, en deze is nog
+                   niet ingediend.
                 2. `status:review:In Review`: deze versie is ingediend en moet nog
                    beoordeeld worden door een Privacy Officer.
                 3. `status:approved:Goedgekeurd`: deze versie is goedgekeurd door een Privacy
@@ -65,6 +64,14 @@ final class Goedkeuringsproces
                 5. `status:expired:Vervallen`: deze versie is komen te vervallen, mogelijk
                    omdat een nieuwere versie is aangemaakt die dezelfde status heeft
                    verkregen.
+
+                ![De knop "Status aanpassen" op de detailpagina van een versie](/handleiding/03_goedkeuringsproces/09_snapshots_status_aanpassen.png)
+
+                Een (Chief) Privacy Officer kan de status met de knop
+                "Status aanpassen" op de detailpagina van een versie rechtstreeks zetten,
+                bijvoorbeeld om een versie te laten vervallen die toch niet vastgesteld gaat
+                worden. Elke statuswijziging wordt vastgelegd en is terug te zien onder
+                "Statuswijzigingen".
                 MARKDOWN,
         );
     }
@@ -76,10 +83,10 @@ final class Goedkeuringsproces
             title: 'Versie indienen en Mandaathouders koppelen',
             body: <<<'MARKDOWN'
                 Voor alle entiteiten in de registers en voor alle gerelateerde entiteiten
-                wordt een versie bijgehouden. U hoeft daar niets voor te doen: zodra u een
+                worden versies bijgehouden. U hoeft daar niets voor te doen: zodra u een
                 entiteit opslaat, legt het portaal die inhoud vast als versie met de status
                 "Concept". Slaat u daarna opnieuw op, dan wordt diezelfde conceptversie
-                bijgewerkt — er ontstaat dus geen stapel halve versies.
+                bijgewerkt.
 
                 Een versie is te vinden onderaan de pagina bij de tabellen op het eerste
                 tabblad "Versies":
@@ -88,20 +95,34 @@ final class Goedkeuringsproces
 
                 Is de entiteit klaar voor het goedkeuringsproces, dan dient u de
                 conceptversie in met de knop "Start vaststellen", rechtsbovenin op de
-                bewerkpagina van de entiteit zelf. Die knop slaat eerst op en stuurt de
-                conceptversie daarna naar review; u hoeft dus niet apart op te slaan en er
-                volgt geen extra bevestiging.
+                bewerkpagina van de entiteit zelf.
 
-                ![Start vaststellen](/handleiding/03_goedkeuringsproces/01_avg-responsible-processing-records_edit_versie.png)
+                ![De knop "Start vaststellen" rechtsbovenin de bewerkpagina](/handleiding/03_goedkeuringsproces/01_avg-responsible-processing-records_edit_versie.png)
+
+                Die knop slaat eerst op en stuurt de conceptversie daarna naar review; u
+                hoeft dus niet apart op te slaan.
 
                 Op dat moment worden de verplichte velden gecontroleerd. Ontbreekt er nog
                 iets, dan blijft de versie een concept en verschijnt de melding bij het veld
-                zelf, zodat u in de stappenlijst direct ziet welke stap nog aandacht nodig
-                heeft. Vult u dat aan en drukt u opnieuw op "Start vaststellen", dan gaat de
-                versie alsnog naar review.
+                zelf wat nog informatie nodig heeft. Wanneer alle verplichte velden in het
+                formulier zijn ingevuld drukt u opnieuw op "Start vaststellen".
 
-                Een conceptversie heeft geen detailpagina: die volgt het formulier en is daar
-                ook de enige plek waar u hem aanpast. Zodra een versie is ingediend staat de
+                ### Twee meldingen die u kunt tegenkomen
+
+                Meestal gaat de versie meteen naar review. In twee gevallen krijgt u eerst
+                een melding.
+
+                *"Er loopt al een vaststelling"* betekent dat er nog een versie in het
+                goedkeuringsproces zit, bijvoorbeeld met de status "In review" of
+                "Goedgekeurd". Gaat u door, dan vervalt die lopende versie. De nieuwe versie
+                wordt dan klaargezet als review. Kies "Toch doorgaan" als dat de bedoeling
+                is; twijfelt u, laat de lopende versie dan eerst afronden.
+
+                *"Geen wijzigingen"* betekent dat de huidige versie niet verschilt van de
+                vorige versie (er zijn geen aanpassingen). Daarmee is het niet nodig om een
+                nieuwe versie in te dienen.
+
+                Zodra een versie is ingediend staat de
                 inhoud vast en kunt u hem openen. Een klik op de versie zal de detailpagina
                 van deze versie tonen. Hier kunnen Mandaathouders worden toegevoegd aan een
                 versie door op "Ondertekeningen" te klikken:
@@ -113,8 +134,9 @@ final class Goedkeuringsproces
 
                 ![Mandaathouder toevoegen](/handleiding/03_goedkeuringsproces/04_snapshots_mandaathouder.png)
 
-                > **Hint**: Privacy Officers krijgen automatisch een e-mail als er een versie
-                > naar review is gestuurd. Wilt u die e-mails niet ontvangen, dan zet u ze uit op
+                > **Hint**: Gebruikers met de rol Privacy Officer krijgen automatisch een
+                > e-mail als er een versie naar review is gestuurd. Wilt u die e-mails niet
+                > ontvangen, dan zet u ze uit op
                 > uw eigen profielpagina (zie [Notificaties](#notificaties)). Wilt u één
                 > specifieke versie onder de aandacht brengen, gebruik dan de
                 > "Ondertekeningen": dat legt het verzoek vast in het portaal in plaats van
@@ -122,11 +144,9 @@ final class Goedkeuringsproces
 
                 > **Let op**: Is een versie eenmaal ingediend, dan is de inhoud van deze
                 > versie niet meer aanpasbaar: slechts de status van een versie kan nog
-                > aangepast worden door een Privacy Officer. Indien er op een vastgestelde
-                > versie van een entiteit wijzigingen moeten worden aangebracht, dan is het de
-                > bedoeling dat de wijzigingen worden doorgevoerd in het formulier en worden
-                > opgeslagen: die vormen dan een nieuwe conceptversie, die u vervolgens met
-                > "Start vaststellen" opnieuw door het goedkeuringsproces leidt.
+                > aangepast worden door een Privacy Officer. Aanpassingen maken gaat door via
+                > het systeem een nieuw concept te maken. En vervolgens kan deze ingediend
+                > worden voor review en daarna worden goedgekeurd.
                 MARKDOWN,
             roles: [
                 Role::INPUT_PROCESSOR,
@@ -185,8 +205,6 @@ final class Goedkeuringsproces
                 detailpagina onderaan op "Akkoord" te klikken. De Mandaathouder kan hier ook
                 op "Niet akkoord" drukken, wat de mogelijkheid biedt om een notitie achter te
                 laten.
-
-                ![Mandaathouders uitnodigen](/handleiding/03_goedkeuringsproces/06_snapshots_mandaathouders_uitnodigen.png)
 
                 > **Hint**: Mandaathouders kunnen op hun profielpagina hun voorkeuren aangeven
                 > voor email notificaties. Het is mogelijk om een notificatie te krijgen bij

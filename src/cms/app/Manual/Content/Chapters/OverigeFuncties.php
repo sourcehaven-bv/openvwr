@@ -147,15 +147,50 @@ final class OverigeFuncties
             title: 'Publiceren',
             body: <<<'MARKDOWN'
                 Vastgestelde verwerkingen kunnen gepubliceerd worden op een openbare website,
-                zodat betrokkenen kunnen zien welke verwerkingen uw organisatie uitvoert.
+                zodat betrokkenen kunnen zien welke verwerkingen uw organisatie uitvoert. Voor
+                veel organisaties is dat een wettelijke verplichting; voor alle organisaties
+                is het de meest zichtbare vorm van verantwoording over de registratie.
 
-                Onder "Openbare website" in het navigatiemenu stelt u de inhoud van de
-                startpagina in. Per verwerking bepaalt u of deze openbaar is: alleen
-                vastgestelde versies van openbare verwerkingen komen op de website terecht.
+                ### Wanneer komt een verwerking op de website
+
+                Er moeten twee dingen kloppen. Er moet een *vastgestelde* versie zijn, en de
+                verwerking moet *openbaar* zijn. Ontbreekt een van beide, dan gebeurt er
+                niets.
+
+                Dat u een verwerking openbaar maakt, legt u vast met het veld "Publiceer
+                vanaf" op de detailpagina. Vult u een datum in de toekomst in, dan verschijnt
+                de verwerking pas vanaf die datum; met de knop "Publiceer vanaf nu" zet u hem
+                direct open. Laat u het veld leeg, dan blijft de verwerking binnen het portaal
+                en komt hij niet op de website.
+
+                In het blok "Publieke beschikbaarheid" op de detailpagina ziet u de huidige
+                status - publiek beschikbaar of niet - en een overzicht van de periodes waarin
+                de verwerking publiek is geweest. Dat overzicht blijft staan, ook nadat u een
+                verwerking weer van de website haalt: het laat zien wat er wanneer openbaar
+                was.
+
+                ### Een verwerking weer van de website halen
+
+                Maakt u het veld "Publiceer vanaf" leeg, dan verdwijnt de verwerking bij de
+                eerstvolgende bouw van de website. De historie van de publieke beschikbaarheid
+                blijft bewaard.
 
                 > **Let op**: Publiceren gaat altijd over de vastgestelde versie. Wijzigt u
                 > een verwerking, dan verandert de gepubliceerde tekst pas zodra er een nieuwe
-                > versie is vastgesteld.
+                > versie is vastgesteld. Een correctie op een gepubliceerde tekst vraagt dus
+                > om een nieuwe versie die het hele goedkeuringsproces doorloopt.
+
+                > **Let op**: Wat u publiceert is openbaar en kan door zoekmachines worden
+                > opgenomen. Loop voor het publiceren na of er geen gegevens in staan die niet
+                > naar buiten horen; een verwerking terughalen wist niet wat anderen al hebben
+                > gezien of bewaard.
+
+                ### De website zelf
+
+                De inrichting van de openbare website - de opbouw van de paginaboom en de
+                teksten eromheen - staat onder "Functioneel beheer" en is werk van een
+                Functioneel beheerder. Als (Chief) Privacy Officer bepaalt u wélke
+                verwerkingen erop komen; niet hoe de website eruitziet.
                 MARKDOWN,
             roles: [Role::CHIEF_PRIVACY_OFFICER, Role::PRIVACY_OFFICER],
             gate: FeatureGate::PUBLISHING,
