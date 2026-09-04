@@ -109,6 +109,37 @@ it('updates the same concept snapshot when saving again', function (): void {
         ->toBe('Gewijzigde naam');
 });
 
+// Saving twice without touching the form leaves the concept alone rather than putting a
+// second version next to it — and once that concept is under review, saving again writes
+// nothing at all, because there is nothing the version does not already say.
+it('writes no new version when saving changes nothing', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->withValidState()
+        ->create();
+
+    $test = $this->asFilamentOrganisationUser($organisation);
+
+    $test->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+        'record' => $avgResponsibleProcessingRecord->id,
+    ])->call('save');
+
+    $avgResponsibleProcessingRecord->refresh()->snapshots->sole()->state->transitionTo(InReview::class);
+
+    $test->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+        'record' => $avgResponsibleProcessingRecord->id,
+    ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $avgResponsibleProcessingRecord->refresh();
+    expect($avgResponsibleProcessingRecord->snapshots)
+        ->toHaveCount(1)
+        ->and($avgResponsibleProcessingRecord->snapshots->first()->state)
+        ->toBeInstanceOf(InReview::class);
+});
+
 it('does not notify anyone while the version is still a concept', function (): void {
     Mail::fake();
 
