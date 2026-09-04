@@ -6,6 +6,7 @@ namespace App\Manual\Content;
 
 use App\Manual\Chapter;
 use App\Manual\Content\Chapters\Beheer;
+use App\Manual\Content\Chapters\Dpia;
 use App\Manual\Content\Chapters\Goedkeuringsproces;
 use App\Manual\Content\Chapters\Labels;
 use App\Manual\Content\Chapters\OverigeFuncties;
@@ -35,6 +36,7 @@ final class ReferenceContent
         return [
             Welkom::chapter(),
             Registers::chapter(),
+            Dpia::chapter(),
             Goedkeuringsproces::chapter(),
             Beheer::chapter(),
             OverigeFuncties::chapter(),

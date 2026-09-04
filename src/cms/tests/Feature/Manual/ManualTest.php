@@ -17,7 +17,7 @@ it('keeps every chapter when both flags are on', function (): void {
     ConfigTestHelper::set('features.wpg', true);
     ConfigTestHelper::set('features.publishing', true);
 
-    expect((new Manual())->chapters())->toHaveCount(7);
+    expect((new Manual())->chapters())->toHaveCount(8);
 });
 
 it('drops a gated topic when its flag is off', function (): void {
@@ -156,9 +156,16 @@ it('searches both layers, case insensitively', function (): void {
 });
 
 it('does not search content that a flag has hidden', function (): void {
+    // "paginaboom" only occurs in publishing-gated content. Do not loosen this
+    // to a phrase like "openbare website": ungated topics mention that too, if
+    // only to say a DPIA is *not* published there, and the test then fails for
+    // a reason that has nothing to do with the flag.
+    ConfigTestHelper::set('features.publishing', true);
+    expect((new Manual())->search('paginaboom')['topics'])->not->toBeEmpty();
+
     ConfigTestHelper::set('features.publishing', false);
 
-    $results = (new Manual())->search('openbare website');
+    $results = (new Manual())->search('paginaboom');
 
     expect($results['tasks'])->toBeEmpty()
         ->and($results['topics'])->toBeEmpty();
