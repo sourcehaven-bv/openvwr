@@ -68,9 +68,12 @@ it('gives every task a page of its own', function (): void {
     $this->asFilamentOrganisationUser($organisation);
 
     foreach ((new Manual())->tasks() as $task) {
+        // Escaped, not raw: a title with an apostrophe ("Risico's ...") renders
+        // as &#039; in the html, so a raw assertion would fail on the text
+        // being correct.
         $this->get(manualUrl($organisation->slug, '/taken/' . $task->id))
             ->assertOk()
-            ->assertSee($task->title, escape: false);
+            ->assertSee($task->title);
     }
 });
 
@@ -81,7 +84,7 @@ it('gives every topic a page of its own', function (): void {
     foreach ((new Manual())->topics() as $topic) {
         $this->get(manualUrl($organisation->slug, '/naslag/' . $topic->id))
             ->assertOk()
-            ->assertSee($topic->title, escape: false);
+            ->assertSee($topic->title);
     }
 });
 
