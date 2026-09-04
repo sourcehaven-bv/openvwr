@@ -6,6 +6,7 @@ namespace App\Manual\Content\Chapters;
 
 use App\Enums\Authorization\Role;
 use App\Manual\Chapter;
+use App\Manual\FeatureGate;
 use App\Manual\Topic;
 
 /**
@@ -18,12 +19,13 @@ final class Beheer
         return new Chapter(
             id: 'beheer',
             title: 'Beheer',
-            summary: 'Gebruikers, tweefactorauthenticatie en bewaartermijnen binnen de '
-                . 'organisatie.',
+            summary: 'Gebruikers, tweefactorauthenticatie, bewaartermijnen en de openbare '
+                . 'website.',
             topics: [
                 self::gebruikers(),
                 self::tweefactorResetten(),
                 self::bewaartermijnen(),
+                self::websitebeheer(),
             ],
         );
     }
@@ -134,6 +136,52 @@ final class Beheer
                 Role::PRIVACY_OFFICER,
             ],
             availability: 'Invoerder, (Chief) Privacy Officer',
+        );
+    }
+
+    private static function websitebeheer(): Topic
+    {
+        return new Topic(
+            id: 'websitebeheer',
+            title: 'De openbare website inrichten',
+            body: <<<'MARKDOWN'
+                De openbare website toont de verwerkingen die een Privacy Officer openbaar
+                heeft gemaakt. Welke verwerkingen dat zijn, bepaalt die Privacy Officer; zie
+                [Publiceren](#publiceren). De inrichting van de website eromheen is werk van
+                een Functioneel beheerder, en dat is wat dit onderwerp beschrijft.
+
+                ### De paginaboom
+
+                Onder Functioneel beheer - Website organogram bouwt u de paginaboom van de
+                openbare website. Elk item is een pagina; door items onder elkaar te hangen
+                ontstaat de structuur die de bezoeker in de navigatie ziet.
+
+                Per item legt u vast:
+
+                - *Titel*: de naam van de pagina, zoals die in de navigatie komt.
+                - *URL-segment*: bepaalt het webadres van deze pagina. Wijzigt u dit later,
+                  dan verandert het adres mee en werken oude links niet meer.
+                - *Tekst publieke website*: de inhoud van de pagina zelf.
+                - *Organisatie*: de organisatie waaronder de pagina valt. Hiermee koppelt u
+                  een deel van de boom aan de verwerkingen van die organisatie.
+                - *Publieke URL*: alleen invullen als het item juist niet naar een eigen
+                  pagina moet wijzen, maar naar een externe website.
+
+                ### Wanneer een pagina live gaat
+
+                Net als bij een verwerking bepaalt een publicatiedatum wanneer een pagina
+                zichtbaar wordt. Staat er geen datum, dan blijft de pagina onzichtbaar voor
+                bezoekers; staat er een datum in de toekomst, dan verschijnt hij vanaf dan.
+                In het overzicht ziet u dat terug als *(geen publicatiedatum)* of *(live
+                vanaf ...)*.
+
+                > **Let op**: De website wordt periodiek opnieuw opgebouwd. Een wijziging in
+                > de paginaboom is dus niet meteen zichtbaar voor bezoekers, net zoals een
+                > nieuw gepubliceerde verwerking pas bij de volgende bouw meekomt.
+                MARKDOWN,
+            roles: [Role::FUNCTIONAL_MANAGER],
+            gate: FeatureGate::PUBLISHING,
+            availability: 'Functioneel beheerder',
         );
     }
 }

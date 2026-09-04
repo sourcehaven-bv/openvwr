@@ -48,6 +48,8 @@ final class TaskContent
         return [
             self::verwerkingVastleggen(),
             self::algoritmeVastleggen(),
+            self::dpiaPrescanDoen(),
+            self::dpiaUitvoeren(),
             self::wpgVerwerkingVastleggen(),
             self::datalekMelden(),
             self::versieIndienenEnLatenGoedkeuren(),
@@ -377,7 +379,7 @@ final class TaskContent
                     title: 'Controleer het resultaat op de website',
                     body: 'De verwerking verschijnt op de openbare website. De inrichting van '
                         . 'die website zelf ligt bij een Functioneel beheerder, niet bij u.',
-                    topicIds: ['publiceren'],
+                    topicIds: ['publiceren', 'websitebeheer'],
                 ),
             ],
             roles: new TaskRoles(
@@ -467,6 +469,102 @@ final class TaskContent
             ),
             done: 'De collega kan weer inloggen en stelt bij de eerstvolgende keer zijn '
                 . 'authenticator opnieuw in.',
+        );
+    }
+
+    private static function dpiaPrescanDoen(): Task
+    {
+        return new Task(
+            id: 'dpia-prescan-doen',
+            group: self::GROUP_REGISTREREN,
+            title: 'Bepalen of een DPIA nodig is',
+            summary: 'Met een pre-scan toetsen of een verwerking een DPIA vraagt.',
+            intro: 'Bij een verwerking met een hoog privacyrisico is een DPIA verplicht. '
+                . 'Met een pre-scan stelt u vast of dat hier zo is - en legt u de afweging '
+                . 'vast, ook als het antwoord nee is.',
+            steps: [
+                new Step(
+                    title: 'Maak een pre-scan aan',
+                    body: 'Ga naar DPIA - Pre-scans DPIA en maak een pre-scan aan voor de '
+                        . 'verwerking die u wilt toetsen.',
+                    topicIds: ['dpia-prescan'],
+                ),
+                new Step(
+                    title: 'Doorloop de toets',
+                    body: 'Beantwoord de vragen over aanleiding, AP- en EDPB-criteria, '
+                        . 'doorgifte, en kinderen en algoritmes. Bij Uitkomst leest u wat '
+                        . 'de antwoorden betekenen.',
+                    topicIds: ['dpia-prescan'],
+                ),
+                new Step(
+                    title: 'Start een DPIA als dat nodig is',
+                    body: 'Geeft de uitkomst daar aanleiding toe, gebruik dan de knop '
+                        . '"DPIA starten". Naam en koppelingen gaan mee naar de nieuwe DPIA.',
+                    topicIds: ['dpia-prescan', 'dpia-invullen'],
+                ),
+            ],
+            roles: new TaskRoles(
+                performers: [
+                    Role::INPUT_PROCESSOR,
+                    Role::CHIEF_PRIVACY_OFFICER,
+                    Role::PRIVACY_OFFICER,
+                ],
+                readers: [
+                    Role::COUNSELOR,
+                    Role::DATA_PROTECTION_OFFICIAL,
+                    Role::MANDATE_HOLDER,
+                ],
+            ),
+            done: 'De afweging is vastgelegd, en waar nodig staat er een DPIA klaar.',
+        );
+    }
+
+    private static function dpiaUitvoeren(): Task
+    {
+        return new Task(
+            id: 'dpia-uitvoeren',
+            group: self::GROUP_REGISTREREN,
+            title: 'Een DPIA uitvoeren',
+            summary: "Persoonsgegevens, risico's en maatregelen vastleggen en laten "
+                . 'vaststellen.',
+            intro: 'Een DPIA volgt de paragrafen van het Model DPIA Rijksdienst. U vult hem '
+                . 'in stappen in, laat hem beoordelen en stelt hem vast - net als een '
+                . 'verwerking.',
+            steps: [
+                new Step(
+                    title: 'Vul de paragrafen in',
+                    body: 'Doorloop de stappen van Voorstel tot Maatregelen. Besteed extra '
+                        . 'aandacht aan paragraaf 2, Persoonsgegevens: daar legt u per '
+                        . 'gegeven type, bron en bewaartermijn vast.',
+                    topicIds: ['dpia-invullen'],
+                ),
+                new Step(
+                    title: "Weeg de risico's en beschrijf maatregelen",
+                    body: "Leg per risico kans en impact vast, en koppel de maatregelen die "
+                        . 'het risico beperken. Blijft een hoog restrisico staan, dan is de '
+                        . 'Autoriteit Persoonsgegevens raadplegen verplicht.',
+                    topicIds: ['dpia-risicos'],
+                ),
+                new Step(
+                    title: 'Laat de DPIA vaststellen',
+                    body: 'Dien de DPIA in met "Start vaststellen". Daarna volgt review '
+                        . 'door een Privacy Officer en het vaststellen.',
+                    topicIds: ['dpia-vaststellen'],
+                ),
+            ],
+            roles: new TaskRoles(
+                performers: [
+                    Role::INPUT_PROCESSOR,
+                    Role::CHIEF_PRIVACY_OFFICER,
+                    Role::PRIVACY_OFFICER,
+                ],
+                readers: [
+                    Role::COUNSELOR,
+                    Role::DATA_PROTECTION_OFFICIAL,
+                    Role::MANDATE_HOLDER,
+                ],
+            ),
+            done: 'De DPIA is vastgesteld en gekoppeld aan de verwerking.',
         );
     }
 }

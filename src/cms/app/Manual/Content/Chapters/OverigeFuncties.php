@@ -190,7 +190,8 @@ final class OverigeFuncties
                 De inrichting van de openbare website - de opbouw van de paginaboom en de
                 teksten eromheen - staat onder "Functioneel beheer" en is werk van een
                 Functioneel beheerder. Als (Chief) Privacy Officer bepaalt u wélke
-                verwerkingen erop komen; niet hoe de website eruitziet.
+                verwerkingen erop komen; niet hoe de website eruitziet. Zie
+                [De openbare website inrichten](#websitebeheer) voor die kant van het werk.
                 MARKDOWN,
             roles: [Role::CHIEF_PRIVACY_OFFICER, Role::PRIVACY_OFFICER],
             gate: FeatureGate::PUBLISHING,
