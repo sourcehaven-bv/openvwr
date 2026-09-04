@@ -156,6 +156,8 @@ final class Beheer
                 openbare website. Elk item is een pagina; door items onder elkaar te hangen
                 ontstaat de structuur die de bezoeker in de navigatie ziet.
 
+                ![Het Website organogram, met de knop om een item toe te voegen](/handleiding/04_beheer/05_public-website-tree.png)
+
                 Per item legt u vast:
 
                 - *Titel*: de naam van de pagina, zoals die in de navigatie komt.

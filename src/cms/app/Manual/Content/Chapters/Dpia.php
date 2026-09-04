@@ -59,6 +59,8 @@ final class Dpia
                 van de pre-scan de knop "DPIA starten". Die maakt een nieuwe DPIA aan waarin
                 de naam, de omschrijving en de gekoppelde verwerkingen al zijn overgenomen.
 
+                ![De knop "DPIA starten" op de bewerkpagina van een pre-scan](/handleiding/03_dpia/01_dpia-prescan-records_edit.png)
+
                 > **Let op**: Een pre-scan doorloopt zelf geen goedkeuringsproces. Er is geen
                 > versie en geen status: de pre-scan is een hulpmiddel om te bepalen wat er
                 > moet gebeuren. Voor de DPIA die eruit voortkomt geldt dat wél; zie
@@ -105,6 +107,8 @@ final class Dpia
                 identificatienummer, dan vraagt het formulier verplicht om een
                 uitzonderingsgrond.
 
+                ![Een persoonsgegeven vastleggen in paragraaf 2, met het type dat de uitzonderingsgrond bepaalt](/handleiding/03_dpia/02_dpia-records_edit_personal-data.png)
+
                 > **Hint**: De bewaartermijn werkt hier hetzelfde als bij een verwerking: u
                 > kiest uit de opzoeklijst *Bewaartermijnen*, en de gekozen waarde wordt bij
                 > het gegeven zelf bewaard. Zie
@@ -139,6 +143,8 @@ final class Dpia
                 een inschatting van de kans dat het zich voordoet en van de impact als dat
                 gebeurt. In *17. Maatregelen* beschrijft u wat u doet om een risico te
                 beperken, en koppelt u die maatregel aan het risico waar hij bij hoort.
+
+                ![Een risico vastleggen in paragraaf 16, met kans en impact](/handleiding/03_dpia/03_dpia-records_edit_risks.png)
 
                 Het portaal rekent kans en impact om naar een risiconiveau. Dat is een
                 hulpmiddel, geen oordeel: de weging blijft aan u en aan de Functionaris

@@ -589,6 +589,115 @@ const FIGURES = [
     },
   },
   {
+    name: 'dpia-prescan',
+    file: '03_dpia/01_dpia-prescan-records_edit.png',
+    auth: true,
+    // The header carries the "DPIA starten" action, and the outcome sits just
+    // below it - both belong in one figure: the button only makes sense once
+    // you see why it appeared.
+    clip: '.fi-main',
+    maxHeight: 900,
+    async shoot(page) {
+      const id = tinker(`
+        echo App\\Models\\Dpia\\DpiaPrescanRecord::query()
+          ->whereHas("organisation", fn($q) => $q->where("slug", "nipg"))
+          ->where("name", "Cameratoezicht toegangsbeveiliging")
+          ->firstOrFail()->id;
+      `);
+      await page.goto(`${BASE}/${tenantOf(page)}/dpia-prescan-records/${id}/edit`, {
+        waitUntil: 'networkidle',
+      });
+      await passOtp(page);
+      // Wait for the action itself: the record name lives in a form input, so
+      // a text selector never matches it.
+      await page
+        .locator('button, a')
+        .filter({ hasText: /DPIA starten/i })
+        .first()
+        .waitFor({ timeout: 30000 });
+      await page.waitForTimeout(600);
+      await page.evaluate(() => {
+        const btn = [...document.querySelectorAll('button, a')].find((b) =>
+          /DPIA starten/i.test(b.textContent || ''),
+        );
+        if (!btn) throw new Error('"DPIA starten" button not found - is the outcome REQUIRED?');
+        window.__annotate.arrow(btn, { side: 'left', length: 130 });
+      });
+    },
+  },
+  {
+    name: 'dpia-personal-data',
+    file: '03_dpia/02_dpia-records_edit_personal-data.png',
+    auth: true,
+    // .fi-fo-wizard, not .fi-fo-wizard-step: Filament keeps every step mounted
+    // at height 0 and only the active one has content, so a step selector
+    // clips to an empty sliver.
+    clip: '.fi-fo-wizard',
+    pad: 12,
+    // High enough that the annotated field is in frame: the arrow is drawn
+    // beside it, and a tighter crop cuts the tip off.
+    maxHeight: 1750,
+    async shoot(page) {
+      await gotoSeededDpia(page, '2. Persoonsgegevens');
+      // The type is what the paragraph is about: it decides whether an
+      // exception ground is required.
+      await page.evaluate(() => {
+        const label = [...document.querySelectorAll('label, .fi-fo-field-wrp-label')].find((l) =>
+          /^\s*Type persoonsgegeven/i.test(l.textContent || ''),
+        );
+        if (!label) throw new Error('"Type persoonsgegeven" field not found');
+        window.__annotate.arrow(label, { side: 'right', length: 110 });
+      });
+    },
+  },
+  {
+    name: 'dpia-risks',
+    file: '03_dpia/03_dpia-records_edit_risks.png',
+    auth: true,
+    clip: '.fi-fo-wizard',
+    pad: 12,
+    // High enough that the annotated field is in frame: the arrow is drawn
+    // beside it, and a tighter crop cuts the tip off.
+    maxHeight: 1750,
+    async shoot(page) {
+      await gotoSeededDpia(page, "16. Risico's voor betrokkenen");
+      // Kans en impact together produce the risk level the text explains.
+      await page.evaluate(() => {
+        const label = [...document.querySelectorAll('label, .fi-fo-field-wrp-label')].find((l) =>
+          /^\s*Kans/i.test(l.textContent || ''),
+        );
+        if (!label) throw new Error('"Kans" field not found');
+        window.__annotate.arrow(label, { side: 'right', length: 110 });
+      });
+    },
+  },
+  {
+    name: 'website-tree',
+    file: '04_beheer/05_public-website-tree.png',
+    auth: true,
+    // isScopedToTenant is false on the resource, but the route still carries a
+    // {tenant} segment - dropping it gives a 404.
+    clip: '.fi-main',
+    // Just the tree: the page is mostly empty below it. In CSS pixels - the
+    // capture runs at deviceScaleFactor 2, so the png is twice this tall.
+    maxHeight: 440,
+    async shoot(page) {
+      await page.goto(`${BASE}/${tenantOf(page)}/public-website-tree`, {
+        waitUntil: 'networkidle',
+      });
+      await passOtp(page);
+      await page.waitForSelector('text=/Website organogram/i', { timeout: 30000 });
+      await page.waitForTimeout(800);
+      await page.evaluate(() => {
+        const btn = [...document.querySelectorAll('button, a')].find((b) =>
+          /Nieuw item maken/i.test(b.textContent || ''),
+        );
+        if (!btn) throw new Error('"Nieuw item maken" button not found');
+        window.__annotate.arrow(btn, { side: 'left', length: 140 });
+      });
+    },
+  },
+  {
     name: 'users-add',
     file: '04_beheer/04_users_toevoegen.png',
     auth: true,
@@ -820,6 +929,47 @@ async function gotoSeededSnapshot(page, tab) {
     await page.getByRole('tab', { name: new RegExp(tab, 'i') }).first().click();
     await page.waitForTimeout(800);
   }
+}
+
+/**
+ * Open the seeded DPIA on one of its wizard steps.
+ *
+ * ScreenshotSeeder::createDpia creates it; the step slug is Filament's
+ * kebab-cased label, so "2. Persoonsgegevens" becomes "persoonsgegevens".
+ */
+async function gotoSeededDpia(page, step) {
+  const id = tinker(`
+    echo App\\Models\\Dpia\\DpiaRecord::query()
+      ->whereHas("organisation", fn($q) => $q->where("slug", "nipg"))
+      ->where("name", "Cameratoezicht toegangsbeveiliging")
+      ->firstOrFail()->id;
+  `);
+  await page.goto(`${BASE}/${tenantOf(page)}/dpia-records/${id}/edit`, {
+    waitUntil: 'networkidle',
+  });
+  await passOtp(page);
+  await page.waitForSelector('.fi-fo-wizard', { timeout: 30000 });
+
+  // The wizard is driven by Livewire, not by the url: a ?step= parameter is
+  // ignored and the page silently stays on step one - a green run producing
+  // the wrong figure. Click the step in the navigation instead, and assert we
+  // arrived, so a renamed paragraph fails loudly.
+  await page
+    .locator('.fi-fo-wizard-header-step')
+    .filter({ hasText: step })
+    .first()
+    .click();
+  await page.waitForTimeout(1200);
+
+  // Assert on the step navigation, not on the panel: the panel's text is the
+  // field content, which does not repeat the paragraph title.
+  const active = page
+    .locator('.fi-fo-wizard-header-step[aria-current="step"], .fi-fo-wizard-header-step')
+    .filter({ hasText: step });
+  if ((await active.count()) === 0) {
+    throw new Error(`wizard step "${step}" not found`);
+  }
+  await page.waitForTimeout(400);
 }
 
 async function gotoRegister(page) {

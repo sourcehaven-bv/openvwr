@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Enums\Authorization\Role;
+use App\Enums\Dpia\MeasureType;
+use App\Enums\Dpia\PersonalDataType;
+use App\Enums\Dpia\RiskLevel;
 use App\Enums\RegisterLayout;
 use App\Enums\Snapshot\SnapshotApprovalStatus;
 use App\Models\Algorithm\AlgorithmRecord;
@@ -12,6 +15,11 @@ use App\Models\Avg\AvgGoal;
 use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecordService;
+use App\Models\Dpia\DpiaMeasure;
+use App\Models\Dpia\DpiaPersonalData;
+use App\Models\Dpia\DpiaPrescanRecord;
+use App\Models\Dpia\DpiaRecord;
+use App\Models\Dpia\DpiaRisk;
 use App\Models\Organisation;
 use App\Models\Receiver;
 use App\Models\Snapshot;
@@ -163,6 +171,7 @@ class ScreenshotSeeder extends Seeder
         $this->renameRecords($organisation);
         $this->renameRelatedEntities($organisation);
         $this->createVersionHistory($organisation);
+        $this->createDpia($organisation);
         $this->applyTags($organisation);
     }
 
@@ -465,5 +474,88 @@ class ScreenshotSeeder extends Seeder
         }
 
         return $ids;
+    }
+
+    /**
+     * A pre-scan that actually requires a DPIA, and the DPIA that follows from
+     * it.
+     *
+     * TestDataSeeder creates neither, so without this the DPIA chapter has no
+     * screen to photograph. The pre-scan ticks the "cameratoezicht" AP
+     * criterion: one AP criterion is enough for PrescanEvaluator to return
+     * REQUIRED, which is what makes the "DPIA starten" button appear - the
+     * whole point of the figure. It also ties the example to the
+     * "Cameratoezicht toegangsbeveiliging" record this seeder already renames,
+     * so the manual reads as one story rather than unrelated fragments.
+     */
+    private function createDpia(Organisation $organisation): void
+    {
+        $name = 'Cameratoezicht toegangsbeveiliging';
+
+        $prescan = DpiaPrescanRecord::factory()->create([
+            'organisation_id' => $organisation->id,
+            'name' => $name,
+            'description' => 'Toets of het cameratoezicht bij de hoofdingang een DPIA '
+                . 'vraagt.',
+            'ap_criteria' => ['cameratoezicht'],
+        ]);
+
+        $dpia = DpiaRecord::factory()->create([
+            'organisation_id' => $organisation->id,
+            'dpia_prescan_record_id' => $prescan->id,
+            'name' => $name,
+            // DpiaRecord has no single description: the Rijksmodel splits it
+            // over the paragraphs, and paragraaf 1 is the one the reader sees
+            // first.
+            'proposal_description' => 'Cameratoezicht op de toegang van het hoofdkantoor, '
+                . 'gericht op het voorkomen van onbevoegde toegang.',
+        ]);
+
+        // Paragraaf 2: one ordinary and one special category, so the figure
+        // shows both the plain case and the one that demands an exception
+        // ground.
+        $data = [
+            ['Camerabeelden hoofdingang', PersonalDataType::ORDINARY, 'Bezoekers en medewerkers', 'Camera', '4 weken'],
+            ['Biometrisch kenmerk gezicht', PersonalDataType::SPECIAL, 'Medewerkers', 'Toegangssysteem', '1 jaar'],
+        ];
+
+        foreach ($data as $i => [$description, $type, $subjects, $source, $retention]) {
+            DpiaPersonalData::factory()->create([
+                'organisation_id' => $organisation->id,
+                'dpia_record_id' => $dpia->id,
+                'description' => $description,
+                'type' => $type,
+                'data_subject_category' => $subjects,
+                'source' => $source,
+                'retention_period' => $retention,
+                'order_column' => $i,
+            ]);
+        }
+
+        // Paragraaf 16 and 17, with the link between them: the figure is about
+        // a measure that lowers a risk, which only reads if they are coupled.
+        $risk = DpiaRisk::factory()->create([
+            'organisation_id' => $organisation->id,
+            'dpia_record_id' => $dpia->id,
+            'title' => 'Beelden langer bewaard dan nodig',
+            'description' => 'Zonder automatische verwijdering blijven camerabeelden staan.',
+            'origin' => 'Handmatig beheer van de opslag.',
+            'likelihood' => RiskLevel::MEDIUM,
+            'impact' => RiskLevel::HIGH,
+            'order_column' => 0,
+        ]);
+
+        $measure = DpiaMeasure::factory()->create([
+            'organisation_id' => $organisation->id,
+            'dpia_record_id' => $dpia->id,
+            'description' => 'Automatische verwijdering na vier weken.',
+            'type' => MeasureType::TECHNICAL,
+            'origin' => 'Bewaarbeleid cameratoezicht.',
+            'residual_level' => RiskLevel::LOW,
+            'owner' => 'Beheerder toegangssystemen',
+            'order_column' => 0,
+        ]);
+
+        $measure->risks()->attach($risk);
     }
 }
