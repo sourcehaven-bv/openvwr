@@ -43,10 +43,14 @@
                 <p class="text-sm">{{ __('user.profile.one_time_password.finish_enabling.description') }}</p>
                 <div class="flex mt-3 space-x-4 divide-x">
                     <div class="px-4 space-y-3 w-1/2">
-                        <div class="flex place-content-center mt-3">
+                        {{-- data-screenshot-mask: the handleiding has a figure of
+                             this card, and its images are served unauthenticated.
+                             tools/screenshots masks these two elements so no
+                             scannable code or key is ever published. --}}
+                        <div class="flex place-content-center mt-3" data-screenshot-mask="qr">
                             {!! $this->getQrCode() !!}
                         </div>
-                        <p class="pt-2 text-sm break-words">
+                        <p class="pt-2 text-sm break-words" data-screenshot-mask="secret">
                             {{ __('user.profile.one_time_password.setup_key') }}
                             {{ $user->otp_secret }}
                         </p>
