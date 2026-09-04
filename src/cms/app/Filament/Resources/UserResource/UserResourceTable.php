@@ -31,6 +31,7 @@ class UserResourceTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('organisations.name')
+                    ->label(__('organisation.model_plural'))
                     ->separator(',')
                     ->visible(Authorization::hasPermission(Permission::USER_ROLE_ORGANISATION_MANAGE)),
                 CreatedAtColumn::make(),
