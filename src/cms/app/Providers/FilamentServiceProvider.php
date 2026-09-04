@@ -17,6 +17,7 @@ use App\Filament\SimpleAvatarProvider;
 use App\Http\Controllers\HealthController;
 use App\Http\Middleware\EnforceOneTimePassword;
 use App\Http\Middleware\IPAllowFilter;
+use App\Http\Middleware\VerifyPratiqueAssertion;
 use App\Models\Organisation;
 use App\Services\Authentication\AuthenticationStrategyFactory;
 use Exception;
@@ -109,37 +110,54 @@ class FilamentServiceProvider extends PanelProvider
     }
 
     /**
-     * The login page for the active auth driver. Under `dev` this is the
-     * credential-free user picker, which is why it is selected here rather than
-     * registered unconditionally — a page that bypasses authentication should not
-     * exist on the panel at all unless that driver is deliberately in use.
+     * The login page for the active auth driver, or null when the app has none.
      *
-     * @return class-string
+     * Under `pratique` the proxy owns login entirely: registering a login page
+     * here would give an unauthenticated visitor somewhere to land inside the app
+     * instead of being bounced to the proxy, and the assertion middleware would
+     * reject it anyway.
+     *
+     * Under `dev` it is the credential-free user picker — selected here rather
+     * than registered unconditionally, because a page that bypasses
+     * authentication should not exist on the panel unless that driver is
+     * deliberately in use.
+     *
+     * @return class-string|null
      */
-    private function loginPage(): string
+    private function loginPage(): ?string
     {
-        return $this->authDriver() === AuthenticationStrategyFactory::DRIVER_DEV
-            ? DevLogin::class
-            : Login::class;
+        return match ($this->authDriver()) {
+            AuthenticationStrategyFactory::DRIVER_PRATIQUE => null,
+            AuthenticationStrategyFactory::DRIVER_DEV => DevLogin::class,
+            default => Login::class,
+        };
     }
 
     /**
-     * Auth middleware for the active driver. The dev driver skips the OTP gate:
-     * it is a credential-free login, so a second factor on top would be theatre,
-     * and enrolling one would block every local login behind an authenticator app.
+     * Auth middleware for the active driver.
+     *
+     * Under `pratique` the proxy has already authenticated the user, so the
+     * session-based gate is replaced wholesale by assertion verification — leaving
+     * Filament's Authenticate in place would look for a session that this driver
+     * never creates. The OTP gate goes too: the second factor is the proxy's
+     * concern there, not this app's.
+     *
+     * The dev driver keeps the session gate but skips OTP: it is a
+     * credential-free login, so a second factor on top would be theatre, and
+     * enrolling one would block every local login behind an authenticator app.
      *
      * @return array<int, class-string>
      */
     private function authMiddleware(): array
     {
-        if ($this->authDriver() === AuthenticationStrategyFactory::DRIVER_DEV) {
-            return [Authenticate::class];
-        }
-
-        return [
-            Authenticate::class,
-            EnforceOneTimePassword::class,
-        ];
+        return match ($this->authDriver()) {
+            AuthenticationStrategyFactory::DRIVER_PRATIQUE => [VerifyPratiqueAssertion::class],
+            AuthenticationStrategyFactory::DRIVER_DEV => [Authenticate::class],
+            default => [
+                Authenticate::class,
+                EnforceOneTimePassword::class,
+            ],
+        };
     }
 
     private function authDriver(): string
