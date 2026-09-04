@@ -27,6 +27,17 @@ it('the command will dispatch the correct jobs', function (): void {
     ]);
 });
 
+it('does not dispatch jobs when publishing is disabled', function (): void {
+    ConfigTestHelper::set('features.publishing', false);
+    Bus::fake();
+
+    $this->artisan('static-website:refresh')
+        ->expectsOutputToContain('publishing feature is disabled')
+        ->assertSuccessful();
+
+    Bus::assertNothingDispatched();
+});
+
 it('can run the command and a published tree node with children, organisation & register', function (): void {
     ConfigTestHelper::set('static-website.static_website_generator', 'fake');
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Listeners\StaticWebsite;
 
+use App\Config\Feature;
 use App\Jobs\StaticWebsite\ContentGeneratorJob;
 use App\Jobs\StaticWebsite\HugoWebsiteGeneratorJob;
 use App\Jobs\StaticWebsite\StaticWebsiteCheckJob;
@@ -19,6 +20,12 @@ readonly class BuildHandler
 
     public function handle(): void
     {
+        if (!Feature::publishingEnabled()) {
+            $this->logger->info('Static website build skipped: publishing feature is disabled');
+
+            return;
+        }
+
         $this->logger->debug('StaticWebsite build handler triggered');
 
         $jobs = [
