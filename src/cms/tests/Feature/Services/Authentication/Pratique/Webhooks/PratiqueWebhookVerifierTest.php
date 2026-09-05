@@ -132,3 +132,17 @@ it('treats a non-object data claim as an empty body', function (): void {
 
     expect($event->string('user_id'))->toBeNull();
 });
+
+/*
+ * A header that decodes to something other than an object cannot name a key.
+ * Reading it must yield "no kid" rather than crash — this endpoint is public, so
+ * a malformed token has to fail as a rejection, never as a 500.
+ */
+it('rejects a token whose header is not an object', function (): void {
+    $encode = static fn (string $raw): string => rtrim(strtr(base64_encode($raw), '+/', '-_'), '=');
+
+    // A valid base64 header that decodes to a JSON string, not an object.
+    $token = $encode('"not-an-object"') . '.' . $encode('{"event":"session.revoked"}') . '.sig';
+
+    webhookVerifier()->verify(webhookRequest($token));
+})->throws(PratiqueWebhookException::class);
