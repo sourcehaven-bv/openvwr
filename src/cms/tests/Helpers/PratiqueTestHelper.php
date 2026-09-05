@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Cache;
 use OpenSSLAsymmetricKey;
 use RuntimeException;
 
+use function array_slice;
 use function base64_encode;
 use function bin2hex;
 use function gmdate;
@@ -44,6 +45,12 @@ final class PratiqueTestHelper
      * on interleaving.
      */
     public const KEY_ID = 'test-key';
+
+    /**
+     * How many recently published keys stay verifiable. Two mirrors the proxy,
+     * which serves current + previous so an in-flight token survives a rotation.
+     */
+    private const PUBLISHED_KEY_WINDOW = 2;
 
     private OpenSSLAsymmetricKey $privateKey;
 
@@ -89,17 +96,23 @@ final class PratiqueTestHelper
      */
     public function publishJwks(): void
     {
-        // MERGE rather than replace. The cache key is shared by every test in the
-        // process, so overwriting it would let one test file's key evict
-        // another's mid-run — and because the verifier only refetches on an
-        // *unknown* kid, the evicted test would fail against a key it never
-        // published. Publishing alongside keeps every helper's key valid, which
-        // is also what the proxy really does: it serves current + previous.
+        // MERGE rather than replace, but keep only the most recent keys.
+        //
+        // The cache key is shared by every test in the process. Replacing it
+        // would let one test file evict another's key mid-run, and because the
+        // verifier only refetches on an *unknown* kid the evicted test would then
+        // fail against a key it never published. Merging avoids that.
+        //
+        // Merging without a bound has the opposite problem: every helper ever
+        // constructed stays valid forever, so a token could verify against a key
+        // from a long-finished test — masking a real failure instead of causing
+        // one. Keeping a small window models what the proxy actually publishes
+        // (current + previous) and keeps both hazards closed.
         $cached = Cache::get('pratique:jwks');
         $keys = is_array($cached) && is_array($cached['keys'] ?? null) ? $cached['keys'] : [];
         $keys[] = $this->jwk;
 
-        Cache::put('pratique:jwks', ['keys' => $keys], 300);
+        Cache::put('pratique:jwks', ['keys' => array_slice($keys, -self::PUBLISHED_KEY_WINDOW)], 300);
     }
 
     /** Publish only a key set that does NOT contain the key this helper signs with. */
