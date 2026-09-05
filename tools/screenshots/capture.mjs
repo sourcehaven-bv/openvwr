@@ -97,6 +97,10 @@ function totp(secret, when = Date.now()) {
  *   pad      - pixels of breathing room around the clipped element.
  *   fullPage - capture the entire scrollable page instead of clipping.
  *   shoot    - drives the app to the required state and adds annotations.
+ *   mask     - [{ selector, text, box }] covered with a labelled placeholder
+ *              before the screenshot, for content that must not be published at
+ *              all. Sized from the element and verified to cover it. `box:
+ *              false` masks a line of text without a frame; see otp-setup.
  *
  * When in doubt, clip wider. A figure with some extra chrome around it still
  * reads fine in the manual; one that has cropped away the table the surrounding
@@ -771,6 +775,17 @@ const FIGURES = [
     // with them instead of silently capturing whichever block sits there.
     clip: '.filament-breezy-grid-section:has(.filament-breezy-grid-title:text-is("Tweefactorauthenticatie"))',
     pad: 16,
+    // The figure necessarily renders a scannable QR code and the matching key
+    // in plain text, and it is written under src/cms/public/, which the app
+    // serves without authentication. The captured secret is faker output from
+    // a dev database, so nothing real leaks today - but the mechanism
+    // publishes whatever the database holds at capture time, so cover it here
+    // rather than relying on that staying true.
+    mask: [
+      { selector: '[data-screenshot-mask="qr"]', text: 'QR-code\nverschijnt hier' },
+      // A line of text, not a placeholder for a missing graphic: no frame.
+      { selector: '[data-screenshot-mask="secret"]', text: 'Sleutel: XXXX XXXX XXXX XXXX', box: false },
+    ],
     async shoot(page) {
       // The seeded user already has a confirmed factor, so the gate would never
       // fire. Roll it back to "enrolled but not confirmed" - the state a real
@@ -1048,6 +1063,30 @@ async function passOtp(page, email = EMAIL) {
   throw new Error(`OTP step did not pass, still at ${page.url()}`);
 }
 
+/**
+ * Cover elements that must not be published, then confirm they really are
+ * covered.
+ *
+ * The verification is the point. Painting an overlay cannot fail loudly on its
+ * own: if a selector goes stale the mask lands somewhere else, the capture
+ * reports success, and the figure ships the secret. So after painting, check
+ * each target's geometry against the masks actually on the page.
+ */
+async function applyMasks(page, masks) {
+  for (const { selector, text, ...options } of masks) {
+    const count = await page.locator(selector).count();
+    if (count === 0) throw new Error(`mask selector not found: ${selector}`);
+    await page.evaluate(
+      ([sel, label, opts]) => window.__annotate.mask(sel, label, opts),
+      [selector, text ?? '', options],
+    );
+    const covered = await page.evaluate((sel) => window.__annotate.masked(sel), selector);
+    if (!covered) {
+      throw new Error(`mask does not cover ${selector} - refusing to publish the figure`);
+    }
+  }
+}
+
 /** Crop to an element's box plus padding, clamped to the page. */
 async function clipOf(page, selector, pad = 0, maxHeight = null) {
   const el = page.locator(selector).first();
@@ -1116,6 +1155,9 @@ for (const fig of todo) {
       authedAs = wantedUser;
     }
     await fig.shoot(page);
+    // After shoot(), so the page has settled where the masked elements live,
+    // and before the screenshot, so the secret is never in the captured image.
+    if (fig.mask) await applyMasks(page, fig.mask);
 
     const outPath = join(OUT, fig.file);
     mkdirSync(dirname(outPath), { recursive: true });
