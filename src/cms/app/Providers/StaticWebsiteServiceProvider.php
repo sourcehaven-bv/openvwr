@@ -56,7 +56,7 @@ class StaticWebsiteServiceProvider extends ServiceProvider
             ->give(self::STATIC_WEBSITE_FILESYSTEM);
         $this->app->when(HugoStaticWebsiteGenerator::class)
             ->needs('$baseUrl')
-            ->giveConfig('static-website.base_url');
+            ->give(static fn (): string => Config::string('static-website.base_url'));
         $this->app->when(HugoStaticWebsiteGenerator::class)
             ->needs('$hugoContentFolder')
             ->giveConfig('static-website.hugo_content_folder');
@@ -66,7 +66,7 @@ class StaticWebsiteServiceProvider extends ServiceProvider
 
         $this->app->when([StaticWebsiteCheckService::class])
             ->needs('$baseUrl')
-            ->giveConfig('static-website.check_base_url');
+            ->give(static fn (): string => Config::string('static-website.check_base_url'));
         $this->app->when([StaticWebsiteCheckService::class])
             ->needs('$proxy')
             ->giveConfig('static-website.check_proxy');
