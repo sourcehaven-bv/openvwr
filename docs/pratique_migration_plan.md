@@ -72,30 +72,63 @@ misleading. Provisioning is via portal, invites, SCIM, or
 These are the reason this is not a pure delete-and-wire job. All were verified in
 the source, not assumed.
 
-### 3.1 The proxy has no public-path allowlist
+### 3.1 Unauthenticated paths — supported (corrected)
 
-`internal/proxy/proxy.go:180` — every path that isn't Pratique-owned goes through
-`Resolver.Resolve`, and on failure the user is 302'd to login. There is no
-"these routes are public" config.
+**This section previously said no public-path allowlist existed. That is no longer
+true**, and the correction matters because the original claim drove a decision
+below. Pratique now ships *two* mechanisms, both verified in the source rather
+than the docs (`docs/05-mvp-plan.md:383` still lists this as unbuilt open item
+#4 — the docs lag the code).
 
-Worth being precise about the status: `docs/04-architecture.md:79` *describes*
-"configurable per-route allow-list for public paths" as though it exists, but
-`docs/05-mvp-plan.md:382` lists it as open item #4, unimplemented. The only path
-allowlist in the config (`suspend.passthrough`) applies solely while an org is
-suspended. So this is a gap to plan around, not a config key to find.
+The hot path (`internal/proxy/proxy.go`, `handle`) is now:
 
-Beyond the signing flow it also affects: **pre-auth static assets** (in practice
-fine, since the session cookie is `Path=/` and logged-in users carry it), and
-**any inbound machine-to-machine POST** — nothing in OpenVWR today, but it
-forecloses adding a webhook later without routing around the proxy.
+1. `IsOwned` — Pratique's own routes, served locally.
+2. **`upstream.public_paths`** — bypasses authentication *entirely*, before any
+   credential is examined. Inbound trusted headers are still stripped, so the
+   request arrives upstream genuinely anonymous. Every caller is anonymous,
+   always.
+3. token credentials (OAuth bearer / PAT), then the session cookie.
+4. **`upstream.anonymous_paths`** — evaluated *after* every credential class has
+   failed. The request is forwarded with an `X-Pratique-Anonymous` marker instead
+   of an assertion, so the app decides what to serve. Dual-mode: an authenticated
+   caller on the same path still gets a full assertion and every session gate.
 
-**Decided:** the mandate-holder signed-link flow is being dropped, not preserved.
-The existing `SnapshotSignLoginController` flow is a security problem in its own
-right — anyone holding the signed URL gets the target user's name disclosed
-(`'user' => $user` in the view), it bypasses `Login::authenticate()`'s rate
-limiting and its "user must have ≥1 organisation" check, and it logs an
+Matching is exact, or a prefix with a trailing `/*`, for both. Wired end to end:
+`config.UpstreamConfig.IsPublicPath` → `app.go:296` → `proxy.go:275`.
+
+Which to reach for:
+
+| Need | Use |
+| --- | --- |
+| An endpoint specified to answer *before* credentials exist (RFC 6764 discovery) | `public_paths` |
+| A path served to both anonymous and signed-in users, or where the app owns the challenge | `anonymous_paths` |
+| An OAuth-protected API path needing an RFC 9728 challenge | `protected_resources` |
+
+**Scope, and the trap:** both exempt a path from *authentication only*. The
+request reaches the app with **no identity**, so the app must do its own
+authorization there. Pratique cannot help — with no org there is nothing for
+suspension or tenant scoping to act on. A path listed here that then serves
+user-specific data is a hole the proxy cannot close.
+
+Consequence for us: pre-auth static assets and any future inbound webhook are
+solvable with config rather than by routing around the proxy.
+
+**Decided: the mandate-holder signed-link flow is still dropped — but now by
+choice, not by force.** The earlier reasoning leaned partly on "the proxy cannot
+serve it anyway", which §3.1 shows is no longer true: `/snapshot/sign/*` could be
+listed in `anonymous_paths` and kept.
+
+It should still go, on its own merits. The existing `SnapshotSignLoginController`
+discloses the target user's name to anyone holding the signed URL
+(`'user' => $user` in the view), bypasses `Login::authenticate()`'s rate limiting
+and its "user must have ≥1 organisation" check, and logs an
 `AuthenticationSuccessEvent` on a mere page view. Deleting it is a net security
 improvement independent of this migration.
+
+And note what preserving it would now require: an `anonymous_paths` entry reaches
+the app with **no identity**, so the app would have to do its own authorization
+for that route — which is exactly the hand-rolled, easy-to-get-wrong code the
+migration is meant to remove. Keeping it is possible; it is not attractive.
 
 So the flow becomes: mandate holder clicks the notification link → Pratique login
 → lands on the approval page. Which requires post-login redirect, and Pratique
@@ -113,8 +146,8 @@ redirect: it rejects backslashes and CRLF before parsing, then rejects absolute
 URLs, any `Host`, any userinfo, and non-`/`-prefixed paths, collapsing anything
 suspicious to `/`.
 
-**The query-string gap is fixed** — pratique PR #3
-(`fix/login-redirect-preserve-query`, awaiting review). `loginRedirect` had used
+**The query-string gap is fixed and merged** — pratique PR #3
+(`fix/login-redirect-preserve-query`), now on `develop`. `loginRedirect` had used
 `r.URL.EscapedPath()`, which dropped the query from every bounced request, so
 `/{tenant}/snapshots/{id}?activeTab=unreviewed` came back as the bare path. It
 now carries path *and* query, escaped as a single parameter value.
@@ -126,10 +159,9 @@ while `rd` was path-only and became reachable once the query was preserved, so
 they were fixed in the same PR: the select-tenant hop, the passkey reproof
 redirect, and invite accept.
 
-**Consequence for us: no workaround needed.** Deep links survive login intact,
-including tab/filter state. The only dependency is that PR #3 lands before we
-cut over — worth confirming at Phase 2, since our snapshot-approval links are
-exactly the deep-link case it fixes.
+**Consequence for us: no workaround needed, and no outstanding dependency.**
+Deep links survive login intact, including tab/filter state. PR #3 has landed, so
+the Phase 2 note about waiting for it is discharged.
 
 ### 3.2 Two tenancy systems must agree
 
@@ -266,7 +298,7 @@ resolves once at boot and an unknown value is a hard startup error.
 1. ~~Resolve §3.1 (mandate-holder links).~~ **Done.** Signed-link flow is being
    dropped (security liability — see §3.1); we rely on Pratique's post-login
    `rd` redirect. The query-string gap that made this lossy is fixed in
-   pratique PR #3 — only needs to land before cutover (§3.1.1).
+   pratique PR #3, which has since merged (§3.1.1).
 2. ~~Decide the fate of mandatory TOTP.~~ **Decided: TOTP survives as part of the
    builtin strategy** (§4). Superseded an earlier decision to delete it outright.
 
@@ -455,6 +487,67 @@ be exercised.
      the replacement and that's a user-communication task, not just a code task.
 4. Verify against a copy of production data before touching anything real.
 
+### Phase 2a — webhook receiver (optional, strictly additive)
+
+**The governing rule: a missed webhook must never become a security issue.**
+
+Everything a webhook would tell us is already reconciled on the next request by
+`PratiqueIdentityResolver` — the user row, the membership, and the roles held in
+the active organisation, added *and withdrawn*. That reconciliation runs before
+any policy is consulted, so authorization is correct on every request whether or
+not a webhook ever arrived.
+
+Webhooks therefore only ever make something happen **sooner**. Nothing may
+depend on one arriving. Concretely, that means:
+
+- **A webhook may never be the only path to a security-relevant state change.**
+  If the receiver is down for a day, the system is still correct — just less
+  prompt.
+- **The receiver is idempotent and order-independent.** Delivery is at-least-once
+  and retried (`webhooks.max_attempts`), so a duplicate or out-of-order event has
+  to be a no-op, not a correction.
+- **A webhook may narrow access, never widen it.** Dropping a role early is safe
+  if the event is spurious — the next request restores it from the assertion.
+  *Granting* one early on a forged or replayed event would be an escalation with
+  no counterweight, so the receiver simply does not grant.
+- **Never trust the payload's contents.** Events carry IDs only (see below); the
+  receiver re-reads authoritative state rather than believing the body.
+
+Two things genuinely worth having, because request-time reconciliation
+structurally cannot do them — both are *liveness*, not *authorization*:
+
+| Event | Why it can't wait for the next request |
+| --- | --- |
+| `session.revoked` | A forced logout cannot tear down an already-open WebSocket/SSE connection: no request arrives to re-check. Payload is user-scoped (`user_id` + `reason`, no `org_id`) — key the teardown on `user_id`. Relevant if Laravel Reverb/Echo is ever used; today OpenVWR has no long-lived connections, so this is a *future* need, not a current one. |
+| `membership.deleted` / `membership.updated` | A withdrawn role persists in OpenVWR's tables until that user's next request. Authorization is unaffected, but the stale row is visible to anything reading the database directly — a scheduled export, a report, an admin listing. |
+
+What the events do **not** give us, verified in the Pratique source rather than
+its docs:
+
+- **There are no `user.*` events at all.** The catalogue is `organization.*`,
+  `membership.*`, `invitation.*`, `service_account.*` and `session.revoked`
+  (`internal/core/core.go:399-421`). A receiver cannot learn that a person was
+  created or that their email changed.
+- **Payloads carry identifiers only** — `membership.created` is
+  `{membership_id, user_id}`, with no email, name or slug. Anything useful means
+  calling back into `/api/v1/members`. That alone disqualifies webhooks as a
+  provisioning path.
+- **SCIM provisioning emits nothing.** `internal/app/scim.go` contains zero emit
+  calls, so on an enterprise deployment where the IdP pushes the roster, no
+  lifecycle webhook fires at all. A design that leaned on webhooks would silently
+  do nothing on exactly the deployments with the most users.
+
+Given all three, **provisioning stays where it is** — in the request path — and
+this phase is optional. Skipping it costs nothing today, since OpenVWR holds no
+long-lived connections. Revisit when Reverb lands, or if stale role rows in
+reports become a real complaint.
+
+If it is built: verify the signature (Pratique signs with the same ES256 key,
+so `JwksProvider` is reusable), and note the endpoint needs an
+`upstream.public_paths` entry (§3.1) since an inbound webhook carries no session.
+Being a public path, it must authenticate the *signature* itself — that is the
+one place where "the app does its own authorization" is unavoidable.
+
 ### Phase 3 — confine the builtin strategy (was: rip out the old auth)
 
 Under the two-strategy design nothing is deleted. Instead the builtin auth code
@@ -612,9 +705,10 @@ is only covered indirectly.
   is an emailed 8-digit code, with no "old credential still works" grace period.
   Verify Pratique's SMTP path end-to-end *before* cutover, not during.
 - **`/health` and `/up`**: `FilamentServiceProvider` registers these via
-  `->routes()`, so they sit behind the proxy and will 302 to login for any
-  unauthenticated monitoring check. Pratique's own `/healthz` + `/readyz` cover
-  the proxy, but whatever monitors Laravel today needs re-pointing.
+  `->routes()`, so they sit behind the proxy. List them in
+  `upstream.public_paths` (§3.1) and existing monitoring keeps working unchanged
+  — they serve no user-specific data, which is exactly the condition that makes a
+  public path safe. Pratique's own `/healthz` + `/readyz` cover the proxy itself.
 - **SQL generator**: `app/Console/Commands/SqlGenerate.php` /
   `app/Services/SqlExport/` emit the versioned schema files. Dropping OTP columns
   and `user_login_tokens` must go through that pipeline, per `DEPLOY_PROCEDURE.md`.
@@ -628,8 +722,9 @@ is only covered indirectly.
 | --- | --- |
 | 0 — decisions | ✅ **complete** — all five resolved |
 | 1a — extract strategy interface + `dev` picker | small-medium; wide but behaviour-preserving, independently mergeable, and immediately useful for local dev |
-| 1b — Pratique strategy + verifier | **largest single chunk**; it's the security boundary |
+| 1b — Pratique strategy + verifier | ✅ **done** (#159) — the security boundary, and the largest single chunk |
 | 2 — proxy config, mTLS, migration script | medium |
+| 2a — webhook receiver | **optional, deferrable**; buys promptness only, never correctness |
 | 3 — confine builtin behind the boundary | small (mostly moves + driver checks) |
 | 4 — tests + cutover | medium; **down from medium-large** — no test-helper rewrite |
 
@@ -641,8 +736,7 @@ ongoing cost, paid mostly in CI matrix time and the discipline to keep the
 builtin path tested once attention moves on.
 
 **Phase 1 is unblocked.** Nothing in it waits on an outstanding decision. The only
-external dependency is pratique PR #3 landing before cutover (§3.1.1), which
-affects Phase 2, not Phase 1.
+external dependency, pratique PR #3, has since merged (§3.1.1).
 
 Documentation work now in scope, easy to forget because it isn't code:
 `docs/handleiding/01_welkom.md` (the 2FA/authenticator section and the login
