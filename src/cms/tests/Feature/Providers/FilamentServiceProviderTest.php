@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Filament\Pages\DevLogin;
 use App\Filament\Pages\Login;
 use App\Http\Middleware\EnforceOneTimePassword;
+use App\Http\Middleware\VerifyPratiqueAssertion;
 use App\Providers\FilamentServiceProvider;
 use Filament\Facades\Filament;
 use Filament\Http\Middleware\Authenticate;
@@ -52,6 +53,29 @@ it('enforces the one-time password gate under the builtin driver', function (): 
  * would be theatre — and enrolling one would put every local login behind an
  * authenticator app.
  */
+/*
+ * Under pratique the proxy has already authenticated the user, so the session
+ * gate is replaced wholesale: leaving Filament's Authenticate in place would send
+ * it looking for a session this driver never creates.
+ */
+it('verifies the assertion instead of a session under the pratique driver', function (): void {
+    $panel = buildPanel('pratique');
+
+    expect($panel->getAuthMiddleware())
+        ->toContain(VerifyPratiqueAssertion::class)
+        ->not->toContain(Authenticate::class)
+        ->not->toContain(EnforceOneTimePassword::class);
+});
+
+/*
+ * The proxy owns login entirely. Registering a login page here would give an
+ * unauthenticated visitor somewhere to land inside the app instead of being
+ * bounced back to the proxy.
+ */
+it('registers no login page under the pratique driver', function (): void {
+    expect(buildPanel('pratique')->getLoginRouteAction())->toBeNull();
+});
+
 it('skips the one-time password gate under the dev driver', function (): void {
     $panel = buildPanel('dev');
 
