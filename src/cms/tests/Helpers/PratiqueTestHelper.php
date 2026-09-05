@@ -10,9 +10,12 @@ use OpenSSLAsymmetricKey;
 use RuntimeException;
 
 use function base64_encode;
+use function bin2hex;
 use function gmdate;
+use function is_array;
 use function openssl_pkey_get_details;
 use function openssl_pkey_new;
+use function random_bytes;
 use function rtrim;
 use function strtr;
 use function time;
@@ -31,15 +34,26 @@ final class PratiqueTestHelper
     public const ISSUER = 'https://auth.test';
     public const AUDIENCE = 'app://openvwr-test';
     public const JWKS_URL = 'https://auth.test/.well-known/pratique/jwks.json';
-    public const KEY_ID = 'test-key-1';
+
+    /**
+     * Default key id prefix. Each helper appends a unique suffix, because two
+     * helpers generate DIFFERENT keypairs: sharing one id would let a token
+     * signed by helper A be checked against helper B's cached key — and since the
+     * ids matched, the verifier would see no reason to refetch. Tests running in
+     * parallel then fail with "OpenSSL unable to validate key" depending purely
+     * on interleaving.
+     */
+    public const KEY_ID = 'test-key';
 
     private OpenSSLAsymmetricKey $privateKey;
 
     /** @var array<string, mixed> */
     private array $jwk;
 
-    public function __construct(string $keyId = self::KEY_ID)
+    public function __construct(?string $keyId = null)
     {
+        $keyId ??= self::KEY_ID . '-' . bin2hex(random_bytes(8));
+
         $key = openssl_pkey_new([
             'digest_alg' => 'sha256',
             'private_key_type' => OPENSSL_KEYTYPE_EC,
@@ -75,13 +89,23 @@ final class PratiqueTestHelper
      */
     public function publishJwks(): void
     {
-        Cache::put('pratique:jwks', $this->jwks(), 300);
+        // MERGE rather than replace. The cache key is shared by every test in the
+        // process, so overwriting it would let one test file's key evict
+        // another's mid-run — and because the verifier only refetches on an
+        // *unknown* kid, the evicted test would fail against a key it never
+        // published. Publishing alongside keeps every helper's key valid, which
+        // is also what the proxy really does: it serves current + previous.
+        $cached = Cache::get('pratique:jwks');
+        $keys = is_array($cached) && is_array($cached['keys'] ?? null) ? $cached['keys'] : [];
+        $keys[] = $this->jwk;
+
+        Cache::put('pratique:jwks', ['keys' => $keys], 300);
     }
 
-    /** Publish a key set that does not contain the key this helper signs with. */
+    /** Publish only a key set that does NOT contain the key this helper signs with. */
     public function publishForeignJwks(): void
     {
-        Cache::put('pratique:jwks', (new self('someone-elses-key'))->jwks(), 300);
+        Cache::put('pratique:jwks', (new self())->jwks(), 300);
     }
 
     /**
