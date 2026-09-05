@@ -487,7 +487,7 @@ be exercised.
      the replacement and that's a user-communication task, not just a code task.
 4. Verify against a copy of production data before touching anything real.
 
-### Phase 2a — webhook receiver (optional, strictly additive)
+### Phase 2a — webhook receiver (optional, strictly additive) ✅ built
 
 **The governing rule: a missed webhook must never become a security issue.**
 
@@ -542,11 +542,33 @@ this phase is optional. Skipping it costs nothing today, since OpenVWR holds no
 long-lived connections. Revisit when Reverb lands, or if stale role rows in
 reports become a real complaint.
 
-If it is built: verify the signature (Pratique signs with the same ES256 key,
-so `JwksProvider` is reusable), and note the endpoint needs an
-`upstream.public_paths` entry (§3.1) since an inbound webhook carries no session.
-Being a public path, it must authenticate the *signature* itself — that is the
-one place where "the app does its own authorization" is unavoidable.
+**Built** as `PratiqueWebhook{Event,Exception,Verifier,Handler}` plus
+`PratiqueWebhookController`, at `POST /pratique/webhook`, registered only under
+the pratique driver. Three things learned in the building that were not obvious
+from the plan:
+
+- **The webhook token carries no `aud`.** Pratique's `signer.MintClaims` stamps
+  only `iss`/`iat`/`exp`. The assertion verifier requires a strict audience — the
+  confused-deputy guard on every authenticated request — so relaxing it to fit
+  webhooks would weaken the far more important path. Hence a *separate* verifier
+  that shares `JwksProvider` but not the audience check.
+- **Status codes are a contract with the delivery loop**, not decoration: 204
+  accepted (including an event we deliberately ignore), 403 not-our-signature,
+  500 genuine event we failed to apply. A 4xx on a transient local failure
+  silently drops the event after ~20 attempts; a 5xx on a forged one invites an
+  attacker to make us retry.
+- **The endpoint must be CSRF-exempt.** It is server-to-server with no session to
+  protect, and the signature over the whole body is a far stronger check than a
+  CSRF token could be.
+
+It still needs an `upstream.public_paths` entry on the proxy side (§3.1), since
+an inbound webhook carries no session — making this the one place where "the app
+does its own authorization" is unavoidable.
+
+Against pratique PR #33 (`user.*` events + SCIM emission), which is open at time
+of writing: this receiver ignores `user.*` deliberately. A user's email and name
+are refreshed from the assertion on their next request, and acting on a `user.*`
+event would mean *writing* — the one thing the narrow-only rule forbids.
 
 ### Phase 3 — confine the builtin strategy (was: rip out the old auth)
 

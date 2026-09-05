@@ -2,13 +2,16 @@
 
 declare(strict_types=1);
 
+use App\Config\Config;
 use App\Enums\RouteName;
 use App\Filament\Pages\OneTimePasswordValidation;
 use App\Http\Controllers\Authentication\PasswordlessLoginController;
 use App\Http\Controllers\Authentication\SnapshotSignLoginController;
+use App\Http\Controllers\PratiqueWebhookController;
 use App\Http\Controllers\PrivateMediaController;
 use App\Http\Controllers\RedirectToTenantController;
 use App\Http\Controllers\TransferExportDownloadController;
+use App\Services\Authentication\AuthenticationStrategyFactory;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', RedirectToTenantController::class)->name(RouteName::HOME);
@@ -38,3 +41,15 @@ Route::prefix('/snapshot/sign')->middleware('signed')->group(static function ():
 
 Route::get('/{tenant}/two-factor-authentication', OneTimePasswordValidation::class)
     ->name(RouteName::TWO_FACTOR_AUTHENTICATION_REQUEST);
+
+// Lifecycle events from the Pratique proxy. Registered only under that driver,
+// and deliberately outside every auth middleware: the proxy holds no session
+// when it calls us, so the JWT signature in the body is the authentication.
+// See PratiqueWebhookController.
+if (
+    Config::string('auth.driver', AuthenticationStrategyFactory::DRIVER_BUILTIN)
+    === AuthenticationStrategyFactory::DRIVER_PRATIQUE
+) {
+    Route::post('/pratique/webhook', PratiqueWebhookController::class)
+        ->name(RouteName::PRATIQUE_WEBHOOK);
+}
