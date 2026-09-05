@@ -10,6 +10,7 @@ use OpenSSLAsymmetricKey;
 use RuntimeException;
 
 use function base64_encode;
+use function gmdate;
 use function openssl_pkey_get_details;
 use function openssl_pkey_new;
 use function rtrim;
@@ -111,6 +112,42 @@ final class PratiqueTestHelper
         ];
 
         return JWT::encode($claims, $this->privateKey, 'ES256', $this->jwk['kid']);
+    }
+
+    /**
+     * A signed webhook delivery, shaped as the proxy mints them: the whole body
+     * is a JWT carrying id/event/occurred_at/data, stamped with iss/iat/exp and
+     * — unlike an assertion — no `aud`.
+     *
+     * @param array<string, mixed> $data
+     * @param array<string, mixed> $overrides
+     */
+    public function webhook(string $event, array $data = [], array $overrides = []): string
+    {
+        $now = time();
+
+        $claims = [
+            'id' => 'evt_' . $now,
+            'event' => $event,
+            'occurred_at' => gmdate('c', $now),
+            'data' => $data,
+            'iss' => self::ISSUER,
+            'iat' => $now,
+            'exp' => $now + 300,
+            ...$overrides,
+        ];
+
+        return JWT::encode($claims, $this->privateKey, 'ES256', $this->jwk['kid']);
+    }
+
+    /**
+     * A webhook signed by a key the proxy does not publish.
+     *
+     * @param array<string, mixed> $data
+     */
+    public static function webhookFromForeignKey(string $event, array $data = []): string
+    {
+        return (new self('attacker-key'))->webhook($event, $data);
     }
 
     /**
