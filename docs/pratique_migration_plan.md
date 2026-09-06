@@ -1,7 +1,9 @@
 # Plan: replace OpenVWR's auth with a Pratique proxy
 
-Status: in progress. Phase 0 (decisions), 1a (strategy seam + dev driver, #92)
-and 1b (the Pratique strategy) are done; Phase 2 onwards is still proposal.
+Status: in progress. Phase 0 (decisions), 1a (strategy seam + dev driver, #92),
+1b (the Pratique strategy, #159) and 2a (webhook receiver, #161) zijn klaar.
+Phase 2 is deels gedaan: de app-kant van het inrichten staat er, mTLS uitrollen
+en een proefrun tegen productiedata niet. Phase 3 en 4 zijn nog voorstel.
 
 ## 1. What we have today
 
@@ -464,7 +466,30 @@ Decisions taken while building, worth carrying into Phase 2:
 Ship this behind a feature flag with the old auth still present, so both paths can
 be exercised.
 
-### Phase 2 — proxy + provisioning
+### Phase 2 — proxy + provisioning ◐ deels gedaan
+
+De app-kant is er: `artisan pratique:export-provisioning` leest de organisaties
+en lidmaatschappen uit en schrijft een plan (`--format=json`) of een idempotent
+inrichtingsscript (`--format=sh`). Het verandert zelf niets, dus het is veilig op
+productie te draaien; de muterende helft is een los script dat een mens draait
+tegen een plan dat hij gelezen heeft. `docs/pratique_deployment.md` bevat de
+proxyconfiguratie, de isolatie-eis en het draaiboek.
+
+Wat het bouwen opleverde en niet in het plan stond:
+
+- **`add-member` is niet idempotent.** `CreateMembership` is een kale INSERT op
+  een UNIQUE(user_id, org_id), dus een tweede run faalt. Het script kijkt daarom
+  eerst met `list-members`, net zoals het met `get-org` (exit 4 = afwezig) kijkt
+  voordat het een organisatie aanmaakt.
+- **`-roles` staat standaard op `member`.** Een lid zonder rollen moet dus
+  expliciet een lege set meekrijgen; het weglaten van de vlag zou een rol geven
+  die deze applicatie nooit heeft toegekend.
+- **`-org` wil een org-id, geen slug.** Vandaar dat het script de id opvangt die
+  `get-org`/`create-org` op stdout zetten.
+
+Rest: mTLS daadwerkelijk uitrollen en tegen een kopie van productiedata draaien.
+
+Oorspronkelijk plan:
 
 1. `pratique.yaml`: `upstream.target` → the Laravel container, `upstream.audience`
    → e.g. `app://openvwr`, `rbac.roles` → the 8 OpenVWR roles, `signup.self_serve_orgs: false`
