@@ -1196,3 +1196,27 @@ it('refuses a register that is behind a feature flag that is off', function (): 
 
     expect(fn () => $page->review())->toThrow(HttpException::class);
 });
+
+it('starts fields the source lacks out as the form does instead of refusing the row', function (): void {
+    $this->asFilamentUser();
+
+    // This source has no "gemeld aan FG" and no "type" column; the form would
+    // start them out as no and as the first option.
+    $page = pageAtReview(
+        [['Naam' => 'Zonder FG-kolom']],
+        ['Naam' => ['target' => 'name']],
+    );
+    $page->apply(
+        $this->app->get(DryRunner::class),
+        $this->app->get(MappedRecordWriter::class),
+        $this->app->get(MappingProfileRepository::class),
+    );
+
+    $record = DataBreachRecord::query()->where('name', 'Zonder FG-kolom')->first();
+
+    expect($page->result['imported'])->toBe(1)
+        ->and($record?->fg_reported)->toBeFalse()
+        ->and($record?->ap_reported)->toBeFalse()
+        ->and($record?->type)->toBe(__('data_breach_record.type_options')[0])
+        ->and($record?->nature_of_incident)->toBeNull();
+});

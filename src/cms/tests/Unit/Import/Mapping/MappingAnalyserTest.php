@@ -235,3 +235,27 @@ it('does not let yes/no values make a loose heading confident', function (): voi
 
     expect(targetFor($profile->fields, 'Verwerkers overeenkomst?')?->confidence)->toBe(MappingConfidence::Label);
 });
+
+it('does not put a column of reference numbers in a yes/no field, however it is headed', function (): void {
+    /** @var MappingAnalyser $analyser */
+    $analyser = $this->app->get(MappingAnalyser::class);
+    $rows = [['Gemeld aan AP' => 'AP-nummer 2026-0031'], ['Gemeld aan AP' => 'AP-nummer 2026-0044']];
+    $profile = $analyser->analyse(ImportTarget::DataBreachRecord, ['Gemeld aan AP'], $rows);
+
+    expect(targetFor($profile->fields, 'Gemeld aan AP'))->toBeNull();
+});
+
+it('recognises a field by its fixed choices and refuses values outside them', function (): void {
+    /** @var MappingAnalyser $analyser */
+    $analyser = $this->app->get(MappingAnalyser::class);
+
+    $byValues = $analyser->analyse(ImportTarget::DataBreachRecord, ['Soort'], [['Soort' => 'Voorlopig'], ['Soort' => 'Definitief']]);
+    $outside = $analyser->analyse(
+        ImportTarget::DataBreachRecord,
+        ['Categorie'],
+        [['Categorie' => 'Gegevens gedeeld met verkeerde ontvanger.']],
+    );
+
+    expect(targetFor($byValues->fields, 'Soort')?->target)->toBe('type')
+        ->and(targetFor($outside->fields, 'Categorie')?->target)->not->toBe('type');
+});

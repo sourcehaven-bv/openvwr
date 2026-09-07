@@ -35,6 +35,7 @@ class MappedRecordWriter
         private readonly EntityResolver $entityResolver,
         private readonly LookupListFactory $lookupFactory,
         private readonly DatabaseManager $databaseManager,
+        private readonly FormDefaults $formDefaults,
     ) {
     }
 
@@ -98,7 +99,8 @@ class MappedRecordWriter
         }
 
         $model = new $modelClass();
-        $model->fill($fit['attributes']);
+        // Fields the source lacks start out as they do on the form.
+        $model->fill($fit['attributes'] + $this->formDefaults->defaults($modelClass));
         $model->setAttribute('organisation_id', $organisationId);
 
         $this->attachLookups($model, $target, $profile, $fit['row'], $organisationId);

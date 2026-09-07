@@ -6,13 +6,9 @@ namespace App\Import\Mapping;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Schema;
-use Webmozart\Assert\Assert;
 
 use function __;
 use function implode;
-use function in_array;
-use function is_string;
 
 /**
  * Runs a profile over the source rows without touching the database, so the
@@ -20,13 +16,9 @@ use function is_string;
  */
 class DryRunner
 {
-    /**
-     * Never treated as missing: filled in by the application, not the source.
-     */
-    private const GENERATED = ['id', 'number', 'organisation_id', 'import_id', 'created_at', 'updated_at', 'deleted_at'];
-
     public function __construct(
         private readonly MappingEngine $mappingEngine,
+        private readonly FormDefaults $formDefaults,
     ) {
     }
 
@@ -36,7 +28,7 @@ class DryRunner
      */
     public function run(MappingProfile $profile, array $rows): DryRunResult
     {
-        $required = $this->requiredAttributes($profile->target);
+        $required = $this->formDefaults->required($profile->target);
 
         $fits = [];
         $issues = [];
@@ -89,39 +81,5 @@ class DryRunner
         }
 
         return null;
-    }
-
-    /**
-     * Columns the database insists on, minus the ones the application fills in.
-     *
-     * @param class-string<Model> $target
-     *
-     * @return array<int, string>
-     */
-    private function requiredAttributes(string $target): array
-    {
-        $model = new $target();
-        $table = $model->getTable();
-
-        $required = [];
-        foreach (Schema::getColumns($table) as $column) {
-            Assert::isArray($column);
-            $name = $column['name'] ?? null;
-            if (!is_string($name) || in_array($name, self::GENERATED, true)) {
-                continue;
-            }
-
-            if (($column['nullable'] ?? true) === true) {
-                continue;
-            }
-
-            if (($column['default'] ?? null) !== null) {
-                continue;
-            }
-
-            $required[] = $name;
-        }
-
-        return $required;
     }
 }

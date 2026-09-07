@@ -56,7 +56,7 @@ class FieldSynonyms
         ['persoonsgegevens', 'persoonsgegeven', 'gegevens', 'data', 'informatie'],
 
         // --- Gevolg / opvolging ---
-        ['maatregel', 'maatregelen', 'actie', 'acties', 'vervolgactie', 'oplossing', 'herstel', 'genomen'],
+        ['maatregel', 'maatregelen', 'actie', 'acties', 'vervolgactie', 'vervolgacties', 'oplossing', 'herstel', 'genomen'],
         ['risico', 'impact', 'ernst', 'gevolg', 'gevolgen', 'inschatting'],
         ['oorzaak', 'reden', 'aanleiding'],
 

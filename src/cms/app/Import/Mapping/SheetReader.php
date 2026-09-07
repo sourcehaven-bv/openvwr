@@ -197,6 +197,11 @@ class SheetReader
         $header = preg_replace('/,?\s*meerdere (keuzes|antwoorden|opties) mogelijk\.?$/iu', '', $header) ?? $header;
         $header = preg_replace('/\s*\([^()]{12,}\)$/u', '', $header) ?? $header;
 
+        // "Gemeld aan betrokkenen        Ja=1" -- a legend for the values,
+        // padded with spaces to sit under the name.
+        $header = preg_replace('/\s+(ja|nee|yes|no)\s*=\s*\d.*$/iu', '', $header) ?? $header;
+        $header = preg_replace('/\s+/u', ' ', $header) ?? $header;
+
         return trim($header);
     }
 

@@ -93,3 +93,12 @@ it('keeps only the name of a heading that carries instructions', function (): vo
     expect($sheet->headers)->toBe(['Omschrijving', 'Verwerkers', 'Ontvangers buiten de EER?', 'Grondslag', 'Maatregelen'])
         ->and($sheet->rows[0]['Verwerkers'])->toBe('Firma A');
 });
+
+it('drops a value legend and padding from a heading', function (): void {
+    $sheet = (new SheetReader())->read(
+        'export.csv',
+        "\"Gemeld aan betrokkenen        Ja=1       \",\"Aard inbreuk / datalek           \"\n1,Verlies\n",
+    );
+
+    expect($sheet->headers)->toBe(['Gemeld aan betrokkenen', 'Aard inbreuk / datalek']);
+});

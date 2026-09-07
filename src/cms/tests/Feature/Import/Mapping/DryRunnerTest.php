@@ -76,7 +76,7 @@ it('separates good rows from problem rows', function (): void {
 
     $result = $dryRunner->run(breachProfile(), [
         completeRow(),
-        completeRow(['Type' => null]),
+        completeRow(['Naam' => null]),
         completeRow(),
     ]);
 

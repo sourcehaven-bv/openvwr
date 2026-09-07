@@ -42,6 +42,7 @@ class MappingAnalyser
         private readonly TransformResolver $transformResolver,
         private readonly CandidateScorer $candidateScorer,
         private readonly DateFormatDetector $dateFormatDetector,
+        private readonly FieldOptions $fieldOptions,
     ) {
     }
 
@@ -68,7 +69,7 @@ class MappingAnalyser
      * Everything a column may be mapped onto, with the conversion each implies.
      * Links and lookups are matched on their label alone and read as text.
      *
-     * @return array<string, array{label: string, transform: MappingTransform, relation: bool}>
+     * @return array<string, array{label: string, transform: MappingTransform, relation: bool, options: array<int, string>}>
      */
     private function candidates(ImportTarget $target, Model $model): array
     {
@@ -93,6 +94,7 @@ class MappingAnalyser
                 'label' => $label,
                 'transform' => $isAttribute ? $this->transformResolver->forAttribute($model, $key) : MappingTransform::Text,
                 'relation' => !$isAttribute,
+                'options' => $isAttribute ? $this->fieldOptions->for($model, $key) : [],
             ];
         }
 
@@ -104,7 +106,7 @@ class MappingAnalyser
      * globally rather than first-come-first-served.
      *
      * @param array<int, string> $headers
-     * @param array<string, array{label: string, transform: MappingTransform, relation: bool}> $candidates
+     * @param array<string, array{label: string, transform: MappingTransform, relation: bool, options: array<int, string>}> $candidates
      * @param array<int, array<string, mixed>> $rows
      *
      * @return array<int, array{header: string, attribute: string, score: float}>
@@ -117,7 +119,14 @@ class MappingAnalyser
             $samples = $this->samples($rows, $header);
 
             foreach ($candidates as $key => $candidate) {
-                $score = $this->candidateScorer->score($header, $candidate['label'], $key, $candidate['transform'], $samples);
+                $score = $this->candidateScorer->score(
+                    $header,
+                    $candidate['label'],
+                    $key,
+                    $candidate['transform'],
+                    $samples,
+                    $candidate['options'],
+                );
 
                 // Near-misses are kept so ambiguity can be detected; they are
                 // filtered out again once the field is known to be a clear win.
@@ -184,7 +193,7 @@ class MappingAnalyser
      * Best matches first; each header and each target is used once.
      *
      * @param array<int, string> $headers
-     * @param array<string, array{label: string, transform: MappingTransform, relation: bool}> $candidates
+     * @param array<string, array{label: string, transform: MappingTransform, relation: bool, options: array<int, string>}> $candidates
      * @param array<int, array{header: string, attribute: string, score: float}> $scores
      * @param array<int, array<string, mixed>> $rows
      *

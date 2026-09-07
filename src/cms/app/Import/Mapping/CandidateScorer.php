@@ -7,7 +7,10 @@ namespace App\Import\Mapping;
 use App\Enums\Import\MappingTransform;
 use Illuminate\Support\Str;
 
+use function array_diff;
+use function array_filter;
 use function array_intersect;
+use function array_map;
 use function array_unique;
 use function array_values;
 use function count;
@@ -67,17 +70,38 @@ class CandidateScorer
 
     /**
      * @param array<int, string> $samples
+     * @param array<int, string> $options the values the field accepts, when it
+     *        is a fixed choice; the samples are then judged against those
      */
-    public function score(string $header, string $fieldLabel, string $attribute, MappingTransform $transform, array $samples): float
-    {
+    public function score(
+        string $header,
+        string $fieldLabel,
+        string $attribute,
+        MappingTransform $transform,
+        array $samples,
+        array $options = [],
+    ): float {
+        $content = $options === []
+            ? $this->contentScore($transform, $samples)
+            : $this->optionScore($options, $samples);
+
+        // A column of AP reference numbers is not a yes/no field, whatever its
+        // heading says, and free text is not a choice from a fixed list: values
+        // that fit nowhere count against the name, so the column is left for
+        // the user to place.
+        $contradicted = $samples !== [] && $content === 0.0 && ($options !== [] || $transform !== MappingTransform::Text);
+
         // A heading that *is* the field name or its label leaves nothing to
-        // interpret, whatever the values happen to look like.
-        if ($this->isExactName($header, $fieldLabel, $attribute)) {
+        // interpret, unless the values say otherwise.
+        if (!$contradicted && $this->isExactName($header, $fieldLabel, $attribute)) {
             return 1.0;
         }
 
         $name = $this->nameScore($header, $fieldLabel, $attribute);
-        $content = $this->contentScore($transform, $samples);
+
+        if ($contradicted) {
+            $name *= 0.5;
+        }
 
         // An exact name match is decisive; otherwise the values get a real say,
         // so a mistyped column cannot win on its heading alone.
@@ -242,6 +266,33 @@ class CandidateScorer
         $matches = 0;
         foreach ($samples as $sample) {
             if ($this->looksLike($transform, trim($sample))) {
+                $matches++;
+            }
+        }
+
+        return $matches / count($samples);
+    }
+
+    /**
+     * The share of samples that are one of the field's fixed choices. A cell
+     * may hold several, one per line.
+     *
+     * @param array<int, string> $options
+     * @param array<int, string> $samples
+     */
+    private function optionScore(array $options, array $samples): float
+    {
+        if ($samples === []) {
+            return 0.0;
+        }
+
+        $allowed = array_map(static fn (string $option): string => Str::lower(trim($option)), $options);
+        $matches = 0;
+
+        foreach ($samples as $sample) {
+            $parts = array_filter(array_map('trim', explode("\n", $sample)), static fn (string $part): bool => $part !== '');
+
+            if ($parts !== [] && array_diff(array_map(Str::lower(...), $parts), $allowed) === []) {
                 $matches++;
             }
         }

@@ -425,6 +425,15 @@ Uit een proefimport van een echt verwerkingsregister-sjabloon (september 2026):
 | Ja/nee-waarden lieten een losse naamgelijkenis ("Verwerkers overeenkomst?" → "Heeft verwerkers") als zeker doorgaan; "Omschrijving" werd op string-gelijkenis aan "Toelichting doorgifte" gekoppeld | Inhoud bevestigt een naam maar maakt hem niet zeker; een kop die maar een fragment van een label is blijft een voorstel |
 | "J"/"N" werden niet als ja/nee gelezen | Toegevoegd aan de engine |
 
+Uit een proefimport van een datalek-sjabloon (september 2026):
+
+| Bevinding | Oplossing |
+|---|---|
+| Koppen met een waardelegenda ("Gemeld aan betrokkenen        Ja=1") | `SheetReader` laat de legenda en de opvulling weg |
+| Een kolom met AP-nummers werd op naam ("Gemeld aan AP") als ja/nee-veld voorgesteld; een kolom met vrije tekst als "Type" (Voorlopig/Definitief) | Waarden die nergens in passen tellen tegen de naam, ook bij een exacte naam. Vaste keuzelijsten (`<veld>_options` in `resources/lang`) gelden als bewijs: erin → het veld, erbuiten → niet (`FieldOptions`) |
+| Verplichte velden zonder bronkolom (`fg_reported`, `type`) blokkeerden elke rij | `FormDefaults`: een verplicht ja/nee-veld begint als "nee", een verplichte vaste keuze als de eerste optie, precies zoals het formulier; alleen kolommen die de database afdwingt |
+| Losse regels onder een record (extra keuzewaarden in één cel) | Komen als eigen rij binnen en vallen in de proefdraai af op de ontbrekende naam; de gebruiker ziet ze als aandachtsrij |
+
 Nog niet ondersteund, bewust: categorieën persoonsgegevens en bewaartermijn
 (die horen bij de gegevens per betrokkene, twee niveaus diep), en cellen met
 komma-gescheiden opsommingen ("Belastingdienst, pensioenuitvoerder") worden
