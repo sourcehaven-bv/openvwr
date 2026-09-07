@@ -415,6 +415,22 @@ Wat de review vond en hoe het is opgelost. De volgorde is die van ernst.
 | Zip-inspectie kende geen limieten | Dezelfde limieten als `ZipImporter` |
 | Pagina van 1.200 regels, complexiteit 148 | Gesplitst in `TargetOptions`, `EditableMapping`/`ColumnReview` en `MappedRecordWriter` |
 
+Uit een proefimport van een echt verwerkingsregister-sjabloon (september 2026):
+
+| Bevinding | Oplossing |
+|---|---|
+| Kopcellen bevatten instructies ("Omschrijving\nNoteer hier…", "Verwerkers: Noteer hier…", "…, meerdere keuzes mogelijk.") | `SheetReader` houdt alleen de naam over: eerste regel, tekst vóór een dubbele punt met zin erachter, zonder invulinstructie of toelichting tussen haakjes |
+| De analyser stelde velden voor die het scherm niet aanbiedt (`public_from`) en kende koppelingen en opzoeklijsten niet | De kandidaten zijn precies de opties van `TargetOptions`; "Verwerkers", "Contactpersoon", "Verwerkingsdoel" worden nu herkend |
+| Doelen, grondslag, betrokkenen en contactpersonen hadden geen doel | `contactPersons`, `stakeholders`, `avgGoals` (met grondslag als extra kolom) en `wpgGoals` zijn gedeelde entiteiten |
+| Ja/nee-waarden lieten een losse naamgelijkenis ("Verwerkers overeenkomst?" → "Heeft verwerkers") als zeker doorgaan; "Omschrijving" werd op string-gelijkenis aan "Toelichting doorgifte" gekoppeld | Inhoud bevestigt een naam maar maakt hem niet zeker; een kop die maar een fragment van een label is blijft een voorstel |
+| "J"/"N" werden niet als ja/nee gelezen | Toegevoegd aan de engine |
+
+Nog niet ondersteund, bewust: categorieën persoonsgegevens en bewaartermijn
+(die horen bij de gegevens per betrokkene, twee niveaus diep), en cellen met
+komma-gescheiden opsommingen ("Belastingdienst, pensioenuitvoerder") worden
+één record, omdat een komma ook in een naam kan staan; regel per waarde is de
+afspraak.
+
 Bewust niet gedaan: de phpstan-regel `TenantAwareQueryRule` uitbreiden naar
 `App\Import`. De importlaag draait ook in queue-jobs zonder ingelogde tenant
 en werkt daarom met een expliciete `organisationId` in plaats van

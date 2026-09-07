@@ -52,7 +52,13 @@ class CandidateScorer
     /**
      * Shared by so many fields that matching on them proves little.
      */
-    private const WEAK_TOKENS = ['datum', 'gemeld', 'nummer'];
+    /**
+     * The score for a heading that is wholly contained in a label that says
+     * considerably more: a suggestion, never a confident one.
+     */
+    private const PARTIAL_LABEL = 0.75;
+
+    private const WEAK_TOKENS = ['datum', 'gemeld', 'nummer', 'categorie', 'categorieen', 'categorieën', 'van', 'de', 'het', 'een', 'en', 'of'];
 
     public function __construct(
         private readonly FieldSynonyms $fieldSynonyms,
@@ -79,7 +85,12 @@ class CandidateScorer
             return $content === 0.0 ? 0.95 : 1.0;
         }
 
-        return min(1.0, ($name * 0.6) + ($content * 0.4));
+        $score = min(1.0, ($name * 0.6) + ($content * 0.4));
+
+        // Values confirm a name, they do not replace it: a column of yes/no
+        // answers fits every yes/no field, so it cannot make a loose name
+        // match confident enough to be filled in without a look.
+        return $name < self::CONFIDENT ? min($score, self::CONFIDENT - 0.01) : $score;
     }
 
     private function isExactName(string $header, string $fieldLabel, string $attribute): bool
@@ -108,6 +119,13 @@ class CandidateScorer
         // raw string overlap, which favours whichever label is shortest.
         if ($tokenScore >= 0.999) {
             return 1.0;
+        }
+
+        // "Omschrijving" is every word of the heading but only half of the
+        // label "Omschrijving beveiligingsmaatregelen": worth suggesting, not
+        // worth filling in unseen, however similar the strings look.
+        if ($tokenScore === self::PARTIAL_LABEL) {
+            return self::PARTIAL_LABEL;
         }
 
         // Without a single shared word, character similarity is coincidence:
@@ -151,7 +169,18 @@ class CandidateScorer
             $total += in_array($token, self::WEAK_TOKENS, true) ? 0.25 : 1.0;
         }
 
-        return $total <= 0.0 ? 0.0 : $weight / $total;
+        $labelTotal = 0.0;
+        foreach ($labelTokens as $token) {
+            $labelTotal += in_array($token, self::WEAK_TOKENS, true) ? 0.25 : 1.0;
+        }
+
+        $coverage = $total <= 0.0 ? 0.0 : $weight / $total;
+
+        if ($coverage >= 0.999 && $labelTotal > 0.0 && $weight / $labelTotal <= 0.5) {
+            return self::PARTIAL_LABEL;
+        }
+
+        return $coverage;
     }
 
     /**

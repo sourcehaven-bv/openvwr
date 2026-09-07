@@ -4,22 +4,20 @@ declare(strict_types=1);
 
 namespace App\Import\Mapping;
 
+use App\Enums\Import\ImportTarget;
 use App\Enums\Import\MappingConfidence;
 use App\Enums\Import\MappingTransform;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Str;
-use Webmozart\Assert\Assert;
 
 use function array_filter;
 use function array_key_exists;
 use function array_values;
-use function class_basename;
 use function count;
 use function in_array;
 use function is_scalar;
-use function is_string;
+use function str_contains;
 use function usort;
 
 /**
@@ -29,14 +27,12 @@ use function usort;
  * a column headed "Datum melding" matches data_breach_record.reported_at
  * literally. Deliberately no fuzzy string distance -- an empty suggestion is
  * easier to correct than a wrong one.
+ *
+ * The candidates are exactly the targets the review screen offers, so a
+ * proposal can never point at something the user could not have chosen.
  */
 class MappingAnalyser
 {
-    /**
-     * Filled in by the application, so never a suggestion target.
-     */
-    private const SKIP_ATTRIBUTES = ['organisation_id', 'entity_number_id'];
-
     /**
      * How far ahead the best candidate must be before it is offered at all.
      */
@@ -50,14 +46,6 @@ class MappingAnalyser
     }
 
     /**
-     * @param class-string<Model> $target
-     * @param array<int, string> $headers
-     *
-     * @return MappingProfile<Model>
-     */
-
-    /**
-     * @param class-string<Model> $target
      * @param array<int, string> $headers
      * @param array<int, array<string, mixed>> $rows sample rows, used to judge a
      *                                              column by its values as well
@@ -65,53 +53,76 @@ class MappingAnalyser
      *
      * @return MappingProfile<Model>
      */
-    public function analyse(string $target, array $headers, array $rows = []): MappingProfile
+    public function analyse(ImportTarget $target, array $headers, array $rows = []): MappingProfile
     {
-        $model = new $target();
-        /** @var array<int, string> $fillable */
-        $fillable = $model->getFillable();
-        $labels = $this->labelsFor($target);
+        $modelClass = $target->modelClass();
+        $model = new $modelClass();
+        $candidates = $this->candidates($target, $model);
 
-        $scores = $this->scoreAll($model, $headers, $fillable, $labels, $rows);
+        $scores = $this->scoreAll($headers, $candidates, $rows);
 
-        return $this->assign($target, $headers, $model, $scores, $rows);
+        return $this->assign($target, $headers, $candidates, $scores, $rows);
     }
 
     /**
-     * Every header against every field, so the assignment can be made globally
-     * rather than first-come-first-served.
+     * Everything a column may be mapped onto, with the conversion each implies.
+     * Links and lookups are matched on their label alone and read as text.
+     *
+     * @return array<string, array{label: string, transform: MappingTransform, relation: bool}>
+     */
+    private function candidates(ImportTarget $target, Model $model): array
+    {
+        $fillable = $model->getFillable();
+        $candidates = [];
+
+        foreach ((new TargetOptions($target))->flat() as $key => $label) {
+            if ($key === '') {
+                continue;
+            }
+
+            $isAttribute = in_array($key, $fillable, true);
+
+            // "Verwerkers — E-mail" is matched on "E-mail" alone: the relation
+            // part would otherwise make every extra column tie with the
+            // relation itself, and neither would be offered.
+            if (str_contains($key, RelationKey::ATTRIBUTE_SEPARATOR)) {
+                $label = Str::afterLast($label, ' — ');
+            }
+
+            $candidates[$key] = [
+                'label' => $label,
+                'transform' => $isAttribute ? $this->transformResolver->forAttribute($model, $key) : MappingTransform::Text,
+                'relation' => !$isAttribute,
+            ];
+        }
+
+        return $candidates;
+    }
+
+    /**
+     * Every header against every candidate, so the assignment can be made
+     * globally rather than first-come-first-served.
      *
      * @param array<int, string> $headers
-     * @param array<int, string> $fillable
-     * @param array<string, string> $labels
+     * @param array<string, array{label: string, transform: MappingTransform, relation: bool}> $candidates
      * @param array<int, array<string, mixed>> $rows
      *
      * @return array<int, array{header: string, attribute: string, score: float}>
      */
-    private function scoreAll(Model $model, array $headers, array $fillable, array $labels, array $rows): array
+    private function scoreAll(array $headers, array $candidates, array $rows): array
     {
         $scores = [];
 
         foreach ($headers as $header) {
             $samples = $this->samples($rows, $header);
 
-            foreach ($fillable as $attribute) {
-                if (in_array($attribute, self::SKIP_ATTRIBUTES, true)) {
-                    continue;
-                }
-
-                $score = $this->candidateScorer->score(
-                    $header,
-                    $labels[$attribute] ?? $attribute,
-                    $attribute,
-                    $this->transformResolver->forAttribute($model, $attribute),
-                    $samples,
-                );
+            foreach ($candidates as $key => $candidate) {
+                $score = $this->candidateScorer->score($header, $candidate['label'], $key, $candidate['transform'], $samples);
 
                 // Near-misses are kept so ambiguity can be detected; they are
                 // filtered out again once the field is known to be a clear win.
                 if ($score >= CandidateScorer::CONSIDER) {
-                    $scores[] = ['header' => $header, 'attribute' => $attribute, 'score' => $score];
+                    $scores[] = ['header' => $header, 'attribute' => $key, 'score' => $score];
                 }
             }
         }
@@ -122,7 +133,7 @@ class MappingAnalyser
     }
 
     /**
-     * Drops a header's suggestions when its best two candidates are too close to
+     * Drops every candidate for a header whose best candidate is not a clear
      * call. "Meldingsdatum" fits several date fields about equally well, and a
      * coin flip presented as a suggestion is worse than no suggestion: the user
      * has to notice it is wrong before they can correct it.
@@ -170,18 +181,16 @@ class MappingAnalyser
     }
 
     /**
-     * Walks the candidates from most to least likely, taking each header and
-     * field out of play once used, so a strong match cannot be stolen by a
-     * weaker one later in the list.
+     * Best matches first; each header and each target is used once.
      *
-     * @param class-string<Model> $target
      * @param array<int, string> $headers
+     * @param array<string, array{label: string, transform: MappingTransform, relation: bool}> $candidates
      * @param array<int, array{header: string, attribute: string, score: float}> $scores
      * @param array<int, array<string, mixed>> $rows
      *
      * @return MappingProfile<Model>
      */
-    private function assign(string $target, array $headers, Model $model, array $scores, array $rows): MappingProfile
+    private function assign(ImportTarget $target, array $headers, array $candidates, array $scores, array $rows): MappingProfile
     {
         $fields = [];
         $usedHeaders = [];
@@ -199,15 +208,17 @@ class MappingAnalyser
             $usedHeaders[] = $candidate['header'];
             $usedAttributes[] = $candidate['attribute'];
 
-            $transform = $this->transformResolver->forAttribute($model, $candidate['attribute']);
+            $key = $candidate['attribute'];
+            $transform = $candidates[$key]['transform'];
 
             $fields[] = new MappingField(
                 $candidate['header'],
-                $candidate['attribute'],
+                $key,
                 $transform,
                 $candidate['score'] >= CandidateScorer::CONFIDENT
                     ? MappingConfidence::Exact
                     : MappingConfidence::Label,
+                relation: $candidates[$key]['relation'] ? $key : null,
                 // A date column is read in one format; when the samples leave
                 // no doubt it is decided here, otherwise the user is asked.
                 dateFormat: $transform === MappingTransform::Date
@@ -223,7 +234,7 @@ class MappingAnalyser
             }
         }
 
-        return new MappingProfile($target, $fields, $unmapped);
+        return new MappingProfile($target->modelClass(), $fields, $unmapped);
     }
 
     /**
@@ -250,31 +261,5 @@ class MappingAnalyser
         }
 
         return $samples;
-    }
-
-    /**
-     * @param class-string<Model> $target
-     *
-     * @return array<string, string>
-     */
-    private function labelsFor(string $target): array
-    {
-        $key = Str::snake(class_basename($target));
-
-        if (!Lang::has($key)) {
-            return [];
-        }
-
-        $translations = Lang::get($key);
-        Assert::isArray($translations);
-
-        $labels = [];
-        foreach ($translations as $attribute => $label) {
-            if (is_string($attribute) && is_string($label)) {
-                $labels[$attribute] = $label;
-            }
-        }
-
-        return $labels;
     }
 }

@@ -104,7 +104,7 @@ it('proposes a mapping from an uploaded sheet', function (): void {
 
     /** @var MappingAnalyser $analyser */
     $analyser = $this->app->get(MappingAnalyser::class);
-    $profile = $analyser->analyse(DataBreachRecord::class, $sheet->headers);
+    $profile = $analyser->analyse(ImportTarget::DataBreachRecord, $sheet->headers);
 
     $targets = [];
     foreach ($profile->fields as $field) {

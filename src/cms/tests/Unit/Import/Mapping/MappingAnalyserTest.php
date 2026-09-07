@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
+use App\Enums\Import\ImportTarget;
 use App\Enums\Import\MappingConfidence;
 use App\Enums\Import\MappingTransform;
 use App\Import\Mapping\MappingAnalyser;
 use App\Import\Mapping\MappingField;
 use App\Import\Mapping\MappingProfile;
-use App\Models\DataBreachRecord;
-use App\Models\ImportMappingProfile;
 use Tests\TestCase;
 
 uses(TestCase::class);
@@ -29,13 +28,13 @@ function targetFor(array $fields, string $source): ?MappingField
 
 it('matches a column on the dutch field label', function (): void {
     // 'Datum melding' is the label of reported_at in resources/lang/nl.
-    $profile = $this->app->get(MappingAnalyser::class)->analyse(DataBreachRecord::class, ['Datum melding']);
+    $profile = $this->app->get(MappingAnalyser::class)->analyse(ImportTarget::DataBreachRecord, ['Datum melding']);
 
     expect(targetFor($profile->fields, 'Datum melding')?->target)->toBe('reported_at');
 });
 
 it('matches a column on the attribute name', function (): void {
-    $profile = $this->app->get(MappingAnalyser::class)->analyse(DataBreachRecord::class, ['summary']);
+    $profile = $this->app->get(MappingAnalyser::class)->analyse(ImportTarget::DataBreachRecord, ['summary']);
 
     $field = targetFor($profile->fields, 'summary');
 
@@ -44,13 +43,13 @@ it('matches a column on the attribute name', function (): void {
 });
 
 it('ignores case and punctuation when matching labels', function (): void {
-    $profile = $this->app->get(MappingAnalyser::class)->analyse(DataBreachRecord::class, ['DATUM  MELDING']);
+    $profile = $this->app->get(MappingAnalyser::class)->analyse(ImportTarget::DataBreachRecord, ['DATUM  MELDING']);
 
     expect(targetFor($profile->fields, 'DATUM  MELDING')?->target)->toBe('reported_at');
 });
 
 it('derives the transform from the model cast', function (): void {
-    $profile = $this->app->get(MappingAnalyser::class)->analyse(DataBreachRecord::class, [
+    $profile = $this->app->get(MappingAnalyser::class)->analyse(ImportTarget::DataBreachRecord, [
         'Datum melding',
         'Gemeld aan de autoriteit persoonsgegevens (AP)',
         'Categorieën van persoonsgegevens',
@@ -67,14 +66,14 @@ it('derives the transform from the model cast', function (): void {
 });
 
 it('puts unrecognised columns on the unmapped list instead of guessing', function (): void {
-    $profile = $this->app->get(MappingAnalyser::class)->analyse(DataBreachRecord::class, ['Melder', 'Afdeling']);
+    $profile = $this->app->get(MappingAnalyser::class)->analyse(ImportTarget::DataBreachRecord, ['Melder', 'Afdeling']);
 
     expect($profile->unmapped)->toBe(['Melder', 'Afdeling'])
         ->and($profile->fields)->toBeEmpty();
 });
 
 it('does not map two columns onto the same attribute', function (): void {
-    $profile = $this->app->get(MappingAnalyser::class)->analyse(DataBreachRecord::class, ['Samenvatting incident', 'summary']);
+    $profile = $this->app->get(MappingAnalyser::class)->analyse(ImportTarget::DataBreachRecord, ['Samenvatting incident', 'summary']);
 
     $targets = array_map(static fn (MappingField $field): string => $field->target, $profile->fields);
 
@@ -90,7 +89,7 @@ it('uses the values to pick between similarly named fields', function (): void {
     ];
 
     $profile = $this->app->get(MappingAnalyser::class)
-        ->analyse(DataBreachRecord::class, ['Melding AP'], $rows);
+        ->analyse(ImportTarget::DataBreachRecord, ['Melding AP'], $rows);
 
     expect(targetFor($profile->fields, 'Melding AP')?->target)->toBe('ap_reported');
 });
@@ -99,7 +98,7 @@ it('matches through synonyms', function (): void {
     $rows = [['Soort melding' => 'Definitief'], ['Soort melding' => 'Voorlopig']];
 
     $profile = $this->app->get(MappingAnalyser::class)
-        ->analyse(DataBreachRecord::class, ['Soort melding'], $rows);
+        ->analyse(ImportTarget::DataBreachRecord, ['Soort melding'], $rows);
 
     expect(targetFor($profile->fields, 'Soort melding')?->target)->toBe('type');
 });
@@ -110,7 +109,7 @@ it('leaves a column unmapped rather than forcing a weak match', function (): voi
     $rows = [['Melder' => 'J. de Vries'], ['Melder' => 'A. Bakker']];
 
     $profile = $this->app->get(MappingAnalyser::class)
-        ->analyse(DataBreachRecord::class, ['Melder'], $rows);
+        ->analyse(ImportTarget::DataBreachRecord, ['Melder'], $rows);
 
     expect($profile->unmapped)->toContain('Melder')
         ->and($profile->fields)->toBeEmpty();
@@ -126,7 +125,7 @@ it('produces a stable fingerprint regardless of column order', function (): void
 it('ignores a heading that holds no letters or digits', function (): void {
     /** @var MappingAnalyser $analyser */
     $analyser = $this->app->get(MappingAnalyser::class);
-    $profile = $analyser->analyse(DataBreachRecord::class, ['???'], [['???' => 'ja']]);
+    $profile = $analyser->analyse(ImportTarget::DataBreachRecord, ['???'], [['???' => 'ja']]);
 
     expect(targetFor($profile->fields, '???'))->toBeNull()
         ->and($profile->unmapped)->toContain('???');
@@ -140,23 +139,15 @@ it('judges a column by a limited sample and skips nested values', function (): v
 
     /** @var MappingAnalyser $analyser */
     $analyser = $this->app->get(MappingAnalyser::class);
-    $profile = $analyser->analyse(DataBreachRecord::class, ['Samenvatting incident', 'Adres'], $rows);
+    $profile = $analyser->analyse(ImportTarget::DataBreachRecord, ['Samenvatting incident', 'Adres'], $rows);
 
     expect(targetFor($profile->fields, 'Samenvatting incident')?->target)->toBe('summary');
-});
-
-it('copes with a target that has no translation file', function (): void {
-    /** @var MappingAnalyser $analyser */
-    $analyser = $this->app->get(MappingAnalyser::class);
-    $profile = $analyser->analyse(ImportMappingProfile::class, ['name'], [['name' => 'x']]);
-
-    expect(targetFor($profile->fields, 'name')?->target)->toBe('name');
 });
 
 it('does not let blank cells count as evidence for a type', function (): void {
     /** @var MappingAnalyser $analyser */
     $analyser = $this->app->get(MappingAnalyser::class);
-    $profile = $analyser->analyse(DataBreachRecord::class, ['Naam'], [['Naam' => ' '], ['Naam' => 'Echt']]);
+    $profile = $analyser->analyse(ImportTarget::DataBreachRecord, ['Naam'], [['Naam' => ' '], ['Naam' => 'Echt']]);
 
     expect(targetFor($profile->fields, 'Naam')?->target)->toBe('name');
 });
@@ -166,7 +157,7 @@ it('offers nothing when a heading fits several fields about equally well', funct
     $analyser = $this->app->get(MappingAnalyser::class);
     // "Gegevens categorie" fits the type field and the nature-of-incident field
     // equally; a wrong suggestion is harder to spot than an empty one.
-    $profile = $analyser->analyse(DataBreachRecord::class, ['Gegevens categorie'], [['Gegevens categorie' => 'Een stuk tekst']]);
+    $profile = $analyser->analyse(ImportTarget::DataBreachRecord, ['Gegevens categorie'], [['Gegevens categorie' => 'Een stuk tekst']]);
 
     expect(targetFor($profile->fields, 'Gegevens categorie'))->toBeNull()
         ->and($profile->unmapped)->toContain('Gegevens categorie');
@@ -175,7 +166,7 @@ it('offers nothing when a heading fits several fields about equally well', funct
 it('records the date format of a column when the values leave no doubt', function (): void {
     /** @var MappingAnalyser $analyser */
     $analyser = $this->app->get(MappingAnalyser::class);
-    $profile = $analyser->analyse(DataBreachRecord::class, ['Datum melding'], [['Datum melding' => '13-03-2026']]);
+    $profile = $analyser->analyse(ImportTarget::DataBreachRecord, ['Datum melding'], [['Datum melding' => '13-03-2026']]);
 
     expect(targetFor($profile->fields, 'Datum melding')?->dateFormat)->toBe('d-m-Y');
 });
@@ -183,8 +174,64 @@ it('records the date format of a column when the values leave no doubt', functio
 it('leaves the date format open when the values could be read two ways', function (): void {
     /** @var MappingAnalyser $analyser */
     $analyser = $this->app->get(MappingAnalyser::class);
-    $profile = $analyser->analyse(DataBreachRecord::class, ['Datum melding'], [['Datum melding' => '04-03-2026']]);
+    $profile = $analyser->analyse(ImportTarget::DataBreachRecord, ['Datum melding'], [['Datum melding' => '04-03-2026']]);
 
     expect(targetFor($profile->fields, 'Datum melding')?->target)->toBe('reported_at')
         ->and(targetFor($profile->fields, 'Datum melding')?->dateFormat)->toBeNull();
+});
+
+it('proposes links and lookups by their label, not only plain fields', function (): void {
+    /** @var MappingAnalyser $analyser */
+    $analyser = $this->app->get(MappingAnalyser::class);
+    $profile = $analyser->analyse(
+        ImportTarget::AvgResponsibleProcessingRecord,
+        ['Verwerkers', 'Contactpersoon', 'Dienst', 'Verwerkingsdoel'],
+        [['Verwerkers' => 'Firma A', 'Contactpersoon' => 'J. de Vries', 'Dienst' => 'Zorg', 'Verwerkingsdoel' => 'Behandeling']],
+    );
+
+    expect(targetFor($profile->fields, 'Verwerkers')?->relation)->toBe('processors')
+        ->and(targetFor($profile->fields, 'Contactpersoon')?->relation)->toBe('contactPersons')
+        ->and(targetFor($profile->fields, 'Dienst')?->target)->toBe('service')
+        ->and(targetFor($profile->fields, 'Verwerkingsdoel')?->relation)->toBe('avgGoals');
+});
+
+it('never proposes a field the screen does not offer', function (): void {
+    /** @var MappingAnalyser $analyser */
+    $analyser = $this->app->get(MappingAnalyser::class);
+    // "public_from" is filled in by the application; its label used to attract
+    // any column that looked like a date.
+    $profile = $analyser->analyse(
+        ImportTarget::AvgResponsibleProcessingRecord,
+        ['Laatste controle'],
+        [['Laatste controle' => '2026-03-12']],
+    );
+
+    expect(targetFor($profile->fields, 'Laatste controle'))->toBeNull();
+});
+
+it('only suggests, never fills in, a heading that is a fragment of a label', function (): void {
+    /** @var MappingAnalyser $analyser */
+    $analyser = $this->app->get(MappingAnalyser::class);
+    // "Omschrijving" occurs in several labels ("Omschrijving beveiligingsmaatregelen",
+    // "Toelichting doorgifte" via synonyms); in this template it was the name.
+    $profile = $analyser->analyse(
+        ImportTarget::AvgResponsibleProcessingRecord,
+        ['Omschrijving'],
+        [['Omschrijving' => 'Elektronisch patiëntendossier']],
+    );
+    $field = targetFor($profile->fields, 'Omschrijving');
+
+    expect($field === null || $field->confidence === MappingConfidence::Label)->toBeTrue();
+});
+
+it('does not let yes/no values make a loose heading confident', function (): void {
+    /** @var MappingAnalyser $analyser */
+    $analyser = $this->app->get(MappingAnalyser::class);
+    $profile = $analyser->analyse(
+        ImportTarget::AvgResponsibleProcessingRecord,
+        ['Verwerkers overeenkomst?'],
+        [['Verwerkers overeenkomst?' => 'JA'], ['Verwerkers overeenkomst?' => 'NEE']],
+    );
+
+    expect(targetFor($profile->fields, 'Verwerkers overeenkomst?')?->confidence)->toBe(MappingConfidence::Label);
 });

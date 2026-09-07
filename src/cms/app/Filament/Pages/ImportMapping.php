@@ -273,7 +273,8 @@ class ImportMapping extends Page implements HasForms
         $this->headers = $sheet->headers;
         $this->setRows($sheet->rows);
 
-        $modelClass = $this->importTarget()->modelClass();
+        $target = $this->importTarget();
+        $modelClass = $target->modelClass();
         $saved = $repository->findByFingerprint(
             MappingProfile::fingerprint($this->headers),
             Authentication::organisation()->id,
@@ -283,7 +284,7 @@ class ImportMapping extends Page implements HasForms
         $this->recognisedProfile = $recognised ? $saved->name : null;
         $this->mapping = EditableMapping::fromProfile(
             $this->headers,
-            $recognised ? $saved->toMappingProfile() : $analyser->analyse($modelClass, $this->headers, $sheet->rows),
+            $recognised ? $saved->toMappingProfile() : $analyser->analyse($target, $this->headers, $sheet->rows),
         );
         $this->step = self::STEP_REVIEW;
     }

@@ -43,6 +43,8 @@ it('reads dutch booleans', function (string $input, bool $expected): void {
     ['Ja', true],
     ['nee', false],
     ['NEE', false],
+    ['J', true],
+    ['n', false],
     ['true', true],
     ['false', false],
 ]);

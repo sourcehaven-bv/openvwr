@@ -83,3 +83,13 @@ it('keeps typed cells from a workbook as they are', function (): void {
 
     expect($sheet->rows[0]['Aantal'])->toEqual(42);
 });
+
+it('keeps only the name of a heading that carries instructions', function (): void {
+    $sheet = (new SheetReader())->read(
+        'template.csv',
+        "\"Omschrijving\nNoteer hier de naam van de verwerking.\",\"Verwerkers: Noteer hier de namen van de partijen die de gegevens verwerken\",\"Ontvangers buiten de EER?\",\"Grondslag, meerdere keuzes mogelijk.\",\"Maatregelen (indien afwijkend van het algemene beleid)\"\nEPD,Firma A,NEE,Toestemming,Encryptie\n",
+    );
+
+    expect($sheet->headers)->toBe(['Omschrijving', 'Verwerkers', 'Ontvangers buiten de EER?', 'Grondslag', 'Maatregelen'])
+        ->and($sheet->rows[0]['Verwerkers'])->toBe('Firma A');
+});

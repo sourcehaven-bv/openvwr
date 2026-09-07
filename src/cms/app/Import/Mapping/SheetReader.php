@@ -23,6 +23,8 @@ use function array_values;
 use function count;
 use function in_array;
 use function is_string;
+use function preg_match;
+use function preg_replace;
 use function sprintf;
 use function str_starts_with;
 use function substr_count;
@@ -176,6 +178,29 @@ class SheetReader
     }
 
     /**
+     * Templates often put instructions in the heading cell, below the name or
+     * after a colon: "Omschrijving\nNoteer hier de naam van de verwerking".
+     * Only the name is the column's name.
+     */
+    private function cleanHeader(string $value): string
+    {
+        $header = trim(Str::before($value, "\n"));
+
+        // "Verwerkers: Noteer hier de namen van ..." -- a short part before the
+        // colon followed by a longer sentence is a label with an instruction.
+        if (preg_match('/^(.{2,40}?):\s+(.{20,})$/u', $header, $matches) === 1) {
+            $header = trim($matches[1]);
+        }
+
+        // "Grondslag, meerdere keuzes mogelijk." and "(indien afwijkend van
+        // het beleid)" describe how to fill the column in, not what it is.
+        $header = preg_replace('/,?\s*meerdere (keuzes|antwoorden|opties) mogelijk\.?$/iu', '', $header) ?? $header;
+        $header = preg_replace('/\s*\([^()]{12,}\)$/u', '', $header) ?? $header;
+
+        return trim($header);
+    }
+
+    /**
      * Trailing empty columns are dropped so they cannot produce null-only keys.
      * Two columns with the same name, or a name that is also the prefix of a
      * dotted name, would silently overwrite each other's values, so those are
@@ -191,7 +216,7 @@ class SheetReader
     {
         $headers = [];
         foreach ($values as $index => $value) {
-            $header = is_string($value) ? trim($value) : '';
+            $header = is_string($value) ? $this->cleanHeader($value) : '';
             if ($header === '') {
                 continue;
             }

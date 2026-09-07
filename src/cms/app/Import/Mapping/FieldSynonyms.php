@@ -75,6 +75,16 @@ class FieldSynonyms
         // --- Communicatie ---
         ['communicatiemiddel', 'kanaal', 'wijze', 'medium'],
         ['bijzondere', 'gevoelige', 'speciale'],
+        // --- Register-begrippen ---
+        ['doel', 'doelen', 'doeleinde', 'doeleinden', 'verwerkingsdoel', 'verwerkingsdoelen', 'purpose'],
+        ['grondslag', 'grondslagen', 'rechtsgrond', 'rechtsgronden', 'wettelijkegrondslag'],
+        ['bewaartermijn', 'bewaartermijnen', 'termijn', 'retentie', 'bewaarduur'],
+        ['contactpersoon', 'contactpersonen', 'contact', 'aanspreekpunt', 'eigenaar', 'proceseigenaar'],
+        ['ontvanger', 'ontvangers', 'afnemer', 'afnemers'],
+        ['dpia', 'pia', 'geb', 'gegevensbeschermingseffectbeoordeling'],
+        ['algoritme', 'algoritmes', 'algoritmen', 'ai', 'kunstmatige', 'intelligentie'],
+        ['verantwoordelijke', 'verantwoordelijken', 'verwerkingsverantwoordelijke'],
+        ['eer', 'eu', 'europa', 'buitenland', 'doorgifte'],
     ];
 
     /** @var array<string, string>|null */

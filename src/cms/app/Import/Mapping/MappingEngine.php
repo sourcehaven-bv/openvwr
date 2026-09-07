@@ -143,8 +143,8 @@ class MappingEngine
     private function toDutchBoolean(string $text): ?bool
     {
         return match (mb_strtolower($text)) {
-            'ja', 'waar' => true,
-            'nee', 'neen', 'onwaar' => false,
+            'ja', 'j', 'waar' => true,
+            'nee', 'neen', 'n', 'onwaar' => false,
             default => null,
         };
     }
