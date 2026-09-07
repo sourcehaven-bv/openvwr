@@ -23,6 +23,7 @@ use App\Models\Processor;
 use Filament\Notifications\Notification;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -1184,4 +1185,14 @@ it('carries the chosen date format into a saved profile and back', function (): 
     $editable = EditableMapping::fromProfile($page->headers, $saved->toMappingProfile());
 
     expect($editable['Datum melding']['date_format'])->toBe('m-d-Y');
+});
+
+it('refuses a register that is behind a feature flag that is off', function (): void {
+    $this->asFilamentUser();
+    Config::set('features.wpg', false);
+
+    $page = pageAtReview(breachRows(), breachMapping());
+    $page->target = ImportTarget::WpgProcessingRecord->value;
+
+    expect(fn () => $page->review())->toThrow(HttpException::class);
 });

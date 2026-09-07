@@ -522,7 +522,7 @@ class ImportMapping extends Page implements HasForms
     {
         $target = ImportTarget::tryFrom($this->target);
 
-        if ($target === null) {
+        if ($target === null || !$target->enabled()) {
             abort(403);
         }
 
