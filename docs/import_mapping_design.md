@@ -404,7 +404,7 @@ Wat de review vond en hoe het is opgelost. De volgorde is die van ernst.
 |---|---|
 | Upload werd geparsed vóór validatie (virusscan, bestandstype) door de `live()`-hook | `analyse()` haalt eerst `getState()` op; pas daarna wordt het bestand geopend |
 | Profielen werden organisatie-overstijgend gezocht (fingerprint, versienummer) | `MappingProfileRepository` neemt overal expliciet een `organisationId` |
-| Datums gingen als tekst naar Eloquent en werden door Carbon Amerikaans geraden | `MappingEngine` parseert tegen `import.mapping.date_formats` (dag-eerst); geen match → dry-run-melding |
+| Datums gingen als tekst naar Eloquent en werden door Carbon Amerikaans geraden | Het datumformaat is onderdeel van de mapping, per kolom: `DateFormatDetector` bepaalt welke formaten uit `import.mapping.date_formats` op álle voorbeeldwaarden passen; één → vastgelegd, meerdere → de gebruiker kiest (in datums, niet in formaatstrings); de engine leest de kolom strikt in dat formaat, en het formaat gaat mee in het profiel |
 | CSV met puntkomma (Nederlands Excel) werd één kolom | `SheetReader` bepaalt het scheidingsteken uit de kopregel |
 | Dubbele of overlappende kolomnamen overschreven elkaar stil | Geweigerd met een melding |
 | `apply()` was niet idempotent en slikte fouten in, zonder transactie | `MappedRecordWriter`: per rij een transactie, rijen met bekend `import_id` overgeslagen, mislukte rijen per nummer gemeld |

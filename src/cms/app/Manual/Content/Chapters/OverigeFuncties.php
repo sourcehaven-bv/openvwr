@@ -100,6 +100,16 @@ final class OverigeFuncties
 
                 ![Het type volgt uit het veld](/handleiding/05_overige_functies/08_import-mapping_kolom.png)
 
+                ### Datums
+
+                Een datumkolom wordt in één formaat gelezen, voor de hele kolom.
+                Meestal blijkt dat formaat uit de waarden zelf en staat het onder de
+                kolom: "13-03-2026 wordt gelezen als 13 maart 2026". Kan een waarde
+                twee kanten op, zoals "04-03-2026", dan vraagt het scherm welke datum
+                dat is. Zonder antwoord wordt er niet proefgedraaid of geïmporteerd:
+                raden is precies wat hier niet mag gebeuren. De keuze wordt met de
+                mapping bewaard.
+
                 ### Ja/nee omzetten naar een datum
 
                 Soms registreert het bronsysteem alleen *dát* iets is gemeld, terwijl OpenVWR

@@ -39,6 +39,14 @@ return [
     'true_date_today' => 'Datum van de import',
     'true_date_fixed' => 'Vaste datum',
     'true_date_no' => '"nee" laat het veld leeg.',
+    'date_format_intro' => 'Deze kolom bevat ":sample". Welke datum is dat?',
+    'date_format_example' => ':sample wordt gelezen als :date',
+    'date_format_missing' => 'Kies eerst het datumformaat voor kolom ":column".',
+    'date_order' => [
+        'day_first' => 'dag-maand-jaar',
+        'month_first' => 'maand-dag-jaar',
+        'year_first' => 'jaar-maand-dag',
+    ],
     'column_row' => 'Rij',
     'column_reason' => 'Reden',
 

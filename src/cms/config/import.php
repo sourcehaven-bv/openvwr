@@ -47,8 +47,11 @@ return [
         // Kilobytes; Livewire's own temporary-upload limit is 12 MB.
         'max_upload_kb' => 12_288,
         'sheet_ttl_minutes' => 240,
-        // Tried in order; the first exact match wins. Day-first, as the sources
-        // are Dutch. A value matching none of these is reported, not guessed.
+        // The formats a column may be written in. The analyser keeps the ones
+        // every sample fits; when that leaves more than one (e.g. day-first and
+        // month-first for "04-03-2026") the user is asked. Order matters only
+        // as a fallback for profiles without a recorded format: day-first
+        // wins, as the sources are Dutch.
         'date_formats' => [
             'Y-m-d\TH:i:s.v',
             'Y-m-d\TH:i:s',
@@ -63,6 +66,10 @@ return [
             'd/m/Y H:i',
             'd/m/Y',
             'j/n/Y',
+            'm-d-Y',
+            'n-j-Y',
+            'm/d/Y',
+            'n/j/Y',
         ],
     ],
 

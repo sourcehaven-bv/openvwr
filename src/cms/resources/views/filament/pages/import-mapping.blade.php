@@ -156,6 +156,32 @@
                                     </p>
                                 </div>
                             @endif
+
+                            @php($dateExamples = count($column->dateFormatCandidates()) > 1 ? $column->dateFormatExamples() : [])
+                            @if (count($dateExamples) > 1)
+                                <div class="mt-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 p-3">
+                                    <p class="text-xs mb-2">
+                                        {{ __('import_mapping.date_format_intro', ['sample' => $column->samples(1)[0] ?? '']) }}
+                                    </p>
+
+                                    <div class="flex flex-wrap items-center gap-3">
+                                        @foreach ($dateExamples as $format => $example)
+                                            <label class="flex items-center gap-2 text-xs">
+                                                <input
+                                                    type="radio"
+                                                    value="{{ $format }}"
+                                                    wire:model.live="mapping.{{ $header }}.date_format"
+                                                />
+                                                {{ $example }}
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @elseif ($column->dateFormat() !== null && ($column->samples(1)[0] ?? '') !== '')
+                                <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                    {{ __('import_mapping.date_format_example', ['sample' => $column->samples(1)[0], 'date' => $column->dateFormatExamples()[$column->dateFormat()] ?? '']) }}
+                                </p>
+                            @endif
                         </div>
                     </div>
                 @endforeach

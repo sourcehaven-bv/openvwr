@@ -66,6 +66,9 @@ Vink een regel af in de kolom "Test Geslaagd" zodra de stap is uitgevoerd en het
 | 18  | Koppel "Meldnummer" aan "Bronkenmerk (nummer uit het bronsysteem)" onder de groep Herkomst. Koppel "Onderwerp" aan Naam en "Meldingsdatum" aan Datum melding. Laat "Melder" en "Afdeling" op niet importeren staan.             | [ ]           |             |
 | 19  | Koppel een ja/nee-kolom (bijvoorbeeld "Melding AP") aan een datumveld (bijvoorbeeld "Datum melding AP"). Controleer dat de vraag verschijnt welke datum bij "ja" hoort, met de keuzes "Datum van de import" en "Vaste datum". | [ ]           |             |
 | 20  | Kies "Vaste datum", vul een datum in en controleer dat na de import de rijen met "ja" die datum hebben en rijen met "nee" het veld leeg laten.                                                                                  | [ ]           |             |
+| 20a | Maak in Excel een kopie van `04-datalekken.csv` waarin de kolom "Datum melding" als tekst `04-03-2026` en `12-11-2026` bevat en upload die. Controleer dat onder de kolom de vraag verschijnt welke datum "04-03-2026" is, met de keuzes "4 maart 2026 (dag-maand-jaar)" en "3 april 2026 (maand-dag-jaar)". | [ ]           |             |
+| 20b | Klik "Proefdraaien" zonder te kiezen en controleer dat het scherm vraagt eerst het datumformaat te kiezen en niets proefdraait. Kies daarna "3 april 2026", importeer en controleer dat het datalek de datum 3 april 2026 heeft.       | [ ]           |             |
+| 20c | Upload een bestand waarin de datums als `13-03-2026` staan (dag boven de 12) en controleer dat er geen vraag komt maar onder de kolom staat: "13-03-2026 wordt gelezen als 13 maart 2026 (dag-maand-jaar)".                          | [ ]           |             |
 
 ---
 

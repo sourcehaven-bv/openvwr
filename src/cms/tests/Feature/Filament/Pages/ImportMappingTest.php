@@ -9,6 +9,7 @@ use App\Facades\Authentication;
 use App\Filament\Pages\ImportMapping;
 use App\Import\ImportFailedException;
 use App\Import\Mapping\DryRunner;
+use App\Import\Mapping\EditableMapping;
 use App\Import\Mapping\MappedRecordWriter;
 use App\Import\Mapping\MappingAnalyser;
 use App\Import\Mapping\MappingProfile;
@@ -1110,4 +1111,77 @@ it('falls back to a readable attribute name when no label exists', function (): 
 
     expect(pageAtReview(breachRows(), breachMapping())->review()->options()->flat()['involved_people'])
         ->toBe('Involved people');
+});
+
+it('asks which way round an ambiguous date is, and refuses to guess', function (): void {
+    $this->asFilamentUser();
+
+    $rows = [[...breachRows()[0], 'Datum melding' => '04-03-2026']];
+    $page = pageAtReview($rows, breachMapping());
+    $column = $page->review()->column('Datum melding');
+
+    expect($column->needsDateFormat())->toBeTrue()
+        ->and($column->dateFormatCandidates())->toBe(['d-m-Y', 'm-d-Y'])
+        ->and($column->dateFormatExamples()['d-m-Y'])->toStartWith('4 maart 2026')
+        ->and($column->dateFormatExamples()['m-d-Y'])->toStartWith('3 april 2026');
+
+    $page->dryRun($this->app->get(DryRunner::class));
+
+    expect($page->result['fits'])->toBe(0);
+    Notification::assertNotified(__('import_mapping.review_heading'));
+});
+
+it('reads the whole column in the format the user chose', function (): void {
+    $this->asFilamentUser();
+
+    $rows = [[...breachRows()[0], 'Datum melding' => '04-03-2026']];
+    $mapping = breachMapping();
+    $mapping['Datum melding'] = ['target' => 'reported_at', 'date_format' => 'm-d-Y'];
+
+    $page = pageAtReview($rows, $mapping);
+    $page->apply(
+        $this->app->get(DryRunner::class),
+        $this->app->get(MappedRecordWriter::class),
+        $this->app->get(MappingProfileRepository::class),
+    );
+
+    $record = DataBreachRecord::query()->where('name', 'Mail naar verkeerde ontvanger')->first();
+
+    expect($record?->reported_at?->format('Y-m-d'))->toBe('2026-04-03');
+});
+
+it('decides the date format itself when the values allow only one', function (): void {
+    $this->asFilamentUser();
+
+    $rows = [[...breachRows()[0], 'Datum melding' => '13-03-2026']];
+    $page = pageAtReview($rows, breachMapping());
+    $column = $page->review()->column('Datum melding');
+
+    expect($column->needsDateFormat())->toBeFalse()
+        ->and($column->dateFormat())->toBe('d-m-Y')
+        ->and($column->dateFormatExamples())->toHaveKey('d-m-Y')
+        ->and($page->review()->toProfile()->fields[2]->dateFormat)->toBe('d-m-Y');
+});
+
+it('carries the chosen date format into a saved profile and back', function (): void {
+    $this->asFilamentUser();
+
+    $rows = [[...breachRows()[0], 'Datum melding' => '04-03-2026']];
+    $mapping = breachMapping();
+    $mapping['Datum melding'] = ['target' => 'reported_at', 'date_format' => 'm-d-Y'];
+
+    $page = pageAtReview($rows, $mapping);
+    $page->profileName = 'Amerikaanse export';
+    $page->apply(
+        $this->app->get(DryRunner::class),
+        $this->app->get(MappedRecordWriter::class),
+        $this->app->get(MappingProfileRepository::class),
+    );
+
+    /** @var MappingProfileRepository $repository */
+    $repository = $this->app->get(MappingProfileRepository::class);
+    $saved = $repository->findByFingerprint(MappingProfile::fingerprint($page->headers), Authentication::organisation()->id);
+    $editable = EditableMapping::fromProfile($page->headers, $saved->toMappingProfile());
+
+    expect($editable['Datum melding']['date_format'])->toBe('m-d-Y');
 });

@@ -171,3 +171,20 @@ it('offers nothing when a heading fits several fields about equally well', funct
     expect(targetFor($profile->fields, 'Gegevens categorie'))->toBeNull()
         ->and($profile->unmapped)->toContain('Gegevens categorie');
 });
+
+it('records the date format of a column when the values leave no doubt', function (): void {
+    /** @var MappingAnalyser $analyser */
+    $analyser = $this->app->get(MappingAnalyser::class);
+    $profile = $analyser->analyse(DataBreachRecord::class, ['Datum melding'], [['Datum melding' => '13-03-2026']]);
+
+    expect(targetFor($profile->fields, 'Datum melding')?->dateFormat)->toBe('d-m-Y');
+});
+
+it('leaves the date format open when the values could be read two ways', function (): void {
+    /** @var MappingAnalyser $analyser */
+    $analyser = $this->app->get(MappingAnalyser::class);
+    $profile = $analyser->analyse(DataBreachRecord::class, ['Datum melding'], [['Datum melding' => '04-03-2026']]);
+
+    expect(targetFor($profile->fields, 'Datum melding')?->target)->toBe('reported_at')
+        ->and(targetFor($profile->fields, 'Datum melding')?->dateFormat)->toBeNull();
+});

@@ -6,10 +6,13 @@ namespace App\Import\Mapping;
 
 use App\Enums\Import\MappingConfidence;
 use App\Enums\Import\MappingTransform;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Str;
+use Webmozart\Assert\Assert;
 
 use function __;
 use function array_slice;
+use function count;
 use function in_array;
 use function sprintf;
 use function trim;
@@ -37,6 +40,7 @@ readonly class ColumnReview
         private TargetOptions $options,
         private ?MappingTransform $transform,
         private bool $isRelation,
+        private DateFormatDetector $dateFormatDetector,
     ) {
     }
 
@@ -151,6 +155,72 @@ readonly class ColumnReview
         $date = $this->settings['true_date'] ?? '';
 
         return $date === '' ? null : sprintf('%sT00:00:00', $date);
+    }
+
+    /**
+     * The formats every sample of a date column fits. More than one means the
+     * values alone cannot decide, e.g. "04-03-2026".
+     *
+     * @return array<int, string>
+     */
+    public function dateFormatCandidates(): array
+    {
+        if ($this->transform !== MappingTransform::Date || $this->needsTrueDate()) {
+            return [];
+        }
+
+        return $this->dateFormatDetector->candidates($this->samples);
+    }
+
+    /**
+     * The format this column is read in: chosen by the user, or the only one
+     * that fits. Null when it still has to be chosen or does not apply.
+     */
+    public function dateFormat(): ?string
+    {
+        $candidates = $this->dateFormatCandidates();
+        $chosen = $this->settings['date_format'] ?? '';
+
+        if ($chosen !== '' && in_array($chosen, $candidates, true)) {
+            return $chosen;
+        }
+
+        return count($candidates) === 1 ? $candidates[0] : null;
+    }
+
+    /**
+     * True when the samples fit several formats and the user has not said
+     * which one applies.
+     */
+    public function needsDateFormat(): bool
+    {
+        return count($this->dateFormatCandidates()) > 1 && $this->dateFormat() === null;
+    }
+
+    /**
+     * What the first sample means in each candidate format, so the question
+     * can be asked in dates rather than in format strings.
+     *
+     * @return array<string, string> format => rendered date
+     */
+    public function dateFormatExamples(): array
+    {
+        $sample = $this->samples[0] ?? '';
+        $examples = [];
+
+        foreach ($this->dateFormatCandidates() as $format) {
+            // A candidate fits every sample by definition, so this parses.
+            $date = $this->dateFormatDetector->parse($sample, $format);
+            Assert::isInstanceOf($date, CarbonImmutable::class);
+
+            $examples[$format] = sprintf(
+                '%s (%s)',
+                $date->translatedFormat('j F Y' . (Str::contains($format, 'H') ? ' H:i' : '')),
+                $this->dateFormatDetector->describe($format),
+            );
+        }
+
+        return $examples;
     }
 
     /**

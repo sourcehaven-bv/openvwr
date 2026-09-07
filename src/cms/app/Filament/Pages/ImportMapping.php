@@ -12,6 +12,7 @@ use App\Facades\Authorization;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Import\ImportFailedException;
 use App\Import\Mapping\ArchiveInspector;
+use App\Import\Mapping\DateFormatDetector;
 use App\Import\Mapping\DryRunner;
 use App\Import\Mapping\DryRunResult;
 use App\Import\Mapping\EditableMapping;
@@ -419,6 +420,14 @@ class ImportMapping extends Page implements HasForms
             return null;
         }
 
+        $undecided = $this->review()->headersNeedingDateFormat();
+
+        if ($undecided !== []) {
+            $this->failed(__('import_mapping.review_heading'), __('import_mapping.date_format_missing', ['column' => $undecided[0]]));
+
+            return null;
+        }
+
         try {
             $profile = $this->review()->toProfile();
         } catch (UnknownMappingTargetException) {
@@ -475,6 +484,7 @@ class ImportMapping extends Page implements HasForms
             $this->recognisedProfile !== null,
             new TargetOptions($target),
             app(TransformResolver::class),
+            app(DateFormatDetector::class),
         );
     }
 

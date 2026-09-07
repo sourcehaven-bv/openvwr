@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Import\Mapping;
 
 use App\Enums\Import\MappingConfidence;
+use App\Enums\Import\MappingTransform;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Lang;
@@ -44,6 +45,7 @@ class MappingAnalyser
     public function __construct(
         private readonly TransformResolver $transformResolver,
         private readonly CandidateScorer $candidateScorer,
+        private readonly DateFormatDetector $dateFormatDetector,
     ) {
     }
 
@@ -72,7 +74,7 @@ class MappingAnalyser
 
         $scores = $this->scoreAll($model, $headers, $fillable, $labels, $rows);
 
-        return $this->assign($target, $headers, $model, $scores);
+        return $this->assign($target, $headers, $model, $scores, $rows);
     }
 
     /**
@@ -175,10 +177,11 @@ class MappingAnalyser
      * @param class-string<Model> $target
      * @param array<int, string> $headers
      * @param array<int, array{header: string, attribute: string, score: float}> $scores
+     * @param array<int, array<string, mixed>> $rows
      *
      * @return MappingProfile<Model>
      */
-    private function assign(string $target, array $headers, Model $model, array $scores): MappingProfile
+    private function assign(string $target, array $headers, Model $model, array $scores, array $rows): MappingProfile
     {
         $fields = [];
         $usedHeaders = [];
@@ -196,13 +199,20 @@ class MappingAnalyser
             $usedHeaders[] = $candidate['header'];
             $usedAttributes[] = $candidate['attribute'];
 
+            $transform = $this->transformResolver->forAttribute($model, $candidate['attribute']);
+
             $fields[] = new MappingField(
                 $candidate['header'],
                 $candidate['attribute'],
-                $this->transformResolver->forAttribute($model, $candidate['attribute']),
+                $transform,
                 $candidate['score'] >= CandidateScorer::CONFIDENT
                     ? MappingConfidence::Exact
                     : MappingConfidence::Label,
+                // A date column is read in one format; when the samples leave
+                // no doubt it is decided here, otherwise the user is asked.
+                dateFormat: $transform === MappingTransform::Date
+                    ? $this->dateFormatDetector->detect($this->samples($rows, $candidate['header']))
+                    : null,
             );
         }
 

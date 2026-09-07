@@ -6,10 +6,8 @@ namespace App\Import\Mapping;
 
 use App\Enums\Import\MappingTransform;
 use Carbon\CarbonImmutable;
-use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Config;
 
 use function explode;
 use function filter_var;
@@ -32,10 +30,10 @@ use const FILTER_VALIDATE_INT;
  */
 class MappingEngine
 {
-    /**
-     * The one format the engine emits, so every consumer parses the same thing.
-     */
-    private const DATE_FORMAT = 'Y-m-d\TH:i:s';
+    public function __construct(
+        private readonly DateFormatDetector $dateFormatDetector,
+    ) {
+    }
 
     /**
      * @param MappingProfile<covariant Model> $profile
@@ -48,7 +46,7 @@ class MappingEngine
         $mapped = [];
 
         foreach ($profile->fields as $field) {
-            $value = $this->transform(Arr::get($row, $field->source), $field->transform, $field->trueDate);
+            $value = $this->transform(Arr::get($row, $field->source), $field);
 
             $mapped[$field->target] = $value;
         }
@@ -56,16 +54,16 @@ class MappingEngine
         return $mapped;
     }
 
-    private function transform(mixed $value, MappingTransform $transform, ?string $trueDate = null): mixed
+    private function transform(mixed $value, MappingField $field): mixed
     {
         if ($value === null) {
             return null;
         }
 
-        return match ($transform) {
-            MappingTransform::BooleanToDate => $this->toDateFromBoolean($value, $trueDate),
+        return match ($field->transform) {
+            MappingTransform::BooleanToDate => $this->toDateFromBoolean($value, $field->trueDate),
             MappingTransform::Text => $this->toText($value),
-            MappingTransform::Date => $this->toDate($value),
+            MappingTransform::Date => $this->toDate($value, $field->dateFormat),
             MappingTransform::Boolean => $this->toBoolean($value),
             MappingTransform::Integer => $this->toInteger($value),
             MappingTransform::StringList => $this->toStringList($value),
@@ -82,44 +80,30 @@ class MappingEngine
             return null;
         }
 
-        return $trueDate ?? CarbonImmutable::now()->format(self::DATE_FORMAT);
+        return $trueDate ?? CarbonImmutable::now()->format(DateFormatDetector::OUTPUT_FORMAT);
     }
 
     /**
-     * Dates are parsed against a fixed list of formats rather than guessed:
-     * "01/02/2026" is 1 February in a Dutch source, and a permissive parser
-     * would silently make it 2 January. A value that matches no format stays
-     * null, so the dry-run reports it instead of the register receiving a wrong
-     * date.
+     * A column's dates are all read in the format decided for that column;
+     * "01/02/2026" is 1 February in a Dutch source and a per-cell guess would
+     * silently make it 2 January. A value that does not fit stays null, so the
+     * dry-run reports it instead of the register receiving a wrong date.
+     *
+     * Without a format (a profile saved before formats were recorded) the
+     * configured formats are tried in order.
      */
-    private function toDate(mixed $value): ?string
+    private function toDate(mixed $value, ?string $format): ?string
     {
         $text = $this->toText($value);
         if ($text === null) {
             return null;
         }
 
-        $timezone = Config::string('import.date.timezone');
+        $date = $format === null
+            ? $this->dateFormatDetector->parseAny($text)
+            : $this->dateFormatDetector->parse($text, $format);
 
-        foreach (Config::array('import.mapping.date_formats') as $format) {
-            try {
-                // "!" resets the fields the format does not mention, so a date
-                // without a time is midnight rather than the current time.
-                $date = CarbonImmutable::rawCreateFromFormat('!' . $format, $text, $timezone);
-            } catch (InvalidFormatException) {
-                continue;
-            }
-
-            // PHP rolls "31-02-2026" over into March; only an exact round trip
-            // proves the value really was a date in this format.
-            if ($date === null || $date->format($format) !== $text) {
-                continue;
-            }
-
-            return $date->format(self::DATE_FORMAT);
-        }
-
-        return null;
+        return $date?->format(DateFormatDetector::OUTPUT_FORMAT);
     }
 
     private function toText(mixed $value): ?string

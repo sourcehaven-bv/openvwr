@@ -55,6 +55,7 @@ class EditableMapping
         private readonly bool $fromProfile,
         private readonly TargetOptions $options,
         private readonly TransformResolver $transformResolver,
+        private readonly DateFormatDetector $dateFormatDetector,
     ) {
     }
 
@@ -81,6 +82,7 @@ class EditableMapping
             $editable[$field->source] = [
                 'target' => $field->target,
                 'confidence' => $field->confidence->value,
+                'date_format' => $field->dateFormat ?? '',
             ];
         }
 
@@ -123,7 +125,23 @@ class EditableMapping
             $this->options,
             $isRelation ? null : ($this->transforms()[$target] ?? null),
             $isRelation,
+            $this->dateFormatDetector,
         );
+    }
+
+    /**
+     * Columns whose date format still has to be chosen. Until they are, the
+     * mapping cannot be run: a guess would be exactly what a per-column format
+     * is meant to prevent.
+     *
+     * @return array<int, string>
+     */
+    public function headersNeedingDateFormat(): array
+    {
+        return array_values(array_filter(
+            $this->headers,
+            fn (string $header): bool => $this->column($header)->needsDateFormat(),
+        ));
     }
 
     /**
@@ -175,8 +193,17 @@ class EditableMapping
             $transform = $column->profileTransform();
             $relation = $this->isRelationTarget($target) || RelationKey::isLookup($target) ? $target : null;
             $trueDate = $transform === MappingTransform::BooleanToDate ? $column->trueDate() : null;
+            $dateFormat = $transform === MappingTransform::Date ? $column->dateFormat() : null;
 
-            $fields[] = new MappingField($source, $target, $transform, MappingConfidence::Manual, $trueDate, $relation);
+            $fields[] = new MappingField(
+                $source,
+                $target,
+                $transform,
+                MappingConfidence::Manual,
+                $trueDate,
+                $relation,
+                dateFormat: $dateFormat,
+            );
         }
 
         return new MappingProfile($this->target->modelClass(), $fields, $unmapped);

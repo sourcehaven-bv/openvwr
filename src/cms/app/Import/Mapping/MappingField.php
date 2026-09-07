@@ -37,6 +37,11 @@ readonly class MappingField
          * @var non-empty-string
          */
         public string $separator = "\n",
+        /**
+         * For Date: how the source writes its dates, e.g. "d-m-Y". Decided per
+         * column, because "04-03-2026" cannot be read on its own.
+         */
+        public ?string $dateFormat = null,
     ) {
     }
 
@@ -68,7 +73,12 @@ readonly class MappingField
             $relation = $data['relation'];
         }
 
-        return new self($data['source'], $data['target'], $transform, $confidence, $trueDate, $relation);
+        $dateFormat = null;
+        if (array_key_exists('date_format', $data) && is_string($data['date_format'])) {
+            $dateFormat = $data['date_format'];
+        }
+
+        return new self($data['source'], $data['target'], $transform, $confidence, $trueDate, $relation, dateFormat: $dateFormat);
     }
 
     /**
@@ -83,6 +93,7 @@ readonly class MappingField
             'confidence' => $this->confidence->value,
             'true_date' => $this->trueDate,
             'relation' => $this->relation,
+            'date_format' => $this->dateFormat,
         ];
     }
 }
