@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Import\Mapping\ArchiveInspector;
 use App\Import\ZipImporter;
 use Illuminate\Support\ServiceProvider;
 
@@ -23,5 +24,9 @@ class ImportServiceProvider extends ServiceProvider
         $this->app->when(ZipImporter::class)
             ->needs('$importers')
             ->giveConfig('import.importers');
+
+        $this->app->when(ArchiveInspector::class)
+            ->needs('$factories')
+            ->giveConfig('import.factories');
     }
 }

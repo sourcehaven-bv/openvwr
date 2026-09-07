@@ -35,15 +35,154 @@ final class OverigeFuncties
         return new Topic(
             id: 'import',
             title: 'Import',
-            body: <<<'MARKDOWN'
-                Met de "import" functionaliteit leest u een bestaand register in. Komt uw
-                register uit het [AVG Register
-                Rijksoverheid](https://www.avgregisterrijksoverheid.nl/), dan zijn de
-                zip-files die dat systeem exporteert direct te importeren.
-                MARKDOWN,
+            body: self::importBestandEnMapping() . self::importProefdraaienEnImporteren() . self::importKoppelingen(),
             roles: [Role::CHIEF_PRIVACY_OFFICER, Role::PRIVACY_OFFICER],
             availability: '(Chief) Privacy Officer',
         );
+    }
+
+    private static function importBestandEnMapping(): string
+    {
+        return <<<'MARKDOWN'
+                Onder "Import" leest u gegevens in vanuit een bestand. Er is één scherm voor
+                twee soorten bestanden; OpenVWR herkent zelf welke u aanbiedt.
+
+                **Een OpenVWR-export (`.zip`)** - bijvoorbeeld uit het [AVG Register
+                Rijksoverheid](https://www.avgregisterrijksoverheid.nl/) of uit een andere
+                OpenVWR-omgeving. De indeling is al bekend, dus er valt niets te koppelen: het
+                scherm toont welke registers in het bestand zitten en hoeveel records, en u
+                bevestigt.
+
+                **Een Excel- of CSV-bestand** - uit een ander systeem, met eigen kolomnamen.
+                Hiervoor koppelt u de kolommen aan de velden in OpenVWR. De rest van dit
+                onderwerp beschrijft die stappen.
+
+                ### Bestand kiezen
+
+                Kies eerst het register waarin de gegevens terecht moeten komen en upload
+                daarna het bestand. De eerste rij moet de kolomnamen bevatten. Zodra het
+                bestand is geüpload wordt het meteen geanalyseerd; een aparte knop is niet
+                nodig.
+
+                Het register hoeft u alleen te kiezen bij een Excel- of CSV-bestand. Biedt u
+                een OpenVWR-export aan, dan bepaalt het bestand dat zelf.
+
+                ![Bestand kiezen](/handleiding/05_overige_functies/06_import-mapping_upload.png)
+
+                ### Mapping controleren
+
+                OpenVWR probeert iedere kolom zelf aan een veld te koppelen. Dat gebeurt op
+                basis van de kolomnaam én de waarden in de kolom: een kolom met "ja" en "nee"
+                hoort bij een ja/nee-veld, ook als de naam op een datumveld lijkt. Per kolom
+                staat wat het systeem heeft gedaan:
+
+                | Melding | Betekenis |
+                | --- | --- |
+                | Automatisch ingevuld | Het systeem is zeker van de koppeling |
+                | Voorstel - controleer | Waarschijnlijk goed, maar het is de moeite van het nakijken waard |
+                | Nog geen keuze gemaakt | Er is geen betrouwbare koppeling gevonden; kies zelf een veld |
+                | Zelf gekozen | U heeft deze koppeling aangepast |
+
+                Twijfelt het systeem tussen twee velden die ongeveer even goed passen, dan
+                doet het bewust geen voorstel: een verkeerde suggestie is lastiger te
+                herkennen dan een lege.
+
+                Onder iedere kolomnaam staan enkele waarden uit het bestand, zodat u kunt
+                zien wat er werkelijk in de kolom staat. Kolommen die niet mee moeten -
+                bijvoorbeeld de naam van de melder of de afdeling - laat u op "niet
+                importeren" staan.
+
+                ![Wat wel en niet meegaat](/handleiding/05_overige_functies/07_import-mapping_mapping.png)
+
+                Onder het gekozen veld staat hoe de waarde gelezen wordt: als tekst, datum,
+                ja/nee of lijst. Dat is geen keuze maar een gevolg van het veld dat u kiest -
+                een datumveld leest altijd een datum.
+
+                ![Het type volgt uit het veld](/handleiding/05_overige_functies/08_import-mapping_kolom.png)
+
+                ### Ja/nee omzetten naar een datum
+
+                Soms registreert het bronsysteem alleen *dát* iets is gemeld, terwijl OpenVWR
+                ook wil weten *wanneer*. Koppelt u een ja/nee-kolom aan een datumveld, dan
+                vraagt het scherm welke datum bij "ja" hoort: de datum van de import, of een
+                datum die u zelf kiest. Bij "nee" blijft het veld leeg.
+
+                MARKDOWN;
+    }
+
+    private static function importProefdraaienEnImporteren(): string
+    {
+        return <<<'MARKDOWN'
+                ### Proefdraaien
+
+                Met "Proefdraaien" controleert OpenVWR de mapping tegen alle rijen zonder
+                iets op te slaan. U ziet hoeveel rijen goed gaan en welke aandacht nodig
+                hebben, met per rij de reden - bijvoorbeeld een verplicht veld dat leeg
+                blijft, of een waarde die niet als datum gelezen kan worden. Pas de mapping
+                aan en draai opnieuw proef tot het beeld klopt.
+
+                ### Importeren
+
+                "Importeren" voegt de rijen toe die passen. Rijen met een probleem worden
+                overgeslagen; die kunt u in het bronbestand corrigeren en opnieuw aanbieden.
+                Vult u een naam in bij "Mapping bewaren voor hergebruik", dan wordt de
+                mapping opgeslagen. Biedt u later een bestand met dezelfde kolommen aan, dan
+                herkent OpenVWR de indeling en is de mapping al ingevuld.
+
+                Koppelt u een kolom aan "Bronkenmerk", bijvoorbeeld het meldnummer uit het
+                bronsysteem, dan herkent OpenVWR de rij bij een volgende import aan dat
+                kenmerk en ontstaan er geen dubbelen. Zonder bronkenmerk maakt een tweede
+                import van hetzelfde bestand de records opnieuw aan.
+
+                > **Let op**: Geïmporteerde records komen als gewoon bronrecord binnen. Ze
+                > hebben nog geen versie en doorlopen het goedkeuringsproces pas als u er
+                > een aanmaakt.
+
+                MARKDOWN;
+    }
+
+    private static function importKoppelingen(): string
+    {
+        return <<<'MARKDOWN'
+                ### Koppelingen naar verwerkers en systemen
+
+                Een kolom kan ook naar een gekoppeld record verwijzen, zoals een verwerker of
+                systeem. Die staan in de keuzelijst onder **Koppelingen**. OpenVWR zoekt de
+                naam op in het register en gebruikt het bestaande record; bestaat het nog
+                niet, dan wordt het aangemaakt. Staan er meerdere namen in één cel, zet ze
+                dan onder elkaar in die cel.
+
+                Hoort er meer bij dan een naam, dan kan dat uit aparte kolommen komen. Voor
+                een verwerker biedt de lijst bijvoorbeeld ook "Verwerkers - E-mail" en
+                "Verwerkers - Postcode". Die kolommen horen bij dezelfde verwerker; staan er
+                meerdere namen in één cel, dan wordt op volgorde gekoppeld - de tweede naam
+                krijgt het tweede e-mailadres.
+
+                Verschillen in schrijfwijze worden opgevangen: hoofdletters, dubbele spaties
+                en rechtsvormen als "B.V." leiden tot hetzelfde record. Namen die alleen op
+                elkaar *lijken* worden niet samengevoegd - "Zorggroep Noord" en "Zorggroep
+                Oost" blijven gescheiden.
+
+                Na afloop toont het scherm welke records nieuw zijn aangemaakt en welke op
+                een afwijkende schrijfwijze zijn gekoppeld. Loop die lijst na: zo voorkomt u
+                dat dezelfde verwerker onder twee namen in het register komt.
+
+                Bestaan er al meerdere records met dezelfde naam, dan koppelt OpenVWR aan het
+                oudste en meldt dit. Voeg die dubbelen samen, want de koppeling wijst dan
+                mogelijk naar het verkeerde record.
+
+                Voor verwerkingen geldt een uitzondering: die worden **niet** automatisch
+                aangemaakt. Verwijst een datalek naar een verwerking die niet bestaat, dan
+                wordt dat na afloop gemeld en legt u de koppeling zelf. Zo groeit het register
+                niet ongemerkt met lege verwerkingen.
+
+                ### Opzoeklijsten
+
+                Velden die uit een opzoeklijst komen, zoals de dienst waar een verwerking bij
+                hoort, staan in de keuzelijst onder **Opzoeklijsten**. Komt een waarde nog
+                niet in de lijst voor, dan wordt hij toegevoegd - dat is bij deze lijsten
+                juist de bedoeling.
+                MARKDOWN;
     }
 
     private static function export(): Topic

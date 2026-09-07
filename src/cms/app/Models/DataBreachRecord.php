@@ -34,6 +34,7 @@ use Spatie\ModelStates\HasStates;
 use Spatie\ModelStates\HasStatesContract;
 
 /**
+ * @property string|null $import_id
  * @property string $name
  * @property string $type
  * @property DataBreachRecordState $state
@@ -105,6 +106,7 @@ class DataBreachRecord extends Model implements EntityNumerable, HasStatesContra
 
     protected static string $collectionClass = DataBreachRecordCollection::class;
     protected $fillable = [
+        'import_id',
         'name',
         'type',
         'state',
@@ -161,6 +163,8 @@ class DataBreachRecord extends Model implements EntityNumerable, HasStatesContra
     {
         return [
             'ap_reported' => 'boolean',
+            'fg_reported' => 'boolean',
+            'reported_to_involved' => 'boolean',
             'state' => DataBreachRecordState::class,
 
             'reported_at' => 'date',

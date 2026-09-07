@@ -12,6 +12,7 @@ use App\Filament\Forms\Components\RelationTableColumns;
 use App\Filament\Forms\Components\Section\InformationBlockSection;
 use App\Filament\Forms\Components\TagsInput;
 use App\Filament\Forms\Components\TextInput\EntityNumber;
+use App\Filament\Forms\Components\TextInput\ImportNumber;
 use App\Filament\Forms\FormHelper;
 use App\Filament\Resources\DocumentResource\DocumentResourceForm;
 use App\Filament\Resources\ResponsibleResource\ResponsibleResourceForm;
@@ -23,6 +24,7 @@ use App\Models\Responsible;
 use App\Models\Wpg\WpgProcessingRecord;
 use App\Rules\CurrentOrganisation;
 use Filament\Forms\Components\Component;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -48,8 +50,12 @@ class DataBreachRecordResourceFormSchemas
                 __('information_blocks.data_breach_record.step_name_title'),
                 __('information_blocks.data_breach_record.step_name_info'),
             ),
-            EntityNumber::make()
-                ->label(__('data_breach_record.number')),
+            Grid::make()
+                ->schema([
+                    EntityNumber::make()
+                        ->label(__('data_breach_record.number')),
+                    ImportNumber::make(),
+                ]),
             TextInput::make('name')
                 ->label(__('data_breach_record.name'))
                 ->helperText(__('data_breach_record.help_name'))
