@@ -67,7 +67,7 @@ final class OverigeFuncties
                 Het register hoeft u alleen te kiezen bij een Excel- of CSV-bestand. Biedt u
                 een OpenVWR-export aan, dan bepaalt het bestand dat zelf.
 
-                ![Bestand kiezen](/handleiding/05_overige_functies/06_import-mapping_upload.png)
+                ![Bestand kiezen](/handleiding/05_overige_functies/06_import_upload.png)
 
                 ### Mapping controleren
 
@@ -92,13 +92,15 @@ final class OverigeFuncties
                 bijvoorbeeld de naam van de melder of de afdeling - laat u op "niet
                 importeren" staan.
 
-                ![Wat wel en niet meegaat](/handleiding/05_overige_functies/07_import-mapping_mapping.png)
+                ![Mapping controleren](/handleiding/05_overige_functies/07_import_mapping.png)
 
                 Onder het gekozen veld staat hoe de waarde gelezen wordt: als tekst, datum,
                 ja/nee of lijst. Dat is geen keuze maar een gevolg van het veld dat u kiest -
                 een datumveld leest altijd een datum.
 
-                ![Het type volgt uit het veld](/handleiding/05_overige_functies/08_import-mapping_kolom.png)
+                Kopcellen uit sjablonen die een invulinstructie bevatten ("Omschrijving -
+                noteer hier de naam", "Grondslag, meerdere keuzes mogelijk") worden
+                teruggebracht tot de naam van de kolom.
 
                 ### Datums
 
@@ -109,6 +111,8 @@ final class OverigeFuncties
                 dat is. Zonder antwoord wordt er niet proefgedraaid of geïmporteerd:
                 raden is precies wat hier niet mag gebeuren. De keuze wordt met de
                 mapping bewaard.
+
+                ![Welke datum is dat?](/handleiding/05_overige_functies/08_import_datumformaat.png)
 
                 ### Ja/nee omzetten naar een datum
 
@@ -130,6 +134,12 @@ final class OverigeFuncties
                 hebben, met per rij de reden - bijvoorbeeld een verplicht veld dat leeg
                 blijft, of een waarde die niet als datum gelezen kan worden. Pas de mapping
                 aan en draai opnieuw proef tot het beeld klopt.
+
+                ![Resultaat van een proefdraai](/handleiding/05_overige_functies/09_import_proefdraai.png)
+
+                Velden die het register verplicht stelt maar die in het bestand ontbreken,
+                beginnen zoals op het invoerformulier: een ja/nee-veld als "nee", een vaste
+                keuze als de eerste optie. Andere ontbrekende velden blijven leeg.
 
                 ### Importeren
 
@@ -176,6 +186,8 @@ final class OverigeFuncties
                 Na afloop toont het scherm welke records nieuw zijn aangemaakt en welke op
                 een afwijkende schrijfwijze zijn gekoppeld. Loop die lijst na: zo voorkomt u
                 dat dezelfde verwerker onder twee namen in het register komt.
+
+                ![Na de import: wat is aangemaakt en gekoppeld](/handleiding/05_overige_functies/10_import_resultaat.png)
 
                 Bestaan er al meerdere records met dezelfde naam, dan koppelt OpenVWR aan het
                 oudste en meldt dit. Voeg die dubbelen samen, want de koppeling wijst dan

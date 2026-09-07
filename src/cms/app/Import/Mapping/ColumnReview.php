@@ -213,9 +213,10 @@ readonly class ColumnReview
             $date = $this->dateFormatDetector->parse($sample, $format);
             Assert::isInstanceOf($date, CarbonImmutable::class);
 
+            // A time is only worth showing when there is one.
             $examples[$format] = sprintf(
                 '%s (%s)',
-                $date->translatedFormat('j F Y' . (Str::contains($format, 'H') ? ' H:i' : '')),
+                $date->translatedFormat($date->format('H:i') === '00:00' ? 'j F Y' : 'j F Y H:i'),
                 $this->dateFormatDetector->describe($format),
             );
         }

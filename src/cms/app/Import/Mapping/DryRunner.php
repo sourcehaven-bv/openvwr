@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Import\Mapping;
 
+use App\Enums\Import\ImportTarget;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 
 use function __;
+use function array_map;
 use function implode;
 
 /**
@@ -20,6 +22,14 @@ class DryRunner
         private readonly MappingEngine $mappingEngine,
         private readonly FormDefaults $formDefaults,
     ) {
+    }
+
+    /**
+     * @param class-string<Model> $modelClass
+     */
+    private function labelFor(string $modelClass, string $attribute): string
+    {
+        return (new TargetOptions(ImportTarget::forModel($modelClass)))->label($attribute);
     }
 
     /**
@@ -77,7 +87,10 @@ class DryRunner
         }
 
         if ($missing !== []) {
-            return __('import_mapping.issue.missing_required', ['fields' => implode(', ', $missing)]);
+            // Named as on the screen, not by column: "Naam", not "name".
+            $labels = array_map(fn (string $attribute): string => $this->labelFor($profile->target, $attribute), $missing);
+
+            return __('import_mapping.issue.missing_required', ['fields' => implode(', ', $labels)]);
         }
 
         return null;

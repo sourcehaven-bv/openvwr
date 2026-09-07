@@ -5,6 +5,8 @@ declare(strict_types=1);
 use App\Enums\Import\ImportTarget;
 use App\Enums\Import\MissingEntityPolicy;
 use App\Import\Mapping\TargetOptions;
+use App\Models\DataBreachRecord;
+use App\Models\Organisation;
 use Illuminate\Support\Facades\Config;
 
 it('offers every register, each with the fields, links and lookups its model has', function (): void {
@@ -63,4 +65,9 @@ it('hides the wpg register while its feature flag is off', function (): void {
     $keys = array_map(static fn ($relation): string => $relation->key, ImportTarget::DataBreachRecord->relations());
 
     expect($keys)->not->toContain('wpgProcessingRecords');
+});
+
+it('finds the target for a model and refuses a model that is none', function (): void {
+    expect(ImportTarget::forModel(DataBreachRecord::class))->toBe(ImportTarget::DataBreachRecord)
+        ->and(fn () => ImportTarget::forModel(Organisation::class))->toThrow(InvalidArgumentException::class);
 });

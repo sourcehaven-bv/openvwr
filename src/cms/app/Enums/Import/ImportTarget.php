@@ -32,6 +32,7 @@ use App\Models\Wpg\WpgProcessingRecord;
 use App\Models\Wpg\WpgProcessingRecordService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use InvalidArgumentException;
 use Webmozart\Assert\Assert;
 
 use function __;
@@ -108,6 +109,20 @@ enum ImportTarget: string
             self::DpiaRecord => DpiaRecord::class,
             self::DpiaPrescanRecord => DpiaPrescanRecord::class,
         };
+    }
+
+    /**
+     * @param class-string<Model> $modelClass
+     */
+    public static function forModel(string $modelClass): self
+    {
+        foreach (self::cases() as $case) {
+            if ($case->modelClass() === $modelClass) {
+                return $case;
+            }
+        }
+
+        throw new InvalidArgumentException(sprintf('%s is not an import target', $modelClass));
     }
 
     public function label(): string

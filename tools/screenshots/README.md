@@ -34,6 +34,12 @@ CMS_DIR=../../src/cms npm run capture -- --out ./preview  # eerst bekijken
 Gebruik `--out ./preview` als je het resultaat wilt vergelijken voordat je de
 bestaande afbeeldingen overschrijft.
 
+De importfiguren (`--only import-upload,import-mapping,import-date-format,import-dry-run,import-result`)
+uploaden de fixtures uit `docs/qa/fixtures/import-mapping/`; `import-result`
+schrijft daarbij drie verwerkingen in de geseede organisatie. Zet
+`DEBUGBAR_ENABLED=false` op de server die je fotografeert, anders staat de
+debugbar onder in elke figuur.
+
 Een volledige run duurt enkele minuten. Zet hem op een laptop achter
 `caffeinate`, anders valt de machine op accu tussentijds in slaap:
 

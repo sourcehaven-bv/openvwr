@@ -57,7 +57,7 @@ it('reports a row that misses a required field', function (): void {
 
     expect($result->fitCount())->toBe(0)
         ->and($result->issueCount())->toBe(1)
-        ->and($result->issues[0]->reason)->toContain('name');
+        ->and($result->issues[0]->reason)->toContain(__('data_breach_record.name'));
 });
 
 it('reports a value that cannot be converted, naming the source column', function (): void {
