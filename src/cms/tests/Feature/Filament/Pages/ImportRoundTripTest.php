@@ -196,12 +196,18 @@ it('imports its own processing register export back, links and lookups included'
     ]));
     $original->tags()->attach(Tag::factory()->create(['organisation_id' => $organisationId, 'name' => 'Kernproces']));
 
-    $page = importWorkbook(
-        ImportTarget::AvgResponsibleProcessingRecord,
-        exportWorkbook(AvgResponsibleProcessingRecordExporter::class, [$original]),
-    );
+    $workbook = exportWorkbook(AvgResponsibleProcessingRecordExporter::class, [$original]);
+
+    // The verwerkers, contactpersoon and doel are removed before the import,
+    // so their details can only come back through the sheet.
+    Processor::query()->where('organisation_id', $organisationId)->get()->each->delete();
+    ContactPerson::query()->where('organisation_id', $organisationId)->get()->each->delete();
+    AvgGoal::query()->where('organisation_id', $organisationId)->get()->each->delete();
+
+    $page = importWorkbook(ImportTarget::AvgResponsibleProcessingRecord, $workbook);
 
     $copy = AvgResponsibleProcessingRecord::query()->whereKeyNot($original->id)->where('name', 'Salarisadministratie')->first();
+    $firmaB = Processor::query()->where('name', 'Firma B')->firstOrFail();
 
     expect($page->result['imported'])->toBe(1)
         ->and($page->result['issues'])->toBe([])
@@ -214,7 +220,7 @@ it('imports its own processing register export back, links and lookups included'
         ->and($copy?->measures_description)->toBe('Toegang op basis van rol; logging van inzage.')
         ->and($copy?->avgResponsibleProcessingRecordService?->name)->toBe('HR')
         ->and($copy?->processors()->pluck('name')->sort()->values()->all())->toBe(['Firma A', 'Firma B'])
-        ->and($firmaB->refresh()->email)->toBe('info@firma-b.example')
+        ->and($firmaB->email)->toBe('info@firma-b.example')
         ->and(Processor::query()->where('name', 'Firma A')->firstOrFail()->email)->toBe('')
         ->and($firmaB->address?->city)->toBe('Utrecht')
         ->and($copy?->receivers()->pluck('description')->all())->toBe(['Belastingdienst'])
@@ -226,7 +232,6 @@ it('imports its own processing register export back, links and lookups included'
         ->and($copy?->contactPersons()->pluck('name')->all())->toBe(['P. de Vries'])
         ->and(ContactPerson::query()->where('name', 'P. de Vries')->firstOrFail()->email)->toBe('p.devries@example.org')
         ->and($copy?->dataBreachRecords()->pluck('name')->all())->toBe(['Mail naar verkeerde ontvanger'])
-        // Everything the export names already exists; nothing may be added twice.
         ->and(Processor::query()->where('organisation_id', $organisationId)->count())->toBe(2)
         ->and(AvgGoal::query()->where('organisation_id', $organisationId)->count())->toBe(1)
         ->and(AvgResponsibleProcessingRecordService::query()->where('organisation_id', $organisationId)->count())->toBe(1)
