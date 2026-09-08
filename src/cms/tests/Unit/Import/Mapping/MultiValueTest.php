@@ -26,3 +26,11 @@ it('takes a folded row as it is and ignores what is not text', function (): void
     expect(MultiValue::entries(['a@x', null, 'b@x']))->toBe(['a@x', '', 'b@x'])
         ->and(MultiValue::entries(42))->toBe([]);
 });
+
+it('keeps a choice that itself contains a comma in one piece', function (): void {
+    $options = ['Naam', 'Adres, postcode en woonplaats', 'Telefoonnummer'];
+
+    expect(MultiValue::split('Naam, Adres, postcode en woonplaats, Telefoonnummer', "\n", $options))
+        ->toBe(['Naam', 'Adres, postcode en woonplaats', 'Telefoonnummer'])
+        ->and(MultiValue::split('Naam, Onbekend', "\n", $options))->toBe(['Naam', 'Onbekend']);
+});
