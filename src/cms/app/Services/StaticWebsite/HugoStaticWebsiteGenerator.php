@@ -22,7 +22,7 @@ class HugoStaticWebsiteGenerator implements StaticWebsiteGenerator
     public function __construct(
         private readonly Filesystem $filesystem,
         private readonly LoggerInterface $logger,
-        private readonly string $baseUrl,
+        private readonly ?string $baseUrl,
         private readonly string $hugoContentFolder,
         private readonly string $buildScriptPath,
     ) {
@@ -55,6 +55,13 @@ class HugoStaticWebsiteGenerator implements StaticWebsiteGenerator
 
     private function generateStaticWebsite(string $sourcePath): void
     {
+        // STATIC_WEBSITE_BASE_URL has no default, so an unset env var arrives
+        // here as null. Report it as a config problem instead of letting a
+        // TypeError escape from the container while it builds this class.
+        if ($this->baseUrl === null || $this->baseUrl === '') {
+            throw new BuildException('STATIC_WEBSITE_BASE_URL is not configured; cannot build the static website.');
+        }
+
         // Validate build script exists and is executable
         if (!file_exists($this->buildScriptPath)) {
             throw new BuildException(sprintf('Build script not found: %s', $this->buildScriptPath));
