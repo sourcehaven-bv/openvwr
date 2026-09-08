@@ -76,10 +76,6 @@ class AvgProcessorProcessingRecordExporter extends Exporter
                 ->label(__('avg_processor_processing_record.victims')),
             ExportColumn::make('convicts')
                 ->label(__('avg_processor_processing_record.convicts')),
-            ExportColumn::make('third_parties')
-                ->label(__('avg_processor_processing_record.third_parties')),
-            ExportColumn::make('third_parties_description')
-                ->label(__('avg_processor_processing_record.third_parties_description')),
 
             // besluitvorming
             ExportColumn::make('decision_making')

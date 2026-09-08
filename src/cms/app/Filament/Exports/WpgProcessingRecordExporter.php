@@ -124,8 +124,6 @@ class WpgProcessingRecordExporter extends Exporter
             // beveiliging
             ExportColumn::make('has_security')
                 ->label(__('wpg_processing_record.has_security')),
-            ExportColumn::make('security')
-                ->label(__('wpg_processing_record.security')),
             ExportColumn::make('measures_implemented')
                 ->label(__('processor.measures_implemented')),
             ExportColumn::make('other_measures')
