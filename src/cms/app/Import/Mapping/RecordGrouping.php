@@ -6,7 +6,6 @@ namespace App\Import\Mapping;
 
 use Illuminate\Support\Arr;
 
-use function array_key_exists;
 use function array_search;
 use function count;
 use function in_array;
@@ -59,9 +58,9 @@ class RecordGrouping
                 continue;
             }
 
-            $candidate = ['header' => $header, 'groups' => count($groups), 'rank' => $this->keyRank($header)];
+            $candidate = ['header' => $header, 'rank' => $this->keyRank($header)];
 
-            if ($best === null || $this->preferred($candidate, $best)) {
+            if ($best === null || $candidate['rank'] < $best['rank']) {
                 $best = $candidate;
             }
         }
@@ -157,24 +156,11 @@ class RecordGrouping
     }
 
     /**
-     * Several columns can mark the same rows (the id, the name, the status);
-     * the finest division wins, then the one that is named like a key, then
-     * the leftmost.
-     *
-     * @param array{header: string, groups: int, rank: int} $candidate
-     * @param array{header: string, groups: int, rank: int} $best
-     */
-    private function preferred(array $candidate, array $best): bool
-    {
-        if ($candidate['groups'] !== $best['groups']) {
-            return $candidate['groups'] > $best['groups'];
-        }
-
-        return $candidate['rank'] < $best['rank'];
-    }
-
-    /**
-     * 0 for a column called nummer/id/kenmerk, 1 for a name, 2 for the rest.
+     * Several columns can mark the rows of a record (the id, the name, the
+     * status), and every column that qualifies marks the same rows: one that
+     * divided them further would have disagreed within a group. So only the
+     * name decides: 0 for a column called nummer/id/kenmerk, 1 for a name, 2
+     * for the rest, and the leftmost wins a tie.
      */
     private function keyRank(string $header): int
     {
@@ -190,10 +176,6 @@ class RecordGrouping
      */
     private function cell(array $row, string $header): ?string
     {
-        if (!array_key_exists($header, $row)) {
-            return null;
-        }
-
         $value = Arr::get($row, $header);
 
         if ($value === null) {
