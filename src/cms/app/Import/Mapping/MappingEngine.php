@@ -31,6 +31,7 @@ class MappingEngine
 {
     public function __construct(
         private readonly DateFormatDetector $dateFormatDetector,
+        private readonly FieldOptions $fieldOptions,
     ) {
     }
 
@@ -42,10 +43,12 @@ class MappingEngine
      */
     public function apply(MappingProfile $profile, array $row): array
     {
+        $modelClass = $profile->target;
+        $model = new $modelClass();
         $mapped = [];
 
         foreach ($profile->fields as $field) {
-            $value = $this->transform(Arr::get($row, $field->source), $field);
+            $value = $this->transform(Arr::get($row, $field->source), $field, $model);
 
             $mapped[$field->target] = $value;
         }
@@ -53,7 +56,7 @@ class MappingEngine
         return $mapped;
     }
 
-    private function transform(mixed $value, MappingField $field): mixed
+    private function transform(mixed $value, MappingField $field, Model $model): mixed
     {
         if ($value === null) {
             return null;
@@ -65,7 +68,8 @@ class MappingEngine
             MappingTransform::Date => $this->toDate($value, $field->dateFormat),
             MappingTransform::Boolean => $this->toBoolean($value),
             MappingTransform::Integer => $this->toInteger($value),
-            MappingTransform::StringList => $this->toStringList($value),
+            // The fixed choices tell a comma inside a choice from one between two.
+            MappingTransform::StringList => $this->toStringList($value, $this->fieldOptions->for($model, $field->target)),
         };
     }
 
@@ -161,9 +165,11 @@ class MappingEngine
     }
 
     /**
+     * @param array<int, string> $options
+     *
      * @return array<int, string>|null
      */
-    private function toStringList(mixed $value): ?array
+    private function toStringList(mixed $value, array $options): ?array
     {
         if (is_array($value)) {
             $values = [];
@@ -182,7 +188,7 @@ class MappingEngine
             return null;
         }
 
-        $values = MultiValue::split($text);
+        $values = MultiValue::split($text, "\n", $options);
 
         return $values === [] ? null : $values;
     }

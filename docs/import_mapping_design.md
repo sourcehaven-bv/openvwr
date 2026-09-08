@@ -469,6 +469,20 @@ per rij één item van één lijst):
 | Iedere rij werd een record; met het Id als bronkenmerk werd rij 1 geïmporteerd en de rest overgeslagen, zodat systemen, doelen en betrokkenen nooit aankwamen | `RecordGrouping` stelt de kolom voor waarvan de herhaalde waarde de rijen van één record markeert (alle kolommen die op elk van die rijen gevuld zijn stemmen overeen, alleen de ijle kolommen verschillen); de gebruiker bevestigt of kiest een andere kolom. `RecordGrouper` vouwt de rijen samen: een gewoon veld en een opzoeklijst krijgen één waarde (verschil = aandachtsrij), koppelingen, hun attributen en notities krijgen één invoer per rij, lege plekken inbegrepen, zodat de derde naam bij het derde e-mailadres blijft. De kolom gaat als `identity` mee in het profiel |
 | Kolomgroepen (Id2, Naam3, Type, Telefoon … beschrijven één verantwoordelijke) | Nog niet: de analyser kent geen blokken en koppelt "Postcode" aan het enige adres dat hij kent (verwerkers) |
 
+`ImportRoundTripEveryFieldTest` vult voor elk van de vijf registers ieder
+importveld met willekeurige waarden (faker), hangt alle soorten koppelingen
+aan, exporteert, verwijdert record en gedeelde entiteiten, importeert het
+werkboek en exporteert de kopie: de twee exportregels moeten kolom voor kolom
+gelijk zijn, op nummer en tijdstempels na. Dat legde bloot:
+
+| Bevinding | Oplossing |
+|---|---|
+| Keuzes met een komma erin ("Hacking, malware en/of phishing") werden bij een met ", " samengevoegde lijst in stukken gelezen, en de kolom kwam daardoor op het verkeerde veld terecht | `MultiValue::split()` kent de vaste keuzes en plakt een keuze die op zijn eigen komma is geknipt weer aan elkaar; scorer en engine geven de keuzes mee |
+| `review_at` heeft een eigen cast (`CalendarDateCast`) en gold als tekst | `TransformResolver` kent die cast; zonder cast beslist het kolomtype in de database (bool, date, int, json) |
+| `measures_implemented` had in de AVG- en WPG-modellen een verkeerd gespelde cast (`measures`), WPG miste de cast op `has_pseudonymization`; "ja" ging als tekst naar een boolean-kolom en de database weigerde de rij | Casts hersteld |
+| `created_at`/`updated_at` zijn fillable op WPG en werden als doel aangeboden | Tijdstempels zijn intern |
+| `meta_national_id` en `meta_source_id` (algoritmes) werden als foreign key verborgen | Alleen een uuid-kolom met `_id` is een foreign key |
+
 Nog niet ondersteund, bewust: kolomgroepen (zie boven), categorieën persoonsgegevens en bewaartermijn
 (die horen bij de gegevens per betrokkene, twee niveaus diep), de bijzondere
 gegevens per betrokkene (die liggen in OpenVWR op de gedeelde betrokkene, niet

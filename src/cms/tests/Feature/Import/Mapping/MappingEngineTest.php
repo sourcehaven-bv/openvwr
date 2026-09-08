@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Enums\Import\MappingConfidence;
 use App\Enums\Import\MappingTransform;
 use App\Import\Mapping\DateFormatDetector;
+use App\Import\Mapping\FieldOptions;
 use App\Import\Mapping\MappingEngine;
 use App\Import\Mapping\MappingField;
 use App\Import\Mapping\MappingProfile;
@@ -13,7 +14,7 @@ use Carbon\CarbonImmutable;
 
 function engine(): MappingEngine
 {
-    return new MappingEngine(new DateFormatDetector());
+    return new MappingEngine(new DateFormatDetector(), new FieldOptions());
 }
 
 function profileWith(MappingField ...$fields): MappingProfile

@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace App\Import\Mapping;
 
 use function array_map;
+use function array_slice;
 use function count;
 use function explode;
+use function implode;
+use function in_array;
 use function is_array;
 use function is_string;
+use function mb_strtolower;
 use function preg_replace;
 use function str_contains;
 use function trim;
@@ -28,18 +32,60 @@ final class MultiValue
 
     /**
      * @param non-empty-string $separator
+     * @param array<int, string> $options the values the cell may hold when it
+     *        is a fixed choice; a choice that itself contains ", " ("Hacking,
+     *        malware en/of phishing") is then kept whole
      *
      * @return array<int, string> trimmed, without empty entries
      */
-    public static function split(string $cell, string $separator = "\n"): array
+    public static function split(string $cell, string $separator = "\n", array $options = []): array
     {
         $parts = self::parts($cell, $separator);
 
         if (count($parts) === 1 && $separator !== self::LIST_SEPARATOR && str_contains($cell, self::LIST_SEPARATOR)) {
-            return self::parts($cell, self::LIST_SEPARATOR);
+            return self::rejoinKnown(self::parts($cell, self::LIST_SEPARATOR), $options);
         }
 
         return $parts;
+    }
+
+    /**
+     * Puts back together the pieces of a choice that was cut at its own comma:
+     * the longest run of adjacent pieces that spells a known choice wins.
+     *
+     * @param array<int, string> $parts
+     * @param array<int, string> $options
+     *
+     * @return array<int, string>
+     */
+    private static function rejoinKnown(array $parts, array $options): array
+    {
+        if ($options === []) {
+            return $parts;
+        }
+
+        $known = array_map(static fn (string $option): string => mb_strtolower(trim($option)), $options);
+        $joined = [];
+        $count = count($parts);
+
+        for ($start = 0; $start < $count; $start++) {
+            $taken = 1;
+
+            for ($end = $count; $end > $start + 1; $end--) {
+                $candidate = implode(self::LIST_SEPARATOR, array_slice($parts, $start, $end - $start));
+
+                if (in_array(mb_strtolower($candidate), $known, true)) {
+                    $taken = $end - $start;
+
+                    break;
+                }
+            }
+
+            $joined[] = implode(self::LIST_SEPARATOR, array_slice($parts, $start, $taken));
+            $start += $taken - 1;
+        }
+
+        return $joined;
     }
 
     /**

@@ -148,7 +148,7 @@ class CandidateScorer
         $matches = 0;
 
         foreach ($samples as $sample) {
-            $parts = MultiValue::split($sample);
+            $parts = MultiValue::split($sample, "\n", $options);
 
             if ($parts !== [] && array_diff(array_map(Str::lower(...), $parts), $allowed) === []) {
                 $matches++;
