@@ -8,7 +8,6 @@ use App\Enums\Import\MappingConfidence;
 use App\Enums\Import\MappingTransform;
 use Webmozart\Assert\Assert;
 
-use function array_key_exists;
 use function is_string;
 
 /**
@@ -55,30 +54,28 @@ readonly class MappingField
         Assert::string($data['source']);
         Assert::string($data['target']);
 
-        $transform = array_key_exists('transform', $data) && is_string($data['transform'])
-            ? MappingTransform::from($data['transform'])
-            : MappingTransform::Text;
+        $transform = self::stringOrNull($data, 'transform');
+        $confidence = self::stringOrNull($data, 'confidence');
 
-        $confidence = array_key_exists('confidence', $data) && is_string($data['confidence'])
-            ? MappingConfidence::from($data['confidence'])
-            : MappingConfidence::Manual;
+        return new self(
+            $data['source'],
+            $data['target'],
+            $transform === null ? MappingTransform::Text : MappingTransform::from($transform),
+            $confidence === null ? MappingConfidence::Manual : MappingConfidence::from($confidence),
+            self::stringOrNull($data, 'true_date'),
+            self::stringOrNull($data, 'relation'),
+            dateFormat: self::stringOrNull($data, 'date_format'),
+        );
+    }
 
-        $trueDate = null;
-        if (array_key_exists('true_date', $data) && is_string($data['true_date'])) {
-            $trueDate = $data['true_date'];
-        }
+    /**
+     * @param array<string, mixed> $data
+     */
+    private static function stringOrNull(array $data, string $key): ?string
+    {
+        $value = $data[$key] ?? null;
 
-        $relation = null;
-        if (array_key_exists('relation', $data) && is_string($data['relation'])) {
-            $relation = $data['relation'];
-        }
-
-        $dateFormat = null;
-        if (array_key_exists('date_format', $data) && is_string($data['date_format'])) {
-            $dateFormat = $data['date_format'];
-        }
-
-        return new self($data['source'], $data['target'], $transform, $confidence, $trueDate, $relation, dateFormat: $dateFormat);
+        return is_string($value) ? $value : null;
     }
 
     /**

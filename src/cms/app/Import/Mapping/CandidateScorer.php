@@ -9,20 +9,13 @@ use Illuminate\Support\Str;
 
 use function array_diff;
 use function array_filter;
-use function array_intersect;
 use function array_map;
-use function array_unique;
-use function array_values;
 use function count;
 use function explode;
 use function in_array;
 use function is_numeric;
-use function levenshtein;
-use function max;
 use function min;
 use function preg_match;
-use function similar_text;
-use function strlen;
 use function trim;
 
 /**
@@ -47,24 +40,8 @@ class CandidateScorer
     /** At or above this the suggestion is applied without asking. */
     public const CONFIDENT = 0.80;
 
-    /**
-     * Words too common in Dutch field labels to distinguish anything.
-     */
-    private const STOP_WORDS = ['de', 'het', 'een', 'van', 'aan', 'op', 'in', 'is', 'bij', 'voor', 'of', 'en'];
-
-    /**
-     * Shared by so many fields that matching on them proves little.
-     */
-    /**
-     * The score for a heading that is wholly contained in a label that says
-     * considerably more: a suggestion, never a confident one.
-     */
-    private const PARTIAL_LABEL = 0.75;
-
-    private const WEAK_TOKENS = ['datum', 'gemeld', 'nummer', 'categorie', 'categorieen', 'categorieën', 'van', 'de', 'het', 'een', 'en', 'of'];
-
     public function __construct(
-        private readonly FieldSynonyms $fieldSynonyms,
+        private readonly HeadingSimilarity $headingSimilarity,
     ) {
     }
 
@@ -84,24 +61,15 @@ class CandidateScorer
         $content = $options === []
             ? $this->contentScore($transform, $samples)
             : $this->optionScore($options, $samples);
-
-        // A column of AP reference numbers is not a yes/no field, whatever its
-        // heading says, and free text is not a choice from a fixed list: values
-        // that fit nowhere count against the name, so the column is left for
-        // the user to place.
-        $contradicted = $samples !== [] && $content === 0.0 && ($options !== [] || $transform !== MappingTransform::Text);
+        $contradicted = $this->contradicts($content, $transform, $samples, $options);
 
         // A heading that *is* the field name or its label leaves nothing to
         // interpret, unless the values say otherwise.
-        if (!$contradicted && $this->isExactName($header, $fieldLabel, $attribute)) {
+        if (!$contradicted && $this->headingSimilarity->isExactName($header, $fieldLabel, $attribute)) {
             return 1.0;
         }
 
-        $name = $this->nameScore($header, $fieldLabel, $attribute);
-
-        if ($contradicted) {
-            $name *= 0.5;
-        }
+        $name = $this->headingSimilarity->nameScore($header, $fieldLabel, $attribute) * ($contradicted ? 0.5 : 1.0);
 
         // An exact name match is decisive; otherwise the values get a real say,
         // so a mistyped column cannot win on its heading alone.
@@ -117,138 +85,22 @@ class CandidateScorer
         return $name < self::CONFIDENT ? min($score, self::CONFIDENT - 0.01) : $score;
     }
 
-    private function isExactName(string $header, string $fieldLabel, string $attribute): bool
+    /**
+     * A column of AP reference numbers is not a yes/no field, whatever its
+     * heading says, and free text is not a choice from a fixed list: values
+     * that fit nowhere count against the name, so the column is left for the
+     * user to place.
+     *
+     * @param array<int, string> $samples
+     * @param array<int, string> $options
+     */
+    private function contradicts(float $content, MappingTransform $transform, array $samples, array $options): bool
     {
-        $canonical = $this->fieldSynonyms->canonicalise($header);
-
-        if ($canonical === '') {
+        if ($samples === [] || $content > 0.0) {
             return false;
         }
 
-        return $canonical === $this->fieldSynonyms->canonicalise($attribute)
-            || $canonical === $this->fieldSynonyms->canonicalise($fieldLabel);
-    }
-
-    private function nameScore(string $header, string $fieldLabel, string $attribute): float
-    {
-        $best = 0.0;
-
-        foreach ([$fieldLabel, $attribute] as $candidate) {
-            $best = max($best, $this->similarity($header, $candidate));
-        }
-
-        $tokenScore = $this->tokenScore($header, $fieldLabel);
-
-        // A heading whose words all occur in the label is a better signal than
-        // raw string overlap, which favours whichever label is shortest.
-        if ($tokenScore >= 0.999) {
-            return 1.0;
-        }
-
-        // "Omschrijving" is every word of the heading but only half of the
-        // label "Omschrijving beveiligingsmaatregelen": worth suggesting, not
-        // worth filling in unseen, however similar the strings look.
-        if ($tokenScore === self::PARTIAL_LABEL) {
-            return self::PARTIAL_LABEL;
-        }
-
-        // Without a single shared word, character similarity is coincidence:
-        // "Melder" and "Maatregelen" look alike but mean nothing to each other.
-        if ($tokenScore === 0.0) {
-            $best *= 0.5;
-        }
-
-        return max($best, $tokenScore);
-    }
-
-    /**
-     * Rewards shared distinctive words, which plain edit distance loses in long
-     * labels: "Melding AP" and "Gemeld aan de autoriteit persoonsgegevens (AP)"
-     * share the abbreviation that actually identifies the field.
-     */
-    private function tokenScore(string $header, string $fieldLabel): float
-    {
-        $headerTokens = $this->tokens($header);
-        $labelTokens = $this->tokens($fieldLabel);
-
-        if ($headerTokens === [] || $labelTokens === []) {
-            return 0.0;
-        }
-
-        $shared = array_intersect($headerTokens, $labelTokens);
-
-        if ($shared === []) {
-            return 0.0;
-        }
-
-        // Words shared by many fields of the same type ("datum" across every
-        // date field) say nothing about *which* one, so they count for less.
-        $weight = 0.0;
-        foreach ($shared as $token) {
-            $weight += in_array($token, self::WEAK_TOKENS, true) ? 0.25 : 1.0;
-        }
-
-        $total = 0.0;
-        foreach ($headerTokens as $token) {
-            $total += in_array($token, self::WEAK_TOKENS, true) ? 0.25 : 1.0;
-        }
-
-        $labelTotal = 0.0;
-        foreach ($labelTokens as $token) {
-            $labelTotal += in_array($token, self::WEAK_TOKENS, true) ? 0.25 : 1.0;
-        }
-
-        $coverage = $total <= 0.0 ? 0.0 : $weight / $total;
-
-        if ($coverage >= 0.999 && $labelTotal > 0.0 && $weight / $labelTotal <= 0.5) {
-            return self::PARTIAL_LABEL;
-        }
-
-        return $coverage;
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    private function tokens(string $value): array
-    {
-        $canonical = $this->fieldSynonyms->canonicalise($value);
-
-        if ($canonical === '') {
-            return [];
-        }
-
-        $tokens = [];
-        foreach (explode(' ', $canonical) as $token) {
-            // Skip filler words that appear in almost every Dutch label.
-            if ($token === '' || in_array($token, self::STOP_WORDS, true)) {
-                continue;
-            }
-
-            $tokens[] = $token;
-        }
-
-        return array_values(array_unique($tokens));
-    }
-
-    private function similarity(string $a, string $b): float
-    {
-        $left = $this->fieldSynonyms->canonicalise($a);
-        $right = $this->fieldSynonyms->canonicalise($b);
-
-        if ($left === '' || $right === '') {
-            return 0.0;
-        }
-
-        // Both sides are non-empty by the checks above.
-        $longest = max(strlen($left), strlen($right));
-        $edit = 1.0 - (levenshtein($left, $right) / $longest);
-
-        // Levenshtein punishes differing lengths harshly, so a common-substring
-        // measure keeps "Datum melding" close to "Datum melding AP".
-        similar_text($left, $right, $percent);
-
-        return max(0.0, max($edit, $percent / 100));
+        return $options !== [] || $transform !== MappingTransform::Text;
     }
 
     /**
