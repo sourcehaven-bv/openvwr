@@ -1570,3 +1570,37 @@ it('carries the grouping column into a saved profile', function (): void {
 
     expect($saved?->toMappingProfile()->identity)->toBe('Id');
 });
+
+it('proposes the mapping afresh when the register is changed on the review screen', function (): void {
+    $this->asFilamentUser();
+
+    // Dropped as a datalek, but it is a verwerking: the register is corrected
+    // afterwards and the AVG fields get their columns.
+    $page = pageAtReview([['Naam verwerking' => 'Salarisadministratie', 'Heeft verwerkers' => 'ja']], [
+        'Naam verwerking' => ['target' => ''],
+        'Heeft verwerkers' => ['target' => ''],
+    ]);
+    $page->target = ImportTarget::AvgResponsibleProcessingRecord->value;
+    $page->updatedTarget();
+
+    expect($page->step)->toBe(ImportMapping::STEP_REVIEW)
+        ->and($page->mapping['Naam verwerking']['target'])->toBe('name')
+        ->and($page->mapping['Heeft verwerkers']['target'])->toBe('has_processors');
+});
+
+it('ignores a register change before there is a sheet, and restarts when the rows are gone', function (): void {
+    $this->asFilamentUser();
+
+    $fresh = new ImportMapping();
+    $fresh->mount();
+    $fresh->target = ImportTarget::AvgResponsibleProcessingRecord->value;
+    $fresh->updatedTarget();
+
+    $expired = pageAtReview(breachRows(), breachMapping());
+    Cache::forget((string) $expired->sheetKey);
+    $expired->target = ImportTarget::AvgResponsibleProcessingRecord->value;
+    $expired->updatedTarget();
+
+    expect($fresh->step)->toBe(ImportMapping::STEP_UPLOAD)
+        ->and($expired->step)->toBe(ImportMapping::STEP_UPLOAD);
+});

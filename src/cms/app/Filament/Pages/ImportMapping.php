@@ -22,6 +22,7 @@ use App\Import\Mapping\MappingProfile;
 use App\Import\Mapping\MappingProfileRepository;
 use App\Import\Mapping\RecordGrouping;
 use App\Import\Mapping\SheetReader;
+use App\Import\Mapping\SheetStore;
 use App\Import\Mapping\TargetOptions;
 use App\Import\Mapping\TransformResolver;
 use App\Import\Mapping\UnknownMappingTargetException;
@@ -35,7 +36,6 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
@@ -48,15 +48,10 @@ use function __;
 use function abort;
 use function abort_unless;
 use function app;
-use function array_key_first;
 use function array_keys;
 use function array_sum;
-use function implode;
 use function in_array;
-use function is_array;
 use function is_string;
-use function now;
-use function sprintf;
 
 /**
  * One import screen for two kinds of file.
@@ -281,22 +276,62 @@ class ImportMapping extends Page implements HasForms
 
         $this->headers = $sheet->headers;
         $this->setRows($sheet->rows);
+        $this->mapping = $this->proposal($sheet->rows, $analyser, $repository);
+        $this->step = self::STEP_REVIEW;
+    }
 
+    /**
+     * The mapping for the chosen register: from a saved profile when the
+     * layout is known, from the analyser otherwise. Sets the recognised
+     * profile and the grouping column on the way.
+     *
+     * @param array<int, array<string, mixed>> $rows
+     *
+     * @return array<string, array<string, string>>
+     */
+    private function proposal(array $rows, MappingAnalyser $analyser, MappingProfileRepository $repository): array
+    {
         $target = $this->importTarget();
-        $modelClass = $target->modelClass();
         $saved = $repository->findByFingerprint(
             MappingProfile::fingerprint($this->headers),
             Authentication::organisation()->id,
         );
-        $recognised = $saved !== null && $saved->target === $modelClass;
+        $recognised = $saved !== null && $saved->target === $target->modelClass();
 
-        $profile = $recognised ? $saved->toMappingProfile() : $analyser->analyse($target, $this->headers, $sheet->rows);
-        $identity = $recognised ? $profile->identity : app(RecordGrouping::class)->detect($this->headers, $sheet->rows);
+        $profile = $recognised ? $saved->toMappingProfile() : $analyser->analyse($target, $this->headers, $rows);
+        $identity = $recognised ? $profile->identity : app(RecordGrouping::class)->detect($this->headers, $rows);
 
         $this->recognisedProfile = $recognised ? $saved->name : null;
-        $this->mapping = EditableMapping::fromProfile($this->headers, $profile);
         $this->groupBy = $identity ?? '';
-        $this->step = self::STEP_REVIEW;
+        $this->review = null;
+
+        return EditableMapping::fromProfile($this->headers, $profile);
+    }
+
+    /**
+     * The register can still be changed on the review screen: a sheet dropped
+     * before the register was chosen was analysed for the wrong one, and the
+     * mapping is then proposed afresh for the right one.
+     */
+    public function updatedTarget(): void
+    {
+        if ($this->step !== self::STEP_REVIEW) {
+            return;
+        }
+
+        abort_unless(static::canAccess(), 403);
+
+        $rows = $this->review()->rows();
+
+        if ($rows === []) {
+            $this->restart();
+            $this->failed(__('import_mapping.read_failed'), __('import_mapping.session_expired'));
+
+            return;
+        }
+
+        $this->result = self::EMPTY_RESULT;
+        $this->mapping = $this->proposal($rows, app(MappingAnalyser::class), app(MappingProfileRepository::class));
     }
 
     /**
@@ -432,7 +467,7 @@ class ImportMapping extends Page implements HasForms
             return null;
         }
 
-        $problem = $this->mappingProblem();
+        $problem = $this->review()->problem();
 
         if ($problem !== null) {
             $this->failed(__('import_mapping.review_heading'), $problem);
@@ -460,37 +495,9 @@ class ImportMapping extends Page implements HasForms
         return $result;
     }
 
-    /**
-     * What still has to be settled before the mapping can be run, as a message
-     * for the user; null when nothing is in the way.
-     */
-    private function mappingProblem(): ?string
-    {
-        $undecided = $this->review()->headersNeedingDateFormat();
-
-        if ($undecided !== []) {
-            return __('import_mapping.date_format_missing', ['column' => $undecided[0]]);
-        }
-
-        $duplicates = $this->review()->duplicateTargets();
-
-        if ($duplicates !== []) {
-            $target = array_key_first($duplicates);
-
-            return __('import_mapping.duplicate_target', [
-                'field' => $this->review()->options()->label($target),
-                'columns' => implode('", "', $duplicates[$target]),
-            ]);
-        }
-
-        return null;
-    }
-
     public function restart(): void
     {
-        if ($this->sheetKey !== null) {
-            Cache::forget($this->sheetKey);
-        }
+        app(SheetStore::class)->forget($this->sheetKey);
 
         $this->step = self::STEP_UPLOAD;
         $this->headers = [];
@@ -523,7 +530,7 @@ class ImportMapping extends Page implements HasForms
             $target,
             $this->headers,
             $this->mapping,
-            $this->storedRows(),
+            app(SheetStore::class)->rows($this->sheetKey),
             $this->recognisedProfile !== null,
             new TargetOptions($target),
             app(TransformResolver::class),
@@ -540,23 +547,8 @@ class ImportMapping extends Page implements HasForms
      */
     public function setRows(array $rows): void
     {
-        $this->sheetKey = sprintf('import-mapping:%s:%s', Authentication::user()->id->toString(), Str::uuid()->toString());
+        $this->sheetKey = app(SheetStore::class)->put($rows);
         $this->review = null;
-
-        Cache::put($this->sheetKey, $rows, now()->addMinutes(Config::integer('import.mapping.sheet_ttl_minutes')));
-    }
-
-    /**
-     * @return array<int, array<string, mixed>>
-     */
-    private function storedRows(): array
-    {
-        $rows = $this->sheetKey === null ? [] : Cache::get($this->sheetKey);
-
-        /** @var array<int, array<string, mixed>> $rows */
-        $rows = is_array($rows) ? $rows : [];
-
-        return $rows;
     }
 
     /**

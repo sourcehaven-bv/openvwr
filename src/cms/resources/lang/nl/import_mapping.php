@@ -12,6 +12,7 @@ return [
     'file' => 'Bestand (xlsx of csv)',
     'file_any' => 'Bestand',
     'target_help' => 'Alleen nodig voor een Excel- of CSV-bestand. Een OpenVWR-export (zip) bepaalt dit zelf.',
+    'target_review_body' => 'De kolommen zijn gekoppeld aan de velden van dit register. Kies een ander register en de mapping wordt opnieuw voorgesteld.',
 
     'archive_heading' => 'OpenVWR-export gevonden',
     'archive_body' => 'Dit bestand bevat gegevens in het formaat van OpenVWR zelf. De kolommen hoeven niet gekoppeld te worden; controleer wat er gevonden is en bevestig.',

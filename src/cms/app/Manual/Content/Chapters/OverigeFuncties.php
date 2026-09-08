@@ -71,6 +71,10 @@ final class OverigeFuncties
 
                 ### Mapping controleren
 
+                Bovenaan staat voor welk register de kolommen zijn gekoppeld. Is het
+                bestand voor een ander register bedoeld, kies dat dan daar; de mapping
+                wordt opnieuw voorgesteld.
+
                 OpenVWR probeert iedere kolom zelf aan een veld te koppelen. Dat gebeurt op
                 basis van de kolomnaam én de waarden in de kolom: een kolom met "ja" en "nee"
                 hoort bij een ja/nee-veld, ook als de naam op een datumveld lijkt. Per kolom
