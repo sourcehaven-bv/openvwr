@@ -211,6 +211,7 @@ class DataBreachRecordExporter extends Exporter
     private static function metadataColumns(): array
     {
         return [
+            self::fgRemarkColumn(),
             ExportColumn::make('created_at')
                 ->label(__('general.created_at')),
             ExportColumn::make('updated_at')

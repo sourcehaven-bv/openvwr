@@ -161,6 +161,15 @@ function fullRecord(ImportTarget $target): Model
         }
     }
 
+    if (method_exists($record, 'remarks')) {
+        $record->remarks()->create(['body' => 'Eerste notitie, met een komma.']);
+        $record->remarks()->create(['body' => "Tweede notitie\nover twee regels."]);
+    }
+
+    if (method_exists($record, 'fgRemark')) {
+        $record->fgRemark()->create(['body' => 'De FG wil dit volgend jaar opnieuw zien.']);
+    }
+
     return $record->refresh();
 }
 

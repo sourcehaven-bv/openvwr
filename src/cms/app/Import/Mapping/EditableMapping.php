@@ -268,7 +268,7 @@ class EditableMapping
      */
     private function relationFor(string $target): ?string
     {
-        if ($this->isRelationTarget($target) || RelationKey::isLookup($target) || RelationKey::isRemarks($target)) {
+        if ($this->isRelationTarget($target) || RelationKey::isLookup($target) || RelationKey::isNote($target)) {
             return $target;
         }
 

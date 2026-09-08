@@ -209,9 +209,12 @@ final class OverigeFuncties
                 Een kolom die nergens in past - een status uit het oude systeem, een
                 afdeling, een vrij tekstveld - hoeft niet verloren te gaan. Kies
                 **Notitie**: de waarde komt als opmerking bij het record te staan, met de
-                kolomnaam ervoor. Meerdere kolommen mogen naar Notitie; elke kolom wordt een
-                eigen opmerking en een lege cel geeft er geen. De keuze bestaat alleen bij
-                registers die opmerkingen kennen, zoals de verwerkingen en DPIA's.
+                kolomnaam ervoor. Heet de kolom zelf "Opmerkingen", "Notities" of "Tekst",
+                dan zijn het al notities en blijven ze zoals ze zijn. Meerdere kolommen
+                mogen naar Notitie; elke kolom wordt een eigen opmerking en een lege cel
+                geeft er geen. De keuze bestaat alleen bij registers die opmerkingen
+                kennen, zoals de verwerkingen en DPIA's. De opmerking van de FG heeft een
+                eigen doel, "Opmerking FG".
 
                 ### Eén record over meerdere rijen
 

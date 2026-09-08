@@ -146,8 +146,7 @@ class WpgProcessingRecordExporter extends Exporter
                 ->label(__('contact_person.form_title_users')),
 
             // opmerkingen
-            ExportColumn::make('remarks')
-                ->label(__('remark.model_plural')),
+            ...self::noteColumns(),
 
             // categorieën betrokkenen
             ExportColumn::make('suspects')

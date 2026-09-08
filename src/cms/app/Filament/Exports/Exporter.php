@@ -25,6 +25,7 @@ use function is_string;
 use function number_format;
 use function sprintf;
 use function str_replace;
+use function trim;
 
 abstract class Exporter extends FilamentExporter
 {
@@ -135,6 +136,47 @@ abstract class Exporter extends FilamentExporter
     protected static function relatedLabel(string $relationLabelKey, string $attributeLabelKey): string
     {
         return sprintf('%s — %s', __($relationLabelKey), __($attributeLabelKey));
+    }
+
+    /**
+     * The notes on a record, each as its text, a blank line between them; and
+     * the FG's own note. A note may hold commas and line breaks, so a blank
+     * line is the one separator that reads back.
+     *
+     * @return array<ExportColumn>
+     */
+    protected static function noteColumns(): array
+    {
+        return [
+            ExportColumn::make('remarks_body')
+                ->label(__('remark.model_plural'))
+                ->getStateUsing(static function (Model $record): string {
+                    $remarks = $record->getRelationValue('remarks');
+                    Assert::isInstanceOf($remarks, Collection::class);
+
+                    return $remarks
+                        ->map(static fn (Model $remark): string => self::text($remark->getAttribute('body')))
+                        ->filter()
+                        ->implode("\n\n");
+                }),
+            self::fgRemarkColumn(),
+        ];
+    }
+
+    protected static function fgRemarkColumn(): ExportColumn
+    {
+        return ExportColumn::make('fg_remark_body')
+            ->label(__('import_mapping.field_fg_remark'))
+            ->getStateUsing(static function (Model $record): string {
+                $note = $record->getRelationValue('fgRemark');
+
+                return $note instanceof Model ? self::text($note->getAttribute('body')) : '';
+            });
+    }
+
+    private static function text(mixed $value): string
+    {
+        return is_string($value) ? trim($value) : '';
     }
 
     /**

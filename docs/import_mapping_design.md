@@ -482,6 +482,7 @@ gelijk zijn, op nummer en tijdstempels na. Dat legde bloot:
 | `measures_implemented` had in de AVG- en WPG-modellen een verkeerd gespelde cast (`measures`), WPG miste de cast op `has_pseudonymization`; "ja" ging als tekst naar een boolean-kolom en de database weigerde de rij | Casts hersteld |
 | `created_at`/`updated_at` zijn fillable op WPG en werden als doel aangeboden | Tijdstempels zijn intern |
 | `meta_national_id` en `meta_source_id` (algoritmes) werden als foreign key verborgen | Alleen een uuid-kolom met `_id` is een foreign key |
+| De kolom "Opmerkingen" exporteerde de ruwe JSON van de `Remark`-modellen; de opmerking van de FG werd niet geëxporteerd | `Exporter::noteColumns()`: de notities als tekst met een lege regel ertussen, en "Opmerking FG" als eigen kolom. De import leest een notitiekolom ("Opmerkingen", "Notities", "Tekst") als de notities zelf en zet alleen bij een andere kolom de kolomnaam ervoor (`NoteBodies`); "Opmerking FG" is een eigen doel |
 
 Nog niet ondersteund, bewust: kolomgroepen (zie boven), categorieën persoonsgegevens en bewaartermijn
 (die horen bij de gegevens per betrokkene, twee niveaus diep), de bijzondere

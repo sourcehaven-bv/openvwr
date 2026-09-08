@@ -1309,10 +1309,12 @@ it('keeps columns without a field of their own as notes on the record', function
     $first = AvgResponsibleProcessingRecord::query()->where('name', 'Salarisadministratie')->first();
     $second = AvgResponsibleProcessingRecord::query()->where('name', 'Toegangsbeheer')->first();
 
+    // "Tekst" is a notes column, so its notes stay as they are; "Afdeling" is
+    // not, so its value is headed with the column name.
     expect($page->result['imported'])->toBe(2)
         ->and($first?->remarks()->orderBy('body')->pluck('body')->all())->toBe([
             'Afdeling: HR',
-            'Tekst: Overgenomen uit het oude register.',
+            'Overgenomen uit het oude register.',
         ])
         // An empty cell is not a note.
         ->and($second?->remarks()->pluck('body')->all())->toBe(['Afdeling: ICT']);
@@ -1512,7 +1514,7 @@ it('folds the rows of one record and collects its links and notes from every row
         ->and($contacts?->pluck('name')->all())->toBe(['P. de Vries', 'Q. Jansen'])
         // The e-mail address on row three belongs to the contact on row three.
         ->and($contacts?->pluck('email')->all())->toBe(['p@x.nl', null])
-        ->and($record?->remarks()->pluck('body')->all())->toBe(['Tekst: Overgenomen uit het oude register']);
+        ->and($record?->remarks()->pluck('body')->all())->toBe(['Overgenomen uit het oude register']);
 });
 
 it('treats every row as a record when no grouping column is chosen', function (): void {

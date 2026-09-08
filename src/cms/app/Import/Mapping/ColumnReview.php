@@ -121,7 +121,7 @@ readonly class ColumnReview
             return __('import_mapping.transform.relation');
         }
 
-        if (RelationKey::isRemarks($this->target())) {
+        if (RelationKey::isNote($this->target())) {
             return __('import_mapping.transform.remark');
         }
 

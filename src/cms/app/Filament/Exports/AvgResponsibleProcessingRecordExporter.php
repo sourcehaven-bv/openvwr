@@ -143,8 +143,7 @@ class AvgResponsibleProcessingRecordExporter extends Exporter
             ...self::getDocumentColumns(),
 
             // opmerkingen
-            ExportColumn::make('remarks')
-                ->label(__('remark.model_plural')),
+            ...self::noteColumns(),
 
             // overig
             ExportColumn::make('created_at')

@@ -6,12 +6,13 @@ namespace App\Import\Mapping;
 
 use App\Enums\Import\ImportTarget;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Webmozart\Assert\Assert;
 
 use function __;
+use function array_intersect;
 use function array_key_exists;
+use function array_keys;
 use function class_basename;
 use function in_array;
 use function is_string;
@@ -56,12 +57,12 @@ class TargetOptions
     /** @var array<string, array<string, string>>|null */
     private ?array $grouped = null;
 
-    /** @var array<string, string>|null column name => type */
-    private ?array $columns = null;
+    private readonly TableColumns $tableColumns;
 
     public function __construct(
         private readonly ImportTarget $target,
     ) {
+        $this->tableColumns = new TableColumns();
     }
 
     /**
@@ -254,14 +255,20 @@ class TargetOptions
      */
     private function notes(Model $model): array
     {
-        if (!method_exists($model, 'remarks')) {
-            return [];
+        $notes = [];
+
+        if (method_exists($model, 'remarks')) {
+            $notes[RelationKey::REMARKS] = __('import_mapping.field_remarks');
         }
 
-        // The key stands for the relation and must not shadow a column.
-        Assert::false(in_array(RelationKey::REMARKS, $model->getFillable(), true));
+        if (method_exists($model, 'fgRemark')) {
+            $notes[RelationKey::FG_REMARK] = __('import_mapping.field_fg_remark');
+        }
 
-        return [RelationKey::REMARKS => __('import_mapping.field_remarks')];
+        // The keys stand for relations and must not shadow a column.
+        Assert::isEmpty(array_intersect(array_keys($notes), $model->getFillable()));
+
+        return $notes;
     }
 
     /**
@@ -270,32 +277,12 @@ class TargetOptions
      */
     private function isColumn(Model $model, string $attribute): bool
     {
-        return array_key_exists($attribute, $this->columns($model));
+        return $this->tableColumns->type($model, $attribute) !== null;
     }
 
     private function isForeignKey(Model $model, string $attribute): bool
     {
-        return str_ends_with($attribute, self::INTERNAL_SUFFIX) && ($this->columns($model)[$attribute] ?? null) === 'uuid';
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    private function columns(Model $model): array
-    {
-        if ($this->columns === null) {
-            $columns = [];
-            foreach (Schema::getColumns($model->getTable()) as $column) {
-                Assert::isArray($column);
-                Assert::string($column['name']);
-                Assert::string($column['type_name']);
-                $columns[$column['name']] = $column['type_name'];
-            }
-
-            $this->columns = $columns;
-        }
-
-        return $this->columns;
+        return str_ends_with($attribute, self::INTERNAL_SUFFIX) && $this->tableColumns->type($model, $attribute) === 'uuid';
     }
 
     private function isInternal(string $attribute): bool

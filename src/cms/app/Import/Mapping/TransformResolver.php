@@ -7,10 +7,6 @@ namespace App\Import\Mapping;
 use App\Enums\Import\MappingTransform;
 use App\Models\Casts\CalendarDateCast;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Schema;
-use Webmozart\Assert\Assert;
-
-use function array_key_exists;
 
 /**
  * Derives how a value must be converted from the target attribute itself.
@@ -21,8 +17,10 @@ use function array_key_exists;
  */
 class TransformResolver
 {
-    /** @var array<string, array<string, string>> column types per table */
-    private array $columnTypes = [];
+    public function __construct(
+        private readonly TableColumns $tableColumns = new TableColumns(),
+    ) {
+    }
 
     public function forAttribute(Model $model, string $attribute): MappingTransform
     {
@@ -45,21 +43,7 @@ class TransformResolver
      */
     private function fromColumnType(Model $model, string $attribute): MappingTransform
     {
-        $table = $model->getTable();
-
-        if (!array_key_exists($table, $this->columnTypes)) {
-            $types = [];
-            foreach (Schema::getColumns($table) as $column) {
-                Assert::isArray($column);
-                Assert::string($column['name']);
-                Assert::string($column['type_name']);
-                $types[$column['name']] = $column['type_name'];
-            }
-
-            $this->columnTypes[$table] = $types;
-        }
-
-        return match ($this->columnTypes[$table][$attribute] ?? null) {
+        return match ($this->tableColumns->type($model, $attribute)) {
             'bool' => MappingTransform::Boolean,
             'date', 'timestamp', 'timestamptz' => MappingTransform::Date,
             'int2', 'int4', 'int8' => MappingTransform::Integer,

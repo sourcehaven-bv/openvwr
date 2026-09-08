@@ -178,6 +178,7 @@ class AlgorithmRecordExporter extends Exporter
     private static function getOtherColumns(): array
     {
         return [
+            self::fgRemarkColumn(),
             ExportColumn::make('created_at')
                 ->label(__('general.created_at')),
             ExportColumn::make('updated_at')

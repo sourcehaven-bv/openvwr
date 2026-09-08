@@ -60,6 +60,7 @@ return [
     'ignore' => '— niet importeren —',
     'field_import_id' => 'Bronkenmerk (nummer uit het bronsysteem)',
     'field_remarks' => 'Notitie',
+    'field_fg_remark' => 'Opmerking FG',
 
     'group_none' => '',
     'group_source' => 'Herkomst',
