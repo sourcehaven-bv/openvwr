@@ -43,11 +43,11 @@ class TransformResolver
      */
     private function fromColumnType(Model $model, string $attribute): MappingTransform
     {
+        // Lists live in text columns here, so json never comes up.
         return match ($this->tableColumns->type($model, $attribute)) {
             'bool' => MappingTransform::Boolean,
-            'date', 'timestamp', 'timestamptz' => MappingTransform::Date,
-            'int2', 'int4', 'int8' => MappingTransform::Integer,
-            'json', 'jsonb' => MappingTransform::StringList,
+            'date', 'timestamp' => MappingTransform::Date,
+            'int4' => MappingTransform::Integer,
             default => MappingTransform::Text,
         };
     }
