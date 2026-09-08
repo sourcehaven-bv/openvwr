@@ -47,8 +47,10 @@ use function __;
 use function abort;
 use function abort_unless;
 use function app;
+use function array_key_first;
 use function array_keys;
 use function array_sum;
+use function implode;
 use function is_array;
 use function is_string;
 use function now;
@@ -421,10 +423,10 @@ class ImportMapping extends Page implements HasForms
             return null;
         }
 
-        $undecided = $this->review()->headersNeedingDateFormat();
+        $problem = $this->mappingProblem();
 
-        if ($undecided !== []) {
-            $this->failed(__('import_mapping.review_heading'), __('import_mapping.date_format_missing', ['column' => $undecided[0]]));
+        if ($problem !== null) {
+            $this->failed(__('import_mapping.review_heading'), $problem);
 
             return null;
         }
@@ -447,6 +449,32 @@ class ImportMapping extends Page implements HasForms
         $this->result = ['fits' => $result->fitCount(), 'issues' => $issues] + self::EMPTY_RESULT;
 
         return $result;
+    }
+
+    /**
+     * What still has to be settled before the mapping can be run, as a message
+     * for the user; null when nothing is in the way.
+     */
+    private function mappingProblem(): ?string
+    {
+        $undecided = $this->review()->headersNeedingDateFormat();
+
+        if ($undecided !== []) {
+            return __('import_mapping.date_format_missing', ['column' => $undecided[0]]);
+        }
+
+        $duplicates = $this->review()->duplicateTargets();
+
+        if ($duplicates !== []) {
+            $target = array_key_first($duplicates);
+
+            return __('import_mapping.duplicate_target', [
+                'field' => $this->review()->options()->label($target),
+                'columns' => implode('", "', $duplicates[$target]),
+            ]);
+        }
+
+        return null;
     }
 
     public function restart(): void

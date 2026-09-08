@@ -38,7 +38,24 @@ class HeadingSimilarity
     /**
      * Shared by so many fields that matching on them proves little.
      */
-    private const WEAK_TOKENS = ['datum', 'gemeld', 'nummer', 'categorie', 'categorieen', 'categorieën', 'van', 'de', 'het', 'een', 'en', 'of'];
+    private const WEAK_TOKENS = [
+        'datum',
+        'gemeld',
+        'nummer',
+        'categorie',
+        'categorieen',
+        'categorieën',
+        'overig',
+        'overige',
+        'andere',
+        'anders',
+        'van',
+        'de',
+        'het',
+        'een',
+        'en',
+        'of',
+    ];
 
     public function __construct(
         private readonly FieldSynonyms $fieldSynonyms,

@@ -132,8 +132,10 @@ final class OverigeFuncties
                 Met "Proefdraaien" controleert OpenVWR de mapping tegen alle rijen zonder
                 iets op te slaan. U ziet hoeveel rijen goed gaan en welke aandacht nodig
                 hebben, met per rij de reden - bijvoorbeeld een verplicht veld dat leeg
-                blijft, of een waarde die niet als datum gelezen kan worden. Pas de mapping
-                aan en draai opnieuw proef tot het beeld klopt.
+                blijft, een waarde die niet als datum gelezen kan worden, of een tekst die
+                langer is dan het veld toelaat. Pas de mapping aan en draai opnieuw proef
+                tot het beeld klopt. Is hetzelfde veld voor twee kolommen gekozen, dan meldt
+                het scherm dat eerst: een veld neemt één kolom.
 
                 ![Resultaat van een proefdraai](/handleiding/05_overige_functies/09_import_proefdraai.png)
 
@@ -145,6 +147,9 @@ final class OverigeFuncties
 
                 "Importeren" voegt de rijen toe die passen. Rijen met een probleem worden
                 overgeslagen; die kunt u in het bronbestand corrigeren en opnieuw aanbieden.
+                Kan een rij ondanks de proefdraai toch niet worden opgeslagen, dan telt de
+                kop van het resultaat die mee en staat de rij onder "Niet opgeslagen" met
+                de reden.
                 Vult u een naam in bij "Mapping bewaren voor hergebruik", dan wordt de
                 mapping opgeslagen. Biedt u later een bestand met dezelfde kolommen aan, dan
                 herkent OpenVWR de indeling en is de mapping al ingevuld.
@@ -170,7 +175,8 @@ final class OverigeFuncties
                 systeem. Die staan in de keuzelijst onder **Koppelingen**. OpenVWR zoekt de
                 naam op in het register en gebruikt het bestaande record; bestaat het nog
                 niet, dan wordt het aangemaakt. Staan er meerdere namen in één cel, zet ze
-                dan onder elkaar in die cel.
+                dan onder elkaar in die cel, of gescheiden door een komma en een spatie
+                zoals de export van OpenVWR ze schrijft.
 
                 Hoort er meer bij dan een naam, dan kan dat uit aparte kolommen komen. Voor
                 een verwerker biedt de lijst bijvoorbeeld ook "Verwerkers - E-mail" en
@@ -197,6 +203,23 @@ final class OverigeFuncties
                 aangemaakt. Verwijst een datalek naar een verwerking die niet bestaat, dan
                 wordt dat na afloop gemeld en legt u de koppeling zelf. Zo groeit het register
                 niet ongemerkt met lege verwerkingen.
+
+                ### Notities
+
+                Een kolom die nergens in past - een status uit het oude systeem, een
+                afdeling, een vrij tekstveld - hoeft niet verloren te gaan. Kies
+                **Notitie**: de waarde komt als opmerking bij het record te staan, met de
+                kolomnaam ervoor. Meerdere kolommen mogen naar Notitie; elke kolom wordt een
+                eigen opmerking en een lege cel geeft er geen. De keuze bestaat alleen bij
+                registers die opmerkingen kennen, zoals de verwerkingen en DPIA's.
+
+                ### Eigen export opnieuw inlezen
+
+                De Excel-export van een register (de exportknop boven de tabel) kunt u zo
+                weer inlezen: de kolomnamen zijn dezelfde als in de keuzelijst, dus de
+                mapping wordt vrijwel volledig automatisch ingevuld en koppelingen komen
+                bij de bestaande records terecht. Zo zet u records over naar een andere
+                organisatie, of vult u ze in Excel aan en leest u ze opnieuw in.
 
                 ### Opzoeklijsten
 

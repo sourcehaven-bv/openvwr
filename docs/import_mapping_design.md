@@ -434,11 +434,37 @@ Uit een proefimport van een datalek-sjabloon (september 2026):
 | Verplichte velden zonder bronkolom (`fg_reported`, `type`) blokkeerden elke rij | `FormDefaults`: een verplicht ja/nee-veld begint als "nee", een verplichte vaste keuze als de eerste optie, precies zoals het formulier; alleen kolommen die de database afdwingt |
 | Losse regels onder een record (extra keuzewaarden in één cel) | Komen als eigen rij binnen en vallen in de proefdraai af op de ontbrekende naam; de gebruiker ziet ze als aandachtsrij |
 
+Uit het QA-rapport van een teamlid (september 2026), met een export van een
+ander registerpakket van 93 kolommen:
+
+| Bevinding | Oplossing |
+|---|---|
+| Kolomnamen als "RasOfEtniciteit", "IsBronBetrokkene" en "Omschrijving23" werden niet herkend | `FieldSynonyms` knipt camelCase en cijfers los en laat losse volgnummers weg |
+| Hetzelfde doelveld was voor twee kolommen te kiezen; de laatste won stil | `EditableMapping::duplicateTargets()`; proefdraaien en importeren weigeren met beide kolomnamen. Koppelingen en notities nemen wél meerdere kolommen |
+| Een kolom "Tekst" met verzamelinformatie had geen bestemming | Doel "Notitie" (`RelationKey::REMARKS`): per kolom een `Remark` "Kolomnaam: waarde", alleen voor registers met opmerkingen |
+| Proefdraai zonder aandachtsrijen, import "0 geïmporteerd, 0 overgeslagen" | De kop van het resultaat telt nu de mislukte rijen; de reden is per SQLSTATE vertaald (`WriteFailureReason`) zonder celwaarden; waarden langer dan de kolom (`FormDefaults::lengths()`) vallen al in de proefdraai af |
+| De analyser gaf een kolom het vierde beste doel als de betere al bezet waren ("Verantwoordelijke rechtspersoon" → Datalekken) | Alleen kandidaten dicht bij de beste score van de kolom blijven over |
+| Een lege cel in een gekoppelde kolom zette het veld expliciet op NULL, langs het formulierdefault heen | De writer laat lege waarden weg; het veld begint als op het formulier |
+
+De rondreis met de eigen Excel-export (`ImportRoundTripTest`: exporteren met
+de echte `Exporter`, inlezen via `SheetReader` en `MappingAnalyser`, importeren
+via de pagina) legde bloot wat de export en de import van elkaar afweken:
+
+| Bevinding | Oplossing |
+|---|---|
+| Zeven kolommen "Namelijk" in de datalek-export; `SheetReader` weigert dubbele koppen | De export prefixt ze met het bovenliggende veld ("Aard van incident — Namelijk"), zoals de keuzelijst van de import al deed |
+| `reported_to_involved` ontbrak in de datalek-export; de kop van het nummer toonde een ruwe vertaalsleutel | Toegevoegd, sleutel hersteld |
+| De verwerkingsregisters exporteerden beveiligingsvelden onder de labels van de verwerker ("Toelichting maatregelen") in plaats van die van het formulier | Export gebruikt de eigen labels |
+| Export schrijft ja/nee als `yes`/`no`, datums als `04-03-2026 00:00` en lijsten als "Naam, Adres" | Scorer en `ColumnReview` kennen yes/no; datum met tijd geldt als datum; `MultiValue` splitst een cel zonder regeleinden op komma-spatie (lijsten, koppelingen, keuzelijst-bewijs) |
+| `data_collection_source` (enum) werd als tekstveld aangeboden; de export schrijft het label, de cast weigert dat | Enum-velden zijn geen doel; ze houden hun default |
+
 Nog niet ondersteund, bewust: categorieën persoonsgegevens en bewaartermijn
-(die horen bij de gegevens per betrokkene, twee niveaus diep), en cellen met
-komma-gescheiden opsommingen ("Belastingdienst, pensioenuitvoerder") worden
-één record, omdat een komma ook in een naam kan staan; regel per waarde is de
-afspraak.
+(die horen bij de gegevens per betrokkene, twee niveaus diep), de bijzondere
+gegevens per betrokkene (die liggen in OpenVWR op de gedeelde betrokkene, niet
+op de verwerking) en een status uit het bronbestand die direct een vastgestelde
+versie zou moeten opleveren (dat passeert het goedkeuringsproces). Een naam met
+", " erin wordt bij een cel zonder regeleinden in tweeën geknipt; dat is
+zichtbaar onder "Nieuw aangemaakt".
 
 Bewust niet gedaan: de phpstan-regel `TenantAwareQueryRule` uitbreiden naar
 `App\Import`. De importlaag draait ook in queue-jobs zonder ingelogde tenant

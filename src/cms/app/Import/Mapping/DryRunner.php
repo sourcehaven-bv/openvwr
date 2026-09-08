@@ -11,6 +11,8 @@ use Illuminate\Support\Arr;
 use function __;
 use function array_map;
 use function implode;
+use function is_string;
+use function mb_strlen;
 
 /**
  * Runs a profile over the source rows without touching the database, so the
@@ -39,13 +41,14 @@ class DryRunner
     public function run(MappingProfile $profile, array $rows): DryRunResult
     {
         $required = $this->formDefaults->required($profile->target);
+        $lengths = $this->formDefaults->lengths($profile->target);
 
         $fits = [];
         $issues = [];
 
         foreach ($rows as $index => $row) {
             $mapped = $this->mappingEngine->apply($profile, $row);
-            $reason = $this->reasonForIssue($mapped, $required, $profile, $row);
+            $reason = $this->reasonForIssue($mapped, $required, $lengths, $profile, $row);
 
             if ($reason !== null) {
                 $issues[] = new DryRunIssue($index + 1, $row, $reason);
@@ -62,10 +65,11 @@ class DryRunner
     /**
      * @param array<string, mixed> $mapped
      * @param array<int, string> $required
+     * @param array<string, int> $lengths
      * @param MappingProfile<Model> $profile
      * @param array<string, mixed> $row
      */
-    private function reasonForIssue(array $mapped, array $required, MappingProfile $profile, array $row): ?string
+    private function reasonForIssue(array $mapped, array $required, array $lengths, MappingProfile $profile, array $row): ?string
     {
         // A value that was present but could not be converted is the more
         // specific problem, so it is reported before a plain empty field.
@@ -77,6 +81,11 @@ class DryRunner
                     'transform' => $field->transform->label(),
                 ]);
             }
+        }
+
+        $tooLong = $this->tooLong($mapped, $lengths, $profile->target);
+        if ($tooLong !== null) {
+            return $tooLong;
         }
 
         $missing = [];
@@ -91,6 +100,31 @@ class DryRunner
             $labels = array_map(fn (string $attribute): string => $this->labelFor($profile->target, $attribute), $missing);
 
             return __('import_mapping.issue.missing_required', ['fields' => implode(', ', $labels)]);
+        }
+
+        return null;
+    }
+
+    /**
+     * The database cuts nothing off quietly: a value longer than its column
+     * fails the whole row when it is written, which the dry-run exists to see
+     * first.
+     *
+     * @param array<string, mixed> $mapped
+     * @param array<string, int> $lengths
+     * @param class-string<Model> $modelClass
+     */
+    private function tooLong(array $mapped, array $lengths, string $modelClass): ?string
+    {
+        foreach ($lengths as $attribute => $max) {
+            $value = Arr::get($mapped, $attribute);
+
+            if (is_string($value) && mb_strlen($value) > $max) {
+                return __('import_mapping.issue.too_long', [
+                    'field' => $this->labelFor($modelClass, $attribute),
+                    'max' => $max,
+                ]);
+            }
         }
 
         return null;

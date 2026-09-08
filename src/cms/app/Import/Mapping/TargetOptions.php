@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Import\Mapping;
 
 use App\Enums\Import\ImportTarget;
+use BackedEnum;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Webmozart\Assert\Assert;
@@ -14,6 +15,8 @@ use function array_key_exists;
 use function class_basename;
 use function in_array;
 use function is_string;
+use function is_subclass_of;
+use function method_exists;
 use function sprintf;
 use function str_contains;
 use function str_ends_with;
@@ -95,6 +98,11 @@ class TargetOptions
             $grouped[__('import_mapping.group_relations')] = $relations;
         }
 
+        $notes = $this->notes($model);
+        if ($notes !== []) {
+            $grouped[__('import_mapping.group_notes')] = $notes;
+        }
+
         return $this->grouped = $grouped;
     }
 
@@ -145,6 +153,7 @@ class TargetOptions
                 // model does not expose is a mistake to fix, not to hide.
                 Assert::inArray($attribute, $fillable);
                 Assert::false($this->isInternal($attribute));
+                Assert::false($this->isEnum($model, $attribute));
 
                 $options[$attribute] = $this->attributeLabel($labelKey, $attribute);
                 $placed[] = $attribute;
@@ -169,7 +178,7 @@ class TargetOptions
     {
         $remaining = [];
         foreach ($model->getFillable() as $attribute) {
-            if ($this->isInternal($attribute) || in_array($attribute, $placed, true)) {
+            if ($this->isInternal($attribute) || $this->isEnum($model, $attribute) || in_array($attribute, $placed, true)) {
                 continue;
             }
 
@@ -224,6 +233,37 @@ class TargetOptions
         }
 
         return $relations;
+    }
+
+    /**
+     * Text without a field of its own can still be kept, as a note on the
+     * record. Only registers that have notes offer it; any number of columns
+     * may go there, each becoming a note of its own.
+     *
+     * @return array<string, string>
+     */
+    private function notes(Model $model): array
+    {
+        if (!method_exists($model, 'remarks')) {
+            return [];
+        }
+
+        // The key stands for the relation and must not shadow a column.
+        Assert::false(in_array(RelationKey::REMARKS, $model->getFillable(), true));
+
+        return [RelationKey::REMARKS => __('import_mapping.field_remarks')];
+    }
+
+    /**
+     * An enum-cast field takes a code ("primary") that a source file does not
+     * write; it writes the label, which the cast refuses. Such fields keep
+     * their default.
+     */
+    private function isEnum(Model $model, string $attribute): bool
+    {
+        $cast = $model->getCasts()[$attribute] ?? null;
+
+        return is_string($cast) && is_subclass_of($cast, BackedEnum::class);
     }
 
     private function isInternal(string $attribute): bool

@@ -322,6 +322,12 @@
                     {{ __('import_mapping.skipped_existing', ['count' => $result['skipped']]) }}
                 </p>
             @endif
+
+            @if (count($result['failures']) > 0)
+                <p class="text-sm mt-2 text-warning-600 dark:text-warning-400">
+                    {{ __('import_mapping.result_failed', ['count' => count($result['failures'])]) }}
+                </p>
+            @endif
         </x-filament::section>
 
         @if (count($result['failures']) > 0)

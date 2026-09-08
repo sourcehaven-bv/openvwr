@@ -85,12 +85,13 @@ class AvgResponsibleProcessingRecordExporter extends Exporter
             // beveiliging
             ExportColumn::make('has_security')
                 ->label(__('avg_responsible_processing_record.has_security')),
+            // Labelled as on the register's own form, so an export reads back in.
             ExportColumn::make('measures_implemented')
-                ->label(__('processor.measures_implemented')),
+                ->label(__('avg_responsible_processing_record.measures_implemented')),
             ExportColumn::make('other_measures')
-                ->label(__('processor.other_measures')),
+                ->label(__('avg_responsible_processing_record.other_measures')),
             ExportColumn::make('measures_description')
-                ->label(__('processor.measures_description')),
+                ->label(__('avg_responsible_processing_record.measures_description')),
             ExportColumn::make('has_pseudonymization')
                 ->label(__('avg_responsible_processing_record.has_pseudonymization')),
             ExportColumn::make('pseudonymization')

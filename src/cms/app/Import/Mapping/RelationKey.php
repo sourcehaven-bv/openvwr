@@ -12,8 +12,8 @@ use function str_starts_with;
 /**
  * The strings a mapping uses to point at something other than a plain column:
  * a shared entity ("processors"), one of its attributes ("processors::email"),
- * a sub-record attribute ("processors::address.city") or a lookup list
- * ("lookup:service").
+ * a sub-record attribute ("processors::address.city"), a lookup list
+ * ("lookup:service") or a note on the record ("remarks").
  */
 final class RelationKey
 {
@@ -26,6 +26,12 @@ final class RelationKey
      * Marks a target as a lookup list rather than a column.
      */
     public const LOOKUP_PREFIX = 'lookup:';
+
+    /**
+     * The target that keeps a column as a note on the record, for text that
+     * has no field of its own. Any number of columns may go there.
+     */
+    public const REMARKS = 'remarks';
 
     public static function attribute(string $relation, string $attribute): string
     {
@@ -40,6 +46,11 @@ final class RelationKey
     public static function isLookup(string $target): bool
     {
         return str_starts_with($target, self::LOOKUP_PREFIX);
+    }
+
+    public static function isRemarks(string $target): bool
+    {
+        return $target === self::REMARKS;
     }
 
     /**

@@ -69,6 +69,8 @@ Vink een regel af in de kolom "Test Geslaagd" zodra de stap is uitgevoerd en het
 | 20a | Maak in Excel een kopie van `04-datalekken.csv` waarin de kolom "Datum melding" als tekst `04-03-2026` en `12-11-2026` bevat en upload die. Controleer dat onder de kolom de vraag verschijnt welke datum "04-03-2026" is, met de keuzes "4 maart 2026 (dag-maand-jaar)" en "3 april 2026 (maand-dag-jaar)". | [ ]           |             |
 | 20b | Klik "Proefdraaien" zonder te kiezen en controleer dat het scherm vraagt eerst het datumformaat te kiezen en niets proefdraait. Kies daarna "3 april 2026", importeer en controleer dat het datalek de datum 3 april 2026 heeft.       | [ ]           |             |
 | 20c | Upload een bestand waarin de datums als `13-03-2026` staan (dag boven de 12) en controleer dat er geen vraag komt maar onder de kolom staat: "13-03-2026 wordt gelezen als 13 maart 2026 (dag-maand-jaar)".                          | [ ]           |             |
+| 20d | Koppel in `01-datalekken-schoon.xlsx` zowel "Naam" als "Type" aan het veld Naam en klik "Proefdraaien". Controleer dat het scherm meldt dat het veld "Naam" voor meer dan één kolom is gekozen, met beide kolomnamen, en dat er niets proefdraait. | [ ]           |             |
+| 20e | Maak in Excel een kopie van `04-datalekken.csv` waarin de kopcellen aan elkaar geschreven zijn zoals andere registertools dat doen ("DatumMelding", "GemeldAP", "Naam2") en upload die. Controleer dat deze kolommen toch automatisch herkend worden. | [ ]           |             |
 
 ---
 
@@ -83,6 +85,7 @@ Vink een regel af in de kolom "Test Geslaagd" zodra de stap is uitgevoerd en het
 | 23  | Controleer dat per probleemrij het rijnummer en een reden staan: een verplicht veld leeg (Naam), en tweemaal een kolom met een waarde die niet als Ja/nee respectievelijk Datum gelezen kan worden.                                    | [ ]           |             |
 | 24  | Controleer dat het aantal datalekken in het register onveranderd is.                                                                                                                                                                   | [ ]           |             |
 | 25  | Zet de kolom "Gemeld aan de autoriteit persoonsgegevens (AP)" op niet importeren en draai opnieuw proef. Controleer dat de rij met "misschien" nu wél past (3 passen, 2 aandacht).                                                    | [ ]           |             |
+| 25a | Maak in Excel een kopie van `01-datalekken-schoon.xlsx` waarin de naam van de eerste rij 300 tekens lang is, en draai proef. Controleer dat rij 1 als aandachtsrij staat met de reden dat het veld "Naam" langer is dan 255 tekens, en dat er niets is opgeslagen. | [ ]           |             |
 
 ---
 
@@ -99,7 +102,7 @@ Vink een regel af in de kolom "Test Geslaagd" zodra de stap is uitgevoerd en het
 | 30  | Importeer `03-datalekken-met-fouten.xlsx` met de standaardmapping. Controleer dat er 2 rijen geïmporteerd zijn en dat het resultaatscherm meldt dat 3 rijen zijn overgeslagen.                                                              | [ ]           |             |
 | 31  | Controleer dat de probleemrijen inderdaad niet in het register staan en dat de twee goede rijen ("Correcte rij", "Tweede correcte rij") er wel staan.                                                                                        | [ ]           |             |
 | 32  | Importeer `01-datalekken-schoon.xlsx` nogmaals. Controleer dat de drie datalekken een tweede keer worden aangemaakt: dit bestand heeft geen bronkenmerk, dus OpenVWR kan de rijen niet herkennen. Verwijder de dubbelen daarna.               | [ ]           |             |
-| 32a | Maak in Excel een kopie van `01-datalekken-schoon.xlsx` waarin de naam van de eerste rij 300 tekens lang is, en importeer die. Controleer dat het resultaatscherm 2 geïmporteerde rijen meldt en onder "Niet opgeslagen" rij 1 met een reden toont. | [ ]           |             |
+| 32a | Maak in Excel een kopie van `01-datalekken-schoon.xlsx` met een extra kolom "Aantal" waarin de eerste rij `99999999999` heeft, koppel die aan "Exact aantal betrokkenen" en importeer. Controleer dat de proefdraai de rij goedkeurt, maar dat het resultaatscherm meldt dat 2 rijen zijn geïmporteerd én dat 1 rij niet kon worden opgeslagen, en dat onder "Niet opgeslagen" rij 1 staat met de reden dat een getal buiten het bereik van het veld valt. | [ ]           |             |
 | 33  | Importeer `02-zenya-vim-export.xlsx` met de mapping uit stap 18 en controleer dat de drie meldingen in het register staan en dat op de detailpagina en in het overzicht het importnummer (VIM-2026-…) zichtbaar is.                        | [ ]           |             |
 | 34  | Importeer `02-zenya-vim-export.xlsx` nogmaals met dezelfde mapping. Controleer dat er géén dubbelen ontstaan en dat het resultaatscherm meldt dat 3 rijen al eerder waren geïmporteerd en zijn overgeslagen.                                  | [ ]           |             |
 | 35  | Controleer op de detailpagina van een geïmporteerde VIM-melding dat de naam van de melder en de afdeling nergens in het record voorkomen.                                                                                                    | [ ]           |             |
@@ -137,6 +140,9 @@ Vink een regel af in de kolom "Test Geslaagd" zodra de stap is uitgevoerd en het
 | 49  | Open de opzoeklijst Dienst en controleer dat "Bedrijfsvoering" en "Zorg" zijn toegevoegd en dat de verwerkingen eraan gekoppeld zijn.                                                                                                        | [ ]           |             |
 | 50  | Maak handmatig een tweede verwerker "Firma B" aan (dubbel) en importeer het bestand nogmaals. Controleer dat het resultaatscherm onder "Meerdere records met dezelfde naam" meldt dat "Firma B" twee keer voorkomt.                            | [ ]           |             |
 | 51  | Upload `02-zenya-vim-export.xlsx` (register Datalekken), voeg in Excel vooraf een kolom "Verwerking" toe met een naam die niet bestaat, koppel die aan AVG Verantwoordelijke Verwerkingen en importeer. Controleer dat de verwerking **niet** wordt aangemaakt en onder "Niet gevonden koppelingen" staat. | [ ]           |             |
+| 51a | Voeg in Excel aan `05-verwerkingen-met-verwerkers.csv` twee kolommen toe, "Tekst" en "Afdeling", met wat vrije tekst, en laat één cel leeg. Koppel beide aan "Notitie" (groep Notities) en importeer. Controleer dat elke verwerking per gevulde cel een opmerking heeft in de vorm "Tekst: …" en "Afdeling: …", en dat een lege cel geen opmerking geeft. | [ ]           |             |
+| 51b | Controleer bij het register Datalekken dat de groep Notities in de keuzelijst ontbreekt: datalekken hebben geen opmerkingen.                                                                                                                | [ ]           |             |
+| 51c | Zet in `05-verwerkingen-met-verwerkers.csv` twee verwerkers in één cel gescheiden door een komma en spatie ("Firma A, Firma B") en importeer. Controleer dat beide als aparte verwerker gekoppeld zijn.                                       | [ ]           |             |
 
 ---
 
@@ -149,3 +155,16 @@ Vink een regel af in de kolom "Test Geslaagd" zodra de stap is uitgevoerd en het
 | 54  | Zet in een Excel-bestand een formule in een cel (bijvoorbeeld `=1+1`) en een cel die begint met `=HYPERLINK(...)`. Controleer dat na import alleen de tekstwaarde in OpenVWR staat en dat de export naar Excel daarna geen actieve formule bevat. | [ ]           |             |
 | 55  | Sla `04-datalekken.csv` in Excel op als CSV met puntkomma als scheidingsteken en upload die. Controleer dat de kolommen apart herkend worden. Upload daarna een CSV in Windows-codering (ANSI) met accenten; een nette foutmelding is acceptabel, verminkte tekst niet. | [ ]           |             |
 | 56  | Ververs de browserpagina midden in de stap "Mapping controleren". Controleer dat het scherm terugkeert naar de beginstap zonder foutmelding en dat er niets half is geïmporteerd.                                          | [ ]           |             |
+
+---
+
+## 9. Eigen export opnieuw inlezen
+
+*Bron: handleiding, kop "Eigen export opnieuw inlezen".* De Excel-export van een register moet zonder handwerk weer in te lezen zijn; dit is ook geautomatiseerd getest (`ImportRoundTripTest`).
+
+| Nr  | Testactie                                                                                                                                                                                                                                   | Test Geslaagd | Opmerkingen |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |:-------------:| ----------- |
+| 57  | Maak in het datalekregister een datalek met een verantwoordelijke, drie categorieën persoonsgegevens en een datum ontdekking. Exporteer het register naar Excel (exportknop boven de tabel) en download het bestand.                          | [ ]           |             |
+| 58  | Upload dat bestand als Datalekken. Controleer dat alle kolommen "Automatisch ingevuld" zijn, op Organisatie, Verantwoordelijke rechtspersoon, Nummer, Labels, Aangemaakt op en Bewerkt op na, en dat "Verwerkingsverantwoordelijken" aan de koppeling Verwerkingsverantwoordelijken staat. | [ ]           |             |
+| 59  | Importeer en open de kopie. Controleer dat type, datums, ja/nee-velden, samenvatting en de drie categorieën gelijk zijn aan het origineel, dat de verantwoordelijke dezelfde is (niet opnieuw aangemaakt) en dat de kolommen met "— Namelijk" in de export bij het juiste veld terecht zijn gekomen. | [ ]           |             |
+| 60  | Doe hetzelfde met een AVG-verwerking met verwerkers, ontvangers, doelen, betrokkenen, een dienst en een contactpersoon. Controleer dat na de import alle koppelingen aan de bestaande records hangen en dat "Nieuw aangemaakt" leeg is.        | [ ]           |             |

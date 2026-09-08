@@ -9,7 +9,6 @@ use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 
-use function explode;
 use function filter_var;
 use function is_array;
 use function is_bool;
@@ -183,13 +182,7 @@ class MappingEngine
             return null;
         }
 
-        $values = [];
-        foreach (explode("\n", $text) as $item) {
-            $item = trim($item);
-            if ($item !== '') {
-                $values[] = $item;
-            }
-        }
+        $values = MultiValue::split($text);
 
         return $values === [] ? null : $values;
     }

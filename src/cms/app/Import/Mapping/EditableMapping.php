@@ -191,7 +191,7 @@ class EditableMapping
 
             $column = $this->column($source);
             $transform = $column->profileTransform();
-            $relation = $this->isRelationTarget($target) || RelationKey::isLookup($target) ? $target : null;
+            $relation = $this->relationFor($target);
             $trueDate = $transform === MappingTransform::BooleanToDate ? $column->trueDate() : null;
             $dateFormat = $transform === MappingTransform::Date ? $column->dateFormat() : null;
 
@@ -207,6 +207,54 @@ class EditableMapping
         }
 
         return new MappingProfile($this->target->modelClass(), $fields, $unmapped);
+    }
+
+    /**
+     * Targets chosen for more than one column, with those columns. A plain
+     * field holds one value, so the second column would silently replace the
+     * first; a link or a note takes as many columns as the source has.
+     *
+     * @return array<string, array<int, string>> target => source columns
+     */
+    public function duplicateTargets(): array
+    {
+        $columns = [];
+
+        foreach ($this->mapping as $source => $settings) {
+            $target = $settings['target'] ?? '';
+
+            if ($target === '' || $this->acceptsSeveralColumns($target)) {
+                continue;
+            }
+
+            $columns[$target][] = $source;
+        }
+
+        return array_filter($columns, static fn (array $sources): bool => count($sources) > 1);
+    }
+
+    /**
+     * A shared entity collects every column that names one; a note is made per
+     * column. Everything else, an attribute of a linked record included, is a
+     * single value.
+     */
+    private function acceptsSeveralColumns(string $target): bool
+    {
+        [, $attribute] = RelationKey::split($target);
+
+        return RelationKey::isRemarks($target) || ($attribute === null && $this->isRelationTarget($target));
+    }
+
+    /**
+     * The key the writer resolves the column through, null for a plain field.
+     */
+    private function relationFor(string $target): ?string
+    {
+        if ($this->isRelationTarget($target) || RelationKey::isLookup($target) || RelationKey::isRemarks($target)) {
+            return $target;
+        }
+
+        return null;
     }
 
     /**

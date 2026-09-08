@@ -26,7 +26,7 @@ readonly class ColumnReview
     /**
      * Values that mark a column as a yes/no answer rather than free text.
      */
-    private const BOOLEAN_VALUES = ['ja', 'nee', 'neen', 'j', 'n', 'true', 'false', 'waar', 'onwaar', '1', '0'];
+    private const BOOLEAN_VALUES = ['ja', 'nee', 'neen', 'j', 'n', 'yes', 'no', 'true', 'false', 'waar', 'onwaar', '1', '0'];
 
     /**
      * @param array<int, string> $samples a few distinct values from the source
@@ -119,6 +119,10 @@ readonly class ColumnReview
 
         if ($this->isRelation) {
             return __('import_mapping.transform.relation');
+        }
+
+        if (RelationKey::isRemarks($this->target())) {
+            return __('import_mapping.transform.remark');
         }
 
         return ($this->transform ?? MappingTransform::Text)->label();

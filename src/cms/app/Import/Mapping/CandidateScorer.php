@@ -8,10 +8,8 @@ use App\Enums\Import\MappingTransform;
 use Illuminate\Support\Str;
 
 use function array_diff;
-use function array_filter;
 use function array_map;
 use function count;
-use function explode;
 use function in_array;
 use function is_numeric;
 use function min;
@@ -142,7 +140,7 @@ class CandidateScorer
         $matches = 0;
 
         foreach ($samples as $sample) {
-            $parts = array_filter(array_map('trim', explode("\n", $sample)), static fn (string $part): bool => $part !== '');
+            $parts = MultiValue::split($sample);
 
             if ($parts !== [] && array_diff(array_map(Str::lower(...), $parts), $allowed) === []) {
                 $matches++;
@@ -169,12 +167,16 @@ class CandidateScorer
 
     private function isBooleanish(string $value): bool
     {
-        return in_array(Str::lower($value), ['ja', 'nee', 'neen', 'true', 'false', 'waar', 'onwaar', 'j', 'n', '1', '0'], true);
+        return in_array(
+            Str::lower($value),
+            ['ja', 'nee', 'neen', 'yes', 'no', 'true', 'false', 'waar', 'onwaar', 'j', 'n', '1', '0'],
+            true,
+        );
     }
 
     private function isDateish(string $value): bool
     {
         return preg_match('/^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}|$)/', $value) === 1
-            || preg_match('#^\d{1,2}[-/]\d{1,2}[-/]\d{4}$#', $value) === 1;
+            || preg_match('#^\d{1,2}[-/]\d{1,2}[-/]\d{4}( \d{2}:\d{2}(:\d{2})?)?$#', $value) === 1;
     }
 }

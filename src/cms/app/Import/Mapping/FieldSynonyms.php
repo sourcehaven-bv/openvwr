@@ -7,6 +7,7 @@ namespace App\Import\Mapping;
 use Illuminate\Support\Str;
 
 use function array_key_exists;
+use function ctype_digit;
 use function explode;
 use function implode;
 use function preg_replace;
@@ -48,7 +49,7 @@ class FieldSynonyms
 
         // --- Beschrijving ---
         ['samenvatting', 'toelichting', 'omschrijving', 'beschrijving', 'details', 'uitleg', 'context', 'situatie'],
-        ['opmerking', 'notitie', 'aantekening', 'commentaar'],
+        ['opmerking', 'opmerkingen', 'notitie', 'notities', 'aantekening', 'aantekeningen', 'commentaar', 'tekst'],
 
         // --- Personen ---
         ['betrokkene', 'client', 'patient', 'clint', 'patint', 'bewoner', 'deelnemer'],
@@ -83,7 +84,9 @@ class FieldSynonyms
         ['ontvanger', 'ontvangers', 'afnemer', 'afnemers'],
         ['dpia', 'pia', 'geb', 'gegevensbeschermingseffectbeoordeling'],
         ['algoritme', 'algoritmes', 'algoritmen', 'ai', 'kunstmatige', 'intelligentie'],
-        ['verantwoordelijke', 'verantwoordelijken', 'verwerkingsverantwoordelijke'],
+        // Not 'verwerkingsverantwoordelijke': that is the legal entity, which
+        // OpenVWR keeps at organisation level, not a responsible unit.
+        ['verantwoordelijke', 'verantwoordelijken'],
         ['eer', 'eu', 'europa', 'buitenland', 'doorgifte'],
     ];
 
@@ -96,7 +99,12 @@ class FieldSynonyms
      */
     public function canonicalise(string $value): string
     {
-        $value = Str::lower(trim($value));
+        // "RasOfEtniciteit" and "Omschrijving23" are one word to a computer and
+        // several to a person; the capitals and digits mark the seams, so they
+        // are cut before lowercasing hides them.
+        $value = preg_replace('/(\p{Ll})(\p{Lu})/u', '$1 $2', trim($value)) ?? $value;
+        $value = preg_replace('/(\p{L})(\p{N})|(\p{N})(\p{L})/u', '$1$3 $2$4', $value) ?? $value;
+        $value = Str::lower($value);
         $value = preg_replace('/[^\p{L}\p{N}]+/u', ' ', $value) ?? $value;
         $value = trim($value);
 
@@ -108,6 +116,11 @@ class FieldSynonyms
         $words = [];
 
         foreach (explode(' ', $value) as $word) {
+            // A bare number is a sequence number ("Doel 2"), not a meaning.
+            if (ctype_digit($word)) {
+                continue;
+            }
+
             $words[] = $lookup[$word] ?? $word;
         }
 

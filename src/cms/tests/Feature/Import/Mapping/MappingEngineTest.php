@@ -63,6 +63,21 @@ it('splits a multi-value cell', function (): void {
         ->toBe(['personal_data_categories' => ['Naam', 'E-mailadres']]);
 });
 
+it('splits a comma-separated list when the cell has no line breaks', function (): void {
+    // OpenVWR's own export writes lists this way.
+    $profile = profileWith(field('Categorieen', 'personal_data_categories', MappingTransform::StringList));
+
+    expect(engine()->apply($profile, ['Categorieen' => 'Naam, E-mailadres, Adres en woonplaats']))
+        ->toBe(['personal_data_categories' => ['Naam', 'E-mailadres', 'Adres en woonplaats']]);
+});
+
+it('keeps a comma inside the lines of a line-separated list', function (): void {
+    $profile = profileWith(field('Categorieen', 'personal_data_categories', MappingTransform::StringList));
+
+    expect(engine()->apply($profile, ['Categorieen' => "Adres, woonplaats\nNaam"]))
+        ->toBe(['personal_data_categories' => ['Adres, woonplaats', 'Naam']]);
+});
+
 it('keeps an already structured list', function (): void {
     $profile = profileWith(field('Categorieen', 'personal_data_categories', MappingTransform::StringList));
 

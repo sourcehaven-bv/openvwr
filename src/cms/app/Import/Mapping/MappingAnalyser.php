@@ -142,10 +142,16 @@ class MappingAnalyser
     }
 
     /**
-     * Drops every candidate for a header whose best candidate is not a clear
-     * call. "Meldingsdatum" fits several date fields about equally well, and a
-     * coin flip presented as a suggestion is worse than no suggestion: the user
-     * has to notice it is wrong before they can correct it.
+     * Keeps, per header, only the candidates worth assigning: at or above the
+     * threshold and close to the header's best fit. When the best fit goes to
+     * another column, the leftovers are not a suggestion -- "Verantwoordelijke
+     * rechtspersoon" must not end up on "Datalekken" because everything it
+     * resembled was taken.
+     *
+     * A header whose best candidate is not a clear call keeps nothing at all.
+     * "Meldingsdatum" fits several date fields about equally well, and a coin
+     * flip presented as a suggestion is worse than no suggestion: the user has
+     * to notice it is wrong before they can correct it.
      *
      * @param array<int, array{header: string, attribute: string, score: float}> $scores
      *
@@ -173,15 +179,15 @@ class MappingAnalyser
         return array_values(array_filter($scores, static function (array $candidate) use ($best, $runnerUp): bool {
             $header = $candidate['header'];
 
-            if (!array_key_exists($header, $runnerUp)) {
-                return true;
-            }
-
             if ($candidate['score'] < CandidateScorer::THRESHOLD) {
                 return false;
             }
 
-            if ($best[$header] >= CandidateScorer::CONFIDENT) {
+            if ($candidate['score'] < $best[$header] - self::AMBIGUITY_MARGIN) {
+                return false;
+            }
+
+            if (!array_key_exists($header, $runnerUp) || $best[$header] >= CandidateScorer::CONFIDENT) {
                 return true;
             }
 

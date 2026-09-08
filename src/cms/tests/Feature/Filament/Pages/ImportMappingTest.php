@@ -834,12 +834,15 @@ it('skips rows whose source reference was imported before', function (): void {
 it('reports a row that could not be written instead of hiding it', function (): void {
     $this->asFilamentUser();
 
+    // A count beyond what the integer column holds passes the dry-run (it is
+    // a whole number) and is refused by the database.
     $rows = [
-        breachRows()[0],
-        [...breachRows()[0], 'Naam' => str_repeat('x', 300)],
+        [...breachRows()[0], 'Aantal' => '12'],
+        [...breachRows()[0], 'Aantal' => '99999999999'],
     ];
+    $mapping = [...breachMapping(), 'Aantal' => ['target' => 'affected_count']];
 
-    $page = pageAtReview($rows, breachMapping());
+    $page = pageAtReview($rows, $mapping);
     $page->apply(
         $this->app->get(DryRunner::class),
         $this->app->get(MappedRecordWriter::class),
@@ -849,7 +852,25 @@ it('reports a row that could not be written instead of hiding it', function (): 
     expect($page->result['imported'])->toBe(1)
         ->and($page->result['failures'])->toHaveCount(1)
         ->and($page->result['failures'][0]['row'])->toBe(2)
+        ->and($page->result['failures'][0]['reason'])->toBe(__('import_mapping.issue.write_failed_out_of_range'))
         ->and(DataBreachRecord::query()->where('name', 'Mail naar verkeerde ontvanger')->count())->toBe(1);
+});
+
+it('catches a value too long for its column before anything is written', function (): void {
+    $this->asFilamentUser();
+
+    $rows = [
+        breachRows()[0],
+        [...breachRows()[0], 'Naam' => str_repeat('x', 300)],
+    ];
+
+    $page = pageAtReview($rows, breachMapping());
+    $page->dryRun($this->app->get(DryRunner::class));
+
+    expect($page->result['fits'])->toBe(1)
+        ->and($page->result['issues'])->toHaveCount(1)
+        ->and($page->result['issues'][0]['reason'])->toBe(__('import_mapping.issue.too_long', ['field' => 'Naam', 'max' => 255]))
+        ->and(DataBreachRecord::query()->count())->toBe(0);
 });
 
 it('refuses a mapping target the screen never offered', function (): void {
@@ -1219,4 +1240,107 @@ it('starts fields the source lacks out as the form does instead of refusing the 
         ->and($record?->ap_reported)->toBeFalse()
         ->and($record?->type)->toBe(__('data_breach_record.type_options')[0])
         ->and($record?->nature_of_incident)->toBeNull();
+});
+
+it('refuses to run when two columns feed the same plain field', function (): void {
+    $this->asFilamentUser();
+
+    // The second column would silently replace the first; which one wins is
+    // not something the user should have to guess.
+    $page = pageAtReview(breachRows(), [...breachMapping(), 'Type' => ['target' => 'name']]);
+    $page->dryRun($this->app->get(DryRunner::class));
+
+    expect($page->result['fits'])->toBe(0)
+        ->and($page->review()->duplicateTargets())->toBe(['name' => ['Naam', 'Type']]);
+    Notification::assertNotified(__('import_mapping.review_heading'));
+});
+
+it('takes any number of columns for a link, but one for an attribute of it', function (): void {
+    $this->asFilamentUser();
+
+    $page = new ImportMapping();
+    $page->mount();
+    $page->target = ImportTarget::AvgResponsibleProcessingRecord->value;
+    $page->headers = ['Naam', 'Verwerker 1', 'Verwerker 2', 'E-mail 1', 'E-mail 2'];
+    $page->setRows([['Naam' => 'Een', 'Verwerker 1' => 'A', 'Verwerker 2' => 'B', 'E-mail 1' => 'a@x', 'E-mail 2' => 'b@x']]);
+    $page->mapping = [
+        'Naam' => ['target' => 'name'],
+        'Verwerker 1' => ['target' => 'processors'],
+        'Verwerker 2' => ['target' => 'processors'],
+        'E-mail 1' => ['target' => 'processors::email'],
+        'E-mail 2' => ['target' => 'processors::email'],
+    ];
+    $page->step = ImportMapping::STEP_REVIEW;
+
+    expect($page->review()->duplicateTargets())->toBe(['processors::email' => ['E-mail 1', 'E-mail 2']]);
+});
+
+it('keeps columns without a field of their own as notes on the record', function (): void {
+    $this->asFilamentUser();
+
+    $page = new ImportMapping();
+    $page->mount();
+    $page->target = ImportTarget::AvgResponsibleProcessingRecord->value;
+    $page->headers = ['Naam', 'Tekst', 'Afdeling'];
+    $page->setRows([
+        ['Naam' => 'Salarisadministratie', 'Tekst' => 'Overgenomen uit het oude register.', 'Afdeling' => 'HR'],
+        ['Naam' => 'Toegangsbeheer', 'Tekst' => null, 'Afdeling' => 'ICT'],
+    ]);
+    $page->mapping = [
+        'Naam' => ['target' => 'name'],
+        'Tekst' => ['target' => 'remarks'],
+        'Afdeling' => ['target' => 'remarks'],
+    ];
+    $page->step = ImportMapping::STEP_REVIEW;
+
+    $page->dryRun($this->app->get(DryRunner::class));
+    expect($page->result['fits'])->toBe(2);
+
+    $page->apply(
+        $this->app->get(DryRunner::class),
+        $this->app->get(MappedRecordWriter::class),
+        $this->app->get(MappingProfileRepository::class),
+    );
+
+    $first = AvgResponsibleProcessingRecord::query()->where('name', 'Salarisadministratie')->first();
+    $second = AvgResponsibleProcessingRecord::query()->where('name', 'Toegangsbeheer')->first();
+
+    expect($page->result['imported'])->toBe(2)
+        ->and($first?->remarks()->orderBy('body')->pluck('body')->all())->toBe([
+            'Afdeling: HR',
+            'Tekst: Overgenomen uit het oude register.',
+        ])
+        // An empty cell is not a note.
+        ->and($second?->remarks()->pluck('body')->all())->toBe(['Afdeling: ICT']);
+});
+
+it('offers notes only to registers that keep them, and shows the target as such', function (): void {
+    $this->asFilamentUser();
+
+    $breach = new ImportMapping();
+    $breach->mount();
+    $breach->target = ImportTarget::DataBreachRecord->value;
+
+    $processing = new ImportMapping();
+    $processing->mount();
+    $processing->target = ImportTarget::AvgResponsibleProcessingRecord->value;
+    $processing->headers = ['Tekst'];
+    $processing->setRows([['Tekst' => 'iets']]);
+    $processing->mapping = ['Tekst' => ['target' => 'remarks']];
+
+    expect($breach->review()->options()->flat())->not->toHaveKey('remarks')
+        ->and($processing->review()->options()->flat())->toHaveKey('remarks')
+        ->and($processing->review()->column('Tekst')->transformLabel())->toBe(__('import_mapping.transform.remark'));
+});
+
+it('leaves a field that takes a code rather than a label out of the targets', function (): void {
+    $this->asFilamentUser();
+
+    // data_collection_source is an enum; the export writes its label, which
+    // the cast would refuse. The field keeps its default instead.
+    $page = new ImportMapping();
+    $page->mount();
+    $page->target = ImportTarget::AvgResponsibleProcessingRecord->value;
+
+    expect($page->review()->options()->flat())->not->toHaveKey('data_collection_source');
 });

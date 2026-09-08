@@ -9,14 +9,14 @@ use App\Enums\Import\ImportTarget;
 use App\Import\Factories\General\LookupListFactory;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 use Webmozart\Assert\Assert;
 
-use function __;
+use function array_filter;
 use function array_keys;
-use function explode;
 use function is_string;
 use function sprintf;
 use function trim;
@@ -61,7 +61,7 @@ class MappedRecordWriter
                 $imported += $written ? 1 : 0;
                 $skipped += $written ? 0 : 1;
             } catch (Throwable $throwable) {
-                $failures[] = ['row' => $fit['number'], 'reason' => __('import_mapping.issue.write_failed')];
+                $failures[] = ['row' => $fit['number'], 'reason' => WriteFailureReason::describe($throwable)];
 
                 // Rows hold personal data, so the exception message (which for a
                 // query exception includes the bound values) stays out of the log.
@@ -99,14 +99,17 @@ class MappedRecordWriter
         }
 
         $model = new $modelClass();
-        // Fields the source lacks start out as they do on the form.
-        $model->fill($fit['attributes'] + $this->formDefaults->defaults($modelClass));
+        // An empty cell says nothing; the field starts out as it does on the
+        // form, rather than being emptied on purpose.
+        $supplied = array_filter($fit['attributes'], static fn (mixed $value): bool => $value !== null);
+        $model->fill($supplied + $this->formDefaults->defaults($modelClass));
         $model->setAttribute('organisation_id', $organisationId);
 
         $this->attachLookups($model, $target, $profile, $fit['row'], $organisationId);
         $model->save();
 
         $this->attachRelations($model, $target, $profile, $fit['row'], $organisationId);
+        $this->attachRemarks($model, $profile, $fit['row']);
 
         return true;
     }
@@ -227,6 +230,36 @@ class MappedRecordWriter
     }
 
     /**
+     * Keeps columns without a field of their own as notes on the record, one
+     * per column, headed with the column name so the origin stays visible.
+     *
+     * @param MappingProfile<Model> $profile
+     * @param array<string, mixed> $row
+     */
+    private function attachRemarks(Model $model, MappingProfile $profile, array $row): void
+    {
+        foreach ($profile->fields as $field) {
+            if ($field->relation !== RelationKey::REMARKS) {
+                continue;
+            }
+
+            $value = Arr::get($row, $field->source);
+
+            if (!is_string($value) || trim($value) === '') {
+                continue;
+            }
+
+            // Only registers with notes offer the target; TargetOptions sees to that.
+            $callable = [$model, 'remarks'];
+            Assert::isCallable($callable);
+            $relation = $callable();
+            Assert::isInstanceOf($relation, MorphMany::class);
+
+            $relation->create(['body' => sprintf('%s: %s', $field->source, trim($value))]);
+        }
+    }
+
+    /**
      * Builds the record that belongs to a related record, such as an address,
      * from whichever columns the source supplies.
      *
@@ -308,12 +341,8 @@ class MappedRecordWriter
                 continue;
             }
 
-            foreach (explode($field->separator, $value) as $part) {
-                $part = trim($part);
-
-                if ($part !== '') {
-                    $values[] = $part;
-                }
+            foreach (MultiValue::split($value, $field->separator) as $part) {
+                $values[] = $part;
             }
         }
 

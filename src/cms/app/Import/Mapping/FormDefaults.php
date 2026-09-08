@@ -11,6 +11,7 @@ use Webmozart\Assert\Assert;
 use function array_key_exists;
 use function in_array;
 use function is_string;
+use function preg_match;
 
 /**
  * What a record starts out with when the source says nothing: the values the
@@ -25,7 +26,7 @@ class FormDefaults
      */
     private const GENERATED = ['id', 'number', 'organisation_id', 'import_id', 'created_at', 'updated_at', 'deleted_at'];
 
-    /** @var array<class-string<Model>, array{required: array<int, string>, defaults: array<string, mixed>}> */
+    /** @var array<class-string<Model>, array{required: array<int, string>, defaults: array<string, mixed>, lengths: array<string, int>}> */
     private array $cache = [];
 
     public function __construct(
@@ -60,9 +61,22 @@ class FormDefaults
     }
 
     /**
+     * The most a text column holds, per column. The database refuses a longer
+     * value outright, so the dry-run checks it first.
+     *
      * @param class-string<Model> $modelClass
      *
-     * @return array{required: array<int, string>, defaults: array<string, mixed>}
+     * @return array<string, int>
+     */
+    public function lengths(string $modelClass): array
+    {
+        return $this->inspect($modelClass)['lengths'];
+    }
+
+    /**
+     * @param class-string<Model> $modelClass
+     *
+     * @return array{required: array<int, string>, defaults: array<string, mixed>, lengths: array<string, int>}
      */
     private function inspect(string $modelClass): array
     {
@@ -73,16 +87,22 @@ class FormDefaults
         $model = new $modelClass();
         $required = [];
         $defaults = [];
+        $lengths = [];
 
         foreach (Schema::getColumns($model->getTable()) as $column) {
             Assert::isArray($column);
             $name = $column['name'] ?? null;
 
-            if (!is_string($name) || in_array($name, self::GENERATED, true)) {
+            if (!is_string($name)) {
                 continue;
             }
 
-            if (($column['nullable'] ?? true) === true || ($column['default'] ?? null) !== null) {
+            $length = $this->length($column);
+            if ($length !== null) {
+                $lengths[$name] = $length;
+            }
+
+            if (!$this->insistsOnValue($column, $name)) {
                 continue;
             }
 
@@ -103,6 +123,37 @@ class FormDefaults
             $required[] = $name;
         }
 
-        return $this->cache[$modelClass] = ['required' => $required, 'defaults' => $defaults];
+        return $this->cache[$modelClass] = ['required' => $required, 'defaults' => $defaults, 'lengths' => $lengths];
+    }
+
+    /**
+     * A column the database will not leave empty and does not fill itself.
+     *
+     * @param array<mixed> $column
+     */
+    private function insistsOnValue(array $column, string $name): bool
+    {
+        if (in_array($name, self::GENERATED, true)) {
+            return false;
+        }
+
+        return ($column['nullable'] ?? true) !== true && ($column['default'] ?? null) === null;
+    }
+
+    /**
+     * The character limit of a "character varying(255)" column; null for
+     * unbounded text and for anything that is not text.
+     *
+     * @param array<mixed> $column
+     */
+    private function length(array $column): ?int
+    {
+        $type = $column['type'] ?? null;
+
+        if (!is_string($type) || preg_match('/^(character varying|character|varchar|char)\((\d+)\)$/', $type, $match) !== 1) {
+            return null;
+        }
+
+        return (int) $match[2];
     }
 }

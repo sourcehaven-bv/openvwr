@@ -42,6 +42,7 @@ return [
     'date_format_intro' => 'Deze kolom bevat ":sample". Welke datum is dat?',
     'date_format_example' => ':sample wordt gelezen als :date',
     'date_format_missing' => 'Kies eerst het datumformaat voor kolom ":column".',
+    'duplicate_target' => 'Het veld ":field" is voor meer dan één kolom gekozen (":columns"). Een veld neemt één kolom; zet de andere op "niet importeren" of op Notitie.',
     'date_order' => [
         'day_first' => 'dag-maand-jaar',
         'month_first' => 'maand-dag-jaar',
@@ -52,12 +53,14 @@ return [
 
     'ignore' => '— niet importeren —',
     'field_import_id' => 'Bronkenmerk (nummer uit het bronsysteem)',
+    'field_remarks' => 'Notitie',
 
     'group_none' => '',
     'group_source' => 'Herkomst',
     'group_other' => 'Overig',
     'group_relations' => 'Koppelingen',
     'group_lookups' => 'Opzoeklijsten',
+    'group_notes' => 'Notities',
 
     'status_open' => 'Nog geen keuze gemaakt',
     'status_suggested_strong' => 'Automatisch ingevuld',
@@ -97,6 +100,7 @@ return [
 
     'result_heading' => 'Import afgerond',
     'result_body' => ':count rijen geïmporteerd. :issues rijen zijn overgeslagen en kunnen na aanpassing opnieuw worden aangeboden.',
+    'result_failed' => ':count rijen konden niet worden opgeslagen; de reden staat hieronder.',
 
     'transform' => [
         'text' => 'Tekst',
@@ -105,13 +109,21 @@ return [
         'integer' => 'Getal',
         'string_list' => 'Lijst (regel per waarde)',
         'relation' => 'Gekoppeld record (wordt opgezocht of aangemaakt)',
+        'remark' => 'Notitie bij het record (kolomnaam: waarde)',
     ],
 
 
     'issue' => [
         'missing_required' => 'Verplicht veld leeg: :fields',
         'not_convertible' => 'Kolom ":column" bevat een waarde die niet als :transform gelezen kan worden',
+        'too_long' => 'Veld ":field" is langer dan :max tekens',
         'write_failed' => 'De rij kon niet worden opgeslagen; de details staan in het logboek.',
+        'write_failed_too_long' => 'Een waarde is te lang voor het veld in OpenVWR.',
+        'write_failed_out_of_range' => 'Een getal valt buiten het bereik van het veld.',
+        'write_failed_wrong_type' => 'Een waarde heeft niet het type dat het veld verwacht.',
+        'write_failed_required' => 'Een verplicht veld is leeg.',
+        'write_failed_reference' => 'Een koppeling verwijst naar een record dat niet bestaat.',
+        'write_failed_duplicate' => 'Het record bestaat al.',
     ],
 
     'error' => [

@@ -259,3 +259,49 @@ it('recognises a field by its fixed choices and refuses values outside them', fu
     expect(targetFor($byValues->fields, 'Soort')?->target)->toBe('type')
         ->and(targetFor($outside->fields, 'Categorie')?->target)->not->toBe('type');
 });
+
+it('reads a camel-cased or numbered heading as separate words', function (): void {
+    // Exports from other register tools name columns "DatumMelding" and, for a
+    // repeated group, "Naam2".
+    $profile = $this->app->get(MappingAnalyser::class)->analyse(ImportTarget::DataBreachRecord, ['DatumMelding', 'Naam2']);
+
+    expect(targetFor($profile->fields, 'DatumMelding')?->target)->toBe('reported_at')
+        ->and(targetFor($profile->fields, 'Naam2')?->target)->toBe('name');
+});
+
+it('recognises the spellings of an OpenVWR export: yes/no and dates with a time', function (): void {
+    $headers = ['Gemeld aan de autoriteit persoonsgegevens (AP)', 'Datum melding'];
+    $profile = $this->app->get(MappingAnalyser::class)->analyse(ImportTarget::DataBreachRecord, $headers, [
+        ['Gemeld aan de autoriteit persoonsgegevens (AP)' => 'yes', 'Datum melding' => '04-03-2026 00:00'],
+        ['Gemeld aan de autoriteit persoonsgegevens (AP)' => 'no', 'Datum melding' => '13-03-2026 00:00'],
+    ]);
+
+    $reported = targetFor($profile->fields, 'Gemeld aan de autoriteit persoonsgegevens (AP)');
+    $date = targetFor($profile->fields, 'Datum melding');
+
+    expect($reported?->target)->toBe('ap_reported')
+        ->and($reported?->confidence)->toBe(MappingConfidence::Exact)
+        ->and($date?->target)->toBe('reported_at')
+        ->and($date?->confidence)->toBe(MappingConfidence::Exact)
+        ->and($date?->dateFormat)->toBe('d-m-Y H:i');
+});
+
+it('accepts a comma-separated list of fixed choices as evidence for the field', function (): void {
+    $profile = $this->app->get(MappingAnalyser::class)->analyse(ImportTarget::DataBreachRecord, ['Categorieën van persoonsgegevens'], [
+        ['Categorieën van persoonsgegevens' => 'Naam, E-mailadres, Adres en woonplaats'],
+    ]);
+
+    $field = targetFor($profile->fields, 'Categorieën van persoonsgegevens');
+
+    expect($field?->target)->toBe('personal_data_categories')
+        ->and($field?->confidence)->toBe(MappingConfidence::Exact);
+});
+
+it('proposes the note target for a column of remarks', function (): void {
+    $profile = $this->app->get(MappingAnalyser::class)->analyse(ImportTarget::AvgResponsibleProcessingRecord, ['Opmerkingen']);
+
+    $field = targetFor($profile->fields, 'Opmerkingen');
+
+    expect($field?->target)->toBe('remarks')
+        ->and($field?->relation)->toBe('remarks');
+});
