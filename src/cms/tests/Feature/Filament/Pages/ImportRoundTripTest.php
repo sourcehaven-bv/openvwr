@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\CoreEntityDataCollectionSource;
 use App\Enums\Import\ImportTarget;
 use App\Facades\Authentication;
 use App\Filament\Exports\AvgResponsibleProcessingRecordExporter;
@@ -23,6 +24,7 @@ use App\Models\Processor;
 use App\Models\Receiver;
 use App\Models\Responsible;
 use App\Models\Stakeholder;
+use App\Models\Tag;
 use Filament\Actions\Exports\Models\Export;
 use Illuminate\Database\Eloquent\Model;
 use OpenSpout\Common\Entity\Row;
@@ -141,6 +143,7 @@ it('imports its own processing register export back, links and lookups included'
     $original = AvgResponsibleProcessingRecord::factory()->create([
         'organisation_id' => $organisationId,
         'name' => 'Salarisadministratie',
+        'data_collection_source' => CoreEntityDataCollectionSource::SECONDARY,
         'has_processors' => true,
         'outside_eu' => false,
         'decision_making' => false,
@@ -163,6 +166,7 @@ it('imports its own processing register export back, links and lookups included'
     );
     $original->avgGoals()->attach(AvgGoal::factory()->create(['organisation_id' => $organisationId, 'goal' => 'Uitbetalen van salaris']));
     $original->contactPersons()->attach(ContactPerson::factory()->create(['organisation_id' => $organisationId, 'name' => 'P. de Vries']));
+    $original->tags()->attach(Tag::factory()->create(['organisation_id' => $organisationId, 'name' => 'Kernproces']));
 
     $page = importWorkbook(
         ImportTarget::AvgResponsibleProcessingRecord,
@@ -176,6 +180,8 @@ it('imports its own processing register export back, links and lookups included'
         ->and($page->result['failures'])->toBe([])
         ->and($copy)->toBeInstanceOf(AvgResponsibleProcessingRecord::class)
         ->and($copy?->has_processors)->toBeTrue()
+        ->and($copy?->data_collection_source)->toBe(CoreEntityDataCollectionSource::SECONDARY)
+        ->and($copy?->tags()->pluck('name')->all())->toBe(['Kernproces'])
         ->and($copy?->outside_eu)->toBeFalse()
         ->and($copy?->measures_description)->toBe('Toegang op basis van rol; logging van inzage.')
         ->and($copy?->avgResponsibleProcessingRecordService?->name)->toBe('HR')
@@ -187,5 +193,6 @@ it('imports its own processing register export back, links and lookups included'
         // Everything the export names already exists; nothing may be added twice.
         ->and(Processor::query()->where('organisation_id', $organisationId)->count())->toBe(2)
         ->and(AvgGoal::query()->where('organisation_id', $organisationId)->count())->toBe(1)
-        ->and(AvgResponsibleProcessingRecordService::query()->where('organisation_id', $organisationId)->count())->toBe(1);
+        ->and(AvgResponsibleProcessingRecordService::query()->where('organisation_id', $organisationId)->count())->toBe(1)
+        ->and(Tag::query()->where('organisation_id', $organisationId)->count())->toBe(1);
 });

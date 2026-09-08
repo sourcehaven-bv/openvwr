@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Import\Mapping;
 
 use App\Enums\Import\ImportTarget;
-use BackedEnum;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Webmozart\Assert\Assert;
@@ -15,7 +14,6 @@ use function array_key_exists;
 use function class_basename;
 use function in_array;
 use function is_string;
-use function is_subclass_of;
 use function method_exists;
 use function sprintf;
 use function str_contains;
@@ -41,7 +39,6 @@ class TargetOptions
         'organisation_id',
         'parent_id',
         'public_from',
-        'review_at',
         'state',
     ];
 
@@ -153,7 +150,6 @@ class TargetOptions
                 // model does not expose is a mistake to fix, not to hide.
                 Assert::inArray($attribute, $fillable);
                 Assert::false($this->isInternal($attribute));
-                Assert::false($this->isEnum($model, $attribute));
 
                 $options[$attribute] = $this->attributeLabel($labelKey, $attribute);
                 $placed[] = $attribute;
@@ -178,7 +174,7 @@ class TargetOptions
     {
         $remaining = [];
         foreach ($model->getFillable() as $attribute) {
-            if ($this->isInternal($attribute) || $this->isEnum($model, $attribute) || in_array($attribute, $placed, true)) {
+            if ($this->isInternal($attribute) || in_array($attribute, $placed, true)) {
                 continue;
             }
 
@@ -252,18 +248,6 @@ class TargetOptions
         Assert::false(in_array(RelationKey::REMARKS, $model->getFillable(), true));
 
         return [RelationKey::REMARKS => __('import_mapping.field_remarks')];
-    }
-
-    /**
-     * An enum-cast field takes a code ("primary") that a source file does not
-     * write; it writes the label, which the cast refuses. Such fields keep
-     * their default.
-     */
-    private function isEnum(Model $model, string $attribute): bool
-    {
-        $cast = $model->getCasts()[$attribute] ?? null;
-
-        return is_string($cast) && is_subclass_of($cast, BackedEnum::class);
     }
 
     private function isInternal(string $attribute): bool

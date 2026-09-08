@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use App\Enums\Authorization\Role;
+use App\Enums\CoreEntityDataCollectionSource;
+use App\Enums\Dpia\DpiaSubjectType;
 use App\Enums\Import\ImportTarget;
 use App\Enums\Import\MappingConfidence;
 use App\Facades\Authentication;
@@ -19,7 +21,9 @@ use App\Import\ZipImporter;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecordService;
 use App\Models\DataBreachRecord;
+use App\Models\Dpia\DpiaRecord;
 use App\Models\Processor;
+use App\Models\Tag;
 use Filament\Notifications\Notification;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
@@ -1333,14 +1337,96 @@ it('offers notes only to registers that keep them, and shows the target as such'
         ->and($processing->review()->column('Tekst')->transformLabel())->toBe(__('import_mapping.transform.remark'));
 });
 
-it('leaves a field that takes a code rather than a label out of the targets', function (): void {
+it('reads a fixed choice by its label and refuses a value that is not a choice', function (): void {
     $this->asFilamentUser();
 
-    // data_collection_source is an enum; the export writes its label, which
-    // the cast would refuse. The field keeps its default instead.
+    // data_collection_source is cast to an enum: the sheet says "Secundair",
+    // the model wants the case behind it.
+    $page = new ImportMapping();
+    $page->mount();
+    $page->target = ImportTarget::AvgResponsibleProcessingRecord->value;
+    $page->headers = ['Naam', 'Primair / Secundair'];
+    $page->setRows([
+        ['Naam' => 'Salarisadministratie', 'Primair / Secundair' => 'Secundair'],
+        ['Naam' => 'Toegangsbeheer', 'Primair / Secundair' => 'Onbekend'],
+    ]);
+    $page->mapping = [
+        'Naam' => ['target' => 'name'],
+        'Primair / Secundair' => ['target' => 'data_collection_source'],
+    ];
+    $page->step = ImportMapping::STEP_REVIEW;
+
+    $page->apply(
+        $this->app->get(DryRunner::class),
+        $this->app->get(MappedRecordWriter::class),
+        $this->app->get(MappingProfileRepository::class),
+    );
+
+    $record = AvgResponsibleProcessingRecord::query()->where('name', 'Salarisadministratie')->first();
+
+    expect($page->result['imported'])->toBe(1)
+        ->and($page->result['issues'])->toHaveCount(1)
+        ->and($page->result['issues'][0]['reason'])->toBe(__('import_mapping.issue.not_an_option', [
+            'column' => 'Primair / Secundair',
+            'field' => 'Primair / Secundair',
+        ]))
+        ->and($record?->data_collection_source)->toBe(CoreEntityDataCollectionSource::SECONDARY)
+        ->and($page->review()->options()->flat())->toHaveKey('data_collection_source');
+});
+
+it('reads an enum without labels by its code', function (): void {
+    $this->asFilamentUser();
+
+    $page = new ImportMapping();
+    $page->mount();
+    $page->target = ImportTarget::DpiaRecord->value;
+    $page->headers = ['Naam', 'Onderwerp'];
+    $page->setRows([['Naam' => 'DPIA cameratoezicht', 'Onderwerp' => 'Regelgeving']]);
+    $page->mapping = [
+        'Naam' => ['target' => 'name'],
+        'Onderwerp' => ['target' => 'subject_type'],
+    ];
+    $page->step = ImportMapping::STEP_REVIEW;
+
+    $page->apply(
+        $this->app->get(DryRunner::class),
+        $this->app->get(MappedRecordWriter::class),
+        $this->app->get(MappingProfileRepository::class),
+    );
+
+    expect($page->result['imported'])->toBe(1)
+        ->and(DpiaRecord::query()->where('name', 'DPIA cameratoezicht')->first()?->subject_type)->toBe(DpiaSubjectType::REGULATION);
+});
+
+it('links labels as tags, creating them once', function (): void {
+    $this->asFilamentUser();
+
+    $rows = [
+        [...breachRows()[0], 'Labels' => 'Intern, Urgent'],
+        [...breachRows()[0], 'Naam' => 'Tweede', 'Labels' => 'Urgent'],
+    ];
+    $mapping = [...breachMapping(), 'Labels' => ['target' => 'tags']];
+
+    $page = pageAtReview($rows, $mapping);
+    $page->apply(
+        $this->app->get(DryRunner::class),
+        $this->app->get(MappedRecordWriter::class),
+        $this->app->get(MappingProfileRepository::class),
+    );
+
+    $first = DataBreachRecord::query()->where('name', 'Mail naar verkeerde ontvanger')->first();
+
+    expect($page->result['imported'])->toBe(2)
+        ->and($first?->tags()->pluck('name')->sort()->values()->all())->toBe(['Intern', 'Urgent'])
+        ->and(Tag::query()->where('name', 'Urgent')->count())->toBe(1);
+});
+
+it('offers the review date as a target', function (): void {
+    $this->asFilamentUser();
+
     $page = new ImportMapping();
     $page->mount();
     $page->target = ImportTarget::AvgResponsibleProcessingRecord->value;
 
-    expect($page->review()->options()->flat())->not->toHaveKey('data_collection_source');
+    expect($page->review()->options()->flat())->toHaveKey('review_at');
 });

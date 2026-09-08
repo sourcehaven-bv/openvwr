@@ -43,6 +43,11 @@ it('derives links and shared entities from the model', function (): void {
 
 it('never creates a register record from a link, only reports it', function (): void {
     foreach (ImportTarget::AlgorithmRecord->relations() as $relation) {
+        // Labels are the one shared entity every register has; they are made freely.
+        if ($relation->key === 'tags') {
+            continue;
+        }
+
         expect($relation->missing)->toBe(MissingEntityPolicy::Report);
     }
 });

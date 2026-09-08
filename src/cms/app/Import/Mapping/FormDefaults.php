@@ -92,10 +92,7 @@ class FormDefaults
         foreach (Schema::getColumns($model->getTable()) as $column) {
             Assert::isArray($column);
             $name = $column['name'] ?? null;
-
-            if (!is_string($name)) {
-                continue;
-            }
+            Assert::string($name);
 
             $length = $this->length($column);
             if ($length !== null) {
@@ -106,24 +103,38 @@ class FormDefaults
                 continue;
             }
 
-            if ($model->hasCast($name, ['bool', 'boolean'])) {
-                $defaults[$name] = false;
+            $default = $this->startingValue($model, $name);
+
+            if ($default === null) {
+                $required[] = $name;
 
                 continue;
             }
 
-            $option = $this->fieldOptions->default($model, $name);
-
-            if ($option !== null) {
-                $defaults[$name] = $option;
-
-                continue;
-            }
-
-            $required[] = $name;
+            $defaults[$name] = $default;
         }
 
         return $this->cache[$modelClass] = ['required' => $required, 'defaults' => $defaults, 'lengths' => $lengths];
+    }
+
+    /**
+     * What the form starts a required field out with: "no" for a yes/no field,
+     * the first choice for a fixed choice (as the enum case when the field is
+     * cast to one). Null when the form starts it empty.
+     */
+    private function startingValue(Model $model, string $name): mixed
+    {
+        if ($model->hasCast($name, ['bool', 'boolean'])) {
+            return false;
+        }
+
+        $option = $this->fieldOptions->default($model, $name);
+
+        if ($option === null) {
+            return null;
+        }
+
+        return EnumField::fromLabel($model, $name, $option) ?? $option;
     }
 
     /**

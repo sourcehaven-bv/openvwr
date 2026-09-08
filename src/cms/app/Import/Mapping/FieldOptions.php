@@ -17,7 +17,8 @@ use function sprintf;
 /**
  * The fixed choices of a field, as the register's form offers them: a data
  * breach type is "Voorlopig" or "Definitief". They live next to the field's
- * label in resources/lang, under "<attribute>_options".
+ * label in resources/lang, under "<attribute>_options", or, for a field cast
+ * to an enum, in the enum's labels.
  */
 class FieldOptions
 {
@@ -26,6 +27,12 @@ class FieldOptions
      */
     public function for(Model $model, string $attribute): array
     {
+        $enumLabels = EnumField::labels($model, $attribute);
+
+        if ($enumLabels !== []) {
+            return $enumLabels;
+        }
+
         $options = __(sprintf('%s.%s_options', Str::snake(class_basename($model)), $attribute));
 
         if (!is_array($options)) {

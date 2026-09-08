@@ -27,6 +27,7 @@ use App\Models\Receiver;
 use App\Models\Responsible;
 use App\Models\Stakeholder;
 use App\Models\System;
+use App\Models\Tag;
 use App\Models\Wpg\WpgGoal;
 use App\Models\Wpg\WpgProcessingRecord;
 use App\Models\Wpg\WpgProcessingRecordService;
@@ -78,6 +79,7 @@ enum ImportTarget: string
         'stakeholders' => [Stakeholder::class, 'description', 'stakeholder.model_plural', []],
         'avgGoals' => [AvgGoal::class, 'goal', 'avg_goal.model_plural', ['avg_goal_legal_base' => 'avg_goal.avg_goal_legal_base']],
         'wpgGoals' => [WpgGoal::class, 'description', 'wpg_goal.model_plural', []],
+        'tags' => [Tag::class, 'name', 'tag.model_plural', []],
     ];
 
     /**

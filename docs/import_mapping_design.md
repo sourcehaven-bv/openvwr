@@ -456,7 +456,8 @@ via de pagina) legde bloot wat de export en de import van elkaar afweken:
 | `reported_to_involved` ontbrak in de datalek-export; de kop van het nummer toonde een ruwe vertaalsleutel | Toegevoegd, sleutel hersteld |
 | De verwerkingsregisters exporteerden beveiligingsvelden onder de labels van de verwerker ("Toelichting maatregelen") in plaats van die van het formulier | Export gebruikt de eigen labels |
 | Export schrijft ja/nee als `yes`/`no`, datums als `04-03-2026 00:00` en lijsten als "Naam, Adres" | Scorer en `ColumnReview` kennen yes/no; datum met tijd geldt als datum; `MultiValue` splitst een cel zonder regeleinden op komma-spatie (lijsten, koppelingen, keuzelijst-bewijs) |
-| `data_collection_source` (enum) werd als tekstveld aangeboden; de export schrijft het label, de cast weigert dat | Enum-velden zijn geen doel; ze houden hun default |
+| `data_collection_source` (enum) werd als tekstveld aangeboden; de export schrijft het label, de cast weigert dat | `EnumField`: de labels van de enum zijn de keuzes (bewijs voor de analyser, default voor `FormDefaults`), de proefdraai weigert een waarde die geen keuze is, de writer zet het label om in de case |
+| "Labels" en "Periodieke review" uit de export hadden geen doel | `tags` is een gedeelde entiteit van elk register; `review_at` is een gewoon datumveld en geen intern veld meer |
 
 Nog niet ondersteund, bewust: categorieën persoonsgegevens en bewaartermijn
 (die horen bij de gegevens per betrokkene, twee niveaus diep), de bijzondere

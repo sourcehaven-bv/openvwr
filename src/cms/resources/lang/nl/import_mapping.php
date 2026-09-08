@@ -117,6 +117,7 @@ return [
         'missing_required' => 'Verplicht veld leeg: :fields',
         'not_convertible' => 'Kolom ":column" bevat een waarde die niet als :transform gelezen kan worden',
         'too_long' => 'Veld ":field" is langer dan :max tekens',
+        'not_an_option' => 'Kolom ":column" bevat een waarde die geen keuze is van ":field"',
         'write_failed' => 'De rij kon niet worden opgeslagen; de details staan in het logboek.',
         'write_failed_too_long' => 'Een waarde is te lang voor het veld in OpenVWR.',
         'write_failed_out_of_range' => 'Een getal valt buiten het bereik van het veld.',

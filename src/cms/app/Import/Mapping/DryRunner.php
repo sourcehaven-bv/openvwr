@@ -42,13 +42,15 @@ class DryRunner
     {
         $required = $this->formDefaults->required($profile->target);
         $lengths = $this->formDefaults->lengths($profile->target);
+        $modelClass = $profile->target;
+        $model = new $modelClass();
 
         $fits = [];
         $issues = [];
 
         foreach ($rows as $index => $row) {
             $mapped = $this->mappingEngine->apply($profile, $row);
-            $reason = $this->reasonForIssue($mapped, $required, $lengths, $profile, $row);
+            $reason = $this->reasonForIssue($model, $mapped, $required, $lengths, $profile, $row);
 
             if ($reason !== null) {
                 $issues[] = new DryRunIssue($index + 1, $row, $reason);
@@ -69,8 +71,14 @@ class DryRunner
      * @param MappingProfile<Model> $profile
      * @param array<string, mixed> $row
      */
-    private function reasonForIssue(array $mapped, array $required, array $lengths, MappingProfile $profile, array $row): ?string
-    {
+    private function reasonForIssue(
+        Model $model,
+        array $mapped,
+        array $required,
+        array $lengths,
+        MappingProfile $profile,
+        array $row,
+    ): ?string {
         // A value that was present but could not be converted is the more
         // specific problem, so it is reported before a plain empty field.
         foreach ($profile->fields as $field) {
@@ -88,6 +96,11 @@ class DryRunner
             return $tooLong;
         }
 
+        $wrongChoice = $this->wrongChoice($model, $mapped, $profile);
+        if ($wrongChoice !== null) {
+            return $wrongChoice;
+        }
+
         $missing = [];
         foreach ($required as $attribute) {
             if (Arr::get($mapped, $attribute) === null) {
@@ -100,6 +113,33 @@ class DryRunner
             $labels = array_map(fn (string $attribute): string => $this->labelFor($profile->target, $attribute), $missing);
 
             return __('import_mapping.issue.missing_required', ['fields' => implode(', ', $labels)]);
+        }
+
+        return null;
+    }
+
+    /**
+     * A fixed choice must be one of the choices: "Primair" or "Secundair", not
+     * "Onbekend". Checked here, because the cast would refuse it at write time.
+     *
+     * @param array<string, mixed> $mapped
+     * @param MappingProfile<Model> $profile
+     */
+    private function wrongChoice(Model $model, array $mapped, MappingProfile $profile): ?string
+    {
+        foreach ($profile->fields as $field) {
+            $value = Arr::get($mapped, $field->target);
+
+            if (!is_string($value) || EnumField::enumClass($model, $field->target) === null) {
+                continue;
+            }
+
+            if (EnumField::fromLabel($model, $field->target, $value) === null) {
+                return __('import_mapping.issue.not_an_option', [
+                    'column' => $field->source,
+                    'field' => $this->labelFor($profile->target, $field->target),
+                ]);
+            }
         }
 
         return null;
