@@ -224,10 +224,97 @@
     return el;
   }
 
+  /**
+   * Cover an element with an opaque placeholder carrying its own label, for
+   * content that must not be published at all - a QR code that encodes a TOTP
+   * secret, say. Sized from the element, so a wider or wrapped target is
+   * covered in full without anyone re-measuring anything.
+   *
+   * Unlike redact() this is not a grey bar: it explains itself, so a reader who
+   * meets the figure without the surrounding text understands that a real code
+   * appears here rather than a rendering failure.
+   *
+   * The mask is painted *before* the screenshot, so the secret is never in the
+   * captured image - there is no reversible transform to undo, and nothing to
+   * scrub afterwards. Callers should verify coverage with masked() rather than
+   * assume a selector still matches what they think it does.
+   */
+  function mask(
+    target,
+    text = '',
+    // `box` draws the framed placeholder, which reads as "something belongs
+    // here". Pass box: false for a masked line of text, where a frame around a
+    // single line looks heavier than the text it replaces.
+    { background = '#f3f4f6', border = '#9ca3af', color = '#4b5563', box = true } = {},
+  ) {
+    const t = resolve(target);
+    const el = document.createElement('div');
+    const style = window.getComputedStyle(
+      typeof target === 'string' ? document.querySelector(target) : target,
+    );
+    Object.assign(el.style, {
+      position: 'absolute',
+      left: `${t.left}px`,
+      top: `${t.top}px`,
+      width: `${t.width}px`,
+      // Let a text mask grow if its replacement text needs more room than the
+      // original: the point is to cover, and a clipped placeholder would leave
+      // the real content peeking out below.
+      minHeight: `${t.height}px`,
+      background: box ? background : '#ffffff',
+      border: box ? `2px solid ${border}` : 'none',
+      borderRadius: box ? '4px' : '0',
+      boxSizing: 'border-box',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: box ? 'center' : 'flex-start',
+      textAlign: box ? 'center' : 'left',
+      whiteSpace: 'pre-line',
+      padding: box ? '4px' : '0',
+      color,
+      // Inherit the target's own typography so a masked line of text sits on
+      // the page exactly as the real one did.
+      font: style.font,
+      fontFamily: style.fontFamily,
+      fontSize: box ? '15px' : style.fontSize,
+      lineHeight: box ? '1.3' : style.lineHeight,
+    });
+    el.textContent = text;
+    layer().appendChild(el);
+    return el;
+  }
+
+  /**
+   * Is every element matching `selector` fully covered by a mask?
+   *
+   * A mask that silently lands on the wrong element is worse than none: the
+   * figure ships the secret while the capture reports success. So this checks
+   * the actual geometry rather than trusting that a selector still matches.
+   */
+  function masked(selector) {
+    const masks = [...layer().children].map((m) => m.getBoundingClientRect());
+    const targets = [...document.querySelectorAll(selector)];
+    if (targets.length === 0) return false;
+    return targets.every((el) => {
+      const r = el.getBoundingClientRect();
+      if (r.width === 0 && r.height === 0) return true;
+      // Allow a sub-pixel slack: fractional layout rounding otherwise reports a
+      // fully covered element as exposed by a hairline.
+      const pad = 1;
+      return masks.some(
+        (m) =>
+          m.left <= r.left + pad &&
+          m.top <= r.top + pad &&
+          m.right >= r.right - pad &&
+          m.bottom >= r.bottom - pad,
+      );
+    });
+  }
+
   function clear() {
     const el = document.getElementById(LAYER_ID);
     if (el) el.remove();
   }
 
-  window.__annotate = { arrow, box, badge, redact, clear, ACCENT };
+  window.__annotate = { arrow, box, badge, redact, mask, masked, clear, ACCENT };
 })();

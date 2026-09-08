@@ -63,6 +63,42 @@ optioneel op welk element wordt bijgesneden.
 }
 ```
 
+### Maskeren
+
+De figuren komen in `src/cms/public/` te staan en worden dus zonder
+authenticatie geserveerd. De otp-figuur toont noodzakelijkerwijs een scanbare
+QR-code met de bijbehorende sleutel; die worden daarom vóór het maken van de
+schermafdruk afgedekt met een plaatshouder.
+
+Een figuur declareert dat met `mask`:
+
+```js
+mask: [
+  { selector: '[data-screenshot-mask="qr"]', text: 'QR-code\nverschijnt hier' },
+  { selector: '[data-screenshot-mask="secret"]', text: 'Sleutel: XXXX XXXX XXXX XXXX' },
+],
+```
+
+De plaatshouder wordt op de afmetingen van het element zelf gezet, net als de
+andere annotaties. Dat is hier niet alleen consistentie: de sleutel is tekst van
+variabele breedte in een `break-words`-alinea, dus een brede sleutel maakt de
+regel breder én laat hem doorlopen op een tweede regel. Een vaste rechthoek laat
+dan een deel van het geheim staan.
+
+Het masker gaat er vóór de schermafdruk overheen, dus het geheim komt niet in de
+afbeelding terecht — er valt achteraf niets meer te verwijderen, en er is geen
+omkeerbare bewerking (zoals blur) die iemand ongedaan kan maken.
+
+Daarna wordt gecontroleerd of het masker het element daadwerkelijk dekt; zo
+niet, dan faalt de capture. Een masker dat er stilletjes naast zit is erger dan
+geen: dat leest als "geregeld" terwijl het geheim alsnog gepubliceerd wordt.
+
+De twee elementen hebben hiervoor een `data-screenshot-mask`-attribuut in
+`one-time-password.blade.php`. Dat is bewust een uitzondering op de regel
+hieronder: bij de andere figuren mag een selector die niet meer klopt een
+mislukte capture opleveren, maar hier moet volstrekt duidelijk zijn — ook vanuit
+de blade — dat deze elementen niet gepubliceerd mogen worden.
+
 ### Selectors
 
 Gebruik bij voorkeur `getByRole(...)` met de zichtbare of toegankelijke naam.
@@ -77,9 +113,11 @@ wel een `sr-only`-label met een unieke naam per rij ("Item &lt;key&gt;
 selecteren...") tegenover de kop ("Alle items..."). Daarmee is een rij te
 selecteren zonder op DOM-volgorde of op Alpine's `x-on:click` te leunen.
 
-Er zijn daarom geen extra `data-*`-attributen aan de applicatie toegevoegd:
-rollen en toegankelijke namen dekken de gevallen die ertoe doen, en die zijn
-sowieso nuttig voor toegankelijkheid.
+Er zijn daarom vrijwel geen extra `data-*`-attributen aan de applicatie
+toegevoegd: rollen en toegankelijke namen dekken de gevallen die ertoe doen, en
+die zijn sowieso nuttig voor toegankelijkheid. De uitzondering is
+`data-screenshot-mask` (zie [Maskeren](#maskeren)), waar een mislukte selector
+niet alleen een lelijke figuur maar een gepubliceerd geheim zou opleveren.
 
 Twee keuzes zijn bewust gemaakt:
 
@@ -101,7 +139,13 @@ window.__annotate.arrow('#selector', { side: 'left' });  // left|right|top|botto
 window.__annotate.box('#selector');
 window.__annotate.badge('#selector', 1);
 window.__annotate.redact('#selector');
+window.__annotate.mask('#selector', 'QR-code\nverschijnt hier');  // box: false voor tekst
 ```
+
+`redact` legt een grijze balk over iets; `mask` zet er een plaatshouder mét
+uitleg overheen, voor inhoud die helemaal niet gepubliceerd mag worden.
+Gebruik in figuren bij voorkeur de declaratieve `mask`-eigenschap hierboven:
+die controleert ook of het element daadwerkelijk gedekt is.
 
 `side` is de kant van het element waar de pijl staat; de pijl wijst altijd naar
 het element toe. De accentkleur is `#F84F39`, gelijk aan de huisstijl.
