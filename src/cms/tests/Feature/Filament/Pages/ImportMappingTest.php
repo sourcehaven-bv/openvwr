@@ -1277,6 +1277,35 @@ it('takes any number of columns for a link, but one for an attribute of it', fun
     expect($page->review()->duplicateTargets())->toBe(['processors::email' => ['E-mail 1', 'E-mail 2']]);
 });
 
+it('writes a column mapped onto the FG note as the one FG note of the record', function (): void {
+    $this->asFilamentUser();
+
+    $page = new ImportMapping();
+    $page->mount();
+    $page->target = ImportTarget::AvgResponsibleProcessingRecord->value;
+    $page->headers = ['Naam', 'Opmerking FG'];
+    $page->setRows([
+        ['Naam' => 'Salarisadministratie', 'Opmerking FG' => "Volgend jaar opnieuw bekijken.\n\nGrondslag toetsen."],
+    ]);
+    $page->mapping = [
+        'Naam' => ['target' => 'name'],
+        'Opmerking FG' => ['target' => 'fgRemark'],
+    ];
+    $page->step = ImportMapping::STEP_REVIEW;
+
+    $page->apply(
+        $this->app->get(DryRunner::class),
+        $this->app->get(MappedRecordWriter::class),
+        $this->app->get(MappingProfileRepository::class),
+    );
+
+    $record = AvgResponsibleProcessingRecord::query()->where('name', 'Salarisadministratie')->first();
+
+    expect($page->result['imported'])->toBe(1)
+        ->and($record?->fgRemark?->body)->toBe("Volgend jaar opnieuw bekijken.\n\nGrondslag toetsen.")
+        ->and($record?->remarks()->count())->toBe(0);
+});
+
 it('keeps columns without a field of their own as notes on the record', function (): void {
     $this->asFilamentUser();
 
