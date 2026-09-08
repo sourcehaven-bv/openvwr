@@ -828,6 +828,80 @@ const FIGURES = [
       }
     },
   },
+  // --- Import (Excel/CSV) ---------------------------------------------------
+  // Driven with the synthetic fixtures from docs/qa/fixtures/import-mapping.
+  // Each figure starts from a fresh import page; the result figure writes
+  // three processing records into the seeded organisation.
+  {
+    name: 'import-upload',
+    file: '05_overige_functies/06_import_upload.png',
+    auth: true,
+    clip: '.fi-main',
+    maxHeight: 400,
+    async shoot(page) {
+      await gotoImport(page);
+    },
+  },
+  {
+    name: 'import-mapping',
+    file: '05_overige_functies/07_import_mapping.png',
+    auth: true,
+    clip: '.fi-main',
+    maxHeight: 900,
+    async shoot(page) {
+      await gotoImport(page);
+      await uploadSheet(page, 'data_breach_record', '01-datalekken-schoon.xlsx');
+    },
+  },
+  {
+    name: 'import-date-format',
+    file: '05_overige_functies/08_import_datumformaat.png',
+    auth: true,
+    clip: 'div.rounded-xl:has-text("Welke datum is dat")',
+    pad: 12,
+    async shoot(page) {
+      await gotoImport(page);
+      await uploadSheet(page, 'data_breach_record', '06-datalekken-ambigue-datum.csv');
+      await page.locator('text=Welke datum is dat').first().waitFor();
+    },
+  },
+  {
+    name: 'import-dry-run',
+    file: '05_overige_functies/09_import_proefdraai.png',
+    auth: true,
+    clip: '.fi-section:has-text("Resultaat proefdraai")',
+    pad: 8,
+    async shoot(page) {
+      await gotoImport(page);
+      await uploadSheet(page, 'data_breach_record', '03-datalekken-met-fouten.xlsx');
+      await page.getByRole('button', { name: /^Proefdraaien$/ }).click();
+      await page.locator('text=Resultaat proefdraai').first().waitFor({ timeout: 30000 });
+      await page.waitForLoadState('networkidle');
+    },
+  },
+  {
+    name: 'import-result',
+    file: '05_overige_functies/10_import_resultaat.png',
+    auth: true,
+    clip: '.fi-main',
+    maxHeight: 1000,
+    async shoot(page) {
+      await gotoImport(page);
+      await uploadSheet(page, 'avg_responsible_processing_record', '05-verwerkingen-met-verwerkers.csv');
+      // What a user would fill in by hand for the columns the analyser leaves open.
+      await chooseTarget(page, 'Naam verwerking', 'name');
+      await chooseTarget(page, 'Dienst', 'lookup:service');
+      await chooseTarget(page, 'Verwerker', 'processors');
+      await chooseTarget(page, 'E-mail verwerker', 'processors::email');
+      await chooseTarget(page, 'Postcode verwerker', 'processors::address.postal_code');
+      await chooseTarget(page, 'Plaats verwerker', 'processors::address.city');
+      await chooseTarget(page, 'Systeem', 'systems');
+      await page.getByRole('button', { name: /^Importeren$/ }).click();
+      await page.locator('text=Import afgerond').first().waitFor({ timeout: 60000 });
+      await page.waitForLoadState('networkidle');
+      await page.evaluate(() => window.scrollTo(0, 0));
+    },
+  },
 ];
 
 const tenantOf = (page) => {
@@ -985,6 +1059,28 @@ async function gotoSeededDpia(page, step) {
     throw new Error(`wizard step "${step}" not found`);
   }
   await page.waitForTimeout(400);
+}
+
+const FIXTURES = resolve(join(here, '../../docs/qa/fixtures/import-mapping'));
+
+async function gotoImport(page) {
+  await page.goto(`${BASE}/${tenantOf(page)}/import`, { waitUntil: 'networkidle' });
+  await passOtp(page);
+  await page.locator('input[type="file"]').first().waitFor({ state: 'attached', timeout: 15000 });
+}
+
+/** Choose the register, upload a fixture and wait for the review step. */
+async function uploadSheet(page, target, fixture) {
+  await page.locator('select.fi-select-input').first().selectOption(target);
+  await page.locator('input[type="file"]').first().setInputFiles(join(FIXTURES, fixture));
+  await page.locator('text=rijen gevonden').first().waitFor({ timeout: 60000 });
+  await page.waitForLoadState('networkidle');
+}
+
+/** Map one source column on the review screen. */
+async function chooseTarget(page, header, target) {
+  await page.locator(`select[wire\\:model\\.live="mapping.${header}.target"]`).selectOption(target);
+  await page.waitForLoadState('networkidle');
 }
 
 async function gotoRegister(page) {

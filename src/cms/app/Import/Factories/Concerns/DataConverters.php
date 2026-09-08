@@ -12,12 +12,14 @@ use Illuminate\Support\Str;
 use Webmozart\Assert\Assert;
 
 use function collect;
+use function explode;
 use function in_array;
 use function is_array;
 use function is_bool;
 use function is_int;
 use function is_string;
 use function sprintf;
+use function trim;
 
 trait DataConverters
 {
@@ -96,6 +98,73 @@ trait DataConverters
         throw new InvalidFormatException(
             sprintf('Could not parse date %s using expected formats [%s]', $input, Arr::join($expectedFormats, ', ')),
         );
+    }
+
+    /**
+     * Optional dates: a missing value is not an error, unlike toCarbon().
+     *
+     * @param array<string, mixed> $data
+     */
+    final protected function toCarbonOrNull(array $data, string $key, ?string $format = null): ?CarbonImmutable
+    {
+        if (Arr::get($data, $key) === null) {
+            return null;
+        }
+
+        return $this->toCarbon($data, $key, $format);
+    }
+
+    /**
+     * Calendar dates (`date` columns) carry no time, so they must not be shifted
+     * to UTC the way toCarbon() shifts timestamps: midnight in Europe/Amsterdam
+     * would otherwise become the previous day.
+     *
+     * @param array<string, mixed> $data
+     */
+    final protected function toCalendarDateOrNull(array $data, string $key, ?string $format = null): ?CarbonImmutable
+    {
+        $date = $this->toCarbonOrNull($data, $key, $format);
+
+        if ($date === null) {
+            return null;
+        }
+
+        return $date->setTimezone(Config::string('import.date.timezone'))->startOfDay();
+    }
+
+    /**
+     * Multi-value fields are stored as arrays. A spreadsheet cannot hold a list,
+     * so a single cell is split on newlines.
+     *
+     * @param array<string, mixed> $data
+     * @param non-empty-string $separator
+     *
+     * @return array<int, string>|null
+     */
+    final protected function toStringList(array $data, string $key, string $separator = "\n"): ?array
+    {
+        $input = Arr::get($data, $key);
+
+        if ($input === null) {
+            return null;
+        }
+
+        if (!is_array($input)) {
+            Assert::scalar($input);
+            $input = explode($separator, (string) $input);
+        }
+
+        $values = [];
+        foreach ($input as $value) {
+            Assert::scalar($value);
+            $value = trim((string) $value);
+
+            if ($value !== '') {
+                $values[] = $value;
+            }
+        }
+
+        return $values === [] ? null : $values;
     }
 
     /**

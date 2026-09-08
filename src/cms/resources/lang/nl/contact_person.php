@@ -7,6 +7,7 @@ return [
     'model_plural' => 'Contactpersonen',
     'table_empty_heading' => 'Geen contactpersonen',
 
+    'role' => 'Rol',
     'email' => 'E-mailadres',
     'phone' => 'Telefoonnummer',
 
