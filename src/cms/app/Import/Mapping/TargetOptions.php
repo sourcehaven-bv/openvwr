@@ -12,7 +12,6 @@ use Webmozart\Assert\Assert;
 
 use function __;
 use function array_key_exists;
-use function array_values;
 use function class_basename;
 use function in_array;
 use function is_string;
@@ -41,18 +40,23 @@ class TargetOptions
         'parent_id',
         'public_from',
         'state',
+        'created_at',
+        'updated_at',
+        'deleted_at',
     ];
 
     /**
      * Foreign keys point at records, not at values a source file can supply;
      * mapping a name onto an id column would only produce broken references.
+     * Only a uuid column is one, though: "meta_national_id" is a number a
+     * person types.
      */
     private const INTERNAL_SUFFIX = '_id';
 
     /** @var array<string, array<string, string>>|null */
     private ?array $grouped = null;
 
-    /** @var array<int, string>|null */
+    /** @var array<string, string>|null column name => type */
     private ?array $columns = null;
 
     public function __construct(
@@ -179,7 +183,12 @@ class TargetOptions
     {
         $remaining = [];
         foreach ($model->getFillable() as $attribute) {
-            if (!$this->isColumn($model, $attribute) || $this->isInternal($attribute) || in_array($attribute, $placed, true)) {
+            if (
+                !$this->isColumn($model, $attribute)
+                || $this->isInternal($attribute)
+                || $this->isForeignKey($model, $attribute)
+                || in_array($attribute, $placed, true)
+            ) {
                 continue;
             }
 
@@ -261,23 +270,37 @@ class TargetOptions
      */
     private function isColumn(Model $model, string $attribute): bool
     {
+        return array_key_exists($attribute, $this->columns($model));
+    }
+
+    private function isForeignKey(Model $model, string $attribute): bool
+    {
+        return str_ends_with($attribute, self::INTERNAL_SUFFIX) && ($this->columns($model)[$attribute] ?? null) === 'uuid';
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function columns(Model $model): array
+    {
         if ($this->columns === null) {
-            $columns = Schema::getColumnListing($model->getTable());
-            Assert::allString($columns);
-            $this->columns = array_values($columns);
+            $columns = [];
+            foreach (Schema::getColumns($model->getTable()) as $column) {
+                Assert::isArray($column);
+                Assert::string($column['name']);
+                Assert::string($column['type_name']);
+                $columns[$column['name']] = $column['type_name'];
+            }
+
+            $this->columns = $columns;
         }
 
-        return in_array($attribute, $this->columns, true);
+        return $this->columns;
     }
 
     private function isInternal(string $attribute): bool
     {
-        if (in_array($attribute, self::INTERNAL_ATTRIBUTES, true)) {
-            return true;
-        }
-
-        // import_id is the one id a source does supply: its own reference.
-        return $attribute !== 'import_id' && str_ends_with($attribute, self::INTERNAL_SUFFIX);
+        return in_array($attribute, self::INTERNAL_ATTRIBUTES, true);
     }
 
     /**
