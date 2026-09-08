@@ -4,18 +4,17 @@ declare(strict_types=1);
 
 namespace App\Import\Mapping;
 
+use App\Enums\Authorization\Permission;
 use App\Enums\Import\ImportTarget;
+use App\Facades\Authorization;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 use Webmozart\Assert\Assert;
 
 use function __;
 use function array_intersect;
 use function array_key_exists;
 use function array_keys;
-use function class_basename;
 use function in_array;
-use function is_string;
 use function method_exists;
 use function sprintf;
 use function str_ends_with;
@@ -24,16 +23,17 @@ use function str_ends_with;
  * Everything a source column may be mapped onto for one register: its plain
  * fields, its lookup lists and its shared entities.
  *
- * The list is built server-side from the model and the ImportTarget registry,
- * and the same list is used to validate what the browser sends back, so a
+ * The fields are the ones on the register's form, under the form's labels
+ * (FormFields); a fillable the form does not have is not a field a sheet can
+ * fill. The same list is used to validate what the browser sends back, so a
  * target that is not offered can also not be chosen.
  */
 class TargetOptions
 {
     /**
      * Filled in by the application, so never offered as an import target.
-     * `state` is the workflow status: a source file may not bypass the review
-     * process by supplying one.
+     * `state` is the workflow status and `public_from` the publication: a
+     * source file may not bypass the review process by supplying them.
      */
     private const INTERNAL_ATTRIBUTES = [
         'entity_number_id',
@@ -53,6 +53,12 @@ class TargetOptions
      * person types.
      */
     private const INTERNAL_SUFFIX = '_id';
+
+    /**
+     * The source reference has no field on the form: it is what the import
+     * remembers a row by, so a second run can find what the first made.
+     */
+    private const SOURCE_REFERENCE = 'import_id';
 
     /** @var array<string, array<string, string>>|null */
     private ?array $grouped = null;
@@ -79,17 +85,16 @@ class TargetOptions
 
         $modelClass = $this->target->modelClass();
         $model = new $modelClass();
-        $labelKey = Str::snake(class_basename($modelClass));
 
         $grouped = [];
         $grouped[__('import_mapping.group_none')] = ['' => __('import_mapping.ignore')];
 
         $placed = [];
-        foreach ($this->fieldGroups($model, $labelKey, $placed) as $group => $options) {
+        foreach ($this->fieldGroups($model, $placed) as $group => $options) {
             $grouped[$group] = $options;
         }
 
-        $remaining = $this->remainingFields($model, $labelKey, $placed);
+        $remaining = $this->remainingFields($model, $placed);
         if ($remaining !== []) {
             $grouped[__('import_mapping.group_other')] = $remaining;
         }
@@ -146,7 +151,7 @@ class TargetOptions
      *
      * @return array<string, array<string, string>>
      */
-    private function fieldGroups(Model $model, string $labelKey, array &$placed): array
+    private function fieldGroups(Model $model, array &$placed): array
     {
         $fillable = $model->getFillable();
         $groups = [];
@@ -156,12 +161,14 @@ class TargetOptions
 
             foreach ($attributes as $attribute) {
                 // The groups are configuration; a group naming a field the
-                // model does not expose is a mistake to fix, not to hide.
+                // model or the form does not have is a mistake to fix, not
+                // to hide.
                 Assert::inArray($attribute, $fillable);
                 Assert::true($this->isColumn($model, $attribute));
                 Assert::false($this->isInternal($attribute));
+                Assert::true($this->isOnForm($attribute));
 
-                $options[$attribute] = $this->attributeLabel($labelKey, $attribute);
+                $options[$attribute] = $this->attributeLabel($attribute);
                 $placed[] = $attribute;
             }
 
@@ -180,7 +187,7 @@ class TargetOptions
      *
      * @return array<string, string>
      */
-    private function remainingFields(Model $model, string $labelKey, array $placed): array
+    private function remainingFields(Model $model, array $placed): array
     {
         $remaining = [];
         foreach ($model->getFillable() as $attribute) {
@@ -188,12 +195,13 @@ class TargetOptions
                 !$this->isColumn($model, $attribute)
                 || $this->isInternal($attribute)
                 || $this->isForeignKey($model, $attribute)
+                || !$this->isOnForm($attribute)
                 || in_array($attribute, $placed, true)
             ) {
                 continue;
             }
 
-            $remaining[$attribute] = $this->attributeLabel($labelKey, $attribute);
+            $remaining[$attribute] = $this->attributeLabel($attribute);
         }
 
         return $remaining;
@@ -206,26 +214,31 @@ class TargetOptions
     {
         $lookups = [];
         foreach ($this->target->lookups() as $lookupTarget) {
-            $lookups[RelationKey::lookup($lookupTarget->key)] = __($lookupTarget->labelKey);
+            $lookups[RelationKey::lookup($lookupTarget->key)]
+                = FormFields::label($this->target, $lookupTarget->foreignKey) ?? __($lookupTarget->labelKey);
         }
 
         return $lookups;
     }
 
     /**
+     * A link is called what the form calls it; a link the form has no field
+     * for (the other register that refers to this one) keeps its own name.
+     *
      * @return array<string, string>
      */
     private function relations(): array
     {
         $relations = [];
         foreach ($this->target->relations() as $relationTarget) {
-            $relations[$relationTarget->key] = __($relationTarget->labelKey);
+            $label = FormFields::relationLabel($this->target, $relationTarget->key) ?? __($relationTarget->labelKey);
+            $relations[$relationTarget->key] = $label;
 
             // A source may spread one related record over several columns: a
             // name in one, an e-mail address in the next.
             foreach ($relationTarget->extraAttributes as $attribute => $attributeLabelKey) {
                 $relations[RelationKey::attribute($relationTarget->key, $attribute)]
-                    = sprintf('%s — %s', __($relationTarget->labelKey), __($attributeLabelKey));
+                    = sprintf('%s — %s', $label, __($attributeLabelKey));
             }
 
             // A related record can carry a sub-record of its own, such as an
@@ -239,7 +252,7 @@ class TargetOptions
             foreach ($subRecord->attributes as $attribute => $attributeLabelKey) {
                 $key = RelationKey::attribute($relationTarget->key, sprintf('%s.%s', $subRecord->key, $attribute));
 
-                $relations[$key] = sprintf('%s — %s', __($relationTarget->labelKey), __($attributeLabelKey));
+                $relations[$key] = sprintf('%s — %s', $label, __($attributeLabelKey));
             }
         }
 
@@ -249,7 +262,8 @@ class TargetOptions
     /**
      * Text without a field of its own can still be kept, as a note on the
      * record. Only registers that have notes offer it; any number of columns
-     * may go there, each becoming a note of its own.
+     * may go there, each becoming a note of its own. The FG's note is the
+     * FG's alone: only someone who may read it may fill it.
      *
      * @return array<string, string>
      */
@@ -261,7 +275,8 @@ class TargetOptions
             $notes[RelationKey::REMARKS] = __('import_mapping.field_remarks');
         }
 
-        if (method_exists($model, 'fgRemark')) {
+        $mayReadFgNotes = Authorization::hasPermission(Permission::CORE_ENTITY_FG_REMARKS);
+        if (method_exists($model, 'fgRemark') && $mayReadFgNotes) {
             $notes[RelationKey::FG_REMARK] = __('import_mapping.field_fg_remark');
         }
 
@@ -291,56 +306,27 @@ class TargetOptions
     }
 
     /**
-     * Shows the Dutch field label the register itself uses; the attribute name
-     * is an implementation detail the user has no use for.
+     * A fillable the form has no field for is a leftover of an earlier data
+     * model, not something a sheet can fill.
      */
-    private function attributeLabel(string $labelKey, string $attribute): string
+    private function isOnForm(string $attribute): bool
     {
-        if ($attribute === 'import_id') {
-            return __('import_mapping.field_import_id');
-        }
-
-        $label = $this->translate($labelKey, $attribute);
-
-        if ($label === null) {
-            // No translation anywhere: show the column name, but readably.
-            return Str::of($attribute)
-                ->replace('_', ' ')
-                ->trim()
-                ->ucfirst()
-                ->toString();
-        }
-
-        // Several fields share the label "Namelijk"; prefix them with the field
-        // they belong to so the options stay distinguishable.
-        if (str_ends_with($attribute, '_other')) {
-            $parent = $this->translate($labelKey, Str::beforeLast($attribute, '_other'));
-
-            if ($parent !== null) {
-                return sprintf('%s — %s', $parent, $label);
-            }
-        }
-
-        return $label;
+        return $attribute === self::SOURCE_REFERENCE || FormFields::has($this->target, $attribute);
     }
 
     /**
-     * The registers keep shared field names in processing_record.php and some
-     * general ones in general.php, so a single lookup misses half of them.
+     * The label the form shows for the field; the attribute name is an
+     * implementation detail the user has no use for.
      */
-    private function translate(string $labelKey, string $attribute): ?string
+    private function attributeLabel(string $attribute): string
     {
-        foreach ([$labelKey, 'processing_record', 'general'] as $file) {
-            $key = sprintf('%s.%s', $file, $attribute);
-            $label = __($key);
-
-            // A missing translation comes back as its key; a label may well
-            // contain a dot itself ("art. 16").
-            if (is_string($label) && $label !== $key && $label !== '') {
-                return $label;
-            }
+        if ($attribute === self::SOURCE_REFERENCE) {
+            return __('import_mapping.field_import_id');
         }
 
-        return null;
+        $label = FormFields::label($this->target, $attribute);
+        Assert::notNull($label);
+
+        return $label;
     }
 }

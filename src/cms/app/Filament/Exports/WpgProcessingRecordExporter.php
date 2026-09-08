@@ -25,7 +25,7 @@ class WpgProcessingRecordExporter extends Exporter
             ExportColumn::make('organisation.responsibleLegalEntity.name')
                 ->label(__('responsible_legal_entity.model_singular')),
             ExportColumn::make('entityNumber.number')
-                ->label(__('wpg_processing_record.number')),
+                ->label(__('processing_record.number')),
             ExportColumn::make('wpgProcessingRecordService.name')
                 ->label(__('wpg_processing_record_service.model_singular')),
             ExportColumn::make('name')

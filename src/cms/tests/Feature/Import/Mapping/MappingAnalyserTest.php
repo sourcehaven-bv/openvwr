@@ -8,9 +8,10 @@ use App\Enums\Import\MappingTransform;
 use App\Import\Mapping\MappingAnalyser;
 use App\Import\Mapping\MappingField;
 use App\Import\Mapping\MappingProfile;
-use Tests\TestCase;
 
-uses(TestCase::class);
+beforeEach(function (): void {
+    $this->asFilamentUser();
+});
 
 /**
  * @param array<int, MappingField> $fields
@@ -329,17 +330,28 @@ it('maps a column headed like a lookup list onto the lookup, not a stray attribu
 });
 
 it('maps the heading of a link attribute whether it carries the link name or not', function (): void {
-    $headers = ['Verwerkers', 'Verwerkers — E-mail', 'Contactpersonen — E-mailadres', 'AVG doelen — Grondslag'];
+    $headers = ['Verwerkers', 'Verwerkers — E-mail', 'Overige contactpersonen — E-mailadres', 'AVG doelen — Grondslag'];
     $profile = $this->app->get(MappingAnalyser::class)->analyse(ImportTarget::AvgResponsibleProcessingRecord, $headers, [
         [
             'Verwerkers' => 'Firma A',
             'Verwerkers — E-mail' => 'info@firma-a.example',
-            'Contactpersonen — E-mailadres' => 'p@example.org',
+            'Overige contactpersonen — E-mailadres' => 'p@example.org',
             'AVG doelen — Grondslag' => 'Overeenkomst',
         ]]);
 
     expect(targetFor($profile->fields, 'Verwerkers')?->target)->toBe('processors')
         ->and(targetFor($profile->fields, 'Verwerkers — E-mail')?->target)->toBe('processors::email')
-        ->and(targetFor($profile->fields, 'Contactpersonen — E-mailadres')?->target)->toBe('contactPersons::email')
+        ->and(targetFor($profile->fields, 'Overige contactpersonen — E-mailadres')?->target)->toBe('contactPersons::email')
         ->and(targetFor($profile->fields, 'AVG doelen — Grondslag')?->target)->toBe('avgGoals::avg_goal_legal_base');
+});
+
+it('reads the number of an OpenVWR export as the source reference', function (): void {
+    $profile = $this->app->get(MappingAnalyser::class)->analyse(
+        ImportTarget::AvgResponsibleProcessingRecord,
+        ['Nummer verwerking', 'Naam verwerking'],
+        [['Nummer verwerking' => 'ZGN010', 'Naam verwerking' => 'Salarisadministratie']],
+    );
+
+    expect(targetFor($profile->fields, 'Nummer verwerking')?->target)->toBe('import_id')
+        ->and(targetFor($profile->fields, 'Naam verwerking')?->target)->toBe('name');
 });

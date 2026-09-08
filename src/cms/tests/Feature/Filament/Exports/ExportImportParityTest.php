@@ -9,16 +9,23 @@ use App\Filament\Exports\AvgResponsibleProcessingRecordExporter;
 use App\Filament\Exports\DataBreachRecordExporter;
 use App\Filament\Exports\WpgProcessingRecordExporter;
 use App\Import\Mapping\FieldSynonyms;
+use App\Import\Mapping\MappingAnalyser;
 use App\Import\Mapping\TargetOptions;
 use Illuminate\Support\Facades\Config;
 
 // Targets the export leaves out on purpose: the source reference is the
-// register's own number, which the export writes under its own name.
-const EXPORT_LEAVES_OUT = ['import_id'];
+// register's own number, which the export writes under the number's own
+// name (the analyser knows); the FG's note is for the FG alone and does not
+// travel with the sheet.
+const EXPORT_LEAVES_OUT = ['import_id', 'fgRemark'];
+
+// The number comes back as the source reference, so it is not left over.
+const READ_BACK_AS_REFERENCE = ['number', 'entityNumber.number'];
 
 // Columns the export adds that are not a field a sheet can set: what OpenVWR
-// assigns itself (number, dates, version), or a link to something a sheet
-// cannot name (the organisation, a team member, the parent record).
+// assigns itself (number, dates, version), a link to something a sheet
+// cannot name (the organisation, a team member, the parent record), or a
+// decision a sheet may not take (the publication date).
 const EXPORT_ONLY = [
     'organisation.name',
     'organisation.responsibleLegalEntity.name',
@@ -32,6 +39,7 @@ const EXPORT_ONLY = [
     'snapshot_latest_established',
     'snapshot_latest_status',
     'snapshot_latest_status_created_at',
+    'public_from',
 ];
 
 /**
@@ -106,6 +114,47 @@ it(
         }
 
         expect($orphans)->toBe([]);
+    },
+)->with([
+    'datalekken' => [DataBreachRecordExporter::class, ImportTarget::DataBreachRecord],
+    'avg verantwoordelijke' => [AvgResponsibleProcessingRecordExporter::class, ImportTarget::AvgResponsibleProcessingRecord],
+    'avg verwerker' => [AvgProcessorProcessingRecordExporter::class, ImportTarget::AvgProcessorProcessingRecord],
+    'wpg' => [WpgProcessingRecordExporter::class, ImportTarget::WpgProcessingRecord],
+    'algoritmes' => [AlgorithmRecordExporter::class, ImportTarget::AlgorithmRecord],
+]);
+
+/**
+ * The gate a user runs by hand: export, upload, look for "niet importeren".
+ * Every heading the export writes must be placed by the analyser on its own,
+ * apart from the columns OpenVWR fills itself; the number lands on the
+ * source reference, so a second import of the sheet finds its records.
+ */
+it(
+    'reads its own export back with nothing left over',
+    function (string $exporter, ImportTarget $target): void {
+        $this->asFilamentUser();
+        Config::set('features.wpg', true);
+
+        // A register without a source reference (algoritmes) keeps its
+        // number to itself.
+        $hasReference = (new TargetOptions($target))->allows('import_id');
+
+        $headers = [];
+        $ownLabels = [];
+        foreach ($exporter::getColumns() as $column) {
+            $headers[] = $column->getLabel();
+            $readBack = $hasReference && in_array($column->getName(), READ_BACK_AS_REFERENCE, true);
+
+            if (in_array($column->getName(), EXPORT_ONLY, true) && !$readBack) {
+                $ownLabels[] = $column->getLabel();
+            }
+        }
+
+        $profile = $this->app->get(MappingAnalyser::class)->analyse($target, $headers);
+        $reference = array_filter($profile->fields, static fn ($field): bool => $field->target === 'import_id');
+
+        expect($profile->unmapped)->toBe($ownLabels)
+            ->and(array_values($reference))->toHaveCount($hasReference ? 1 : 0);
     },
 )->with([
     'datalekken' => [DataBreachRecordExporter::class, ImportTarget::DataBreachRecord],

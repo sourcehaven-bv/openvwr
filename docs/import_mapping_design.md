@@ -482,7 +482,8 @@ gelijk zijn, op nummer en tijdstempels na. Dat legde bloot:
 | `measures_implemented` had in de AVG- en WPG-modellen een verkeerd gespelde cast (`measures`), WPG miste de cast op `has_pseudonymization`; "ja" ging als tekst naar een boolean-kolom en de database weigerde de rij | Casts hersteld |
 | `created_at`/`updated_at` zijn fillable op WPG en werden als doel aangeboden | Tijdstempels zijn intern |
 | `meta_national_id` en `meta_source_id` (algoritmes) werden als foreign key verborgen | Alleen een uuid-kolom met `_id` is een foreign key |
-| De kolom "Opmerkingen" exporteerde de ruwe JSON van de `Remark`-modellen; de opmerking van de FG werd niet geëxporteerd | `Exporter::noteColumns()`: de notities als tekst met een lege regel ertussen, en "Opmerking FG" als eigen kolom. De import leest een notitiekolom ("Opmerkingen", "Notities", "Tekst") als de notities zelf en zet alleen bij een andere kolom de kolomnaam ervoor (`NoteBodies`); "Opmerking FG" is een eigen doel |
+| De kolom "Opmerkingen" exporteerde de ruwe JSON van de `Remark`-modellen | `Exporter::noteColumns()`: de notities als tekst met een lege regel ertussen. De import leest een notitiekolom ("Opmerkingen", "Notities", "Tekst") als de notities zelf en zet alleen bij een andere kolom de kolomnaam ervoor (`NoteBodies`). De opmerking van de FG is voor de FG: de export bevat haar nooit, en de import biedt "Opmerking FG" alleen aan wie FG-opmerkingen mag lezen |
+| De AVG-verwerker-export schreef "Derden", "Toelichting derden", "Verdachten", "Slachtoffers", "Veroordeelden" en "Verdeling verantwoordelijkheid": kolommen in de database die het formulier van dat register niet heeft. WPG exporteerde "Beveiliging", een kolom die niet meer bestaat. De import bood diezelfde fillables aan | Het formulier is de bron van waarheid (§9) |
 
 Nog niet ondersteund, bewust: kolomgroepen (zie boven), categorieën persoonsgegevens en bewaartermijn
 (die horen bij de gegevens per betrokkene, twee niveaus diep), de bijzondere
@@ -496,3 +497,36 @@ Bewust niet gedaan: de phpstan-regel `TenantAwareQueryRule` uitbreiden naar
 `App\Import`. De importlaag draait ook in queue-jobs zonder ingelogde tenant
 en werkt daarom met een expliciete `organisationId` in plaats van
 `tenantQuery()`; de regel zou daar alleen valse meldingen geven.
+
+## 9. Het formulier als bron van waarheid
+
+Een register had zijn veldenlijst drie keer, met de hand bijgehouden: het
+Filament-formulier, de exporter en de doelenlijst van de import. Niets leidde
+de een uit de ander af. Elke keer dat een lijst afweek kwam er een kolom uit
+de export die niet terug te lezen was, of ontbrak een veld dat het formulier
+wél heeft; de tests spiegelden de implementatie in plaats van het bestand dat
+de gebruiker in handen krijgt.
+
+`FormFields` leest daarom het formulier zelf: de one-page-variant van het
+register, met verborgen onderdelen erbij, zodat een veld achter een schakelaar
+("GEB (DPIA) uitgevoerd", "Heeft beveiliging") gewoon meetelt. Per veld komt
+de naam, het label en de relatie die het bewerkt eruit. Velden van een
+repeater (een doel, een betrokkene) zijn een eigen record en worden niet
+ingelopen; verborgen velden dragen geen invoer.
+
+Wat daaruit volgt:
+
+- `TargetOptions` biedt alleen fillables aan die op het formulier staan, onder
+  het label van het formulier. Een relatie heet wat het formulier haar noemt
+  ("Subverwerkers" bij een verwerker-verwerking, "Overige contactpersonen").
+  Alleen het bronkenmerk (`import_id`) heeft geen veld en blijft.
+- De exporters houden hun eigen kolomlijst, maar `FormParityTest` houdt die
+  aan het formulier: elk veld van het formulier komt onder het label van het
+  formulier in de export én in de import, en geen van beide voert een plat
+  veld op dat het formulier niet heeft. De uitzonderingen staan in de test
+  met naam en reden (het documentenblok, subverwerkingen, het nummer dat
+  OpenVWR zelf geeft, de hoofdverwerking, het primaire contact, de
+  publicatiedatum).
+
+De volgende stap, de exporterkolommen uit `FormFields` genereren, verandert de
+kolomvolgorde van de export en is een eigen wijziging.

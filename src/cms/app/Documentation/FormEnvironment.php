@@ -6,10 +6,10 @@ namespace App\Documentation;
 
 use App\Components\Uuid\Uuid;
 use App\Enums\RegisterLayout;
+use App\Filament\Forms\FormHost;
 use App\Models\Organisation;
 use App\Models\User;
 use Filament\Facades\Filament;
-use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
-use Livewire\Component as LivewireComponent;
 use RuntimeException;
 
 use function config;
@@ -96,15 +95,7 @@ class FormEnvironment
      */
     public function makeFormHost(): HasForms
     {
-        return new class extends LivewireComponent implements HasForms
-        {
-            use InteractsWithForms;
-
-            public function render(): string
-            {
-                return '';
-            }
-        };
+        return new FormHost();
     }
 
     /**

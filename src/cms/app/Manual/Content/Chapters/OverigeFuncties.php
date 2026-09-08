@@ -218,7 +218,8 @@ final class OverigeFuncties
                 mogen naar Notitie; elke kolom wordt een eigen opmerking en een lege cel
                 geeft er geen. De keuze bestaat alleen bij registers die opmerkingen
                 kennen, zoals de verwerkingen en DPIA's. De opmerking van de FG heeft een
-                eigen doel, "Opmerking FG".
+                eigen doel, "Opmerking FG", dat alleen wie de FG-opmerkingen mag lezen te
+                zien krijgt; de export bevat de FG-opmerking nooit.
 
                 ### Eén record over meerdere rijen
 

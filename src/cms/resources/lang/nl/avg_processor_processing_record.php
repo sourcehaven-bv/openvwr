@@ -58,9 +58,6 @@ return [
     'help_contact_persons' => 'Aanvullende contactpersonen, bijvoorbeeld de beheerder van het systeem.',
 
     'responsibility_distribution' => 'Verdeling verantwoordelijkheid',
-    'measures_implemented' => 'Beveiligingsbeleid geïmplementeerd',
-    'other_measures' => 'Overige beveiligingsmaatregelen',
-    'measures_description' => 'Omschrijving beveiligingsmaatregelen',
     'pseudonymization' => 'Pseudonimisering',
     'outside_eu' => 'Doorgifte buiten EER',
     'outside_eu_protection_level' => 'Vallen alle doorgiftes onder een adequaatheidsbesluit?',

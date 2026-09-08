@@ -9,6 +9,10 @@ use App\Models\DataBreachRecord;
 use App\Models\Organisation;
 use Illuminate\Support\Facades\Config;
 
+beforeEach(function (): void {
+    $this->asFilamentUser();
+});
+
 it('offers every register, each with the fields, links and lookups its model has', function (): void {
     Config::set('features.wpg', true);
 

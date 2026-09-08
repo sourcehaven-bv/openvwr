@@ -38,6 +38,10 @@ class MappingAnalyser
      */
     private const AMBIGUITY_MARGIN = 0.10;
 
+    private const SOURCE_REFERENCE = 'import_id';
+
+    private const NUMBER_FIELD = 'entityNumber.number';
+
     public function __construct(
         private readonly TransformResolver $transformResolver,
         private readonly CandidateScorer $candidateScorer,
@@ -92,6 +96,13 @@ class MappingAnalyser
             if (str_contains($key, RelationKey::ATTRIBUTE_SEPARATOR)) {
                 $exact = $label;
                 $label = Str::afterLast($label, ' — ');
+            }
+
+            // The number OpenVWR gave a record is, once exported, the number
+            // of the source system: the reference a second run finds the
+            // record by again.
+            if ($key === self::SOURCE_REFERENCE) {
+                $exact = FormFields::label($target, self::NUMBER_FIELD);
             }
 
             $candidates[$key] = [

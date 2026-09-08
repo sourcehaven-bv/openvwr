@@ -12,6 +12,7 @@ use App\Filament\Pages\ImportMapping;
 use App\Import\ImportFailedException;
 use App\Import\Mapping\DryRunner;
 use App\Import\Mapping\EditableMapping;
+use App\Import\Mapping\FormFields;
 use App\Import\Mapping\MappedRecordWriter;
 use App\Import\Mapping\MappingAnalyser;
 use App\Import\Mapping\MappingProfile;
@@ -28,7 +29,6 @@ use Filament\Notifications\Notification;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -1129,14 +1129,12 @@ it('updates the address of a processor that already has one', function (): void 
         ->and($processor->fresh()?->address?->address)->toBe('Oude straat 1');
 });
 
-it('falls back to a readable attribute name when no label exists', function (): void {
+it('calls a field what the form calls it', function (): void {
     $this->asFilamentUser();
 
-    // A translation that still looks like a key counts as missing.
-    Lang::addLines(['data_breach_record.involved_people' => 'data_breach_record.involved_people'], 'nl');
-
     expect(pageAtReview(breachRows(), breachMapping())->review()->options()->flat()['involved_people'])
-        ->toBe('Involved people');
+        ->toBe(FormFields::label(ImportTarget::DataBreachRecord, 'involved_people'))
+        ->toBe('Betrokken groep(en) personen');
 });
 
 it('asks which way round an ambiguous date is, and refuses to guess', function (): void {

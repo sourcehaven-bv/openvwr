@@ -36,7 +36,9 @@ use OpenSpout\Writer\XLSX\Writer;
 
 // Columns whose value belongs to a record's life in OpenVWR, not to its
 // content, so a re-imported copy rightly differs there.
-const OWN_LIFE_COLUMNS = ['number', 'entityNumber.number', 'created_at', 'updated_at'];
+const OWN_LIFE_COLUMNS = ['number', 'entityNumber.number', 'created_at', 'updated_at', 'public_from'];
+
+const FG_NOTE = 'De FG wil dit volgend jaar opnieuw zien.';
 
 /**
  * Yes/no fields that open a section of the form; the observer clears the
@@ -167,7 +169,7 @@ function fullRecord(ImportTarget $target): Model
     }
 
     if (method_exists($record, 'fgRemark')) {
-        $record->fgRemark()->create(['body' => 'De FG wil dit volgend jaar opnieuw zien.']);
+        $record->fgRemark()->create(['body' => FG_NOTE]);
     }
 
     return $record->refresh();
@@ -246,6 +248,9 @@ it('exports a copy of a full record exactly as it exported the original', functi
     $original = fullRecord($target);
     $before = exportRow($exporterClass, $original);
     $workbook = workbookOf($exporterClass, $before);
+
+    // The FG's note stays with the FG: it is on the record, never in the sheet.
+    expect(array_values($before))->not->toContain(FG_NOTE);
 
     // The record and everything the import may create go, so every detail
     // has to come back through the sheet.
