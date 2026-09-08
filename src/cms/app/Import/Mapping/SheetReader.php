@@ -187,8 +187,15 @@ class SheetReader
         $header = trim(Str::before($value, "\n"));
 
         // "Verwerkers: Noteer hier de namen van ..." -- a short part before the
-        // colon followed by a longer sentence is a label with an instruction.
-        if (preg_match('/^(.{2,40}?):\s+(.{20,})$/u', $header, $matches) === 1) {
+        // colon followed by an instruction. "Artikel 18: aan ontvangers ..."
+        // is a name with a colon in it and stays whole.
+        if (
+            preg_match(
+                '/^(.{2,40}?):\s+(noteer|vul|geef|beschrijf|omschrijf|kies|selecteer|vermeld|licht)\b.{10,}$/iu',
+                $header,
+                $matches,
+            ) === 1
+        ) {
             $header = trim($matches[1]);
         }
 

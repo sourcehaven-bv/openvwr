@@ -69,7 +69,7 @@ class MappingAnalyser
      * Everything a column may be mapped onto, with the conversion each implies.
      * Links and lookups are matched on their label alone and read as text.
      *
-     * @return array<string, array{label: string, transform: MappingTransform, relation: bool, options: array<int, string>}>
+     * @return array<string, array{label: string, exact: ?string, transform: MappingTransform, relation: bool, options: array<int, string>}>
      */
     private function candidates(ImportTarget $target, Model $model): array
     {
@@ -83,15 +83,20 @@ class MappingAnalyser
 
             $isAttribute = in_array($key, $fillable, true);
 
-            // "Verwerkers — E-mail" is matched on "E-mail" alone: the relation
-            // part would otherwise make every extra column tie with the
-            // relation itself, and neither would be offered.
+            // "Verwerkers — E-mail" is matched on "E-mail" alone, as a template
+            // with a verwerker block heads it: the relation part would
+            // otherwise make every extra column tie with the relation itself.
+            // The whole label still counts when a heading *is* that label, as
+            // an export of OpenVWR itself heads it.
+            $exact = null;
             if (str_contains($key, RelationKey::ATTRIBUTE_SEPARATOR)) {
+                $exact = $label;
                 $label = Str::afterLast($label, ' — ');
             }
 
             $candidates[$key] = [
                 'label' => $label,
+                'exact' => $exact,
                 'transform' => $isAttribute ? $this->transformResolver->forAttribute($model, $key) : MappingTransform::Text,
                 'relation' => !$isAttribute,
                 'options' => $isAttribute ? $this->fieldOptions->for($model, $key) : [],
@@ -106,7 +111,7 @@ class MappingAnalyser
      * globally rather than first-come-first-served.
      *
      * @param array<int, string> $headers
-     * @param array<string, array{label: string, transform: MappingTransform, relation: bool, options: array<int, string>}> $candidates
+     * @param array<string, array{label: string, exact: ?string, transform: MappingTransform, relation: bool, options: array<int, string>}> $candidates
      * @param array<int, array<string, mixed>> $rows
      *
      * @return array<int, array{header: string, attribute: string, score: float}>
@@ -127,6 +132,10 @@ class MappingAnalyser
                     $samples,
                     $candidate['options'],
                 );
+
+                if ($candidate['exact'] !== null && $this->candidateScorer->namesExactly($header, $candidate['exact'], $key)) {
+                    $score = 1.0;
+                }
 
                 // Near-misses are kept so ambiguity can be detected; they are
                 // filtered out again once the field is known to be a clear win.
@@ -199,7 +208,7 @@ class MappingAnalyser
      * Best matches first; each header and each target is used once.
      *
      * @param array<int, string> $headers
-     * @param array<string, array{label: string, transform: MappingTransform, relation: bool, options: array<int, string>}> $candidates
+     * @param array<string, array{label: string, exact: ?string, transform: MappingTransform, relation: bool, options: array<int, string>}> $candidates
      * @param array<int, array{header: string, attribute: string, score: float}> $scores
      * @param array<int, array<string, mixed>> $rows
      *

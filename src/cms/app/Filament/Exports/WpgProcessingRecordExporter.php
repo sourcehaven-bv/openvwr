@@ -46,8 +46,7 @@ class WpgProcessingRecordExporter extends Exporter
             // verwerker
             ExportColumn::make('has_processors')
                 ->label(__('wpg_processing_record.has_processors')),
-            ExportColumn::make('processors.name')
-                ->label(__('processor.model_plural')),
+            ...self::processorAndContactColumns(),
 
             // ontvanger
             ExportColumn::make('article_15')
@@ -62,15 +61,15 @@ class WpgProcessingRecordExporter extends Exporter
                 ->label(__('wpg_processing_record.article_17')),
             ExportColumn::make('article_19')
                 ->label(__('wpg_processing_record.article_19')),
-            ExportColumn::make('article_19')
-                ->label(__('wpg_processing_record.article_19')),
+            ExportColumn::make('article_18')
+                ->label(__('wpg_processing_record.article_18')),
             ExportColumn::make('article_20')
                 ->label(__('wpg_processing_record.article_20')),
             ExportColumn::make('article_22')
                 ->label(__('wpg_processing_record.article_22')),
             ExportColumn::make('article_23')
                 ->label(__('wpg_processing_record.article_23')),
-            ExportColumn::make('article_23')
+            ExportColumn::make('article_24')
                 ->label(__('wpg_processing_record.article_24')),
             ExportColumn::make('explanation_provisioning')
                 ->label(__('wpg_processing_record.explanation_provisioning')),
@@ -119,6 +118,8 @@ class WpgProcessingRecordExporter extends Exporter
                 ->label(__('wpg_processing_record.has_algorithms')),
             ExportColumn::make('algorithmRecords.name')
                 ->label(__('algorithm_record.model_plural')),
+            ExportColumn::make('dataBreachRecords.name')
+                ->label(__('data_breach_record.model_plural')),
 
             // beveiliging
             ExportColumn::make('has_security')
@@ -143,8 +144,6 @@ class WpgProcessingRecordExporter extends Exporter
             // contactpersoon
             ExportColumn::make('users.name')
                 ->label(__('contact_person.form_title_users')),
-            ExportColumn::make('contactPersons.name')
-                ->label(__('contact_person.form_title_contact_persons')),
 
             // opmerkingen
             ExportColumn::make('remarks')
@@ -157,7 +156,7 @@ class WpgProcessingRecordExporter extends Exporter
                 ->label(__('wpg_processing_record.victims')),
             ExportColumn::make('convicts')
                 ->label(__('wpg_processing_record.convicts')),
-            ExportColumn::make('police_sexual_life')
+            ExportColumn::make('police_justice')
                 ->label(__('wpg_processing_record.police_justice')),
             ExportColumn::make('third_parties')
                 ->label(__('wpg_processing_record.third_parties')),

@@ -27,7 +27,7 @@ return [
     'recognised_body' => 'De kolommen komen overeen met het opgeslagen profiel ":name". De mapping is alvast ingevuld.',
 
     'review_heading' => 'Mapping controleren',
-    'review_body' => ':rows rijen gevonden. Herkende kolommen zijn alvast ingevuld; controleer ze en vul de rest aan. Kolommen op "niet importeren" blijven buiten de import.',
+    'review_body' => ':rows rijen gevonden, te importeren als :target. Herkende kolommen zijn alvast ingevuld; controleer ze en vul de rest aan. Kolommen op "niet importeren" blijven buiten de import.',
 
     'rows_heading' => 'Rijen samenvoegen',
     'rows_body' => 'Staat één record in het bestand over meerdere rijen, bijvoorbeeld een rij per systeem of per doel, kies dan de kolom die het record aanduidt. Rijen met dezelfde waarde daarin worden één record.',

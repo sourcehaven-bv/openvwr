@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Import\Mapping;
 
+use function array_map;
 use function count;
 use function explode;
 use function is_array;
 use function is_string;
+use function preg_replace;
 use function str_contains;
 use function trim;
 
@@ -60,7 +62,20 @@ final class MultiValue
             return $entries;
         }
 
-        return is_string($cell) ? self::split($cell, $separator) : [];
+        if (!is_string($cell)) {
+            return [];
+        }
+
+        // An export joins a list with ", " and leaves a blank where a record
+        // has no value; the blank has to stay so the positions hold. A blank
+        // at the end survives only as a trailing comma once the cell is
+        // trimmed, so that comma is read as a separator too.
+        $cell = preg_replace('/,\s*$/', self::LIST_SEPARATOR, $cell) ?? $cell;
+        $actual = str_contains($cell, $separator) || !str_contains($cell, self::LIST_SEPARATOR)
+            ? $separator
+            : self::LIST_SEPARATOR;
+
+        return array_map(trim(...), explode($actual, $cell));
     }
 
     /**

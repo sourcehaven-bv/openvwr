@@ -48,8 +48,7 @@ class AvgResponsibleProcessingRecordExporter extends Exporter
             // verwerker
             ExportColumn::make('has_processors')
                 ->label(__('avg_responsible_processing_record.has_processors')),
-            ExportColumn::make('processors.name')
-                ->label(__('processor.model_plural')),
+            ...self::processorAndContactColumns(),
 
             // ontvanger
             ExportColumn::make('receivers.description')
@@ -58,6 +57,11 @@ class AvgResponsibleProcessingRecordExporter extends Exporter
             // doel & grondslag
             ExportColumn::make('avgGoals.goal')
                 ->label(__('avg_goal.model_plural')),
+            self::relatedListColumn(
+                'avgGoals',
+                'avg_goal_legal_base',
+                self::relatedLabel('avg_goal.model_plural', 'avg_goal.avg_goal_legal_base'),
+            ),
 
             // betrokkenen en gegevens
             ExportColumn::make('stakeholders.description')
@@ -81,6 +85,10 @@ class AvgResponsibleProcessingRecordExporter extends Exporter
                 ->label(__('avg_responsible_processing_record.has_algorithms')),
             ExportColumn::make('algorithmRecords.name')
                 ->label(__('algorithm_record.model_plural')),
+            ExportColumn::make('dataBreachRecords.name')
+                ->label(__('data_breach_record.model_plural')),
+            ExportColumn::make('dpiaRecords.name')
+                ->label(__('dpia_record.model_plural')),
 
             // beveiliging
             ExportColumn::make('has_security')
@@ -103,7 +111,7 @@ class AvgResponsibleProcessingRecordExporter extends Exporter
             ExportColumn::make('country')
                 ->label(__('general.country')),
             ExportColumn::make('country_other')
-                ->label(__('general.country_other')),
+                ->label(self::relatedLabel('general.country', 'general.country_other')),
             ExportColumn::make('outside_eu_description')
                 ->label(__('avg_responsible_processing_record.outside_eu_description')),
             ExportColumn::make('outside_eu_protection_level')
@@ -130,8 +138,6 @@ class AvgResponsibleProcessingRecordExporter extends Exporter
             // contactpersoon
             ExportColumn::make('users.name')
                 ->label(__('contact_person.form_title_users')),
-            ExportColumn::make('contactPersons.name')
-                ->label(__('contact_person.form_title_contact_persons')),
 
             // documenten
             ...self::getDocumentColumns(),

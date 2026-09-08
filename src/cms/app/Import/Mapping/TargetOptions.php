@@ -18,7 +18,6 @@ use function in_array;
 use function is_string;
 use function method_exists;
 use function sprintf;
-use function str_contains;
 use function str_ends_with;
 
 /**
@@ -322,9 +321,12 @@ class TargetOptions
     private function translate(string $labelKey, string $attribute): ?string
     {
         foreach ([$labelKey, 'processing_record', 'general'] as $file) {
-            $label = __(sprintf('%s.%s', $file, $attribute));
+            $key = sprintf('%s.%s', $file, $attribute);
+            $label = __($key);
 
-            if (is_string($label) && !str_contains($label, '.')) {
+            // A missing translation comes back as its key; a label may well
+            // contain a dot itself ("art. 16").
+            if (is_string($label) && $label !== $key && $label !== '') {
                 return $label;
             }
         }
