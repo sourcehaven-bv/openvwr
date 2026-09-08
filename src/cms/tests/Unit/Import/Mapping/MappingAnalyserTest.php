@@ -319,7 +319,11 @@ it('never fills in a field on character similarity alone', function (): void {
 });
 
 it('maps a column headed like a lookup list onto the lookup, not a stray attribute', function (): void {
-    $profile = $this->app->get(MappingAnalyser::class)->analyse(ImportTarget::AvgResponsibleProcessingRecord, ['Dienst'], [['Dienst' => 'Zorg']]);
+    $profile = $this->app->get(MappingAnalyser::class)->analyse(
+        ImportTarget::AvgResponsibleProcessingRecord,
+        ['Dienst'],
+        [['Dienst' => 'Zorg']],
+    );
 
     expect(targetFor($profile->fields, 'Dienst')?->target)->toBe('lookup:service');
 });
