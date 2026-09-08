@@ -75,7 +75,7 @@ enum ImportTarget: string
         'systems' => [System::class, 'description', 'system.model_plural', []],
         'receivers' => [Receiver::class, 'description', 'receiver.model_plural', []],
         'responsibles' => [Responsible::class, 'name', 'responsible.model_plural', []],
-        'contactPersons' => [ContactPerson::class, 'name', 'contact_person.model_plural', ['email' => 'contact_person.email', 'phone' => 'contact_person.phone', 'role' => 'contact_person.role']],
+        'contactPersons' => [ContactPerson::class, 'name', 'contact_person.model_plural', ['email' => 'contact_person.email', 'phone' => 'contact_person.phone']],
         'stakeholders' => [Stakeholder::class, 'description', 'stakeholder.model_plural', []],
         'avgGoals' => [AvgGoal::class, 'goal', 'avg_goal.model_plural', ['avg_goal_legal_base' => 'avg_goal.avg_goal_legal_base']],
         'wpgGoals' => [WpgGoal::class, 'description', 'wpg_goal.model_plural', []],

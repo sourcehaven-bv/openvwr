@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Import\Mapping;
 
+use function array_map;
 use function count;
 use function explode;
 use function is_array;
@@ -60,7 +61,17 @@ final class MultiValue
             return $entries;
         }
 
-        return is_string($cell) ? self::split($cell, $separator) : [];
+        if (!is_string($cell)) {
+            return [];
+        }
+
+        // An export joins a list with ", " and leaves a blank where a record
+        // has no value; the blank has to stay so the positions hold.
+        $actual = str_contains($cell, $separator) || !str_contains($cell, self::LIST_SEPARATOR)
+            ? $separator
+            : self::LIST_SEPARATOR;
+
+        return array_map(trim(...), explode($actual, $cell));
     }
 
     /**

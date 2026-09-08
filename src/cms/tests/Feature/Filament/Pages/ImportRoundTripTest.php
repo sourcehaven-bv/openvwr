@@ -5,9 +5,12 @@ declare(strict_types=1);
 use App\Enums\CoreEntityDataCollectionSource;
 use App\Enums\Import\ImportTarget;
 use App\Facades\Authentication;
+use App\Filament\Exports\AlgorithmRecordExporter;
+use App\Filament\Exports\AvgProcessorProcessingRecordExporter;
 use App\Filament\Exports\AvgResponsibleProcessingRecordExporter;
 use App\Filament\Exports\DataBreachRecordExporter;
 use App\Filament\Exports\Exporter;
+use App\Filament\Exports\WpgProcessingRecordExporter;
 use App\Filament\Pages\ImportMapping;
 use App\Import\Mapping\DryRunner;
 use App\Import\Mapping\EditableMapping;
@@ -15,7 +18,10 @@ use App\Import\Mapping\MappedRecordWriter;
 use App\Import\Mapping\MappingAnalyser;
 use App\Import\Mapping\MappingProfileRepository;
 use App\Import\Mapping\SheetReader;
+use App\Models\Algorithm\AlgorithmRecord;
+use App\Models\Algorithm\AlgorithmTheme;
 use App\Models\Avg\AvgGoal;
+use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecordService;
 use App\Models\ContactPerson;
@@ -25,8 +31,11 @@ use App\Models\Receiver;
 use App\Models\Responsible;
 use App\Models\Stakeholder;
 use App\Models\Tag;
+use App\Models\Wpg\WpgGoal;
+use App\Models\Wpg\WpgProcessingRecord;
 use Filament\Actions\Exports\Models\Export;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Config;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Writer\XLSX\Writer;
 
@@ -159,15 +168,32 @@ it('imports its own processing register export back, links and lookups included'
     ]);
 
     foreach (['Firma A', 'Firma B'] as $name) {
-        $original->processors()->attach(Processor::factory()->create(['organisation_id' => $organisationId, 'name' => $name]));
+        $processor = Processor::factory()->create(['organisation_id' => $organisationId, 'name' => $name, 'email' => '']);
+        $original->processors()->attach($processor);
     }
+
+    // Only the second verwerker has details; the export must keep the blank
+    // so the details are not read onto the first.
+    $firmaB = Processor::query()->where('name', 'Firma B')->firstOrFail();
+    $firmaB->update(['email' => 'info@firma-b.example']);
+    $firmaB->address()->create(['address' => 'Stationsplein 1', 'postal_code' => '3511 ED', 'city' => 'Utrecht', 'country' => 'Nederland']);
+    $breach = DataBreachRecord::factory()->create(['organisation_id' => $organisationId, 'name' => 'Mail naar verkeerde ontvanger']);
+    $original->dataBreachRecords()->attach($breach);
 
     $original->receivers()->attach(Receiver::factory()->create(['organisation_id' => $organisationId, 'description' => 'Belastingdienst']));
     $original->stakeholders()->attach(
         Stakeholder::factory()->create(['organisation_id' => $organisationId, 'description' => 'Medewerkers']),
     );
-    $original->avgGoals()->attach(AvgGoal::factory()->create(['organisation_id' => $organisationId, 'goal' => 'Uitbetalen van salaris']));
-    $original->contactPersons()->attach(ContactPerson::factory()->create(['organisation_id' => $organisationId, 'name' => 'P. de Vries']));
+    $original->avgGoals()->attach(AvgGoal::factory()->create([
+        'organisation_id' => $organisationId,
+        'goal' => 'Uitbetalen van salaris',
+        'avg_goal_legal_base' => 'Wettelijke verplichting',
+    ]));
+    $original->contactPersons()->attach(ContactPerson::factory()->create([
+        'organisation_id' => $organisationId,
+        'name' => 'P. de Vries',
+        'email' => 'p.devries@example.org',
+    ]));
     $original->tags()->attach(Tag::factory()->create(['organisation_id' => $organisationId, 'name' => 'Kernproces']));
 
     $page = importWorkbook(
@@ -188,13 +214,135 @@ it('imports its own processing register export back, links and lookups included'
         ->and($copy?->measures_description)->toBe('Toegang op basis van rol; logging van inzage.')
         ->and($copy?->avgResponsibleProcessingRecordService?->name)->toBe('HR')
         ->and($copy?->processors()->pluck('name')->sort()->values()->all())->toBe(['Firma A', 'Firma B'])
+        ->and($firmaB->refresh()->email)->toBe('info@firma-b.example')
+        ->and(Processor::query()->where('name', 'Firma A')->firstOrFail()->email)->toBe('')
+        ->and($firmaB->address?->city)->toBe('Utrecht')
         ->and($copy?->receivers()->pluck('description')->all())->toBe(['Belastingdienst'])
         ->and($copy?->stakeholders()->pluck('description')->all())->toBe(['Medewerkers'])
         ->and($copy?->avgGoals()->pluck('goal')->all())->toBe(['Uitbetalen van salaris'])
+        ->and(AvgGoal::query()->where('goal', 'Uitbetalen van salaris')->firstOrFail()->avg_goal_legal_base)->toBe(
+            'Wettelijke verplichting',
+        )
         ->and($copy?->contactPersons()->pluck('name')->all())->toBe(['P. de Vries'])
+        ->and(ContactPerson::query()->where('name', 'P. de Vries')->firstOrFail()->email)->toBe('p.devries@example.org')
+        ->and($copy?->dataBreachRecords()->pluck('name')->all())->toBe(['Mail naar verkeerde ontvanger'])
         // Everything the export names already exists; nothing may be added twice.
         ->and(Processor::query()->where('organisation_id', $organisationId)->count())->toBe(2)
         ->and(AvgGoal::query()->where('organisation_id', $organisationId)->count())->toBe(1)
         ->and(AvgResponsibleProcessingRecordService::query()->where('organisation_id', $organisationId)->count())->toBe(1)
         ->and(Tag::query()->where('organisation_id', $organisationId)->count())->toBe(1);
+});
+
+it('imports its own processor register export back', function (): void {
+    $this->asFilamentUser();
+    $organisationId = Authentication::organisation()->id;
+
+    $original = AvgProcessorProcessingRecord::factory()->create([
+        'organisation_id' => $organisationId,
+        'name' => 'Salarisverwerking voor klanten',
+        'has_processors' => true,
+        'has_security' => true,
+        'measures_description' => 'Versleuteling en toegangscontrole.',
+        'responsibility_distribution' => 'De klant is verwerkingsverantwoordelijke.',
+    ]);
+    $original->processors()->attach(
+        Processor::factory()->create(['organisation_id' => $organisationId, 'name' => 'Subverwerker X', 'email' => 'x@example.org']),
+    );
+    $original->stakeholders()->attach(
+        Stakeholder::factory()->create(['organisation_id' => $organisationId, 'description' => 'Werknemers van klanten']),
+    );
+    $original->avgGoals()->attach(
+        AvgGoal::factory()->create(
+            ['organisation_id' => $organisationId, 'goal' => 'Salarisverwerking', 'avg_goal_legal_base' => 'Overeenkomst'],
+        ),
+    );
+    $original->contactPersons()->attach(ContactPerson::factory()->create(['organisation_id' => $organisationId, 'name' => 'K. Bakker']));
+
+    $page = importWorkbook(
+        ImportTarget::AvgProcessorProcessingRecord,
+        exportWorkbook(AvgProcessorProcessingRecordExporter::class, [$original]),
+    );
+
+    $copy = AvgProcessorProcessingRecord::query()->whereKeyNot($original->id)->where('name', $original->name)->first();
+
+    expect($page->result['imported'])->toBe(1)
+        ->and($page->result['issues'])->toBe([])
+        ->and($page->result['failures'])->toBe([])
+        ->and($copy?->measures_description)->toBe('Versleuteling en toegangscontrole.')
+        ->and($copy?->responsibility_distribution)->toBe('De klant is verwerkingsverantwoordelijke.')
+        ->and($copy?->processors()->pluck('name')->all())->toBe(['Subverwerker X'])
+        ->and($copy?->stakeholders()->pluck('description')->all())->toBe(['Werknemers van klanten'])
+        ->and($copy?->avgGoals()->pluck('goal')->all())->toBe(['Salarisverwerking'])
+        ->and($copy?->contactPersons()->pluck('name')->all())->toBe(['K. Bakker'])
+        ->and(Processor::query()->where('organisation_id', $organisationId)->count())->toBe(1);
+});
+
+it('imports its own wpg register export back', function (): void {
+    $this->asFilamentUser();
+    Config::set('features.wpg', true);
+    $organisationId = Authentication::organisation()->id;
+
+    $original = WpgProcessingRecord::factory()->create([
+        'organisation_id' => $organisationId,
+        'name' => 'Cameratoezicht station',
+        'has_processors' => true,
+        'has_security' => true,
+        'article_17_a' => true,
+        'article_18' => true,
+        'article_19' => false,
+        'article_24' => true,
+        'police_justice' => true,
+        'explanation_transfer' => 'Doorgifte aan Europol onder verdrag.',
+    ]);
+    $original->processors()->attach(
+        Processor::factory()->create(['organisation_id' => $organisationId, 'name' => 'Beveiligingsbedrijf Z']),
+    );
+    $original->wpgGoals()->attach(
+        WpgGoal::factory()->create(['organisation_id' => $organisationId, 'description' => 'Handhaving openbare orde']),
+    );
+    $original->contactPersons()->attach(ContactPerson::factory()->create(['organisation_id' => $organisationId, 'name' => 'M. Visser']));
+
+    $page = importWorkbook(ImportTarget::WpgProcessingRecord, exportWorkbook(WpgProcessingRecordExporter::class, [$original]));
+
+    $copy = WpgProcessingRecord::query()->whereKeyNot($original->id)->where('name', $original->name)->first();
+
+    expect($page->result['imported'])->toBe(1)
+        ->and($page->result['issues'])->toBe([])
+        ->and($page->result['failures'])->toBe([])
+        ->and($copy?->article_18)->toBeTrue()
+        ->and($copy?->article_19)->toBeFalse()
+        ->and($copy?->article_24)->toBeTrue()
+        ->and($copy?->police_justice)->toBeTrue()
+        ->and($copy?->explanation_transfer)->toBe('Doorgifte aan Europol onder verdrag.')
+        ->and($copy?->processors()->pluck('name')->all())->toBe(['Beveiligingsbedrijf Z'])
+        ->and($copy?->wpgGoals()->pluck('description')->all())->toBe(['Handhaving openbare orde'])
+        ->and($copy?->contactPersons()->pluck('name')->all())->toBe(['M. Visser']);
+});
+
+it('imports its own algorithm register export back', function (): void {
+    $this->asFilamentUser();
+    $organisationId = Authentication::organisation()->id;
+
+    $processing = AvgResponsibleProcessingRecord::factory()->create(['organisation_id' => $organisationId, 'name' => 'Fraudedetectie']);
+    $original = AlgorithmRecord::factory()->create([
+        'organisation_id' => $organisationId,
+        'name' => 'Risicoscore aanvragen',
+        'description' => 'Rangschikt aanvragen op kans op fout.',
+        'algorithm_theme_id' => AlgorithmTheme::factory()->create(
+            ['organisation_id' => $organisationId, 'name' => 'Toezicht', 'enabled' => true],
+        )->id,
+    ]);
+    $original->avgResponsibleProcessingRecords()->attach($processing);
+
+    $page = importWorkbook(ImportTarget::AlgorithmRecord, exportWorkbook(AlgorithmRecordExporter::class, [$original]));
+
+    $copy = AlgorithmRecord::query()->whereKeyNot($original->id)->where('name', $original->name)->first();
+
+    expect($page->result['imported'])->toBe(1)
+        ->and($page->result['issues'])->toBe([])
+        ->and($page->result['failures'])->toBe([])
+        ->and($copy?->description)->toBe('Rangschikt aanvragen op kans op fout.')
+        ->and($copy?->algorithmTheme?->name)->toBe('Toezicht')
+        ->and($copy?->avgResponsibleProcessingRecords()->pluck('name')->all())->toBe(['Fraudedetectie'])
+        ->and(AlgorithmTheme::query()->where('organisation_id', $organisationId)->count())->toBe(1);
 });
