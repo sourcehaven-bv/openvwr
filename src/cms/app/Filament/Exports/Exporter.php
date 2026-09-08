@@ -14,9 +14,13 @@ use Filament\Actions\Exports\Exporter as FilamentExporter;
 use Filament\Actions\Exports\Models\Export;
 use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Webmozart\Assert\Assert;
 
 use function __;
+use function data_get;
+use function is_scalar;
 use function is_string;
 use function number_format;
 use function sprintf;
@@ -94,6 +98,70 @@ abstract class Exporter extends FilamentExporter
     {
         return parent::modifyQuery($query)
             ->withGlobalScope('tenant', new TenantScope());
+    }
+
+    /**
+     * A column for an attribute of a related list, with one entry per related
+     * record in the order of the names column and blanks kept, so that when
+     * the sheet is read back the third e-mail address still belongs to the
+     * third name.
+     *
+     * @param string $relation the list on the record, e.g. "processors"
+     * @param string $path an attribute of the related record, or one of its own
+     *        related record: "address.city"
+     */
+    protected static function relatedListColumn(string $relation, string $path, string $label): ExportColumn
+    {
+        return ExportColumn::make(sprintf('%s_%s', $relation, str_replace('.', '_', $path)))
+            ->label($label)
+            ->getStateUsing(static function (Model $record) use ($relation, $path): array {
+                $related = $record->getRelationValue($relation);
+                Assert::isInstanceOf($related, Collection::class);
+
+                return $related
+                    ->map(static function (Model $item) use ($path): string {
+                        $value = data_get($item, $path);
+
+                        return is_scalar($value) ? (string) $value : '';
+                    })
+                    ->all();
+            });
+    }
+
+    /**
+     * Labels the attribute of a related list the way the import offers it:
+     * "Verwerkers — E-mail".
+     */
+    protected static function relatedLabel(string $relationLabelKey, string $attributeLabelKey): string
+    {
+        return sprintf('%s — %s', __($relationLabelKey), __($attributeLabelKey));
+    }
+
+    /**
+     * The columns every register shares for its verwerkers and contactpersonen.
+     *
+     * @return array<ExportColumn>
+     */
+    protected static function processorAndContactColumns(): array
+    {
+        return [
+            ExportColumn::make('processors.name')
+                ->label(__('processor.model_plural')),
+            self::relatedListColumn('processors', 'email', self::relatedLabel('processor.model_plural', 'processor.email')),
+            self::relatedListColumn('processors', 'phone', self::relatedLabel('processor.model_plural', 'processor.phone')),
+            self::relatedListColumn('processors', 'address.address', self::relatedLabel('processor.model_plural', 'address.address')),
+            self::relatedListColumn(
+                'processors',
+                'address.postal_code',
+                self::relatedLabel('processor.model_plural', 'address.postal_code'),
+            ),
+            self::relatedListColumn('processors', 'address.city', self::relatedLabel('processor.model_plural', 'address.city')),
+            self::relatedListColumn('processors', 'address.country', self::relatedLabel('processor.model_plural', 'address.country')),
+            ExportColumn::make('contactPersons.name')
+                ->label(__('contact_person.model_plural')),
+            self::relatedListColumn('contactPersons', 'email', self::relatedLabel('contact_person.model_plural', 'contact_person.email')),
+            self::relatedListColumn('contactPersons', 'phone', self::relatedLabel('contact_person.model_plural', 'contact_person.phone')),
+        ];
     }
 
     /**

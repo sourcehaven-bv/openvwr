@@ -7,7 +7,6 @@ namespace App\Import\Mapping;
 use Illuminate\Support\Str;
 
 use function array_key_exists;
-use function ctype_digit;
 use function explode;
 use function implode;
 use function preg_replace;
@@ -99,11 +98,13 @@ class FieldSynonyms
      */
     public function canonicalise(string $value): string
     {
-        // "RasOfEtniciteit" and "Omschrijving23" are one word to a computer and
-        // several to a person; the capitals and digits mark the seams, so they
-        // are cut before lowercasing hides them.
+        // "RasOfEtniciteit" is one word to a computer and three to a person;
+        // the capitals mark the seams, so they are cut before lowercasing
+        // hides them. Digits glued to a word ("Omschrijving23", "Id2") are a
+        // sequence number a tool added and say nothing; a number of its own
+        // ("Artikel 18") is part of the name.
         $value = preg_replace('/(\p{Ll})(\p{Lu})/u', '$1 $2', trim($value)) ?? $value;
-        $value = preg_replace('/(\p{L})(\p{N})|(\p{N})(\p{L})/u', '$1$3 $2$4', $value) ?? $value;
+        $value = preg_replace('/(\p{L})\p{N}+(?!\p{L})/u', '$1', $value) ?? $value;
         $value = Str::lower($value);
         $value = preg_replace('/[^\p{L}\p{N}]+/u', ' ', $value) ?? $value;
         $value = trim($value);
@@ -116,11 +117,6 @@ class FieldSynonyms
         $words = [];
 
         foreach (explode(' ', $value) as $word) {
-            // A bare number is a sequence number ("Doel 2"), not a meaning.
-            if (ctype_digit($word)) {
-                continue;
-            }
-
             $words[] = $lookup[$word] ?? $word;
         }
 
