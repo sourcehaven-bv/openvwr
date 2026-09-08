@@ -6,11 +6,13 @@ namespace App\Import\Mapping;
 
 use App\Enums\Import\ImportTarget;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Webmozart\Assert\Assert;
 
 use function __;
 use function array_key_exists;
+use function array_values;
 use function class_basename;
 use function in_array;
 use function is_string;
@@ -50,6 +52,9 @@ class TargetOptions
 
     /** @var array<string, array<string, string>>|null */
     private ?array $grouped = null;
+
+    /** @var array<int, string>|null */
+    private ?array $columns = null;
 
     public function __construct(
         private readonly ImportTarget $target,
@@ -149,6 +154,7 @@ class TargetOptions
                 // The groups are configuration; a group naming a field the
                 // model does not expose is a mistake to fix, not to hide.
                 Assert::inArray($attribute, $fillable);
+                Assert::true($this->isColumn($model, $attribute));
                 Assert::false($this->isInternal($attribute));
 
                 $options[$attribute] = $this->attributeLabel($labelKey, $attribute);
@@ -174,7 +180,7 @@ class TargetOptions
     {
         $remaining = [];
         foreach ($model->getFillable() as $attribute) {
-            if ($this->isInternal($attribute) || in_array($attribute, $placed, true)) {
+            if (!$this->isColumn($model, $attribute) || $this->isInternal($attribute) || in_array($attribute, $placed, true)) {
                 continue;
             }
 
@@ -248,6 +254,21 @@ class TargetOptions
         Assert::false(in_array(RelationKey::REMARKS, $model->getFillable(), true));
 
         return [RelationKey::REMARKS => __('import_mapping.field_remarks')];
+    }
+
+    /**
+     * A fillable name that has no column behind it (a leftover in the model)
+     * would be accepted by the mapping and refused by the database.
+     */
+    private function isColumn(Model $model, string $attribute): bool
+    {
+        if ($this->columns === null) {
+            $columns = Schema::getColumnListing($model->getTable());
+            Assert::allString($columns);
+            $this->columns = array_values($columns);
+        }
+
+        return in_array($attribute, $this->columns, true);
     }
 
     private function isInternal(string $attribute): bool

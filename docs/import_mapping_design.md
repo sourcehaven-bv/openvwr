@@ -459,7 +459,16 @@ via de pagina) legde bloot wat de export en de import van elkaar afweken:
 | `data_collection_source` (enum) werd als tekstveld aangeboden; de export schrijft het label, de cast weigert dat | `EnumField`: de labels van de enum zijn de keuzes (bewijs voor de analyser, default voor `FormDefaults`), de proefdraai weigert een waarde die geen keuze is, de writer zet het label om in de case |
 | "Labels" en "Periodieke review" uit de export hadden geen doel | `tags` is een gedeelde entiteit van elk register; `review_at` is een gewoon datumveld en geen intern veld meer |
 
-Nog niet ondersteund, bewust: categorieën persoonsgegevens en bewaartermijn
+Uit het bestand van het QA-teamlid (RIVM-export, 93 kolommen, 9 rijen die
+samen één verwerking zijn: de kolommen van het record herhaald op elke rij,
+per rij één item van één lijst):
+
+| Bevinding | Oplossing |
+|---|---|
+| Iedere rij werd een record; met het Id als bronkenmerk werd rij 1 geïmporteerd en de rest overgeslagen, zodat systemen, doelen en betrokkenen nooit aankwamen | `RecordGrouping` stelt de kolom voor waarvan de herhaalde waarde de rijen van één record markeert (alle kolommen die op elk van die rijen gevuld zijn stemmen overeen, alleen de ijle kolommen verschillen); de gebruiker bevestigt of kiest een andere kolom. `RecordGrouper` vouwt de rijen samen: een gewoon veld en een opzoeklijst krijgen één waarde (verschil = aandachtsrij), koppelingen, hun attributen en notities krijgen één invoer per rij, lege plekken inbegrepen, zodat de derde naam bij het derde e-mailadres blijft. De kolom gaat als `identity` mee in het profiel |
+| Kolomgroepen (Id2, Naam3, Type, Telefoon … beschrijven één verantwoordelijke) | Nog niet: de analyser kent geen blokken en koppelt "Postcode" aan het enige adres dat hij kent (verwerkers) |
+
+Nog niet ondersteund, bewust: kolomgroepen (zie boven), categorieën persoonsgegevens en bewaartermijn
 (die horen bij de gegevens per betrokkene, twee niveaus diep), de bijzondere
 gegevens per betrokkene (die liggen in OpenVWR op de gedeelde betrokkene, niet
 op de verwerking) en een status uit het bronbestand die direct een vastgestelde

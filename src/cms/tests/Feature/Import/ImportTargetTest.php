@@ -76,3 +76,12 @@ it('finds the target for a model and refuses a model that is none', function ():
     expect(ImportTarget::forModel(DataBreachRecord::class))->toBe(ImportTarget::DataBreachRecord)
         ->and(fn () => ImportTarget::forModel(Organisation::class))->toThrow(InvalidArgumentException::class);
 });
+
+it('offers only fields that exist as columns, whatever the model calls fillable', function (): void {
+    // "service" is fillable on the AVG record but has no column; the dienst is
+    // a lookup list. Offering it made "Dienst" map onto it and the insert fail.
+    $options = (new TargetOptions(ImportTarget::AvgResponsibleProcessingRecord))->flat();
+
+    expect($options)->not->toHaveKey('service')
+        ->and($options)->toHaveKey('lookup:service');
+});

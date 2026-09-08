@@ -20,6 +20,7 @@ use App\Import\Mapping\MappedRecordWriter;
 use App\Import\Mapping\MappingAnalyser;
 use App\Import\Mapping\MappingProfile;
 use App\Import\Mapping\MappingProfileRepository;
+use App\Import\Mapping\RecordGrouping;
 use App\Import\Mapping\SheetReader;
 use App\Import\Mapping\TargetOptions;
 use App\Import\Mapping\TransformResolver;
@@ -51,6 +52,7 @@ use function array_key_first;
 use function array_keys;
 use function array_sum;
 use function implode;
+use function in_array;
 use function is_array;
 use function is_string;
 use function now;
@@ -81,6 +83,7 @@ class ImportMapping extends Page implements HasForms
     public const STEP_RESULT = 'result';
 
     private const EMPTY_RESULT = [
+        'archive' => [],
         'fits' => 0,
         'issues' => [],
         'imported' => 0,
@@ -120,19 +123,22 @@ class ImportMapping extends Page implements HasForms
     /**
      * What the dry-run found and, after apply, what was written.
      *
-     * @var array{fits: int, issues: array<int, array{row: int, reason: string}>, imported: int, skipped: int, failures: array<int, array{row: int, reason: string}>, entities: array<string, array<string, mixed>>}
+     * @var array{archive: array<string, int>, fits: int, issues: array<int, array{row: int, reason: string}>, imported: int, skipped: int, failures: array<int, array{row: int, reason: string}>, entities: array<string, array<string, mixed>>}
      */
     #[Locked]
     public array $result = self::EMPTY_RESULT;
-
-    /** @var array<string, int> */
-    #[Locked]
-    public array $archiveContents = [];
 
     public ?string $profileName = null;
 
     #[Locked]
     public ?string $recognisedProfile = null;
+
+    /**
+     * The source column whose repeated value marks the rows of one record;
+     * empty when every row is a record. Proposed by RecordGrouping, chosen by
+     * the user.
+     */
+    public string $groupBy = '';
 
     private ?EditableMapping $review = null;
 
@@ -241,9 +247,10 @@ class ImportMapping extends Page implements HasForms
      */
     private function inspectArchive(TemporaryUploadedFile $file, ArchiveInspector $inspector): void
     {
-        $this->archiveContents = $inspector->inspect((string) $file->get());
+        $contents = $inspector->inspect((string) $file->get());
+        $this->result = ['archive' => $contents] + self::EMPTY_RESULT;
 
-        if ($this->archiveContents === []) {
+        if ($contents === []) {
             Notification::make()
                 ->title(__('import_mapping.archive_empty'))
                 ->warning()
@@ -283,11 +290,12 @@ class ImportMapping extends Page implements HasForms
         );
         $recognised = $saved !== null && $saved->target === $modelClass;
 
+        $profile = $recognised ? $saved->toMappingProfile() : $analyser->analyse($target, $this->headers, $sheet->rows);
+        $identity = $recognised ? $profile->identity : app(RecordGrouping::class)->detect($this->headers, $sheet->rows);
+
         $this->recognisedProfile = $recognised ? $saved->name : null;
-        $this->mapping = EditableMapping::fromProfile(
-            $this->headers,
-            $recognised ? $saved->toMappingProfile() : $analyser->analyse($target, $this->headers, $sheet->rows),
-        );
+        $this->mapping = EditableMapping::fromProfile($this->headers, $profile);
+        $this->groupBy = $identity ?? '';
         $this->step = self::STEP_REVIEW;
     }
 
@@ -317,9 +325,10 @@ class ImportMapping extends Page implements HasForms
         BuildEvent::dispatch();
 
         $this->step = self::STEP_RESULT;
-        $this->result = ['imported' => array_sum($this->archiveContents)] + self::EMPTY_RESULT;
+        $registers = $this->result['archive'];
+        $this->result = ['imported' => array_sum($registers)] + self::EMPTY_RESULT;
 
-        Log::info('Import applied', ['route' => 'archive', 'registers' => $this->archiveContents]);
+        Log::info('Import applied', ['route' => 'archive', 'registers' => $registers]);
 
         Notification::make()
             ->title(__('import.upload_success'))
@@ -490,9 +499,9 @@ class ImportMapping extends Page implements HasForms
         $this->mapping = [];
         $this->result = self::EMPTY_RESULT;
         $this->recognisedProfile = null;
-        $this->archiveContents = [];
         $this->profileName = null;
         $this->files = null;
+        $this->groupBy = '';
 
         // Refill rather than clear: $target is required, so it must keep a value.
         $this->getForm('form')?->fill(['target' => $this->target]);
@@ -505,6 +514,11 @@ class ImportMapping extends Page implements HasForms
     {
         $target = $this->importTarget();
 
+        // The grouping column is chosen from the sheet's own columns, so
+        // anything else did not come from the screen.
+        $identity = $this->groupBy === '' ? null : $this->groupBy;
+        abort_unless($identity === null || in_array($identity, $this->headers, true), 403);
+
         return $this->review ??= new EditableMapping(
             $target,
             $this->headers,
@@ -514,6 +528,7 @@ class ImportMapping extends Page implements HasForms
             new TargetOptions($target),
             app(TransformResolver::class),
             app(DateFormatDetector::class),
+            $identity,
         );
     }
 

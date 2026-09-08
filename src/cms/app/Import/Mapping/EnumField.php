@@ -72,6 +72,25 @@ final class EnumField
         return null;
     }
 
+    /**
+     * A fixed choice arrives as its label ("Primair"); the cast wants the case.
+     * The dry-run has already refused anything that is not a choice.
+     *
+     * @param array<string, mixed> $attributes
+     *
+     * @return array<string, mixed>
+     */
+    public static function casesFor(Model $model, array $attributes): array
+    {
+        foreach ($attributes as $attribute => $value) {
+            if (is_string($value) && self::enumClass($model, $attribute) !== null) {
+                $attributes[$attribute] = self::fromLabel($model, $attribute, $value);
+            }
+        }
+
+        return $attributes;
+    }
+
     private static function label(BackedEnum $case): string
     {
         if ($case instanceof HasLabel) {

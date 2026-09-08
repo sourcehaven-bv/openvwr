@@ -777,7 +777,7 @@ it('recognises a native archive and shows what it holds', function (): void {
     $this->createLivewireTestable(ImportMapping::class)
         ->set('files', $file)
         ->assertSet('step', ImportMapping::STEP_ARCHIVE)
-        ->assertSet('archiveContents', ['Datalekken' => 2]);
+        ->assertSet('result.archive', ['Datalekken' => 2]);
 });
 
 it('sends a spreadsheet to the mapping step instead', function (): void {
@@ -793,7 +793,7 @@ it('sends a spreadsheet to the mapping step instead', function (): void {
         ->set('target', ImportTarget::DataBreachRecord->value)
         ->set('files', $file)
         ->assertSet('step', ImportMapping::STEP_REVIEW)
-        ->assertSet('archiveContents', []);
+        ->assertSet('result.archive', []);
 });
 
 it('starts over on restart', function (): void {
@@ -1429,4 +1429,142 @@ it('offers the review date as a target', function (): void {
     $page->target = ImportTarget::AvgResponsibleProcessingRecord->value;
 
     expect($page->review()->options()->flat())->toHaveKey('review_at');
+});
+
+/**
+ * A verwerking spread over four rows, plus one on a single row.
+ *
+ * @return array<int, array<string, mixed>>
+ */
+function flattenedSheet(): array
+{
+    $row = static fn (string $id, string $name, array $item): array => [
+        'Id' => $id,
+        'Naam' => $name,
+        'Systeem' => null,
+        'Contactpersoon' => null,
+        'E-mail contact' => null,
+        'Tekst' => null,
+        ...$item,
+    ];
+
+    return [
+        $row('9717', 'Salarisadministratie', ['Tekst' => 'Overgenomen uit het oude register']),
+        $row('9717', 'Salarisadministratie', ['Systeem' => 'Salarispakket']),
+        $row('9717', 'Salarisadministratie', ['Systeem' => 'HR-systeem', 'Contactpersoon' => 'P. de Vries', 'E-mail contact' => 'p@x.nl']),
+        $row('9717', 'Salarisadministratie', ['Contactpersoon' => 'Q. Jansen']),
+        $row('9720', 'Toegangsbeheer', ['Systeem' => 'Toegangssysteem']),
+    ];
+}
+
+/**
+ * @return array<string, array<string, string>>
+ */
+function flattenedMapping(): array
+{
+    return [
+        'Id' => ['target' => 'import_id'],
+        'Naam' => ['target' => 'name'],
+        'Systeem' => ['target' => 'systems'],
+        'Contactpersoon' => ['target' => 'contactPersons'],
+        'E-mail contact' => ['target' => 'contactPersons::email'],
+        'Tekst' => ['target' => 'remarks'],
+    ];
+}
+
+function pageWithFlattenedSheet(string $groupBy): ImportMapping
+{
+    $rows = flattenedSheet();
+
+    $page = new ImportMapping();
+    $page->mount();
+    $page->target = ImportTarget::AvgResponsibleProcessingRecord->value;
+    $page->headers = array_keys($rows[0]);
+    $page->setRows($rows);
+    $page->mapping = flattenedMapping();
+    $page->groupBy = $groupBy;
+    $page->step = ImportMapping::STEP_REVIEW;
+
+    return $page;
+}
+
+it('folds the rows of one record and collects its links and notes from every row', function (): void {
+    $this->asFilamentUser();
+
+    $page = pageWithFlattenedSheet('Id');
+
+    expect($page->review()->recordCount())->toBe(2)
+        ->and($page->review()->rowCount())->toBe(5);
+
+    $page->apply(
+        $this->app->get(DryRunner::class),
+        $this->app->get(MappedRecordWriter::class),
+        $this->app->get(MappingProfileRepository::class),
+    );
+
+    $record = AvgResponsibleProcessingRecord::query()->where('import_id', '9717')->first();
+    $contacts = $record?->contactPersons()->orderBy('name')->get();
+
+    expect($page->result['imported'])->toBe(2)
+        ->and($page->result['skipped'])->toBe(0)
+        ->and(AvgResponsibleProcessingRecord::query()->count())->toBe(2)
+        ->and($record?->systems()->pluck('description')->sort()->values()->all())->toBe(['HR-systeem', 'Salarispakket'])
+        ->and($contacts?->pluck('name')->all())->toBe(['P. de Vries', 'Q. Jansen'])
+        // The e-mail address on row three belongs to the contact on row three.
+        ->and($contacts?->pluck('email')->all())->toBe(['p@x.nl', null])
+        ->and($record?->remarks()->pluck('body')->all())->toBe(['Tekst: Overgenomen uit het oude register']);
+});
+
+it('treats every row as a record when no grouping column is chosen', function (): void {
+    $this->asFilamentUser();
+
+    $page = pageWithFlattenedSheet('');
+    $page->dryRun($this->app->get(DryRunner::class));
+
+    expect($page->review()->recordCount())->toBe(5)
+        ->and($page->result['fits'])->toBe(5);
+});
+
+it('refuses a grouping column the sheet does not have', function (): void {
+    $this->asFilamentUser();
+
+    $page = pageWithFlattenedSheet('Onbekend');
+
+    expect(fn () => $page->dryRun($this->app->get(DryRunner::class)))->toThrow(HttpException::class);
+});
+
+it('proposes the grouping when the uploaded rows spell one record over several', function (): void {
+    $this->asFilamentUser();
+    Storage::fake('local');
+
+    $lines = ['Id,Naam,Systeem,Tekst'];
+    foreach (flattenedSheet() as $row) {
+        $lines[] = implode(',', [$row['Id'], $row['Naam'], $row['Systeem'] ?? '', $row['Tekst'] ?? '']);
+    }
+    $file = UploadedFile::fake()->createWithContent('verwerkingen.csv', implode("\n", $lines) . "\n");
+
+    $this->createLivewireTestable(ImportMapping::class)
+        ->set('target', ImportTarget::AvgResponsibleProcessingRecord->value)
+        ->set('files', $file)
+        ->assertSet('step', ImportMapping::STEP_REVIEW)
+        ->assertSet('groupBy', 'Id')
+        ->assertSee(__('import_mapping.rows_heading'));
+});
+
+it('carries the grouping column into a saved profile', function (): void {
+    $this->asFilamentUser();
+
+    $page = pageWithFlattenedSheet('Id');
+    $page->profileName = 'RIVM-export';
+    $page->apply(
+        $this->app->get(DryRunner::class),
+        $this->app->get(MappedRecordWriter::class),
+        $this->app->get(MappingProfileRepository::class),
+    );
+
+    /** @var MappingProfileRepository $repository */
+    $repository = $this->app->get(MappingProfileRepository::class);
+    $saved = $repository->findByFingerprint(MappingProfile::fingerprint($page->headers), Authentication::organisation()->id);
+
+    expect($saved?->toMappingProfile()->identity)->toBe('Id');
 });

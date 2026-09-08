@@ -6,6 +6,8 @@ namespace App\Import\Mapping;
 
 use function count;
 use function explode;
+use function is_array;
+use function is_string;
 use function str_contains;
 use function trim;
 
@@ -36,6 +38,29 @@ final class MultiValue
         }
 
         return $parts;
+    }
+
+    /**
+     * The entries a cell contributes to a list. A record folded from several
+     * rows holds one entry per row, blanks included, so the third name still
+     * meets the third e-mail address; a plain cell is split as usual.
+     *
+     * @param non-empty-string $separator
+     *
+     * @return array<int, string>
+     */
+    public static function entries(mixed $cell, string $separator = "\n"): array
+    {
+        if (is_array($cell)) {
+            $entries = [];
+            foreach ($cell as $entry) {
+                $entries[] = is_string($entry) ? trim($entry) : '';
+            }
+
+            return $entries;
+        }
+
+        return is_string($cell) ? self::split($cell, $separator) : [];
     }
 
     /**

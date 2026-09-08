@@ -102,7 +102,7 @@ class MappedRecordWriter
         // An empty cell says nothing; the field starts out as it does on the
         // form, rather than being emptied on purpose.
         $supplied = array_filter($fit['attributes'], static fn (mixed $value): bool => $value !== null);
-        $model->fill($this->withEnumCases($model, $supplied) + $this->formDefaults->defaults($modelClass));
+        $model->fill(EnumField::casesFor($model, $supplied) + $this->formDefaults->defaults($modelClass));
         $model->setAttribute('organisation_id', $organisationId);
 
         $this->attachLookups($model, $target, $profile, $fit['row'], $organisationId);
@@ -112,25 +112,6 @@ class MappedRecordWriter
         $this->attachRemarks($model, $profile, $fit['row']);
 
         return true;
-    }
-
-    /**
-     * A fixed choice arrives as its label ("Primair"); the cast wants the case.
-     * The dry-run has already refused anything that is not a choice.
-     *
-     * @param array<string, mixed> $attributes
-     *
-     * @return array<string, mixed>
-     */
-    private function withEnumCases(Model $model, array $attributes): array
-    {
-        foreach ($attributes as $attribute => $value) {
-            if (is_string($value) && EnumField::enumClass($model, $attribute) !== null) {
-                $attributes[$attribute] = EnumField::fromLabel($model, $attribute, $value);
-            }
-        }
-
-        return $attributes;
     }
 
     /**
@@ -262,19 +243,20 @@ class MappedRecordWriter
                 continue;
             }
 
-            $value = Arr::get($row, $field->source);
-
-            if (!is_string($value) || trim($value) === '') {
-                continue;
-            }
-
             // Only registers with notes offer the target; TargetOptions sees to that.
             $callable = [$model, 'remarks'];
             Assert::isCallable($callable);
             $relation = $callable();
             Assert::isInstanceOf($relation, MorphMany::class);
 
-            $relation->create(['body' => sprintf('%s: %s', $field->source, trim($value))]);
+            // A record folded from several rows brings one entry per row.
+            foreach ((array) Arr::get($row, $field->source) as $value) {
+                if (!is_string($value) || trim($value) === '') {
+                    continue;
+                }
+
+                $relation->create(['body' => sprintf('%s: %s', $field->source, trim($value))]);
+            }
         }
     }
 
@@ -354,14 +336,8 @@ class MappedRecordWriter
                 continue;
             }
 
-            $value = Arr::get($row, $field->source);
-
-            if (!is_string($value)) {
-                continue;
-            }
-
-            foreach (MultiValue::split($value, $field->separator) as $part) {
-                $values[] = $part;
+            foreach (MultiValue::entries(Arr::get($row, $field->source), $field->separator) as $entry) {
+                $values[] = $entry;
             }
         }
 

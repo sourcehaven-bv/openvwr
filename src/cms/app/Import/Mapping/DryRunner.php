@@ -23,6 +23,7 @@ class DryRunner
     public function __construct(
         private readonly MappingEngine $mappingEngine,
         private readonly FormDefaults $formDefaults,
+        private readonly RecordGrouper $recordGrouper,
     ) {
     }
 
@@ -48,20 +49,43 @@ class DryRunner
         $fits = [];
         $issues = [];
 
-        foreach ($rows as $index => $row) {
+        // With an identity column a record spans several rows; without one
+        // every row is a record.
+        foreach ($this->recordGrouper->group($profile, $rows) as $record) {
+            $row = $record['row'];
             $mapped = $this->mappingEngine->apply($profile, $row);
-            $reason = $this->reasonForIssue($model, $mapped, $required, $lengths, $profile, $row);
+            $reason = $this->disagreement($record, $profile)
+                ?? $this->reasonForIssue($model, $mapped, $required, $lengths, $profile, $row);
 
             if ($reason !== null) {
-                $issues[] = new DryRunIssue($index + 1, $row, $reason);
+                $issues[] = new DryRunIssue($record['number'], $row, $reason);
 
                 continue;
             }
 
-            $fits[] = ['number' => $index + 1, 'attributes' => $mapped, 'row' => $row];
+            $fits[] = ['number' => $record['number'], 'attributes' => $mapped, 'row' => $row];
         }
 
         return new DryRunResult($fits, $issues);
+    }
+
+    /**
+     * Rows of one record that give a plain field two different values: the
+     * record can hold only one, and picking is not the importer's call.
+     *
+     * @param array{number: int, numbers: array<int, int>, row: array<string, mixed>, conflicts: array<int, string>} $record
+     * @param MappingProfile<Model> $profile
+     */
+    private function disagreement(array $record, MappingProfile $profile): ?string
+    {
+        if ($record['conflicts'] === []) {
+            return null;
+        }
+
+        return __('import_mapping.issue.rows_disagree', [
+            'rows' => implode(', ', $record['numbers']),
+            'column' => $record['conflicts'][0],
+        ]);
     }
 
     /**
@@ -81,14 +105,9 @@ class DryRunner
     ): ?string {
         // A value that was present but could not be converted is the more
         // specific problem, so it is reported before a plain empty field.
-        foreach ($profile->fields as $field) {
-            $source = Arr::get($row, $field->source);
-            if ($source !== null && Arr::get($mapped, $field->target) === null) {
-                return __('import_mapping.issue.not_convertible', [
-                    'column' => $field->source,
-                    'transform' => $field->transform->label(),
-                ]);
-            }
+        $notConvertible = $this->notConvertible($mapped, $profile, $row);
+        if ($notConvertible !== null) {
+            return $notConvertible;
         }
 
         $tooLong = $this->tooLong($mapped, $lengths, $profile->target);
@@ -113,6 +132,31 @@ class DryRunner
             $labels = array_map(fn (string $attribute): string => $this->labelFor($profile->target, $attribute), $missing);
 
             return __('import_mapping.issue.missing_required', ['fields' => implode(', ', $labels)]);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array<string, mixed> $mapped
+     * @param MappingProfile<Model> $profile
+     * @param array<string, mixed> $row
+     */
+    private function notConvertible(array $mapped, MappingProfile $profile, array $row): ?string
+    {
+        foreach ($profile->fields as $field) {
+            // Links and notes are read from the row as they are, not converted.
+            if ($field->relation !== null) {
+                continue;
+            }
+
+            $source = Arr::get($row, $field->source);
+            if ($source !== null && Arr::get($mapped, $field->target) === null) {
+                return __('import_mapping.issue.not_convertible', [
+                    'column' => $field->source,
+                    'transform' => $field->transform->label(),
+                ]);
+            }
         }
 
         return null;

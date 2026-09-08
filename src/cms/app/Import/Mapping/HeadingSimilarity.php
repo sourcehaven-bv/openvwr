@@ -11,6 +11,7 @@ use function explode;
 use function in_array;
 use function levenshtein;
 use function max;
+use function min;
 use function similar_text;
 use function strlen;
 
@@ -97,6 +98,11 @@ class HeadingSimilarity
         if ($tokenScore === self::PARTIAL_LABEL) {
             return self::PARTIAL_LABEL;
         }
+
+        // Characters alone never make a match confident: "Bron omschrijving"
+        // and "Toelichting doorgifte" canonicalise to near-identical strings
+        // while meaning different things. At most a suggestion.
+        $best = min($best, self::PARTIAL_LABEL);
 
         // Without a single shared word, character similarity is coincidence:
         // "Melder" and "Maatregelen" look alike but mean nothing to each other.

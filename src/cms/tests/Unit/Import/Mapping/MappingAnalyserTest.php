@@ -191,7 +191,7 @@ it('proposes links and lookups by their label, not only plain fields', function 
 
     expect(targetFor($profile->fields, 'Verwerkers')?->relation)->toBe('processors')
         ->and(targetFor($profile->fields, 'Contactpersoon')?->relation)->toBe('contactPersons')
-        ->and(targetFor($profile->fields, 'Dienst')?->target)->toBe('service')
+        ->and(targetFor($profile->fields, 'Dienst')?->target)->toBe('lookup:service')
         ->and(targetFor($profile->fields, 'Verwerkingsdoel')?->relation)->toBe('avgGoals');
 });
 
@@ -304,4 +304,22 @@ it('proposes the note target for a column of remarks', function (): void {
 
     expect($field?->target)->toBe('remarks')
         ->and($field?->relation)->toBe('remarks');
+});
+
+it('never fills in a field on character similarity alone', function (): void {
+    // "Bron omschrijving" and "Toelichting doorgifte" reduce to near-identical
+    // strings once synonyms are folded; that is a suggestion at most.
+    $profile = $this->app->get(MappingAnalyser::class)->analyse(ImportTarget::AvgResponsibleProcessingRecord, ['BronOmschrijving'], [
+        ['BronOmschrijving' => 'Betrokkene, namelijk: het interne meldformulier'],
+    ]);
+
+    $field = targetFor($profile->fields, 'BronOmschrijving');
+
+    expect($field?->confidence)->not->toBe(MappingConfidence::Exact);
+});
+
+it('maps a column headed like a lookup list onto the lookup, not a stray attribute', function (): void {
+    $profile = $this->app->get(MappingAnalyser::class)->analyse(ImportTarget::AvgResponsibleProcessingRecord, ['Dienst'], [['Dienst' => 'Zorg']]);
+
+    expect(targetFor($profile->fields, 'Dienst')?->target)->toBe('lookup:service');
 });

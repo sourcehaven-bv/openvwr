@@ -7,6 +7,7 @@ use App\Enums\Import\MappingTransform;
 use App\Import\Mapping\DryRunner;
 use App\Import\Mapping\MappingField;
 use App\Import\Mapping\MappingProfile;
+use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\DataBreachRecord;
 
 function breachProfile(): MappingProfile
@@ -102,4 +103,60 @@ it('writes nothing to the database', function (): void {
     $dryRunner->run(breachProfile(), [completeRow(), completeRow()]);
 
     expect(DataBreachRecord::query()->count())->toBe($before);
+});
+
+/**
+ * @return MappingProfile<AvgResponsibleProcessingRecord>
+ */
+function groupedProfile(): MappingProfile
+{
+    return new MappingProfile(AvgResponsibleProcessingRecord::class, [
+        new MappingField('Id', 'import_id', MappingTransform::Text, MappingConfidence::Exact),
+        new MappingField('Naam', 'name', MappingTransform::Text, MappingConfidence::Exact),
+        new MappingField('Systeem', 'systems', MappingTransform::Text, MappingConfidence::Exact, relation: 'systems'),
+    ], identity: 'Id');
+}
+
+it('folds the rows of one record and keeps one link entry per row', function (): void {
+    /** @var DryRunner $dryRunner */
+    $dryRunner = $this->app->get(DryRunner::class);
+
+    $result = $dryRunner->run(groupedProfile(), [
+        ['Id' => '9717', 'Naam' => 'Salarisadministratie', 'Systeem' => 'Salarispakket'],
+        ['Id' => '9717', 'Naam' => null, 'Systeem' => 'HR-systeem'],
+        ['Id' => '9720', 'Naam' => 'Toegangsbeheer', 'Systeem' => null],
+    ]);
+
+    expect($result->fitCount())->toBe(2)
+        ->and($result->issueCount())->toBe(0)
+        ->and($result->fits[0]['number'])->toBe(1)
+        ->and($result->fits[0]['attributes']['name'])->toBe('Salarisadministratie')
+        ->and($result->fits[0]['row']['Systeem'])->toBe(['Salarispakket', 'HR-systeem'])
+        ->and($result->fits[1]['number'])->toBe(3);
+});
+
+it('reports rows of one record that disagree on a plain field', function (): void {
+    /** @var DryRunner $dryRunner */
+    $dryRunner = $this->app->get(DryRunner::class);
+
+    $result = $dryRunner->run(groupedProfile(), [
+        ['Id' => '9717', 'Naam' => 'Salarisadministratie', 'Systeem' => 'Salarispakket'],
+        ['Id' => '9717', 'Naam' => 'Salaris', 'Systeem' => null],
+    ]);
+
+    expect($result->fitCount())->toBe(0)
+        ->and($result->issues[0]->rowNumber)->toBe(1)
+        ->and($result->issues[0]->reason)->toBe(__('import_mapping.issue.rows_disagree', ['rows' => '1, 2', 'column' => 'Naam']));
+});
+
+it('keeps a row without a key as a record of its own', function (): void {
+    /** @var DryRunner $dryRunner */
+    $dryRunner = $this->app->get(DryRunner::class);
+
+    $result = $dryRunner->run(groupedProfile(), [
+        ['Id' => null, 'Naam' => 'Eerste', 'Systeem' => null],
+        ['Id' => null, 'Naam' => 'Tweede', 'Systeem' => null],
+    ]);
+
+    expect($result->fitCount())->toBe(2);
 });

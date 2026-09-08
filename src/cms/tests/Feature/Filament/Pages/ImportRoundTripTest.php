@@ -145,6 +145,8 @@ it('imports its own processing register export back, links and lookups included'
         'name' => 'Salarisadministratie',
         'data_collection_source' => CoreEntityDataCollectionSource::SECONDARY,
         'has_processors' => true,
+        // The observer clears the security fields when has_security is off.
+        'has_security' => true,
         'outside_eu' => false,
         'decision_making' => false,
         'logic' => null,

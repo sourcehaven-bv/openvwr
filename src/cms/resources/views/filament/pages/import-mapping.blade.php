@@ -15,7 +15,7 @@
             <x-slot name="description">{{ __('import_mapping.archive_body') }}</x-slot>
 
             <ul class="space-y-1">
-                @foreach ($archiveContents as $register => $count)
+                @foreach ($result['archive'] as $register => $count)
                     <li class="text-sm">
                         &bull; {{ __('import_mapping.archive_row', ['register' => $register, 'count' => $count]) }}
                     </li>
@@ -48,6 +48,36 @@
                 {{ __('import_mapping.recognised_body', ['name' => $recognisedProfile]) }}
             </x-filament::section>
         @endif
+
+        <x-filament::section>
+            <x-slot name="heading">{{ __('import_mapping.rows_heading') }}</x-slot>
+            <x-slot name="description">
+                @if ($review->identity() !== null)
+                    {{ trans_choice('import_mapping.rows_proposal', $review->recordCount(), ['rows' => $review->rowCount(), 'records' => $review->recordCount(), 'column' => $review->identity()]) }}
+                @else
+                    {{ __('import_mapping.rows_body') }}
+                @endif
+            </x-slot>
+
+            <label class="block">
+                <span class="block text-xs font-medium mb-1">{{ __('import_mapping.rows_column') }}</span>
+                <select
+                    wire:model.live="groupBy"
+                    class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-sm"
+                >
+                    <option value="">{{ __('import_mapping.rows_none') }}</option>
+                    @foreach ($headers as $header)
+                        <option value="{{ $header }}">{{ $header }}</option>
+                    @endforeach
+                </select>
+            </label>
+
+            @if ($review->identity() !== null)
+                <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                    {{ __('import_mapping.rows_effect', ['records' => $review->recordCount(), 'rows' => $review->rowCount()]) }}
+                </p>
+            @endif
+        </x-filament::section>
 
         <x-filament::section>
             <x-slot name="heading">{{ __('import_mapping.review_heading') }}</x-slot>

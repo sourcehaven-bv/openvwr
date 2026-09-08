@@ -213,6 +213,17 @@ final class OverigeFuncties
                 eigen opmerking en een lege cel geeft er geen. De keuze bestaat alleen bij
                 registers die opmerkingen kennen, zoals de verwerkingen en DPIA's.
 
+                ### Eén record over meerdere rijen
+
+                Sommige registertools zetten één record over meerdere rijen: de kolommen
+                van het record staan op iedere rij, en elke rij bevat één systeem, één
+                doel of één notitie. OpenVWR herkent dat en stelt bovenaan het scherm de
+                kolom voor die het record aanduidt, meestal een nummer of id. Rijen met
+                dezelfde waarde in die kolom worden dan één record: koppelingen en notities
+                worden uit alle rijen verzameld, een gewoon veld moet in die rijen dezelfde
+                waarde hebben. Klopt de kolom niet, kies dan een andere, of kies "iedere rij
+                is een eigen record". De keuze gaat mee in een bewaard profiel.
+
                 ### Eigen export opnieuw inlezen
 
                 De Excel-export van een register (de exportknop boven de tabel) kunt u zo

@@ -169,3 +169,18 @@ Vink een regel af in de kolom "Test Geslaagd" zodra de stap is uitgevoerd en het
 | 58  | Upload dat bestand als Datalekken. Controleer dat alle kolommen "Automatisch ingevuld" zijn, op Organisatie, Verantwoordelijke rechtspersoon, Aangemaakt op en Bewerkt op na (Nummer is een voorstel voor Bronkenmerk), en dat "Verwerkingsverantwoordelijken" aan de koppeling Verwerkingsverantwoordelijken staat en "Labels" aan Labels. | [ ]           |             |
 | 59  | Importeer en open de kopie. Controleer dat type, datums, ja/nee-velden, samenvatting en de drie categorieën gelijk zijn aan het origineel, dat de verantwoordelijke dezelfde is (niet opnieuw aangemaakt) en dat de kolommen met "— Namelijk" in de export bij het juiste veld terecht zijn gekomen. | [ ]           |             |
 | 60  | Doe hetzelfde met een AVG-verwerking met verwerkers, ontvangers, doelen, betrokkenen, een dienst en een contactpersoon. Controleer dat na de import alle koppelingen aan de bestaande records hangen en dat "Nieuw aangemaakt" leeg is.        | [ ]           |             |
+
+---
+
+## 10. Eén record over meerdere rijen
+
+*Bron: handleiding, kop "Eén record over meerdere rijen".* Exports van andere registertools zetten de kolommen van een record op elke rij en geven iedere rij één item van een lijst (een systeem, een doel, een notitie). Gebruik het register **AVG Verantwoordelijke Verwerkingen**.
+
+| Nr  | Testactie                                                                                                                                                                                                                                   | Test Geslaagd | Opmerkingen |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |:-------------:| ----------- |
+| 61  | Upload `07-verwerking-in-meerdere-rijen.csv`. Controleer dat bovenaan "Rijen samenvoegen" staat met de tekst dat de 7 rijen 2 records lijken, rijen met dezelfde "Id" horen bij elkaar, en dat de kolomkeuze op "Id" staat.                     | [ ]           |             |
+| 62  | Koppel Id aan Bronkenmerk, Naam aan Naam verwerking, Dienst aan Dienst, Tekst aan Notitie, Systeem aan Systemen, Doel aan AVG doelen, Contactpersoon aan Contactpersonen en E-mail contactpersoon aan "Contactpersonen — E-mailadres". Klik "Proefdraaien" en controleer: 2 passen, 0 aandacht. | [ ]           |             |
+| 63  | Importeer en open "Salarisadministratie". Controleer: twee systemen (Salarispakket, HR-systeem), één doel, één contactpersoon P. de Vries met e-mailadres, één opmerking "Tekst: Overgenomen uit het oude register". "Toegangsbeheer" heeft één systeem en één doel. | [ ]           |             |
+| 64  | Maak in Excel een kopie waarin de tweede rij van 9717 als naam "Salaris" heeft en draai proef. Controleer dat rij 1 als aandachtsrij staat met de melding dat rijen 1 en 2 bij één record horen maar verschillen in kolom "Naam".                | [ ]           |             |
+| 65  | Zet de kolomkeuze op "— iedere rij is een eigen record —" en draai proef. Controleer dat er nu 7 rijen passen. Zet hem terug op "Id".                                                                                                        | [ ]           |             |
+| 66  | Importeer met profielnaam "Meerdere rijen", klik "Opnieuw beginnen" en upload hetzelfde bestand. Controleer dat het profiel herkend wordt en de kolomkeuze weer op "Id" staat, en dat de import beide records overslaat (zelfde bronkenmerk). | [ ]           |             |

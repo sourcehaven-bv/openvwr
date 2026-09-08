@@ -56,6 +56,11 @@ class EditableMapping
         private readonly TargetOptions $options,
         private readonly TransformResolver $transformResolver,
         private readonly DateFormatDetector $dateFormatDetector,
+        /**
+         * The source column whose value marks the rows of one record; null
+         * when every row is a record.
+         */
+        private readonly ?string $identity = null,
     ) {
     }
 
@@ -100,6 +105,19 @@ class EditableMapping
     public function rowCount(): int
     {
         return count($this->rows);
+    }
+
+    /**
+     * How many records the rows make once those of one record are folded.
+     */
+    public function recordCount(): int
+    {
+        return RecordGrouper::recordCount($this->rows, $this->identity);
+    }
+
+    public function identity(): ?string
+    {
+        return $this->identity;
     }
 
     public function options(): TargetOptions
@@ -206,7 +224,7 @@ class EditableMapping
             );
         }
 
-        return new MappingProfile($this->target->modelClass(), $fields, $unmapped);
+        return new MappingProfile($this->target->modelClass(), $fields, $unmapped, $this->identity);
     }
 
     /**
