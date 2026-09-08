@@ -327,3 +327,19 @@ it('maps a column headed like a lookup list onto the lookup, not a stray attribu
 
     expect(targetFor($profile->fields, 'Dienst')?->target)->toBe('lookup:service');
 });
+
+it('maps the heading of a link attribute whether it carries the link name or not', function (): void {
+    $headers = ['Verwerkers', 'Verwerkers — E-mail', 'Contactpersonen — E-mailadres', 'AVG doelen — Grondslag'];
+    $profile = $this->app->get(MappingAnalyser::class)->analyse(ImportTarget::AvgResponsibleProcessingRecord, $headers, [
+        [
+            'Verwerkers' => 'Firma A',
+            'Verwerkers — E-mail' => 'info@firma-a.example',
+            'Contactpersonen — E-mailadres' => 'p@example.org',
+            'AVG doelen — Grondslag' => 'Overeenkomst',
+        ]]);
+
+    expect(targetFor($profile->fields, 'Verwerkers')?->target)->toBe('processors')
+        ->and(targetFor($profile->fields, 'Verwerkers — E-mail')?->target)->toBe('processors::email')
+        ->and(targetFor($profile->fields, 'Contactpersonen — E-mailadres')?->target)->toBe('contactPersons::email')
+        ->and(targetFor($profile->fields, 'AVG doelen — Grondslag')?->target)->toBe('avgGoals::avg_goal_legal_base');
+});

@@ -84,6 +84,14 @@ class CandidateScorer
     }
 
     /**
+     * The heading *is* the field's name or label, synonyms folded.
+     */
+    public function namesExactly(string $header, string $fieldLabel, string $attribute): bool
+    {
+        return $this->headingSimilarity->isExactName($header, $fieldLabel, $attribute);
+    }
+
+    /**
      * A column of AP reference numbers is not a yes/no field, whatever its
      * heading says, and free text is not a choice from a fixed list: values
      * that fit nowhere count against the name, so the column is left for the
