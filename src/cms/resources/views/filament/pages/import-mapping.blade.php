@@ -82,7 +82,7 @@
         <x-filament::section>
             <x-slot name="heading">{{ __('import_mapping.review_heading') }}</x-slot>
             <x-slot name="description">
-                {{ __('import_mapping.review_body', ['rows' => $review->rowCount()]) }}
+                {{ __('import_mapping.review_body', ['rows' => $review->rowCount(), 'target' => \App\Enums\Import\ImportTarget::from($target)->label()]) }}
             </x-slot>
 
             @if (count($unsettled) === 0)
