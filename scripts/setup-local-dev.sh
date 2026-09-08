@@ -148,18 +148,31 @@ create_database "$TEST_DB_NAME"
 
 cd "$CMS_DIR"
 
-if [[ -f .env ]]; then
-    ok ".env already exists (left untouched)"
+# The native setup has its own environment file, so a Docker .env on the same
+# machine is left alone and the two setups can live side by side. An existing
+# .env that already points at a local database is adopted, not overwritten.
+if [[ -f .env.native ]]; then
+    ok ".env.native already exists (left untouched)"
+elif [[ -f .env ]] && grep -qE '^DB_HOST=127\.0\.0\.1' .env; then
+    info "Adopting the existing native .env as .env.native..."
+    cp .env .env.native
 else
-    info "Creating .env from .env.nodocker.example..."
-    cp .env.nodocker.example .env
+    info "Creating .env.native from .env.nodocker.example..."
+    cp .env.nodocker.example .env.native
 fi
 
-# The .env is left untouched when it already exists, so append the object-storage
+# Everything below runs against .env.native; artisan reads it from the
+# environment rather than from the .env file.
+set -a
+# shellcheck disable=SC1091
+source .env.native
+set +a
+
+# The file is left untouched when it already exists, so append the object-storage
 # settings only when they are absent -- re-running must not duplicate them.
-if [[ "$WITH_OBJECT_STORAGE" -eq 1 ]] && ! grep -q '^FILESYSTEM_SHARED_DRIVER=' .env; then
-    info "Adding object-storage settings to .env..."
-    cat >> .env <<EOF
+if [[ "$WITH_OBJECT_STORAGE" -eq 1 ]] && ! grep -q '^FILESYSTEM_SHARED_DRIVER=' .env.native; then
+    info "Adding object-storage settings to .env.native..."
+    cat >> .env.native <<EOF
 
 # Object storage (added by setup-local-dev.sh --with-object-storage)
 FILESYSTEM_SHARED_DRIVER=s3
@@ -169,6 +182,10 @@ AWS_SECRET_ACCESS_KEY=minioadmin
 AWS_DEFAULT_REGION=eu-central-1
 AWS_USE_PATH_STYLE_ENDPOINT=true
 EOF
+    set -a
+    # shellcheck disable=SC1091
+    source .env.native
+    set +a
 fi
 
 info "Installing composer dependencies..."
@@ -176,11 +193,13 @@ info "Installing composer dependencies..."
 
 # APP_KEY must exist before seeding: otp_secret is encrypted with it, and
 # rotating the key afterwards makes existing secrets undecryptable.
-if grep -qE '^APP_KEY=.+' .env; then
+if grep -qE '^APP_KEY=.+' .env.native; then
     ok "APP_KEY already set"
 else
     info "Generating APP_KEY..."
-    "$PHP_BIN" artisan key:generate
+    APP_KEY="$("$PHP_BIN" artisan key:generate --show)"
+    sed -i '' "s|^APP_KEY=.*|APP_KEY=${APP_KEY}|" .env.native
+    export APP_KEY
 fi
 
 info "Installing npm dependencies and building assets..."
