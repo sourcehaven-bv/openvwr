@@ -33,6 +33,17 @@ final class RelationKey
      */
     public const REMARKS = 'remarks';
 
+    /**
+     * The one note the FG keeps on a record; a single value, unlike REMARKS.
+     */
+    public const FG_REMARK = 'fgRemark';
+
+    /**
+     * Notes joined in one cell are separated by a blank line: a note may
+     * itself hold a comma or a line break.
+     */
+    public const NOTE_SEPARATOR = "\n\n";
+
     public static function attribute(string $relation, string $attribute): string
     {
         return sprintf('%s%s%s', $relation, self::ATTRIBUTE_SEPARATOR, $attribute);
@@ -51,6 +62,14 @@ final class RelationKey
     public static function isRemarks(string $target): bool
     {
         return $target === self::REMARKS;
+    }
+
+    /**
+     * Either kind of note.
+     */
+    public static function isNote(string $target): bool
+    {
+        return $target === self::REMARKS || $target === self::FG_REMARK;
     }
 
     /**

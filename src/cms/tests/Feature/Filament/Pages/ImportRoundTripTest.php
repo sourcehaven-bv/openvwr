@@ -248,7 +248,6 @@ it('imports its own processor register export back', function (): void {
         'has_processors' => true,
         'has_security' => true,
         'measures_description' => 'Versleuteling en toegangscontrole.',
-        'responsibility_distribution' => 'De klant is verwerkingsverantwoordelijke.',
     ]);
     $original->processors()->attach(
         Processor::factory()->create(['organisation_id' => $organisationId, 'name' => 'Subverwerker X', 'email' => 'x@example.org']),
@@ -274,7 +273,6 @@ it('imports its own processor register export back', function (): void {
         ->and($page->result['issues'])->toBe([])
         ->and($page->result['failures'])->toBe([])
         ->and($copy?->measures_description)->toBe('Versleuteling en toegangscontrole.')
-        ->and($copy?->responsibility_distribution)->toBe('De klant is verwerkingsverantwoordelijke.')
         ->and($copy?->processors()->pluck('name')->all())->toBe(['Subverwerker X'])
         ->and($copy?->stakeholders()->pluck('description')->all())->toBe(['Werknemers van klanten'])
         ->and($copy?->avgGoals()->pluck('goal')->all())->toBe(['Salarisverwerking'])

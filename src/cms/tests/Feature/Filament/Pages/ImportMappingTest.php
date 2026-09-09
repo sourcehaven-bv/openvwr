@@ -12,6 +12,7 @@ use App\Filament\Pages\ImportMapping;
 use App\Import\ImportFailedException;
 use App\Import\Mapping\DryRunner;
 use App\Import\Mapping\EditableMapping;
+use App\Import\Mapping\FormFields;
 use App\Import\Mapping\MappedRecordWriter;
 use App\Import\Mapping\MappingAnalyser;
 use App\Import\Mapping\MappingProfile;
@@ -28,7 +29,6 @@ use Filament\Notifications\Notification;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -1129,14 +1129,12 @@ it('updates the address of a processor that already has one', function (): void 
         ->and($processor->fresh()?->address?->address)->toBe('Oude straat 1');
 });
 
-it('falls back to a readable attribute name when no label exists', function (): void {
+it('calls a field what the form calls it', function (): void {
     $this->asFilamentUser();
 
-    // A translation that still looks like a key counts as missing.
-    Lang::addLines(['data_breach_record.involved_people' => 'data_breach_record.involved_people'], 'nl');
-
     expect(pageAtReview(breachRows(), breachMapping())->review()->options()->flat()['involved_people'])
-        ->toBe('Involved people');
+        ->toBe(FormFields::label(ImportTarget::DataBreachRecord, 'involved_people'))
+        ->toBe('Betrokken groep(en) personen');
 });
 
 it('asks which way round an ambiguous date is, and refuses to guess', function (): void {
@@ -1279,6 +1277,35 @@ it('takes any number of columns for a link, but one for an attribute of it', fun
     expect($page->review()->duplicateTargets())->toBe(['processors::email' => ['E-mail 1', 'E-mail 2']]);
 });
 
+it('writes a column mapped onto the FG note as the one FG note of the record', function (): void {
+    $this->asFilamentUser();
+
+    $page = new ImportMapping();
+    $page->mount();
+    $page->target = ImportTarget::AvgResponsibleProcessingRecord->value;
+    $page->headers = ['Naam', 'Opmerking FG'];
+    $page->setRows([
+        ['Naam' => 'Salarisadministratie', 'Opmerking FG' => "Volgend jaar opnieuw bekijken.\n\nGrondslag toetsen."],
+    ]);
+    $page->mapping = [
+        'Naam' => ['target' => 'name'],
+        'Opmerking FG' => ['target' => 'fgRemark'],
+    ];
+    $page->step = ImportMapping::STEP_REVIEW;
+
+    $page->apply(
+        $this->app->get(DryRunner::class),
+        $this->app->get(MappedRecordWriter::class),
+        $this->app->get(MappingProfileRepository::class),
+    );
+
+    $record = AvgResponsibleProcessingRecord::query()->where('name', 'Salarisadministratie')->first();
+
+    expect($page->result['imported'])->toBe(1)
+        ->and($record?->fgRemark?->body)->toBe("Volgend jaar opnieuw bekijken.\n\nGrondslag toetsen.")
+        ->and($record?->remarks()->count())->toBe(0);
+});
+
 it('keeps columns without a field of their own as notes on the record', function (): void {
     $this->asFilamentUser();
 
@@ -1309,10 +1336,12 @@ it('keeps columns without a field of their own as notes on the record', function
     $first = AvgResponsibleProcessingRecord::query()->where('name', 'Salarisadministratie')->first();
     $second = AvgResponsibleProcessingRecord::query()->where('name', 'Toegangsbeheer')->first();
 
+    // "Tekst" is a notes column, so its notes stay as they are; "Afdeling" is
+    // not, so its value is headed with the column name.
     expect($page->result['imported'])->toBe(2)
         ->and($first?->remarks()->orderBy('body')->pluck('body')->all())->toBe([
             'Afdeling: HR',
-            'Tekst: Overgenomen uit het oude register.',
+            'Overgenomen uit het oude register.',
         ])
         // An empty cell is not a note.
         ->and($second?->remarks()->pluck('body')->all())->toBe(['Afdeling: ICT']);
@@ -1512,7 +1541,7 @@ it('folds the rows of one record and collects its links and notes from every row
         ->and($contacts?->pluck('name')->all())->toBe(['P. de Vries', 'Q. Jansen'])
         // The e-mail address on row three belongs to the contact on row three.
         ->and($contacts?->pluck('email')->all())->toBe(['p@x.nl', null])
-        ->and($record?->remarks()->pluck('body')->all())->toBe(['Tekst: Overgenomen uit het oude register']);
+        ->and($record?->remarks()->pluck('body')->all())->toBe(['Overgenomen uit het oude register']);
 });
 
 it('treats every row as a record when no grouping column is chosen', function (): void {
@@ -1567,4 +1596,38 @@ it('carries the grouping column into a saved profile', function (): void {
     $saved = $repository->findByFingerprint(MappingProfile::fingerprint($page->headers), Authentication::organisation()->id);
 
     expect($saved?->toMappingProfile()->identity)->toBe('Id');
+});
+
+it('proposes the mapping afresh when the register is changed on the review screen', function (): void {
+    $this->asFilamentUser();
+
+    // Dropped as a datalek, but it is a verwerking: the register is corrected
+    // afterwards and the AVG fields get their columns.
+    $page = pageAtReview([['Naam verwerking' => 'Salarisadministratie', 'Heeft verwerkers' => 'ja']], [
+        'Naam verwerking' => ['target' => ''],
+        'Heeft verwerkers' => ['target' => ''],
+    ]);
+    $page->target = ImportTarget::AvgResponsibleProcessingRecord->value;
+    $page->updatedTarget();
+
+    expect($page->step)->toBe(ImportMapping::STEP_REVIEW)
+        ->and($page->mapping['Naam verwerking']['target'])->toBe('name')
+        ->and($page->mapping['Heeft verwerkers']['target'])->toBe('has_processors');
+});
+
+it('ignores a register change before there is a sheet, and restarts when the rows are gone', function (): void {
+    $this->asFilamentUser();
+
+    $fresh = new ImportMapping();
+    $fresh->mount();
+    $fresh->target = ImportTarget::AvgResponsibleProcessingRecord->value;
+    $fresh->updatedTarget();
+
+    $expired = pageAtReview(breachRows(), breachMapping());
+    Cache::forget((string) $expired->sheetKey);
+    $expired->target = ImportTarget::AvgResponsibleProcessingRecord->value;
+    $expired->updatedTarget();
+
+    expect($fresh->step)->toBe(ImportMapping::STEP_UPLOAD)
+        ->and($expired->step)->toBe(ImportMapping::STEP_UPLOAD);
 });

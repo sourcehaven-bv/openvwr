@@ -10,6 +10,7 @@ use App\Import\Factories\General\LookupListFactory;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -17,6 +18,7 @@ use Webmozart\Assert\Assert;
 
 use function array_filter;
 use function array_keys;
+use function implode;
 use function is_string;
 use function sprintf;
 use function trim;
@@ -36,6 +38,7 @@ class MappedRecordWriter
         private readonly LookupListFactory $lookupFactory,
         private readonly DatabaseManager $databaseManager,
         private readonly FormDefaults $formDefaults,
+        private readonly NoteBodies $noteBodies,
     ) {
     }
 
@@ -230,8 +233,11 @@ class MappedRecordWriter
     }
 
     /**
-     * Keeps columns without a field of their own as notes on the record, one
-     * per column, headed with the column name so the origin stays visible.
+     * Keeps columns as notes on the record. A column that is itself a notes
+     * column ("Opmerkingen", "Notities", "Tekst", or the export of OpenVWR)
+     * holds the notes as they are, separated by blank lines; any other
+     * column becomes one note headed with the column name, so the origin
+     * stays visible. The FG note is a single value on the record.
      *
      * @param MappingProfile<Model> $profile
      * @param array<string, mixed> $row
@@ -239,23 +245,31 @@ class MappedRecordWriter
     private function attachRemarks(Model $model, MappingProfile $profile, array $row): void
     {
         foreach ($profile->fields as $field) {
-            if ($field->relation !== RelationKey::REMARKS) {
+            if (!RelationKey::isNote((string) $field->relation)) {
                 continue;
             }
 
-            // Only registers with notes offer the target; TargetOptions sees to that.
-            $callable = [$model, 'remarks'];
+            $bodies = $this->noteBodies->for($field, Arr::get($row, $field->source));
+
+            if ($bodies === []) {
+                continue;
+            }
+
+            // Only registers with notes offer the targets; TargetOptions sees to that.
+            $callable = [$model, $field->relation];
             Assert::isCallable($callable);
             $relation = $callable();
+
+            if ($relation instanceof MorphOne) {
+                $relation->updateOrCreate([], ['body' => implode(RelationKey::NOTE_SEPARATOR, $bodies)]);
+
+                continue;
+            }
+
             Assert::isInstanceOf($relation, MorphMany::class);
 
-            // A record folded from several rows brings one entry per row.
-            foreach ((array) Arr::get($row, $field->source) as $value) {
-                if (!is_string($value) || trim($value) === '') {
-                    continue;
-                }
-
-                $relation->create(['body' => sprintf('%s: %s', $field->source, trim($value))]);
+            foreach ($bodies as $body) {
+                $relation->create(['body' => $body]);
             }
         }
     }

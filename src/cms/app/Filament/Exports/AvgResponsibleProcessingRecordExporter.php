@@ -29,7 +29,7 @@ class AvgResponsibleProcessingRecordExporter extends Exporter
             ExportColumn::make('data_collection_source')
                 ->label(__('general.data_collection_source')),
             ExportColumn::make('entityNumber.number')
-                ->label(__('avg_responsible_processing_record.number')),
+                ->label(__('processing_record.number')),
             ExportColumn::make('avgResponsibleProcessingRecordService.name')
                 ->label(__('avg_responsible_processing_record_service.model_singular')),
             ExportColumn::make('tags.name')
@@ -95,11 +95,11 @@ class AvgResponsibleProcessingRecordExporter extends Exporter
                 ->label(__('avg_responsible_processing_record.has_security')),
             // Labelled as on the register's own form, so an export reads back in.
             ExportColumn::make('measures_implemented')
-                ->label(__('avg_responsible_processing_record.measures_implemented')),
+                ->label(__('processor.measures_implemented')),
             ExportColumn::make('other_measures')
-                ->label(__('avg_responsible_processing_record.other_measures')),
+                ->label(__('processor.other_measures')),
             ExportColumn::make('measures_description')
-                ->label(__('avg_responsible_processing_record.measures_description')),
+                ->label(__('processor.measures_description')),
             ExportColumn::make('has_pseudonymization')
                 ->label(__('avg_responsible_processing_record.has_pseudonymization')),
             ExportColumn::make('pseudonymization')
@@ -143,10 +143,11 @@ class AvgResponsibleProcessingRecordExporter extends Exporter
             ...self::getDocumentColumns(),
 
             // opmerkingen
-            ExportColumn::make('remarks')
-                ->label(__('remark.model_plural')),
+            ...self::noteColumns(),
 
             // overig
+            ExportColumn::make('public_from')
+                ->label(__('general.public_from')),
             ExportColumn::make('created_at')
                 ->label(__('general.created_at')),
             ExportColumn::make('updated_at')

@@ -71,6 +71,10 @@ final class OverigeFuncties
 
                 ### Mapping controleren
 
+                Bovenaan staat voor welk register de kolommen zijn gekoppeld. Is het
+                bestand voor een ander register bedoeld, kies dat dan daar; de mapping
+                wordt opnieuw voorgesteld.
+
                 OpenVWR probeert iedere kolom zelf aan een veld te koppelen. Dat gebeurt op
                 basis van de kolomnaam én de waarden in de kolom: een kolom met "ja" en "nee"
                 hoort bij een ja/nee-veld, ook als de naam op een datumveld lijkt. Per kolom
@@ -209,9 +213,13 @@ final class OverigeFuncties
                 Een kolom die nergens in past - een status uit het oude systeem, een
                 afdeling, een vrij tekstveld - hoeft niet verloren te gaan. Kies
                 **Notitie**: de waarde komt als opmerking bij het record te staan, met de
-                kolomnaam ervoor. Meerdere kolommen mogen naar Notitie; elke kolom wordt een
-                eigen opmerking en een lege cel geeft er geen. De keuze bestaat alleen bij
-                registers die opmerkingen kennen, zoals de verwerkingen en DPIA's.
+                kolomnaam ervoor. Heet de kolom zelf "Opmerkingen", "Notities" of "Tekst",
+                dan zijn het al notities en blijven ze zoals ze zijn. Meerdere kolommen
+                mogen naar Notitie; elke kolom wordt een eigen opmerking en een lege cel
+                geeft er geen. De keuze bestaat alleen bij registers die opmerkingen
+                kennen, zoals de verwerkingen en DPIA's. De opmerking van de FG heeft een
+                eigen doel, "Opmerking FG", dat alleen wie de FG-opmerkingen mag lezen te
+                zien krijgt; de export bevat de FG-opmerking nooit.
 
                 ### Eén record over meerdere rijen
 

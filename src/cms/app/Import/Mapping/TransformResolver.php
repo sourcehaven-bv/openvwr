@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Import\Mapping;
 
 use App\Enums\Import\MappingTransform;
+use App\Models\Casts\CalendarDateCast;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -16,15 +17,37 @@ use Illuminate\Database\Eloquent\Model;
  */
 class TransformResolver
 {
+    public function __construct(
+        private readonly TableColumns $tableColumns = new TableColumns(),
+    ) {
+    }
+
     public function forAttribute(Model $model, string $attribute): MappingTransform
     {
         $cast = $model->getCasts()[$attribute] ?? null;
 
         return match ($cast) {
-            'date', 'datetime', 'immutable_date', 'immutable_datetime' => MappingTransform::Date,
+            'date', 'datetime', 'immutable_date', 'immutable_datetime', CalendarDateCast::class => MappingTransform::Date,
             'bool', 'boolean' => MappingTransform::Boolean,
             'int', 'integer' => MappingTransform::Integer,
             'array', 'json', 'collection' => MappingTransform::StringList,
+            null => $this->fromColumnType($model, $attribute),
+            default => MappingTransform::Text,
+        };
+    }
+
+    /**
+     * Without a cast the column itself says what it holds. A model that
+     * forgot to cast a yes/no column would otherwise take "ja" as text and
+     * have the database refuse it.
+     */
+    private function fromColumnType(Model $model, string $attribute): MappingTransform
+    {
+        // Lists live in text columns here, so json never comes up.
+        return match ($this->tableColumns->type($model, $attribute)) {
+            'bool' => MappingTransform::Boolean,
+            'date', 'timestamp' => MappingTransform::Date,
+            'int4' => MappingTransform::Integer,
             default => MappingTransform::Text,
         };
     }

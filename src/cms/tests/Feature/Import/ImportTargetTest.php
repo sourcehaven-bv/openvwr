@@ -9,6 +9,10 @@ use App\Models\DataBreachRecord;
 use App\Models\Organisation;
 use Illuminate\Support\Facades\Config;
 
+beforeEach(function (): void {
+    $this->asFilamentUser();
+});
+
 it('offers every register, each with the fields, links and lookups its model has', function (): void {
     Config::set('features.wpg', true);
 
@@ -84,4 +88,13 @@ it('offers only fields that exist as columns, whatever the model calls fillable'
 
     expect($options)->not->toHaveKey('service')
         ->and($options)->toHaveKey('lookup:service');
+});
+
+it('offers an id a person types, and hides only the ids that point at records', function (): void {
+    $options = (new TargetOptions(ImportTarget::AlgorithmRecord))->flat();
+
+    expect($options)->toHaveKey('meta_national_id')
+        ->and($options)->toHaveKey('meta_source_id')
+        ->and($options)->not->toHaveKey('algorithm_theme_id')
+        ->and($options)->not->toHaveKey('organisation_id');
 });

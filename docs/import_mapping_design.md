@@ -469,6 +469,22 @@ per rij één item van één lijst):
 | Iedere rij werd een record; met het Id als bronkenmerk werd rij 1 geïmporteerd en de rest overgeslagen, zodat systemen, doelen en betrokkenen nooit aankwamen | `RecordGrouping` stelt de kolom voor waarvan de herhaalde waarde de rijen van één record markeert (alle kolommen die op elk van die rijen gevuld zijn stemmen overeen, alleen de ijle kolommen verschillen); de gebruiker bevestigt of kiest een andere kolom. `RecordGrouper` vouwt de rijen samen: een gewoon veld en een opzoeklijst krijgen één waarde (verschil = aandachtsrij), koppelingen, hun attributen en notities krijgen één invoer per rij, lege plekken inbegrepen, zodat de derde naam bij het derde e-mailadres blijft. De kolom gaat als `identity` mee in het profiel |
 | Kolomgroepen (Id2, Naam3, Type, Telefoon … beschrijven één verantwoordelijke) | Nog niet: de analyser kent geen blokken en koppelt "Postcode" aan het enige adres dat hij kent (verwerkers) |
 
+`ImportRoundTripEveryFieldTest` vult voor elk van de vijf registers ieder
+importveld met willekeurige waarden (faker), hangt alle soorten koppelingen
+aan, exporteert, verwijdert record en gedeelde entiteiten, importeert het
+werkboek en exporteert de kopie: de twee exportregels moeten kolom voor kolom
+gelijk zijn, op nummer en tijdstempels na. Dat legde bloot:
+
+| Bevinding | Oplossing |
+|---|---|
+| Keuzes met een komma erin ("Hacking, malware en/of phishing") werden bij een met ", " samengevoegde lijst in stukken gelezen, en de kolom kwam daardoor op het verkeerde veld terecht | `MultiValue::split()` kent de vaste keuzes en plakt een keuze die op zijn eigen komma is geknipt weer aan elkaar; scorer en engine geven de keuzes mee |
+| `review_at` heeft een eigen cast (`CalendarDateCast`) en gold als tekst | `TransformResolver` kent die cast; zonder cast beslist het kolomtype in de database (bool, date, int, json) |
+| `measures_implemented` had in de AVG- en WPG-modellen een verkeerd gespelde cast (`measures`), WPG miste de cast op `has_pseudonymization`; "ja" ging als tekst naar een boolean-kolom en de database weigerde de rij | Casts hersteld |
+| `created_at`/`updated_at` zijn fillable op WPG en werden als doel aangeboden | Tijdstempels zijn intern |
+| `meta_national_id` en `meta_source_id` (algoritmes) werden als foreign key verborgen | Alleen een uuid-kolom met `_id` is een foreign key |
+| De kolom "Opmerkingen" exporteerde de ruwe JSON van de `Remark`-modellen | `Exporter::noteColumns()`: de notities als tekst met een lege regel ertussen. De import leest een notitiekolom ("Opmerkingen", "Notities", "Tekst") als de notities zelf en zet alleen bij een andere kolom de kolomnaam ervoor (`NoteBodies`). De opmerking van de FG is voor de FG: de export bevat haar nooit, en de import biedt "Opmerking FG" alleen aan wie FG-opmerkingen mag lezen |
+| De AVG-verwerker-export schreef "Derden", "Toelichting derden", "Verdachten", "Slachtoffers", "Veroordeelden" en "Verdeling verantwoordelijkheid": kolommen in de database die het formulier van dat register niet heeft. WPG exporteerde "Beveiliging", een kolom die niet meer bestaat. De import bood diezelfde fillables aan | Het formulier is de bron van waarheid (§9) |
+
 Nog niet ondersteund, bewust: kolomgroepen (zie boven), categorieën persoonsgegevens en bewaartermijn
 (die horen bij de gegevens per betrokkene, twee niveaus diep), de bijzondere
 gegevens per betrokkene (die liggen in OpenVWR op de gedeelde betrokkene, niet
@@ -481,3 +497,36 @@ Bewust niet gedaan: de phpstan-regel `TenantAwareQueryRule` uitbreiden naar
 `App\Import`. De importlaag draait ook in queue-jobs zonder ingelogde tenant
 en werkt daarom met een expliciete `organisationId` in plaats van
 `tenantQuery()`; de regel zou daar alleen valse meldingen geven.
+
+## 9. Het formulier als bron van waarheid
+
+Een register had zijn veldenlijst drie keer, met de hand bijgehouden: het
+Filament-formulier, de exporter en de doelenlijst van de import. Niets leidde
+de een uit de ander af. Elke keer dat een lijst afweek kwam er een kolom uit
+de export die niet terug te lezen was, of ontbrak een veld dat het formulier
+wél heeft; de tests spiegelden de implementatie in plaats van het bestand dat
+de gebruiker in handen krijgt.
+
+`FormFields` leest daarom het formulier zelf: de one-page-variant van het
+register, met verborgen onderdelen erbij, zodat een veld achter een schakelaar
+("GEB (DPIA) uitgevoerd", "Heeft beveiliging") gewoon meetelt. Per veld komt
+de naam, het label en de relatie die het bewerkt eruit. Velden van een
+repeater (een doel, een betrokkene) zijn een eigen record en worden niet
+ingelopen; verborgen velden dragen geen invoer.
+
+Wat daaruit volgt:
+
+- `TargetOptions` biedt alleen fillables aan die op het formulier staan, onder
+  het label van het formulier. Een relatie heet wat het formulier haar noemt
+  ("Subverwerkers" bij een verwerker-verwerking, "Overige contactpersonen").
+  Alleen het bronkenmerk (`import_id`) heeft geen veld en blijft.
+- De exporters houden hun eigen kolomlijst, maar `FormParityTest` houdt die
+  aan het formulier: elk veld van het formulier komt onder het label van het
+  formulier in de export én in de import, en geen van beide voert een plat
+  veld op dat het formulier niet heeft. De uitzonderingen staan in de test
+  met naam en reden (het documentenblok, subverwerkingen, het nummer dat
+  OpenVWR zelf geeft, de hoofdverwerking, het primaire contact, de
+  publicatiedatum).
+
+De volgende stap, de exporterkolommen uit `FormFields` genereren, verandert de
+kolomvolgorde van de export en is een eigen wijziging.

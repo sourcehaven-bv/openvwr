@@ -172,7 +172,7 @@ class AvgResponsibleProcessingRecord extends Model implements Cloneable, EntityN
             'has_security' => 'bool',
             'has_systems' => 'bool',
             'has_algorithms' => 'bool',
-            'measures' => 'bool',
+            'measures_implemented' => 'bool',
             'other_measures' => 'bool',
             'outside_eu' => 'bool',
             'has_pseudonymization' => 'bool',

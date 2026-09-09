@@ -25,6 +25,7 @@ use function is_string;
 use function number_format;
 use function sprintf;
 use function str_replace;
+use function trim;
 
 abstract class Exporter extends FilamentExporter
 {
@@ -138,29 +139,90 @@ abstract class Exporter extends FilamentExporter
     }
 
     /**
-     * The columns every register shares for its verwerkers and contactpersonen.
+     * The notes on a record, each as its text, a blank line between them. A
+     * note may hold commas and line breaks, so a blank line is the one
+     * separator that reads back. The FG's own note is not exported: it is
+     * for the FG alone and must not travel to whoever receives the sheet.
      *
      * @return array<ExportColumn>
      */
-    protected static function processorAndContactColumns(): array
+    protected static function noteColumns(): array
     {
         return [
+            ExportColumn::make('remarks_body')
+                ->label(__('remark.model_plural'))
+                ->getStateUsing(static function (Model $record): string {
+                    $remarks = $record->getRelationValue('remarks');
+                    Assert::isInstanceOf($remarks, Collection::class);
+
+                    return $remarks
+                        ->map(static fn (Model $remark): string => self::text($remark->getAttribute('body')))
+                        ->filter()
+                        ->implode("\n\n");
+                }),
+        ];
+    }
+
+    private static function text(mixed $value): string
+    {
+        return is_string($value) ? trim($value) : '';
+    }
+
+    /**
+     * The columns every register shares for its verwerkers and contactpersonen,
+     * under the labels the register's form uses for them.
+     *
+     * @return array<ExportColumn>
+     */
+    protected static function processorAndContactColumns(string $processorsLabelKey = 'processor.model_plural'): array
+    {
+        $contactsLabelKey = 'contact_person.form_title_contact_persons';
+
+        return [
             ExportColumn::make('processors.name')
-                ->label(__('processor.model_plural')),
-            self::relatedListColumn('processors', 'email', self::relatedLabel('processor.model_plural', 'processor.email')),
-            self::relatedListColumn('processors', 'phone', self::relatedLabel('processor.model_plural', 'processor.phone')),
-            self::relatedListColumn('processors', 'address.address', self::relatedLabel('processor.model_plural', 'address.address')),
+                ->label(__($processorsLabelKey)),
+            self::relatedListColumn(
+                'processors',
+                'email',
+                self::relatedLabel($processorsLabelKey, 'processor.email'),
+            ),
+            self::relatedListColumn(
+                'processors',
+                'phone',
+                self::relatedLabel($processorsLabelKey, 'processor.phone'),
+            ),
+            self::relatedListColumn(
+                'processors',
+                'address.address',
+                self::relatedLabel($processorsLabelKey, 'address.address'),
+            ),
             self::relatedListColumn(
                 'processors',
                 'address.postal_code',
-                self::relatedLabel('processor.model_plural', 'address.postal_code'),
+                self::relatedLabel($processorsLabelKey, 'address.postal_code'),
             ),
-            self::relatedListColumn('processors', 'address.city', self::relatedLabel('processor.model_plural', 'address.city')),
-            self::relatedListColumn('processors', 'address.country', self::relatedLabel('processor.model_plural', 'address.country')),
+            self::relatedListColumn(
+                'processors',
+                'address.city',
+                self::relatedLabel($processorsLabelKey, 'address.city'),
+            ),
+            self::relatedListColumn(
+                'processors',
+                'address.country',
+                self::relatedLabel($processorsLabelKey, 'address.country'),
+            ),
             ExportColumn::make('contactPersons.name')
-                ->label(__('contact_person.model_plural')),
-            self::relatedListColumn('contactPersons', 'email', self::relatedLabel('contact_person.model_plural', 'contact_person.email')),
-            self::relatedListColumn('contactPersons', 'phone', self::relatedLabel('contact_person.model_plural', 'contact_person.phone')),
+                ->label(__($contactsLabelKey)),
+            self::relatedListColumn(
+                'contactPersons',
+                'email',
+                self::relatedLabel($contactsLabelKey, 'contact_person.email'),
+            ),
+            self::relatedListColumn(
+                'contactPersons',
+                'phone',
+                self::relatedLabel($contactsLabelKey, 'contact_person.phone'),
+            ),
         ];
     }
 

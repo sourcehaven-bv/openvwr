@@ -50,6 +50,20 @@
         @endif
 
         <x-filament::section>
+            <x-slot name="heading">{{ __('import_mapping.target') }}</x-slot>
+            <x-slot name="description">{{ __('import_mapping.target_review_body') }}</x-slot>
+
+            <select
+                wire:model.live="target"
+                class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-sm"
+            >
+                @foreach (\App\Enums\Import\ImportTarget::options() as $value => $label)
+                    <option value="{{ $value }}">{{ $label }}</option>
+                @endforeach
+            </select>
+        </x-filament::section>
+
+        <x-filament::section>
             <x-slot name="heading">{{ __('import_mapping.rows_heading') }}</x-slot>
             <x-slot name="description">
                 @if ($review->identity() !== null)

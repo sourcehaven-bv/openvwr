@@ -25,7 +25,7 @@ class AvgProcessorProcessingRecordExporter extends Exporter
             ExportColumn::make('organisation.responsibleLegalEntity.name')
                 ->label(__('responsible_legal_entity.model_singular')),
             ExportColumn::make('entityNumber.number')
-                ->label(__('avg_processor_processing_record.number')),
+                ->label(__('processing_record.number')),
             ExportColumn::make('avgProcessorProcessingRecordService.name')
                 ->label(__('avg_processor_processing_record_service.model_singular')),
             ExportColumn::make('name')
@@ -42,13 +42,11 @@ class AvgProcessorProcessingRecordExporter extends Exporter
             // verwerkingsverwantwoordelijke
             ExportColumn::make('responsibles.name')
                 ->label(__('responsible.model_plural')),
-            ExportColumn::make('responsibility_distribution')
-                ->label(__('avg_processor_processing_record.responsibility_distribution')),
 
             // subverwerkers
             ExportColumn::make('has_processors')
-                ->label(__('avg_processor_processing_record.has_processors')),
-            ...self::processorAndContactColumns(),
+                ->label(__('avg_processor_processing_record.has_subprocessors')),
+            ...self::processorAndContactColumns('avg_processor_processing_record.subprocessors'),
 
             // ontvanger
             ExportColumn::make('receivers.description')
@@ -70,16 +68,6 @@ class AvgProcessorProcessingRecordExporter extends Exporter
             // betrokkenen en gegevens
             ExportColumn::make('has_involved')
                 ->label(__('avg_processor_processing_record.has_involved')),
-            ExportColumn::make('suspects')
-                ->label(__('avg_processor_processing_record.suspects')),
-            ExportColumn::make('victims')
-                ->label(__('avg_processor_processing_record.victims')),
-            ExportColumn::make('convicts')
-                ->label(__('avg_processor_processing_record.convicts')),
-            ExportColumn::make('third_parties')
-                ->label(__('avg_processor_processing_record.third_parties')),
-            ExportColumn::make('third_parties_description')
-                ->label(__('avg_processor_processing_record.third_parties_description')),
 
             // besluitvorming
             ExportColumn::make('decision_making')
@@ -106,11 +94,11 @@ class AvgProcessorProcessingRecordExporter extends Exporter
             ExportColumn::make('has_security')
                 ->label(__('avg_processor_processing_record.has_security')),
             ExportColumn::make('measures_implemented')
-                ->label(__('avg_processor_processing_record.measures_implemented')),
+                ->label(__('processor.measures_implemented')),
             ExportColumn::make('other_measures')
-                ->label(__('avg_processor_processing_record.other_measures')),
+                ->label(__('processor.other_measures')),
             ExportColumn::make('measures_description')
-                ->label(__('avg_processor_processing_record.measures_description')),
+                ->label(__('processor.measures_description')),
             ExportColumn::make('has_pseudonymization')
                 ->label(__('avg_processor_processing_record.has_pseudonymization')),
             ExportColumn::make('pseudonymization')
@@ -139,8 +127,7 @@ class AvgProcessorProcessingRecordExporter extends Exporter
                 ->label(__('contact_person.form_title_users')),
 
             // opmerkingen
-            ExportColumn::make('remarks')
-                ->label(__('remark.model_plural')),
+            ...self::noteColumns(),
 
             // documenten
             ...self::getDocumentColumns(),

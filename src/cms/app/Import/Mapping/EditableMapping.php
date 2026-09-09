@@ -8,18 +8,14 @@ use App\Enums\Import\ImportTarget;
 use App\Enums\Import\MappingConfidence;
 use App\Enums\Import\MappingTransform;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 
+use function __;
 use function array_filter;
 use function array_key_exists;
+use function array_key_first;
 use function array_values;
 use function count;
 use function implode;
-use function in_array;
-use function is_array;
-use function is_scalar;
-use function trim;
 
 /**
  * The mapping while the user is editing it: a plain array keyed by source
@@ -138,7 +134,7 @@ class EditableMapping
         return $this->columns[$header] = new ColumnReview(
             $header,
             $settings,
-            $this->samplesFor($header),
+            ColumnSamples::for($this->rows, $header, self::SAMPLE_LIMIT),
             $this->fromProfile,
             $this->options,
             $isRelation ? null : ($this->transforms()[$target] ?? null),
@@ -228,6 +224,32 @@ class EditableMapping
     }
 
     /**
+     * What still has to be settled before the mapping can be run, as a
+     * message for the user; null when nothing is in the way.
+     */
+    public function problem(): ?string
+    {
+        $undecided = $this->headersNeedingDateFormat();
+
+        if ($undecided !== []) {
+            return __('import_mapping.date_format_missing', ['column' => $undecided[0]]);
+        }
+
+        $duplicates = $this->duplicateTargets();
+
+        if ($duplicates !== []) {
+            $target = array_key_first($duplicates);
+
+            return __('import_mapping.duplicate_target', [
+                'field' => $this->options->label($target),
+                'columns' => implode('", "', $duplicates[$target]),
+            ]);
+        }
+
+        return null;
+    }
+
+    /**
      * Targets chosen for more than one column, with those columns. A plain
      * field holds one value, so the second column would silently replace the
      * first; a link or a note takes as many columns as the source has.
@@ -268,7 +290,7 @@ class EditableMapping
      */
     private function relationFor(string $target): ?string
     {
-        if ($this->isRelationTarget($target) || RelationKey::isLookup($target) || RelationKey::isRemarks($target)) {
+        if ($this->isRelationTarget($target) || RelationKey::isLookup($target) || RelationKey::isNote($target)) {
             return $target;
         }
 
@@ -297,54 +319,5 @@ class EditableMapping
     private function transforms(): array
     {
         return $this->transforms ??= $this->transformResolver->forModel($this->target->modelClass());
-    }
-
-    /**
-     * A few distinct values from the source, so the user can judge a mapping by
-     * what is actually in the column instead of by its heading alone.
-     *
-     * @return array<int, string>
-     */
-    private function samplesFor(string $header): array
-    {
-        $samples = [];
-
-        foreach ($this->rows as $row) {
-            $value = $this->sampleValue(Arr::get($row, $header));
-
-            if ($value === null || in_array($value, $samples, true)) {
-                continue;
-            }
-
-            $samples[] = $value;
-
-            if (count($samples) >= self::SAMPLE_LIMIT) {
-                break;
-            }
-        }
-
-        return $samples;
-    }
-
-    private function sampleValue(mixed $value): ?string
-    {
-        if (is_array($value)) {
-            $parts = [];
-            foreach ($value as $item) {
-                if (is_scalar($item)) {
-                    $parts[] = (string) $item;
-                }
-            }
-
-            $value = implode(', ', $parts);
-        }
-
-        if (!is_scalar($value)) {
-            return null;
-        }
-
-        $value = trim((string) $value);
-
-        return $value === '' ? null : Str::limit($value, 80);
     }
 }

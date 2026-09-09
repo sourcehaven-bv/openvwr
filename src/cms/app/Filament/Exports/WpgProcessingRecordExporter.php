@@ -25,7 +25,7 @@ class WpgProcessingRecordExporter extends Exporter
             ExportColumn::make('organisation.responsibleLegalEntity.name')
                 ->label(__('responsible_legal_entity.model_singular')),
             ExportColumn::make('entityNumber.number')
-                ->label(__('wpg_processing_record.number')),
+                ->label(__('processing_record.number')),
             ExportColumn::make('wpgProcessingRecordService.name')
                 ->label(__('wpg_processing_record_service.model_singular')),
             ExportColumn::make('name')
@@ -124,8 +124,6 @@ class WpgProcessingRecordExporter extends Exporter
             // beveiliging
             ExportColumn::make('has_security')
                 ->label(__('wpg_processing_record.has_security')),
-            ExportColumn::make('security')
-                ->label(__('wpg_processing_record.security')),
             ExportColumn::make('measures_implemented')
                 ->label(__('processor.measures_implemented')),
             ExportColumn::make('other_measures')
@@ -146,8 +144,7 @@ class WpgProcessingRecordExporter extends Exporter
                 ->label(__('contact_person.form_title_users')),
 
             // opmerkingen
-            ExportColumn::make('remarks')
-                ->label(__('remark.model_plural')),
+            ...self::noteColumns(),
 
             // categorieën betrokkenen
             ExportColumn::make('suspects')
