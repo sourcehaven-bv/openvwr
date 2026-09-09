@@ -42,6 +42,20 @@ it('can generate private markdown', function (): void {
         ->toMatchSnapshot();
 });
 
+it('can generate private markdown without a service', function (): void {
+    $avgProcessorProcessingRecord = AvgProcessorProcessingRecord::factory()
+        ->create([
+            'avg_processor_processing_record_service_id' => null,
+        ]);
+    $snapshot = Snapshot::factory()
+        ->for($avgProcessorProcessingRecord, 'snapshotSource')
+        ->create();
+
+    $avgProcessorProcessingRecordDataFactory = new AvgProcessorProcessingRecordDataFactory();
+    expect($avgProcessorProcessingRecordDataFactory->generatePrivateMarkdown($snapshot))
+        ->toContain('**AVG Verwerking Dienst**: -');
+});
+
 it('can generate public frontmatter', function (): void {
     $snapshot = Snapshot::factory()
         ->create();
