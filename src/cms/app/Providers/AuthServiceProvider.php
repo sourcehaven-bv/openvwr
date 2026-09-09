@@ -43,6 +43,11 @@ use App\Policies\TagPolicy;
 use App\Policies\UserPolicy;
 use App\Services\Authentication\AuthenticationStrategy;
 use App\Services\Authentication\AuthenticationStrategyFactory;
+use App\Services\Authentication\Pratique\JwksProvider;
+use App\Services\Authentication\Pratique\PratiqueAssertionException;
+use App\Services\Authentication\Pratique\PratiqueAssertionVerifier;
+use App\Services\Authentication\Pratique\PratiqueContext;
+use App\Services\Authentication\PratiqueAuthenticationStrategy;
 use App\Services\AuthorizationService;
 use App\Services\CrossOrgAuthorization;
 use App\Services\OneTimePassword\OneTimePassword;
@@ -50,7 +55,9 @@ use App\Services\OneTimePassword\OneTimePasswordManager;
 use App\Services\OneTimePassword\TimedOneTimePassword;
 use App\Services\OtpService;
 use Filament\Actions\Exports\Models\Export;
+use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as IlluminateAuthServiceProvider;
+use Illuminate\Http\Client\Factory as Http;
 
 class AuthServiceProvider extends IlluminateAuthServiceProvider
 {
@@ -117,6 +124,31 @@ class AuthServiceProvider extends IlluminateAuthServiceProvider
             fn (): AuthenticationStrategy => AuthenticationStrategyFactory::make(
                 Config::string('auth.driver', AuthenticationStrategyFactory::DRIVER_BUILTIN),
                 $this->app->environment(),
+                fn (): AuthenticationStrategy => $this->app->make(PratiqueAuthenticationStrategy::class),
+            ),
+        );
+
+        // The verified identity belongs to one request, so this is scoped rather
+        // than a singleton. A shared instance would let one request's user and
+        // organisation answer another's questions — the same shape of bug that
+        // leaked roles across tenants when the builtin strategy memoised on a
+        // singleton.
+        $this->app->scoped(PratiqueContext::class);
+
+        $this->app->singleton(JwksProvider::class, fn (): JwksProvider => new JwksProvider(
+            $this->app->make(Http::class),
+            $this->app->make(Cache::class),
+            self::requiredPratiqueSetting('jwks_url'),
+            Config::integer('auth.pratique.jwks_cache_seconds'),
+        ));
+
+        $this->app->singleton(
+            PratiqueAssertionVerifier::class,
+            fn (): PratiqueAssertionVerifier => new PratiqueAssertionVerifier(
+                $this->app->make(JwksProvider::class),
+                self::requiredPratiqueSetting('issuer'),
+                self::requiredPratiqueSetting('audience'),
+                Config::integer('auth.pratique.leeway_seconds'),
             ),
         );
 
@@ -135,5 +167,27 @@ class AuthServiceProvider extends IlluminateAuthServiceProvider
         $this->app->when(TimedOneTimePassword::class)
             ->needs('$window')
             ->giveConfig('auth.one_time_password.validation_window');
+    }
+
+    /**
+     * A Pratique setting that has no safe default.
+     *
+     * The issuer, audience and JWKS URL define who we trust; guessing any of them
+     * would mean verifying assertions against the wrong authority. An empty value
+     * must therefore stop the app rather than weaken the check — and because these
+     * bindings are only resolved under the pratique driver, this cannot break a
+     * builtin deployment that has never heard of them.
+     *
+     * @throws PratiqueAssertionException
+     */
+    private static function requiredPratiqueSetting(string $key): string
+    {
+        $value = Config::stringOrNull('auth.pratique.' . $key);
+
+        if ($value === null || $value === '') {
+            throw PratiqueAssertionException::misconfigured('auth.pratique.' . $key);
+        }
+
+        return $value;
     }
 }

@@ -21,24 +21,52 @@ final class AuthenticationStrategyFactory
 {
     public const DRIVER_BUILTIN = 'builtin';
     public const DRIVER_DEV = 'dev';
+    public const DRIVER_PRATIQUE = 'pratique';
 
     /** Environments in which the credential-free dev driver may run. */
     private const DEV_ENVIRONMENTS = ['local', 'testing'];
 
     /**
+     * @param (callable(): AuthenticationStrategy)|null $pratique resolves the
+     *        Pratique strategy from the container; it has collaborators to inject,
+     *        unlike the other two. Passed in rather than resolved here so this
+     *        class stays a pure function of its arguments and testable without a
+     *        container.
+     *
      * @throws RuntimeException on an unknown driver, or on `dev` outside local/testing
      */
-    public static function make(string $driver, string $environment): AuthenticationStrategy
-    {
+    public static function make(
+        string $driver,
+        string $environment,
+        ?callable $pratique = null,
+    ): AuthenticationStrategy {
         return match ($driver) {
             self::DRIVER_BUILTIN => new BuiltinAuthenticationStrategy(),
             self::DRIVER_DEV => self::makeDev($environment),
+            self::DRIVER_PRATIQUE => self::makePratique($pratique),
             default => throw new RuntimeException(sprintf(
                 'Unknown auth driver "%s". Valid drivers: %s.',
                 $driver,
-                implode(', ', [self::DRIVER_BUILTIN, self::DRIVER_DEV]),
+                implode(', ', [self::DRIVER_BUILTIN, self::DRIVER_DEV, self::DRIVER_PRATIQUE]),
             )),
         };
+    }
+
+    /**
+     * @param (callable(): AuthenticationStrategy)|null $pratique
+     *
+     * @throws RuntimeException
+     */
+    private static function makePratique(?callable $pratique): AuthenticationStrategy
+    {
+        if ($pratique === null) {
+            throw new RuntimeException(sprintf(
+                'The "%s" auth driver needs its resolver; none was supplied.',
+                self::DRIVER_PRATIQUE,
+            ));
+        }
+
+        return $pratique();
     }
 
     /** Whether the dev driver is permitted to run in this environment. */
