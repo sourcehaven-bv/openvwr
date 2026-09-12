@@ -18,6 +18,7 @@ lokaal draaien, zie [object_storage.md](object_storage.md).
 | Extensies  | —      | `pdo_pgsql`, `fileinfo`, `sockets`, `zip`              |
 | PostgreSQL | 15     | Gelijk aan `postgres:15` uit docker-compose            |
 | Node       | LTS    | Voor `npm run build`                                   |
+| Process Compose | —  | Optioneel; draait alle processen samen, zie hieronder  |
 
 Op macOS met Homebrew:
 
@@ -39,7 +40,7 @@ Het script is idempotent: het slaat over wat er al is, en laat een bestaande
 `.env` ongemoeid. Daarna:
 
 ```bash
-just dev-native          # start op http://127.0.0.1:8000
+just dev                 # start alle processen op http://127.0.0.1:8000
 just dev-native-login    # print een magic link om in te loggen
 ```
 
@@ -50,11 +51,45 @@ Verdere commando's:
 | `just setup-native` | Volledige setup vanaf niets |
 | `just setup-native-object-storage` | Idem, plus minio en een `.env` op objectopslag |
 | `just doctor-native` | Controleert de omgeving en meldt wat ontbreekt |
-| `just dev-native [port]` | Start de applicatie (standaard poort 8000) |
+| `just dev` | Start alle processen samen (zie hieronder) |
+| `just dev-native [port]` | Start alleen de applicatie (standaard poort 8000) |
 | `just dev-native-login [email]` | Magic link (standaard `admin@example.com`) |
 | `just dev-native-reset` | Database opnieuw opbouwen en seeden |
 | `just test-native [args]` | Testsuite draaien met PHP 8.4 |
 | `just minio-native-up` / `-down` | Start of stopt minio als brew-service |
+
+## Alle processen tegelijk (Process Compose)
+
+De applicatie heeft lokaal drie processen nodig: de webserver, de
+queue-worker (`QUEUE_CONNECTION=database`, dus zonder worker blijven exports
+hangen) en Vite voor hot reload. Met de losse recipes kost dat drie terminals.
+[Process Compose](https://github.com/F1bonacc1/process-compose) draait ze samen
+in één scherm:
+
+```bash
+brew install f1bonacc1/tap/process-compose
+just dev
+```
+
+Dat opent een TUI met een regel per proces: pijltjes om te selecteren, `F5` voor
+de logs, `F7`/`F9` om een proces te stoppen of te starten, `F10` om alles af te
+sluiten. De configuratie staat in [`process-compose.yaml`](../process-compose.yaml).
+
+| Commando | Doet |
+|---|---|
+| `just dev` | Start alles in de TUI |
+| `just dev-detached` | Start alles op de achtergrond |
+| `just dev-attach` | Hang de TUI aan een draaiende instantie |
+| `just dev-stop` | Stopt alle processen |
+| `just dev-status` | Toont wat draait en of de applicatie `Ready` is |
+| `just dev-logs-process <naam>` | Volgt de uitvoer van één proces |
+| `just dev-restart <naam>` | Herstart één proces, bijvoorbeeld na `composer install` |
+
+De procesnamen zijn `serve`, `queue` en `vite`. PostgreSQL en minio draaien
+hierbuiten als brew-services: die hebben een eigen levensduur en moeten een
+herstart van de applicatie overleven. `postgres-ready` controleert daarom alleen
+of de database bereikbaar is, en stopt met de brew-opdracht die dat oplost als
+dat niet zo is; `serve` en `queue` wachten daarop.
 
 Werkt er iets niet, draai dan `just doctor-native`: die controleert PHP-versie
 en -extensies, de tools, beide databases, `.env`, `APP_KEY`, dependencies en de
@@ -141,8 +176,8 @@ screenshots, niet als vervanging van de Docker-omgeving:
 
 - Versies van PHP en PostgreSQL kunnen afwijken van de containers, waardoor
   lokaal gedrag niet gegarandeerd gelijk is aan CI of productie.
-- `QUEUE_CONNECTION=sync` verwerkt jobs synchroon. Zodra het project een echte
-  queue-driver gebruikt, worden jobs lokaal niet meer verwerkt zonder worker.
+- `QUEUE_CONNECTION=database` vereist een draaiende worker: zonder `just dev`
+  (of `just dev-native-queue`) blijven jobs zoals exports in de wachtrij staan.
 - Virusscanning en objectopslag worden niet echt getest.
 - De vier `HugoStaticWebsiteGenerator`-tests falen zonder het `hugo`-binary
   (`brew install hugo`). De rest van de suite slaagt native.
