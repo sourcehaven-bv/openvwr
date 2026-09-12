@@ -162,6 +162,23 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Trusted Proxies
+    |--------------------------------------------------------------------------
+    |
+    | The load balancers and reverse proxies in front of this application, as a
+    | comma-separated list of IP addresses or CIDR ranges. Requests arriving
+    | from these addresses have their X-Forwarded-* headers honoured, so that
+    | the visitor's own address is used rather than the proxy's.
+    |
+    | Leave this empty when the application is reached directly. Only list
+    | proxies actually under our control: any address named here may set the
+    | client IP that \App\Http\Middleware\IPAllowFilter matches against.
+    |
+    */
+    'trusted_proxies' => env('TRUSTED_PROXIES'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Maintenance Mode Driver
     |--------------------------------------------------------------------------
     |
