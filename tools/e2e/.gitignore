@@ -1,0 +1,3 @@
+# Runtime artefacts: the built proxy binary, pid files, logs and the generated
+# provisioning script. All produced by run.sh, none of them source.
+.run/

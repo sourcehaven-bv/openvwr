@@ -9,9 +9,14 @@ use Illuminate\Support\Facades\Cache;
 use OpenSSLAsymmetricKey;
 use RuntimeException;
 
+use function array_slice;
 use function base64_encode;
+use function bin2hex;
+use function gmdate;
+use function is_array;
 use function openssl_pkey_get_details;
 use function openssl_pkey_new;
+use function random_bytes;
 use function rtrim;
 use function strtr;
 use function time;
@@ -30,15 +35,32 @@ final class PratiqueTestHelper
     public const ISSUER = 'https://auth.test';
     public const AUDIENCE = 'app://openvwr-test';
     public const JWKS_URL = 'https://auth.test/.well-known/pratique/jwks.json';
-    public const KEY_ID = 'test-key-1';
+
+    /**
+     * Default key id prefix. Each helper appends a unique suffix, because two
+     * helpers generate DIFFERENT keypairs: sharing one id would let a token
+     * signed by helper A be checked against helper B's cached key — and since the
+     * ids matched, the verifier would see no reason to refetch. Tests running in
+     * parallel then fail with "OpenSSL unable to validate key" depending purely
+     * on interleaving.
+     */
+    public const KEY_ID = 'test-key';
+
+    /**
+     * How many recently published keys stay verifiable. Two mirrors the proxy,
+     * which serves current + previous so an in-flight token survives a rotation.
+     */
+    private const PUBLISHED_KEY_WINDOW = 2;
 
     private OpenSSLAsymmetricKey $privateKey;
 
     /** @var array<string, mixed> */
     private array $jwk;
 
-    public function __construct(string $keyId = self::KEY_ID)
+    public function __construct(?string $keyId = null)
     {
+        $keyId ??= self::KEY_ID . '-' . bin2hex(random_bytes(8));
+
         $key = openssl_pkey_new([
             'digest_alg' => 'sha256',
             'private_key_type' => OPENSSL_KEYTYPE_EC,
@@ -74,13 +96,29 @@ final class PratiqueTestHelper
      */
     public function publishJwks(): void
     {
-        Cache::put('pratique:jwks', $this->jwks(), 300);
+        // MERGE rather than replace, but keep only the most recent keys.
+        //
+        // The cache key is shared by every test in the process. Replacing it
+        // would let one test file evict another's key mid-run, and because the
+        // verifier only refetches on an *unknown* kid the evicted test would then
+        // fail against a key it never published. Merging avoids that.
+        //
+        // Merging without a bound has the opposite problem: every helper ever
+        // constructed stays valid forever, so a token could verify against a key
+        // from a long-finished test — masking a real failure instead of causing
+        // one. Keeping a small window models what the proxy actually publishes
+        // (current + previous) and keeps both hazards closed.
+        $cached = Cache::get('pratique:jwks');
+        $keys = is_array($cached) && is_array($cached['keys'] ?? null) ? $cached['keys'] : [];
+        $keys[] = $this->jwk;
+
+        Cache::put('pratique:jwks', ['keys' => array_slice($keys, -self::PUBLISHED_KEY_WINDOW)], 300);
     }
 
-    /** Publish a key set that does not contain the key this helper signs with. */
+    /** Publish only a key set that does NOT contain the key this helper signs with. */
     public function publishForeignJwks(): void
     {
-        Cache::put('pratique:jwks', (new self('someone-elses-key'))->jwks(), 300);
+        Cache::put('pratique:jwks', (new self())->jwks(), 300);
     }
 
     /**
@@ -111,6 +149,42 @@ final class PratiqueTestHelper
         ];
 
         return JWT::encode($claims, $this->privateKey, 'ES256', $this->jwk['kid']);
+    }
+
+    /**
+     * A signed webhook delivery, shaped as the proxy mints them: the whole body
+     * is a JWT carrying id/event/occurred_at/data, stamped with iss/iat/exp and
+     * — unlike an assertion — no `aud`.
+     *
+     * @param array<string, mixed> $data
+     * @param array<string, mixed> $overrides
+     */
+    public function webhook(string $event, array $data = [], array $overrides = []): string
+    {
+        $now = time();
+
+        $claims = [
+            'id' => 'evt_' . $now,
+            'event' => $event,
+            'occurred_at' => gmdate('c', $now),
+            'data' => $data,
+            'iss' => self::ISSUER,
+            'iat' => $now,
+            'exp' => $now + 300,
+            ...$overrides,
+        ];
+
+        return JWT::encode($claims, $this->privateKey, 'ES256', $this->jwk['kid']);
+    }
+
+    /**
+     * A webhook signed by a key the proxy does not publish.
+     *
+     * @param array<string, mixed> $data
+     */
+    public static function webhookFromForeignKey(string $event, array $data = []): string
+    {
+        return (new self('attacker-key'))->webhook($event, $data);
     }
 
     /**

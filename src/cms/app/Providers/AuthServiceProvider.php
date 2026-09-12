@@ -47,6 +47,7 @@ use App\Services\Authentication\Pratique\JwksProvider;
 use App\Services\Authentication\Pratique\PratiqueAssertionException;
 use App\Services\Authentication\Pratique\PratiqueAssertionVerifier;
 use App\Services\Authentication\Pratique\PratiqueContext;
+use App\Services\Authentication\Pratique\Webhooks\PratiqueWebhookVerifier;
 use App\Services\Authentication\PratiqueAuthenticationStrategy;
 use App\Services\AuthorizationService;
 use App\Services\CrossOrgAuthorization;
@@ -148,6 +149,19 @@ class AuthServiceProvider extends IlluminateAuthServiceProvider
                 $this->app->make(JwksProvider::class),
                 self::requiredPratiqueSetting('issuer'),
                 self::requiredPratiqueSetting('audience'),
+                Config::integer('auth.pratique.leeway_seconds'),
+            ),
+        );
+
+        // The webhook verifier shares the key handling with assertions but not
+        // the audience check: a webhook token carries no `aud`, and relaxing the
+        // assertion verifier to match would weaken the guard on every
+        // authenticated request. See PratiqueWebhookVerifier.
+        $this->app->singleton(
+            PratiqueWebhookVerifier::class,
+            fn (): PratiqueWebhookVerifier => new PratiqueWebhookVerifier(
+                $this->app->make(JwksProvider::class),
+                self::requiredPratiqueSetting('issuer'),
                 Config::integer('auth.pratique.leeway_seconds'),
             ),
         );

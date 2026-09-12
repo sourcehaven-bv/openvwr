@@ -9,21 +9,16 @@ use App\Facades\Authentication;
 use App\Filament\LabelColorPalette;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\OnePageLayoutRenderHooks;
-use App\Filament\Pages\DevLogin;
-use App\Filament\Pages\Login;
 use App\Filament\Pages\Manual\Handleiding;
 use App\Filament\Pages\Profile;
 use App\Filament\SimpleAvatarProvider;
 use App\Http\Controllers\HealthController;
-use App\Http\Middleware\EnforceOneTimePassword;
 use App\Http\Middleware\IPAllowFilter;
-use App\Http\Middleware\VerifyPratiqueAssertion;
 use App\Models\Organisation;
-use App\Services\Authentication\AuthenticationStrategyFactory;
+use App\Services\Authentication\AuthenticationStrategy;
 use Exception;
 use Filament\Facades\Filament;
 use Filament\FontProviders\LocalFontProvider;
-use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\MenuItem;
@@ -53,6 +48,7 @@ use Webmozart\Assert\Assert;
 
 use function __;
 use function abort;
+use function app;
 use function app_path;
 use function asset;
 use function base_path;
@@ -110,59 +106,29 @@ class FilamentServiceProvider extends PanelProvider
     }
 
     /**
-     * The login page for the active auth driver, or null when the app has none.
+     * The panel's login page, or null when this driver has none.
      *
-     * Under `pratique` the proxy owns login entirely: registering a login page
-     * here would give an unauthenticated visitor somewhere to land inside the app
-     * instead of being bounced to the proxy, and the assertion middleware would
-     * reject it anyway.
-     *
-     * Under `dev` it is the credential-free user picker — selected here rather
-     * than registered unconditionally, because a page that bypasses
-     * authentication should not exist on the panel unless that driver is
-     * deliberately in use.
+     * Both this and the auth middleware come from the active strategy rather
+     * than a match here: "how is a request gated" and "how is identity
+     * established" are one decision, and splitting them across two files is how
+     * they drift apart.
      *
      * @return class-string|null
      */
     private function loginPage(): ?string
     {
-        return match ($this->authDriver()) {
-            AuthenticationStrategyFactory::DRIVER_PRATIQUE => null,
-            AuthenticationStrategyFactory::DRIVER_DEV => DevLogin::class,
-            default => Login::class,
-        };
+        return $this->strategy()->loginPage();
     }
 
-    /**
-     * Auth middleware for the active driver.
-     *
-     * Under `pratique` the proxy has already authenticated the user, so the
-     * session-based gate is replaced wholesale by assertion verification — leaving
-     * Filament's Authenticate in place would look for a session that this driver
-     * never creates. The OTP gate goes too: the second factor is the proxy's
-     * concern there, not this app's.
-     *
-     * The dev driver keeps the session gate but skips OTP: it is a
-     * credential-free login, so a second factor on top would be theatre, and
-     * enrolling one would block every local login behind an authenticator app.
-     *
-     * @return array<int, class-string>
-     */
+    /** @return array<int, class-string> */
     private function authMiddleware(): array
     {
-        return match ($this->authDriver()) {
-            AuthenticationStrategyFactory::DRIVER_PRATIQUE => [VerifyPratiqueAssertion::class],
-            AuthenticationStrategyFactory::DRIVER_DEV => [Authenticate::class],
-            default => [
-                Authenticate::class,
-                EnforceOneTimePassword::class,
-            ],
-        };
+        return $this->strategy()->panelMiddleware();
     }
 
-    private function authDriver(): string
+    private function strategy(): AuthenticationStrategy
     {
-        return Config::string('auth.driver', AuthenticationStrategyFactory::DRIVER_BUILTIN);
+        return app(AuthenticationStrategy::class);
     }
 
     /**
