@@ -183,6 +183,40 @@ doctor-native:
 dev-native port="8000":
     cd src/cms && "$(brew --prefix php@8.4)/bin/php" artisan serve --host=127.0.0.1 --port={{port}}
 
+# Process Compose (native)
+# ========================
+# Runs the app server, the queue worker and Vite together in one terminal,
+# instead of one `just dev-native*` recipe per process. PostgreSQL and minio
+# stay brew services. See docs/local_development_without_docker.md.
+
+# Start the native processes in the interactive TUI
+dev:
+    process-compose up -p 8077
+
+# Start them in the background (detached); follow along with `just dev-attach`
+dev-detached:
+    process-compose up -p 8077 --detached
+
+# Attach the TUI to the detached instance
+dev-attach:
+    process-compose attach -p 8077
+
+# Stop the processes (works for both the TUI and the detached instance)
+dev-stop:
+    process-compose down -p 8077
+
+# Show what is running and whether the app is ready
+dev-status:
+    process-compose process list -p 8077 -o wide
+
+# Follow the output of one process, e.g. `just dev-logs-process queue`
+dev-logs-process name:
+    process-compose process logs {{name}} -p 8077 --follow
+
+# Restart one process without touching the others, e.g. after a composer install
+dev-restart name:
+    process-compose process restart {{name}} -p 8077
+
 # Print a magic-link to log in (defaults to admin@example.com), pinned to PHP 8.4
 dev-native-login email="admin@example.com":
     cd src/cms && "$(brew --prefix php@8.4)/bin/php" artisan dev:login-link --email={{email}}

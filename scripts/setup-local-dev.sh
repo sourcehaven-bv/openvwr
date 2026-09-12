@@ -210,4 +210,10 @@ fi
 
 printf '\n'
 ok "Setup complete."
-printf '\n  Start the app:  just dev-native\n  Login link:     just dev-native-login\n\n'
+if command -v process-compose >/dev/null; then
+    printf '\n  Start the app:  just dev          (app + queue worker + vite)\n'
+else
+    printf '\n  Start the app:  just dev-native\n'
+    printf '  Tip: `brew install f1bonacc1/tap/process-compose` lets `just dev` run them together.\n'
+fi
+printf '  Login link:     just dev-native-login\n\n'
