@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services\Authentication;
 
+use App\Filament\Pages\DevLogin;
+use Filament\Http\Middleware\Authenticate;
+
 /**
  * Local-development identity: pick a user from a dropdown, no credentials.
  *
@@ -19,4 +22,22 @@ namespace App\Services\Authentication;
  */
 class DevAuthenticationStrategy extends BuiltinAuthenticationStrategy
 {
+    /**
+     * The session guard, but no second factor.
+     *
+     * A credential-free login with an OTP gate on top would be theatre, and
+     * enrolling one would put every local sign-in behind an authenticator app.
+     *
+     * @return array<int, class-string>
+     */
+    public function panelMiddleware(): array
+    {
+        return [Authenticate::class];
+    }
+
+    /** @return class-string */
+    public function loginPage(): string
+    {
+        return DevLogin::class;
+    }
 }

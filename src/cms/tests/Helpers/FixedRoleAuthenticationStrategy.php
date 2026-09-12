@@ -38,4 +38,20 @@ class FixedRoleAuthenticationStrategy implements AuthenticationStrategy
     {
         return new Principal($this->roles);
     }
+
+    /** @return array<int, class-string> */
+    public function panelMiddleware(): array
+    {
+        throw new RuntimeException('The manual does not build the panel.');
+    }
+
+    public function loginPage(): ?string
+    {
+        throw new RuntimeException('The manual does not build the panel.');
+    }
+
+    public function hasLoginPage(): bool
+    {
+        throw new RuntimeException('The manual does not build the panel.');
+    }
 }
