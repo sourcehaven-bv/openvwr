@@ -27,6 +27,13 @@ processes. It is re-runnable: provisioning probes before it writes.
 - `http://localhost:8000/` answers **403** — the app failing closed without an
   assertion is the property the whole design rests on
 - login codes arrive at `http://localhost:8025`
+- **open a record and edit it.** Server-rendered pages are not enough: every
+  interactive part of the panel goes through `POST /livewire/update`, which
+  Livewire registers itself on the `web` group. A driver whose identity does not
+  come from a session has to gate that route explicitly, and when it is missed
+  the app looks perfectly healthy until you click something — lists and
+  dashboards render, while modals, selects and form fields come back 404.
+  Check the Network tab: every `/livewire/update` should be 200.
 
 ## ⚠️ It shares a Postgres server with the test suite
 

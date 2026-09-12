@@ -32,7 +32,13 @@ Route::prefix('/login/consume')->middleware('signed')->group(static function ():
     Route::post('/', [PasswordlessLoginController::class, 'confirm'])->name(RouteName::PASSWORDLESS_LOGIN_VALIDATE_CONFIRM);
 });
 
+// Private media is authorised per item by the controller, but it still needs an
+// identity to authorise against — and like the landing route it sits in the
+// `web` group, which establishes none. Without the gate the controller's own
+// `user()` call throws under the pratique driver and the response is a 500
+// instead of a refusal.
 Route::get('/media/{media}', PrivateMediaController::class)
+    ->middleware(ResolveAuthGate::class)
     ->name(RouteName::MEDIA_PRIVATE);
 
 Route::get('/transfer-export/{filename}', TransferExportDownloadController::class)
