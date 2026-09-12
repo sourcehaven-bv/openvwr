@@ -9,11 +9,9 @@ use Illuminate\Support\Facades\Cache;
 use OpenSSLAsymmetricKey;
 use RuntimeException;
 
-use function array_slice;
 use function base64_encode;
 use function bin2hex;
 use function gmdate;
-use function is_array;
 use function openssl_pkey_get_details;
 use function openssl_pkey_new;
 use function random_bytes;
@@ -45,12 +43,6 @@ final class PratiqueTestHelper
      * on interleaving.
      */
     public const KEY_ID = 'test-key';
-
-    /**
-     * How many recently published keys stay verifiable. Two mirrors the proxy,
-     * which serves current + previous so an in-flight token survives a rotation.
-     */
-    private const PUBLISHED_KEY_WINDOW = 2;
 
     private OpenSSLAsymmetricKey $privateKey;
 
@@ -96,23 +88,20 @@ final class PratiqueTestHelper
      */
     public function publishJwks(): void
     {
-        // MERGE rather than replace, but keep only the most recent keys.
+        // Publish ONLY this helper's key, replacing whatever was cached.
         //
-        // The cache key is shared by every test in the process. Replacing it
-        // would let one test file evict another's key mid-run, and because the
-        // verifier only refetches on an *unknown* kid the evicted test would then
-        // fail against a key it never published. Merging avoids that.
+        // The cache key is one fixed string shared by every test in the process,
+        // so the set left behind by an earlier test is not this test's set. An
+        // earlier version merged instead, keeping the two most recent keys, to
+        // stop tests evicting each other — but a third publish in the same worker
+        // still evicted the first, and the owner of that key then failed with
+        // "OpenSSL unable to validate key" purely on ordering. That is how it
+        // passed locally on ten workers and failed on CI's four.
         //
-        // Merging without a bound has the opposite problem: every helper ever
-        // constructed stays valid forever, so a token could verify against a key
-        // from a long-finished test — masking a real failure instead of causing
-        // one. Keeping a small window models what the proxy actually publishes
-        // (current + previous) and keeps both hazards closed.
-        $cached = Cache::get('pratique:jwks');
-        $keys = is_array($cached) && is_array($cached['keys'] ?? null) ? $cached['keys'] : [];
-        $keys[] = $this->jwk;
-
-        Cache::put('pratique:jwks', ['keys' => array_slice($keys, -self::PUBLISHED_KEY_WINDOW)], 300);
+        // Replacing is safe because no test depends on another's key surviving:
+        // each publishes what it needs. Tests that need several keys at once put
+        // them in one document themselves.
+        Cache::put('pratique:jwks', ['keys' => [$this->jwk]], 300);
     }
 
     /** Publish only a key set that does NOT contain the key this helper signs with. */
@@ -180,21 +169,29 @@ final class PratiqueTestHelper
     /**
      * A webhook signed by a key the proxy does not publish.
      *
+     * The key id is left to the unique default. A fixed one ("attacker-key") let
+     * two parallel workers mint DIFFERENT keypairs under the SAME id, and the
+     * verifier — which only refetches on an unknown kid — then had no reason to
+     * look again, so a token could be checked against the other worker's key.
+     * Unpublished is what makes this key foreign, not the name.
+     *
      * @param array<string, mixed> $data
      */
     public static function webhookFromForeignKey(string $event, array $data = []): string
     {
-        return (new self('attacker-key'))->webhook($event, $data);
+        return (new self())->webhook($event, $data);
     }
 
     /**
      * An assertion signed by a different key than the one the JWKS publishes.
      *
+     * Unique key id, for the reason given on webhookFromForeignKey().
+     *
      * @param array<string, mixed> $overrides
      */
     public static function assertionFromForeignKey(array $overrides = []): string
     {
-        return (new self('attacker-key'))->assertion($overrides);
+        return (new self())->assertion($overrides);
     }
 
     /**
