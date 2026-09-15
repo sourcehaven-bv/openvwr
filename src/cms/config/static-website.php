@@ -20,8 +20,10 @@ return [
     'build_script_path' => env('STATIC_WEBSITE_BUILD_SCRIPT', base_path('static-website/build.sh')),
 
     // the base url for the static website
-    'base_url' => env('STATIC_WEBSITE_BASE_URL'),
-    'check_base_url' => env('STATIC_WEBSITE_CHECK_BASE_URL', env('STATIC_WEBSITE_BASE_URL')),
+    // falls back to the application url so a deployment that does not set
+    // STATIC_WEBSITE_BASE_URL still resolves to a string instead of null
+    'base_url' => env('STATIC_WEBSITE_BASE_URL', env('APP_URL')),
+    'check_base_url' => env('STATIC_WEBSITE_CHECK_BASE_URL', env('STATIC_WEBSITE_BASE_URL', env('APP_URL'))),
     'check_proxy' => env('STATIC_WEBSITE_CHECK_PROXY'),
 
     // plan jobs to check deployments after x minutes
