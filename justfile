@@ -166,6 +166,12 @@ login-link email="admin@example.com":
 # Native Development (no Docker)
 # ==============================
 # macOS + Homebrew only. See docs/local_development_without_docker.md.
+#
+# The native recipes read src/cms/.env.native, so they leave the Docker .env
+# alone and both setups can live side by side. Without that file they fall
+# back to .env.
+
+native_env := 'set -a; [ -f .env.native ] && . ./.env.native; set +a;'
 
 # Install dependencies, create the database, and seed test data
 setup-native:
@@ -181,19 +187,19 @@ doctor-native:
 
 # Serve the application natively on http://127.0.0.1:8000
 dev-native port="8000":
-    cd src/cms && "$(brew --prefix php@8.4)/bin/php" artisan serve --host=127.0.0.1 --port={{port}}
+    cd src/cms && {{native_env}} "$(brew --prefix php@8.4)/bin/php" artisan serve --host=127.0.0.1 --port={{port}}
 
 # Print a magic-link to log in (defaults to admin@example.com), pinned to PHP 8.4
 dev-native-login email="admin@example.com":
-    cd src/cms && "$(brew --prefix php@8.4)/bin/php" artisan dev:login-link --email={{email}}
+    cd src/cms && {{native_env}} "$(brew --prefix php@8.4)/bin/php" artisan dev:login-link --email={{email}}
 
 # Run the test suite natively (needs PHP 8.4; 8.5 fails on UUID casts)
 test-native +args="":
-    cd src/cms && "$(brew --prefix php@8.4)/bin/php" -d memory_limit=4G ./vendor/bin/pest {{args}}
+    cd src/cms && {{native_env}} "$(brew --prefix php@8.4)/bin/php" -d memory_limit=4G ./vendor/bin/pest {{args}}
 
 # Rebuild the native database from scratch and reseed
 dev-native-reset:
-    cd src/cms && "$(brew --prefix php@8.4)/bin/php" artisan migrate:fresh --force \
+    cd src/cms && {{native_env}} "$(brew --prefix php@8.4)/bin/php" artisan migrate:fresh --force \
         && "$(brew --prefix php@8.4)/bin/php" artisan db:seed --class=TestDataSeeder --force
 
 # Handleiding screenshots
@@ -204,7 +210,7 @@ dev-native-reset:
 # Seed the deterministic content the figures need, on top of TestDataSeeder
 screenshots-seed:
     @echo "🌱 Seeding deterministic content for the figures..."
-    cd src/cms && "$(brew --prefix php@8.4)/bin/php" artisan migrate:fresh --force \
+    cd src/cms && {{native_env}} "$(brew --prefix php@8.4)/bin/php" artisan migrate:fresh --force \
         && "$(brew --prefix php@8.4)/bin/php" artisan db:seed --class=TestDataSeeder --force \
         && "$(brew --prefix php@8.4)/bin/php" artisan db:seed --class=ScreenshotSeeder --force
 

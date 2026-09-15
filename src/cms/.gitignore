@@ -6,6 +6,7 @@
 /storage/phpunit
 /vendor
 .env
+.env.native
 .env.backup
 .env.production
 phpcs.xml
