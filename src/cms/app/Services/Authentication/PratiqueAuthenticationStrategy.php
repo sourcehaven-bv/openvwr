@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Authentication;
 
 use App\Enums\Authorization\Role;
+use App\Http\Middleware\VerifyPratiqueAssertion;
 use App\Models\Organisation;
 use App\Models\Principal;
 use App\Models\User;
@@ -40,6 +41,37 @@ class PratiqueAuthenticationStrategy implements AuthenticationStrategy
     public function organisation(): Organisation
     {
         return $this->context->get()->organisation;
+    }
+
+    /**
+     * Assertion verification replaces the session guard wholesale.
+     *
+     * Leaving Filament's Authenticate in place would send it looking for a
+     * session this strategy never creates. The OTP gate goes too: the second
+     * factor is the proxy's concern, not this application's.
+     *
+     * @return array<int, class-string>
+     */
+    public function panelMiddleware(): array
+    {
+        return [VerifyPratiqueAssertion::class];
+    }
+
+    /**
+     * None: the proxy owns the front door.
+     *
+     * Registering a login page here would give an unauthenticated visitor
+     * somewhere to land inside the application instead of being bounced back to
+     * the proxy — and the assertion middleware would refuse them anyway.
+     */
+    public function loginPage(): ?string
+    {
+        return null;
+    }
+
+    public function hasLoginPage(): bool
+    {
+        return false;
     }
 
     public function principal(): Principal

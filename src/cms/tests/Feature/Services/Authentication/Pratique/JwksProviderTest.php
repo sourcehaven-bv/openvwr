@@ -31,7 +31,9 @@ it('fetches and parses the published keys', function (): void {
     $http = new Http();
     $http->fake([PratiqueTestHelper::JWKS_URL => $http::response($helper->jwks())]);
 
-    expect(jwksProvider($http)->keys())->toHaveKey(PratiqueTestHelper::KEY_ID);
+    $publishedKid = $helper->jwks()['keys'][0]['kid'];
+
+    expect(jwksProvider($http)->keys())->toHaveKey($publishedKid);
 });
 
 it('serves later calls from the cache instead of refetching', function (): void {

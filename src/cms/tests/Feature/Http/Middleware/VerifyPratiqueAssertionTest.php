@@ -7,6 +7,7 @@ use App\Models\Organisation;
 use App\Services\Authentication\Pratique\PratiqueContext;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\Helpers\PratiqueTestHelper;
@@ -43,6 +44,15 @@ beforeEach(function (): void {
     $this->pratique = new PratiqueTestHelper();
     $this->pratique->publishJwks();
     Log::spy();
+});
+
+/*
+ * The middleware signs the resolved user into the auth guard, and that outlives
+ * a single test within a worker. Clear it, or a later test starts out believing
+ * someone from an earlier one is still signed in.
+ */
+afterEach(function (): void {
+    Auth::forgetGuards();
 });
 
 it('lets a valid assertion through and records the identity', function (): void {
@@ -179,4 +189,40 @@ it('allows a resolved route that has no tenant segment', function (): void {
     $request->setRouteResolver(static fn (): Route => $route);
 
     expect(pratiqueMiddleware()->handle($request, static fn (): string => 'passed'))->toBe('passed');
+});
+
+/*
+ * Filament asks the auth guard directly — IdentifyTenant calls
+ * $panel->auth()->user() and 404s on null, and the policies reach for it too.
+ * Answering only through our own strategy would leave the framework believing
+ * nobody is signed in, which is how a verified request ended up as a 404.
+ */
+it('signs the resolved user into the auth guard', function (): void {
+    Organisation::factory()->create(['slug' => 'acme']);
+
+    expect(Auth::check())->toBeFalse();
+
+    pratiqueMiddleware()->handle(
+        tenantRequest($this->pratique->assertion(['sub' => 'usr_alice', 'email' => 'alice@example.org', 'org_slug' => 'acme'])),
+        static fn (): string => 'passed',
+    );
+
+    expect(Auth::check())->toBeTrue()
+        ->and(Auth::user()?->email)->toBe('alice@example.org');
+});
+
+/*
+ * setUser, not login: the assertion authenticates one request and the next
+ * brings its own. Persisting a session would let a revoked assertion keep
+ * working until that session expired.
+ */
+it('does not persist a session', function (): void {
+    Organisation::factory()->create(['slug' => 'acme']);
+
+    pratiqueMiddleware()->handle(
+        tenantRequest($this->pratique->assertion(['org_slug' => 'acme'])),
+        static fn (): string => 'passed',
+    );
+
+    expect(session()->has(Auth::getName()))->toBeFalse();
 });

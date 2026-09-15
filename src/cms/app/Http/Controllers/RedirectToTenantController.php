@@ -8,6 +8,7 @@ use App\Enums\RouteName;
 use App\Facades\Authentication;
 use App\Models\Organisation;
 use App\Models\OrganisationUserRole;
+use App\Services\Authentication\AuthenticationStrategy;
 use Filament\Facades\Filament;
 use Filament\Panel;
 use Illuminate\Http\RedirectResponse;
@@ -15,6 +16,7 @@ use Throwable;
 use Webmozart\Assert\Assert;
 
 use function abort;
+use function app;
 use function redirect;
 use function route;
 
@@ -25,6 +27,13 @@ class RedirectToTenantController
         try {
             $user = Authentication::user();
         } catch (Throwable) {
+            // No login page under this strategy means the proxy is the front
+            // door, so there is nowhere to send them. Refuse rather than build a
+            // route that does not exist.
+            if (!app(AuthenticationStrategy::class)->hasLoginPage()) {
+                abort(403);
+            }
+
             return redirect(route(RouteName::FILAMENT_ADMIN_AUTH_LOGIN));
         }
 
