@@ -14,7 +14,7 @@ jobs:
       sha: ${{ steps.version.outputs.SHA }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Get version string
         id: version
