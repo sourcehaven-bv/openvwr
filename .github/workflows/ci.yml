@@ -41,7 +41,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: "18"
+          node-version: "20"
           cache: "npm"
           registry-url: "https://npm.pkg.github.com"
           cache-dependency-path: "**/package-lock.json"
@@ -146,11 +146,10 @@ jobs:
 
       # Run as a step rather than a service container: minio needs `server /data`
       # as its command, and service containers cannot set one -- the entrypoint
-      # then just prints its help and exits. Same pinned tag as docker-compose.
+      # then just prints its help and exits. Same pinned image as docker-compose.
       #
-      # Pulled from quay.io: the minio/minio Docker Hub repository stopped
-      # serving public pulls, which broke this job on every branch. Same tag,
-      # same image, different registry.
+      # Pulled from Chainguard: MinIO no longer serves public pulls from Docker
+      # Hub or quay.io. Chainguard only offers `latest` for free, so pin the digest.
       - name: Start MinIO
         run: |
           docker run -d \
@@ -158,7 +157,7 @@ jobs:
             -p 9000:9000 \
             -e "MINIO_ROOT_USER=minioadmin" \
             -e "MINIO_ROOT_PASSWORD=minioadmin" \
-            quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z \
+            cgr.dev/chainguard/minio@sha256:71674988a1c7ddd5724928633199152b11e4ddefd6c6ce2d60772ff4a8f22ca9 \
             server /data
 
           echo "Waiting for MinIO to be ready..."
@@ -168,7 +167,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: "18"
+          node-version: "20"
           cache: "npm"
           registry-url: "https://npm.pkg.github.com"
           cache-dependency-path: "**/package-lock.json"

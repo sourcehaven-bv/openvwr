@@ -10,6 +10,11 @@ use App\Import\Mapping\MappingProfile;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\DataBreachRecord;
 
+// Validation checks the current organisation, so the rows need a tenant.
+beforeEach(function (): void {
+    $this->asFilamentUser();
+});
+
 function breachProfile(): MappingProfile
 {
     return new MappingProfile(DataBreachRecord::class, [
