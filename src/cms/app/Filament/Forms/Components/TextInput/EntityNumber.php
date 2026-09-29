@@ -11,7 +11,7 @@ use function __;
 
 class EntityNumber extends TextInput
 {
-    public static function make(string $name = 'entityNumber.number'): static
+    public static function make(?string $name = 'entityNumber.number'): static
     {
         return parent::make('entityNumber.number')
             ->label(__('processing_record.number'))

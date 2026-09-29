@@ -10,7 +10,7 @@ use function __;
 
 class ToggleEntry extends TextEntry
 {
-    public static function make(string $name): static
+    public static function make(?string $name = null): static
     {
         return parent::make($name)
             ->formatStateUsing(static function (bool $state): string {

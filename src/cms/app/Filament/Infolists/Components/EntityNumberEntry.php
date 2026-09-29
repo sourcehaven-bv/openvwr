@@ -10,7 +10,7 @@ use function __;
 
 class EntityNumberEntry extends TextEntry
 {
-    public static function make(string $name = 'entityNumber.number'): static
+    public static function make(?string $name = 'entityNumber.number'): static
     {
         return parent::make($name)
             ->label(__('processing_record.number'));

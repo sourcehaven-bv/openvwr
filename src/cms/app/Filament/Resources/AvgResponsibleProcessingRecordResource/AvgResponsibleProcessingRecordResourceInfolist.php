@@ -6,20 +6,20 @@ namespace App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 
 use App\Config\Feature;
 use App\Filament\Infolists\Components\ProcessingRecordTabs;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\Tabs\Tab;
-use Filament\Infolists\Infolist;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Schema;
 
 use function __;
 
 class AvgResponsibleProcessingRecordResourceInfolist
 {
-    public static function stepsInfolist(Infolist $infolist): Infolist
+    public static function stepsInfolist(Schema $schema): Schema
     {
-        return $infolist
+        return $schema
             ->columns(1)
             ->extraAttributes(['class' => 'vertical'])
-            ->schema([
+            ->components([
                 ProcessingRecordTabs::make()
                     ->tabs([
                         Tab::make(__('avg_responsible_processing_record.step_processing_name'))
@@ -57,10 +57,10 @@ class AvgResponsibleProcessingRecordResourceInfolist
             ]);
     }
 
-    public static function onePageInfolist(Infolist $infolist): Infolist
+    public static function onePageInfolist(Schema $schema): Schema
     {
-        return $infolist
-            ->schema([
+        return $schema
+            ->components([
                 Section::make(__('avg_responsible_processing_record.step_processing_name'))
                     ->schema(AvgResponsibleProcessingRecordResourceInfolistSchemas::getProcessingName())
                     ->extraAttributes(['data-onepage-section' => 'step_processing_name']),

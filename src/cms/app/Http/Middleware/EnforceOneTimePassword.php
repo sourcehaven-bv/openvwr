@@ -47,7 +47,7 @@ class EnforceOneTimePassword
 
     private function getProfilePageRouteName(): string
     {
-        $panel = Filament::getCurrentPanel();
+        $panel = Filament::getCurrentOrDefaultPanel();
         Assert::isInstanceOf($panel, Panel::class);
 
         return sprintf('filament.%s.pages.%s', $panel->getId(), Profile::getSlug());

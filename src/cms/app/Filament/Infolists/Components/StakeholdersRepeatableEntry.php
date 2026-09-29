@@ -6,14 +6,14 @@ namespace App\Filament\Infolists\Components;
 
 use App\Filament\Infolists\InfolistHelper;
 use Filament\Infolists\Components\RepeatableEntry;
-use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Section;
 
 use function __;
 
 class StakeholdersRepeatableEntry extends RepeatableEntry
 {
-    public static function make(string $name = 'stakeholders'): static
+    public static function make(?string $name = 'stakeholders'): static
     {
         return parent::make($name)
             ->label(__('stakeholder.model_plural'))

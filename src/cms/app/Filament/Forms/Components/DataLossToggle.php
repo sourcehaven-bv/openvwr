@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms\Components;
 
-use Filament\Forms\Components\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Livewire\Component;
 
 use function __;
@@ -58,9 +58,14 @@ class DataLossToggle extends Toggle
                     // Revert first: dismissing the modal must not discard anything.
                     $set($name, true);
 
+                    $statePath = $component->getStatePath();
+                    if ($statePath === null) {
+                        return;
+                    }
+
                     self::mountConfirmation(
                         $livewire,
-                        $component->getStatePath(),
+                        $statePath,
                         self::confirmActionName($name),
                     );
                 },

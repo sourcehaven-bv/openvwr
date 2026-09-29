@@ -14,7 +14,7 @@ use function sprintf;
 
 class SnapshotLatestStatusColumn extends ExportColumn
 {
-    public static function make(string $name = 'snapshot_latest_status'): static
+    public static function make(?string $name = 'snapshot_latest_status'): static
     {
         return parent::make($name)
             ->label(__('snapshot.latest_status'))

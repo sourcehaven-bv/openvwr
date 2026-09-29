@@ -8,8 +8,8 @@ use App\Enums\Authorization\Role;
 use App\Models\OrganisationUserRole;
 use App\Models\User;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Section;
 use Webmozart\Assert\Assert;
 
 use function __;

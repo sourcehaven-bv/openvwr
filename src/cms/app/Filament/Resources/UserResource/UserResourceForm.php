@@ -10,11 +10,11 @@ use App\Facades\Authorization;
 use App\Filament\Forms\Components\OrganisationUserRolesRepeater;
 use App\Filament\Forms\Components\UserGlobalRoleToggle;
 use App\Models\User;
-use Filament\Forms\Components\Group;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Unique;
 
@@ -25,10 +25,10 @@ class UserResourceForm
     public const string FIELD_USER_GLOBAL_ROLES = 'user_global_roles';
     public const string FIELD_ORGANISATION_USER_ROLES = 'organisation_user_roles';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Section::make(__('user.model_singular'))
                     ->schema([
                         TextInput::make('name')
@@ -58,8 +58,8 @@ class UserResourceForm
                         ),
                     )
                     ->columnSpan(2)
-                    ->schema(static function () use ($form): array {
-                        $user = $form->model;
+                    ->schema(static function () use ($schema): array {
+                        $user = $schema->model;
                         if (!$user instanceof User) {
                             // hide options on user-create
                             return [];

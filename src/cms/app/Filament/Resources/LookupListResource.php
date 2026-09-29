@@ -8,8 +8,8 @@ use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\Resources\LookupListResource\LookupListResourceForm;
 use App\Filament\Resources\LookupListResource\LookupListResourceInfolist;
 use App\Filament\Resources\LookupListResource\LookupListResourceTable;
-use Filament\Forms\Form;
-use Filament\Infolists\Infolist;
+use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Webmozart\Assert\Assert;
@@ -18,7 +18,7 @@ use function __;
 
 abstract class LookupListResource extends Resource
 {
-    protected static ?string $navigationIcon = 'heroicon-o-magnifying-glass';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-magnifying-glass';
 
     abstract public static function getEmptyStateHeading(): string;
 
@@ -27,14 +27,14 @@ abstract class LookupListResource extends Resource
         return __(NavigationGroup::LOOKUP_LISTS->value);
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return LookupListResourceForm::form($form);
+        return LookupListResourceForm::form($schema);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return LookupListResourceInfolist::infolist($infolist);
+        return LookupListResourceInfolist::infolist($schema);
     }
 
     public static function table(Table $table): Table

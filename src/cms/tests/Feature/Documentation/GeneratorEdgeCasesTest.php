@@ -16,9 +16,9 @@ use App\Documentation\SectionNotes;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 use App\Filament\Resources\ContactPersonResource;
 use Filament\Facades\Filament;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\File;
 use Tests\Fixtures\Documentation\BrokenRegisterResource;
 
@@ -40,7 +40,7 @@ afterEach(function (): void {
 });
 
 it('skips a section without a heading', function (): void {
-    $form = Form::make($this->environment->makeFormHost())->schema([
+    $form = Schema::make($this->environment->makeFormHost())->components([
         // A section without a heading gets no chapter; its fields belong to the
         // surrounding structure.
         Section::make()->schema([TextInput::make('a')->label('Zonder kop')]),
@@ -59,7 +59,7 @@ it('skips a section without a heading', function (): void {
 });
 
 it('leaves out a field without a label', function (): void {
-    $form = Form::make($this->environment->makeFormHost())->schema([
+    $form = Schema::make($this->environment->makeFormHost())->components([
         Section::make('Kop')->schema([
             TextInput::make('naamloos')->label(''),
             TextInput::make('b')->label('Wel een label'),
@@ -79,7 +79,7 @@ it('leaves out a field without a label', function (): void {
 
 it('has no register description when the translation is missing', function (): void {
     // ContactPersonResource has no register_description in the translations.
-    $form = Form::make($this->environment->makeFormHost())->schema([
+    $form = Schema::make($this->environment->makeFormHost())->components([
         Section::make('Kop')->schema([TextInput::make('a')->label('Veld')]),
     ]);
 

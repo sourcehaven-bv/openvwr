@@ -6,8 +6,8 @@ namespace Tests\Fixtures\Documentation;
 
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use RuntimeException;
 
 use function __;
@@ -28,7 +28,7 @@ class BrokenRegisterResource extends Resource
         return __(NavigationGroup::REGISTERS->value);
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         throw new RuntimeException('this form cannot be assembled');
     }

@@ -21,8 +21,9 @@ it('narrows the register to breaches still being handled', function (): void {
     $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(
             ListDataBreachRecords::class,
-            queryParameters: ['tableFilters' => ['open' => ['value' => '1']]],
         )
+        ->set('tableFilters.open.value', '1')
+        ->call('applyTableFilters')
         ->assertCanSeeTableRecords([$open])
         ->assertCanNotSeeTableRecords([$closed]);
 });
@@ -44,8 +45,9 @@ it('narrows the register to breaches whose handling is finished', function (): v
     $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(
             ListDataBreachRecords::class,
-            queryParameters: ['tableFilters' => ['open' => ['value' => '0']]],
         )
+        ->set('tableFilters.open.value', '0')
+        ->call('applyTableFilters')
         ->assertCanSeeTableRecords([$closedByState, $closedByDate])
         ->assertCanNotSeeTableRecords([$open]);
 });
@@ -63,7 +65,8 @@ it('leaves the register untouched when the breach filter is not set', function (
     $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(
             ListDataBreachRecords::class,
-            queryParameters: ['tableFilters' => ['open' => ['value' => '']]],
         )
+        ->set('tableFilters.open.value', '')
+        ->call('applyTableFilters')
         ->assertCanSeeTableRecords([$open, $closed]);
 });

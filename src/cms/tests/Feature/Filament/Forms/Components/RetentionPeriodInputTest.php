@@ -119,7 +119,7 @@ it('builds the hidden field plus the two visible fields', function (): void {
     expect($components)->toHaveCount(1);
 
     $names = [];
-    foreach ($components[0]->getChildComponents() as $child) {
+    foreach ($components[0]->getDefaultChildComponents() as $child) {
         $names[] = $child->getName();
     }
 

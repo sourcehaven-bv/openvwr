@@ -7,11 +7,12 @@ namespace App\Filament\Widgets;
 use App\Enums\Authorization\Permission;
 use App\Facades\Authorization;
 use App\Models\FgRemark;
+use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Schema;
 use Filament\Widgets\Widget;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -22,6 +23,7 @@ use function __;
 
 class FgRemarksWidget extends Widget implements HasForms
 {
+    use InteractsWithActions;
     use InteractsWithForms;
 
     public Model $record;
@@ -30,7 +32,7 @@ class FgRemarksWidget extends Widget implements HasForms
     public ?array $data = [];
 
     protected int|string|array $columnSpan = 'full';
-    protected static string $view = 'filament.widgets.fg-remarks';
+    protected string $view = 'filament.widgets.fg-remarks';
 
     public static function canView(): bool
     {
@@ -52,11 +54,11 @@ class FgRemarksWidget extends Widget implements HasForms
         $form->fill($state);
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->statePath('data')
-            ->schema([
+            ->components([
                 Textarea::make('body')
                     ->label(__('general.fg_remarks'))
                     ->columnSpanFull()
@@ -80,10 +82,10 @@ class FgRemarksWidget extends Widget implements HasForms
     /**
      * @throws PropertyNotFoundException
      */
-    private function getWidgetForm(): Form
+    private function getWidgetForm(): Schema
     {
         $form = $this->__get('form');
-        Assert::isInstanceOf($form, Form::class);
+        Assert::isInstanceOf($form, Schema::class);
 
         return $form;
     }

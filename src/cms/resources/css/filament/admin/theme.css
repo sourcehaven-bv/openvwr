@@ -1,9 +1,17 @@
-@import '/vendor/filament/filament/resources/css/theme.css';
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
 /* De handleiding wordt binnen het paneel getoond, dus haar stijlen moeten
    in het paneelthema meekomen. */
 @import '../../app.css';
 
-@config 'tailwind.config.js';
+/* Tailwind 4 leest de te scannen paden uit @source in plaats van uit de
+   `content` van een tailwind.config.js. De lijst is die van het oude
+   configbestand, dat met het v3-preset is komen te vervallen. */
+@source '../../../../app/Filament/**/*.php';
+@source '../../../../resources/lang/**/*.php';
+@source '../../../../resources/views/filament/**/*.blade.php';
+@source '../../../../resources/views/livewire/**/*.blade.php';
+@source '../../../../vendor/filament/**/*.blade.php';
+@source '../../../../vendor/solution-forest/filament-tree/resources/**/*.blade.php';
 
 .related-record {
     @apply rounded-md border border-primary-600 dark:border-primary-400 py-2 px-5 m-0 inline-block;

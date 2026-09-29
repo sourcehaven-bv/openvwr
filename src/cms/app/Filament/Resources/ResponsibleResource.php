@@ -10,13 +10,16 @@ use App\Filament\RelationManagers\AvgResponsibleProcessingRecordRelationManager;
 use App\Filament\RelationManagers\DataBreachRecordRelationManager;
 use App\Filament\RelationManagers\SnapshotsRelationManager;
 use App\Filament\RelationManagers\WpgProcessingRecordRelationManager;
-use App\Filament\Resources\ResponsibleResource\Pages;
+use App\Filament\Resources\ResponsibleResource\Pages\CreateResponsible;
+use App\Filament\Resources\ResponsibleResource\Pages\EditResponsible;
+use App\Filament\Resources\ResponsibleResource\Pages\ListResponsibles;
+use App\Filament\Resources\ResponsibleResource\Pages\ViewResponsible;
 use App\Filament\Resources\ResponsibleResource\ResponsibleResourceForm;
 use App\Filament\Resources\ResponsibleResource\ResponsibleResourceInfolist;
 use App\Filament\Resources\ResponsibleResource\ResponsibleResourceTable;
 use App\Models\Responsible;
-use Filament\Forms\Form;
-use Filament\Infolists\Infolist;
+use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 
 use function __;
@@ -24,7 +27,7 @@ use function __;
 class ResponsibleResource extends Resource
 {
     protected static ?string $model = Responsible::class;
-    protected static ?string $navigationIcon = 'heroicon-o-user-group';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-user-group';
     protected static ?int $navigationSort = 1;
 
     public static function getNavigationGroup(): ?string
@@ -32,14 +35,14 @@ class ResponsibleResource extends Resource
         return __(NavigationGroup::MANAGEMENT->value);
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return ResponsibleResourceForm::form($form);
+        return ResponsibleResourceForm::form($schema);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return ResponsibleResourceInfolist::infolist($infolist);
+        return ResponsibleResourceInfolist::infolist($schema);
     }
 
     public static function table(Table $table): Table
@@ -61,10 +64,10 @@ class ResponsibleResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListResponsibles::route('/'),
-            'create' => Pages\CreateResponsible::route('/create'),
-            'view' => Pages\ViewResponsible::route('/{record}'),
-            'edit' => Pages\EditResponsible::route('/{record}/edit'),
+            'index' => ListResponsibles::route('/'),
+            'create' => CreateResponsible::route('/create'),
+            'view' => ViewResponsible::route('/{record}'),
+            'edit' => EditResponsible::route('/{record}/edit'),
         ];
     }
 

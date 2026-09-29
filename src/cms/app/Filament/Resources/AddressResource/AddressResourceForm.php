@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AddressResource;
 
-use Filament\Forms\Components\Component;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Section;
 
 use function __;
 

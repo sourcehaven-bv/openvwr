@@ -6,7 +6,7 @@ namespace App\Filament\Resources\ReceiverResource\Pages;
 
 use App\Filament\Resources\Pages\Concerns\PersistsFiltersInSession;
 use App\Filament\Resources\ReceiverResource;
-use Filament\Actions;
+use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListReceivers extends ListRecords
@@ -18,7 +18,7 @@ class ListReceivers extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

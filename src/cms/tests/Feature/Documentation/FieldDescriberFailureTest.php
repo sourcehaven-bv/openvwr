@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 use App\Documentation\FieldDescriber;
 use Filament\Forms\Components\Radio;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
 
 beforeEach(function (): void {
     $this->describer = new FieldDescriber();

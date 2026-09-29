@@ -16,7 +16,7 @@ use App\Models\SnapshotApproval;
 use App\Models\States\SnapshotState;
 use App\Services\DateFormatService;
 use App\Services\Snapshot\SnapshotApprovalService;
-use Filament\Tables\Actions\BulkAction;
+use Filament\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -93,7 +93,7 @@ class PersonalSnapshotApprovalResourceTable
                             ->toArray();
                     }),
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 BulkAction::make('snapshot_approval_approve')
                     ->label(__('snapshot_approval.approve'))
                     ->color('success')

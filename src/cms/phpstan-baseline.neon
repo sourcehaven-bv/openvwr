@@ -43,12 +43,6 @@ parameters:
 			path: app/Filament/Actions/Exports/SnapshotLatestStatusColumn.php
 
 		-
-			message: '#^Parameter \#1 \$query \(Illuminate\\Database\\Eloquent\\Builder\<TModel of Illuminate\\Database\\Eloquent\\Model\>\) of method App\\Filament\\Exports\\Exporter\:\:modifyQuery\(\) should be contravariant with parameter \$query \(Illuminate\\Database\\Eloquent\\Builder\) of method Filament\\Actions\\Exports\\Exporter\:\:modifyQuery\(\)$#'
-			identifier: method.childParameterType
-			count: 1
-			path: app/Filament/Exports/Exporter.php
-
-		-
 			message: '#^Dynamic call to static method App\\Models\\Builders\\SnapshotBuilder\:\:whereIn\(\)\.$#'
 			identifier: staticMethod.dynamicCall
 			count: 2
@@ -67,22 +61,10 @@ parameters:
 			path: app/Filament/Resources/OrganisationUserResource/Pages/EditOrganisationUser.php
 
 		-
-			message: '#^Parameter \#2 \$callback of method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Snapshot\>\:\:whereHas\(\) expects \(Closure\(Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\SnapshotApproval\>\)\: mixed\)\|null, Closure\(App\\Models\\Builders\\SnapshotApprovalBuilder\)\: void given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/Filament/Resources/PersonalSnapshotApprovalResource/Pages/ListPersonalSnapshotApprovalItems.php
-
-		-
 			message: '#^Dynamic call to static method App\\Models\\Builders\\SnapshotApprovalBuilder\:\:exists\(\)\.$#'
 			identifier: staticMethod.dynamicCall
 			count: 1
 			path: app/Filament/Resources/PersonalSnapshotApprovalResource/PersonalSnapshotApprovalResourceTable.php
-
-		-
-			message: '#^Dynamic call to static method App\\Models\\Builders\\SnapshotApprovalBuilder\:\:whereNotIn\(\)\.$#'
-			identifier: staticMethod.dynamicCall
-			count: 1
-			path: app/Filament/Resources/SnapshotResource/Pages/ViewSnapshot.php
 
 		-
 			message: '#^Dynamic call to static method App\\Models\\Builders\\UserBuilder\:\:whereNotIn\(\)\.$#'
@@ -263,3 +245,237 @@ parameters:
 			identifier: staticMethod.dynamicCall
 			count: 1
 			path: app/Models/Dpia/DpiaRecord.php
+
+	# Filament v5 deprecations, recorded rather than fixed.
+	#
+	# These are calls that still work in v5 but that Filament wants replaced:
+	# mostly Placeholder, for which the successor (TextEntry with state()) renders
+	# differently. Our call sites pass ->view() and ->content() with their own
+	# blade views, so swapping them is a visual change across half the register --
+	# not a mechanical rename, and not verifiable within the upgrade that
+	# surfaced them. Recorded here so the upgrade is not blocked on it, and so the
+	# work stays visible instead of being silently ignored.
+		-
+			message: '''
+				#^Call to deprecated method form\(\) of class Filament\\Actions\\Action\:
+				Use `schema\(\) instead\.$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: /Users/jeroen/Work/sourcehaven/openvwr-fil5/src/cms/app/Filament/Actions/TransferExportBulkAction.php
+		-
+			message: '''
+				#^Call to method content\(\) of deprecated class Filament\\Forms\\Components\\Placeholder\:
+				Use `TextEntry` with the `state\(\)` method instead\.$#
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: /Users/jeroen/Work/sourcehaven/openvwr-fil5/src/cms/app/Filament/Actions/TransferExportBulkAction.php
+		-
+			message: '''
+				#^Call to static method make\(\) on deprecated class Filament\\Forms\\Components\\Placeholder\:
+				Use `TextEntry` with the `state\(\)` method instead\.$#
+			'''
+			identifier: staticMethod.deprecatedClass
+			count: 1
+			path: /Users/jeroen/Work/sourcehaven/openvwr-fil5/src/cms/app/Filament/Actions/TransferExportBulkAction.php
+		-
+			message: '''
+				#^Call to method content\(\) of deprecated class Filament\\Forms\\Components\\Placeholder\:
+				Use `TextEntry` with the `state\(\)` method instead\.$#
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: /Users/jeroen/Work/sourcehaven/openvwr-fil5/src/cms/app/Filament/Forms/Components/Repeater/DpiaPersonalDataRepeater.php
+		-
+			message: '''
+				#^Call to static method make\(\) on deprecated class Filament\\Forms\\Components\\Placeholder\:
+				Use `TextEntry` with the `state\(\)` method instead\.$#
+			'''
+			identifier: staticMethod.deprecatedClass
+			count: 1
+			path: /Users/jeroen/Work/sourcehaven/openvwr-fil5/src/cms/app/Filament/Forms/Components/Repeater/DpiaPersonalDataRepeater.php
+		-
+			message: '''
+				#^Call to method content\(\) of deprecated class Filament\\Forms\\Components\\Placeholder\:
+				Use `TextEntry` with the `state\(\)` method instead\.$#
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: /Users/jeroen/Work/sourcehaven/openvwr-fil5/src/cms/app/Filament/Forms/Components/Repeater/DpiaRisksRepeater.php
+		-
+			message: '''
+				#^Call to static method make\(\) on deprecated class Filament\\Forms\\Components\\Placeholder\:
+				Use `TextEntry` with the `state\(\)` method instead\.$#
+			'''
+			identifier: staticMethod.deprecatedClass
+			count: 1
+			path: /Users/jeroen/Work/sourcehaven/openvwr-fil5/src/cms/app/Filament/Forms/Components/Repeater/DpiaRisksRepeater.php
+		-
+			message: '''
+				#^Call to method content\(\) of deprecated class Filament\\Forms\\Components\\Placeholder\:
+				Use `TextEntry` with the `state\(\)` method instead\.$#
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: /Users/jeroen/Work/sourcehaven/openvwr-fil5/src/cms/app/Filament/Forms/Components/Section/InformationBlockSection.php
+		-
+			message: '''
+				#^Call to static method make\(\) on deprecated class Filament\\Forms\\Components\\Placeholder\:
+				Use `TextEntry` with the `state\(\)` method instead\.$#
+			'''
+			identifier: staticMethod.deprecatedClass
+			count: 1
+			path: /Users/jeroen/Work/sourcehaven/openvwr-fil5/src/cms/app/Filament/Forms/Components/Section/InformationBlockSection.php
+		-
+			message: '''
+				#^Return type of method App\\Filament\\Forms\\Components\\Section\\InformationBlockSection\:\:makePlaceholderWithHtmlString\(\) has typehint with deprecated class Filament\\Forms\\Components\\Placeholder\:
+				Use `TextEntry` with the `state\(\)` method instead\.$#
+			'''
+			identifier: return.deprecatedClass
+			count: 1
+			path: /Users/jeroen/Work/sourcehaven/openvwr-fil5/src/cms/app/Filament/Forms/Components/Section/InformationBlockSection.php
+		-
+			message: '''
+				#^Call to static method make\(\) on deprecated class Filament\\Forms\\Components\\Placeholder\:
+				Use `TextEntry` with the `state\(\)` method instead\.$#
+			'''
+			identifier: staticMethod.deprecatedClass
+			count: 2
+			path: /Users/jeroen/Work/sourcehaven/openvwr-fil5/src/cms/app/Filament/Forms/Components/Section/StaticWebsiteCheckSection.php
+		-
+			message: '''
+				#^Call to deprecated method imageCropAspectRatio\(\) of class Filament\\Forms\\Components\\FileUpload\:
+				Use `imageAspectRatio\(\)` and `automaticallyCropImagesToAspectRatio\(\)` instead\.$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: /Users/jeroen/Work/sourcehaven/openvwr-fil5/src/cms/app/Filament/Forms/Components/Upload/PosterFileField.php
+		-
+			message: '''
+				#^Call to deprecated method form\(\) of class Filament\\Actions\\Action\:
+				Use `schema\(\) instead\.$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: /Users/jeroen/Work/sourcehaven/openvwr-fil5/src/cms/app/Filament/Infolists/Components/SnapshotStatusChangeAction.php
+		-
+			message: '''
+				#^Call to deprecated method getForm\(\) of class App\\Filament\\Pages\\Import\:
+				Use `getSchema\(\)` instead\.$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: /Users/jeroen/Work/sourcehaven/openvwr-fil5/src/cms/app/Filament/Pages/Import.php
+		-
+			message: '''
+				#^Call to deprecated method getForm\(\) of class App\\Filament\\Pages\\PublicWebsite\:
+				Use `getSchema\(\)` instead\.$#
+			'''
+			identifier: method.deprecated
+			count: 2
+			path: /Users/jeroen/Work/sourcehaven/openvwr-fil5/src/cms/app/Filament/Pages/PublicWebsite.php
+		-
+			message: '''
+				#^Call to deprecated method getForm\(\) of class App\\Filament\\Pages\\TransferImport\:
+				Use `getSchema\(\)` instead\.$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: /Users/jeroen/Work/sourcehaven/openvwr-fil5/src/cms/app/Filament/Pages/TransferImport.php
+		-
+			message: '''
+				#^Call to deprecated method actions\(\) of class Filament\\Tables\\Table\:
+				Use `recordActions\(\)` instead\.$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: /Users/jeroen/Work/sourcehaven/openvwr-fil5/src/cms/app/Filament/RelationManagers/SnapshotsRelationManager.php
+		-
+			message: '''
+				#^Call to method content\(\) of deprecated class Filament\\Forms\\Components\\Placeholder\:
+				Use `TextEntry` with the `state\(\)` method instead\.$#
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: /Users/jeroen/Work/sourcehaven/openvwr-fil5/src/cms/app/Filament/Resources/AlgorithmRecordResource/AlgorithmRecordResourceFormSchemas.php
+		-
+			message: '''
+				#^Call to static method make\(\) on deprecated class Filament\\Forms\\Components\\Placeholder\:
+				Use `TextEntry` with the `state\(\)` method instead\.$#
+			'''
+			identifier: staticMethod.deprecatedClass
+			count: 1
+			path: /Users/jeroen/Work/sourcehaven/openvwr-fil5/src/cms/app/Filament/Resources/AlgorithmRecordResource/AlgorithmRecordResourceFormSchemas.php
+		-
+			message: '''
+				#^Call to method content\(\) of deprecated class Filament\\Forms\\Components\\Placeholder\:
+				Use `TextEntry` with the `state\(\)` method instead\.$#
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: /Users/jeroen/Work/sourcehaven/openvwr-fil5/src/cms/app/Filament/Resources/AvgResponsibleProcessingRecordResource/AvgResponsibleProcessingRecordResourceFormSchemas.php
+		-
+			message: '''
+				#^Call to static method make\(\) on deprecated class Filament\\Forms\\Components\\Placeholder\:
+				Use `TextEntry` with the `state\(\)` method instead\.$#
+			'''
+			identifier: staticMethod.deprecatedClass
+			count: 1
+			path: /Users/jeroen/Work/sourcehaven/openvwr-fil5/src/cms/app/Filament/Resources/AvgResponsibleProcessingRecordResource/AvgResponsibleProcessingRecordResourceFormSchemas.php
+		-
+			message: '''
+				#^Call to method content\(\) of deprecated class Filament\\Forms\\Components\\Placeholder\:
+				Use `TextEntry` with the `state\(\)` method instead\.$#
+			'''
+			identifier: method.deprecatedClass
+			count: 6
+			path: /Users/jeroen/Work/sourcehaven/openvwr-fil5/src/cms/app/Filament/Resources/DpiaPrescanRecordResource/DpiaPrescanRecordResourceFormSchemas.php
+		-
+			message: '''
+				#^Call to static method make\(\) on deprecated class Filament\\Forms\\Components\\Placeholder\:
+				Use `TextEntry` with the `state\(\)` method instead\.$#
+			'''
+			identifier: staticMethod.deprecatedClass
+			count: 6
+			path: /Users/jeroen/Work/sourcehaven/openvwr-fil5/src/cms/app/Filament/Resources/DpiaPrescanRecordResource/DpiaPrescanRecordResourceFormSchemas.php
+		-
+			message: '''
+				#^Call to method content\(\) of deprecated class Filament\\Forms\\Components\\Placeholder\:
+				Use `TextEntry` with the `state\(\)` method instead\.$#
+			'''
+			identifier: method.deprecatedClass
+			count: 4
+			path: /Users/jeroen/Work/sourcehaven/openvwr-fil5/src/cms/app/Filament/Resources/DpiaRecordResource/DpiaRecordResourceAssessmentSchemas.php
+		-
+			message: '''
+				#^Call to static method make\(\) on deprecated class Filament\\Forms\\Components\\Placeholder\:
+				Use `TextEntry` with the `state\(\)` method instead\.$#
+			'''
+			identifier: staticMethod.deprecatedClass
+			count: 4
+			path: /Users/jeroen/Work/sourcehaven/openvwr-fil5/src/cms/app/Filament/Resources/DpiaRecordResource/DpiaRecordResourceAssessmentSchemas.php
+		-
+			message: '''
+				#^Call to method content\(\) of deprecated class Filament\\Forms\\Components\\Placeholder\:
+				Use `TextEntry` with the `state\(\)` method instead\.$#
+			'''
+			identifier: method.deprecatedClass
+			count: 1
+			path: /Users/jeroen/Work/sourcehaven/openvwr-fil5/src/cms/app/Filament/Resources/DpiaRecordResource/DpiaRecordResourceFormSchemas.php
+		-
+			message: '''
+				#^Call to static method make\(\) on deprecated class Filament\\Forms\\Components\\Placeholder\:
+				Use `TextEntry` with the `state\(\)` method instead\.$#
+			'''
+			identifier: staticMethod.deprecatedClass
+			count: 1
+			path: /Users/jeroen/Work/sourcehaven/openvwr-fil5/src/cms/app/Filament/Resources/DpiaRecordResource/DpiaRecordResourceFormSchemas.php
+		-
+			message: '''
+				#^Call to deprecated method getChildComponentContainers\(\) of class Filament\\Schemas\\Components\\Component\:
+				Use `getChildSchemas\(\)` instead\.$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: /Users/jeroen/Work/sourcehaven/openvwr-fil5/src/cms/app/Services/Snapshot/SnapshotReadinessService.php

@@ -8,6 +8,7 @@ use App\Filament\Resources\RelatedSnapshotSourceResource;
 use App\Models\RelatedSnapshotSource;
 use App\Models\Snapshot;
 use App\Models\States\Snapshot\Established;
+use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Concerns\InteractsWithTable;
@@ -22,6 +23,7 @@ use function view;
 
 class RelatedSnapshotSourcesValidation extends Component implements HasForms, HasTable
 {
+    use InteractsWithActions;
     use InteractsWithForms;
     use InteractsWithTable;
 

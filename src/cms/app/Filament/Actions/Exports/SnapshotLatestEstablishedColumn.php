@@ -14,7 +14,7 @@ use function assert;
 
 class SnapshotLatestEstablishedColumn extends ExportColumn
 {
-    public static function make(string $name = 'snapshot_latest_established'): static
+    public static function make(?string $name = 'snapshot_latest_established'): static
     {
         return parent::make($name)
             ->label(__('snapshot.latest_established'))

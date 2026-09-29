@@ -13,7 +13,7 @@ use function array_keys;
 
 class ParentSelect extends Select
 {
-    public static function make(string $name = 'parent_id'): static
+    public static function make(?string $name = 'parent_id'): static
     {
         return parent::make($name)
             ->label(__('general.parent'))

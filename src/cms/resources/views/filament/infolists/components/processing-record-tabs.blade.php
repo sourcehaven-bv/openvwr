@@ -1,5 +1,5 @@
 @php
-    use Filament\Infolists\Components\Tabs\Tab;
+    use Filament\Schemas\Components\Tabs\Tab;
 
     $isContained = $isContained();
 @endphp

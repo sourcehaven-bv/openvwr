@@ -1,11 +1,11 @@
 <x-filament-panels::page>
     {{ __('import.help') }}
-    <x-filament-panels::form wire:submit="submit">
+    <x-form wire:submit="submit">
         {{ $this->form }}
         <div>
             <x-filament::button type="submit" size="sm">
                 Import
             </x-filament::button>
         </div>
-    </x-filament-panels::form>
+    </x-form>
 </x-filament-panels::page>

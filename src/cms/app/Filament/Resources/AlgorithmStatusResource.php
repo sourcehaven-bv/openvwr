@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\RelationManagers\AlgorithmRecordRelationManager;
-use App\Filament\Resources\AlgorithmStatusResource\Pages;
+use App\Filament\Resources\AlgorithmStatusResource\Pages\CreateAlgorithmStatus;
+use App\Filament\Resources\AlgorithmStatusResource\Pages\EditAlgorithmStatus;
+use App\Filament\Resources\AlgorithmStatusResource\Pages\ListAlgorithmStatuses;
+use App\Filament\Resources\AlgorithmStatusResource\Pages\ViewAlgorithmStatus;
 use App\Models\Algorithm\AlgorithmStatus;
 
 use function __;
@@ -18,10 +21,10 @@ class AlgorithmStatusResource extends LookupListResource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAlgorithmStatuses::route('/'),
-            'create' => Pages\CreateAlgorithmStatus::route('/create'),
-            'edit' => Pages\EditAlgorithmStatus::route('/{record}/edit'),
-            'view' => Pages\ViewAlgorithmStatus::route('/{record}'),
+            'index' => ListAlgorithmStatuses::route('/'),
+            'create' => CreateAlgorithmStatus::route('/create'),
+            'edit' => EditAlgorithmStatus::route('/{record}/edit'),
+            'view' => ViewAlgorithmStatus::route('/{record}'),
         ];
     }
 

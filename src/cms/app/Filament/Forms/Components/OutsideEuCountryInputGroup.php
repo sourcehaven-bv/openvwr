@@ -7,9 +7,9 @@ namespace App\Filament\Forms\Components;
 use App\Filament\Forms\FormHelper;
 use App\FixedLists\Lists\AdequacyDecisionCountryList;
 use Closure;
-use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Group;
 use Illuminate\Support\Facades\App;
 use Webmozart\Assert\Assert;
 

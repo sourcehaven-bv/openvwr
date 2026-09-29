@@ -4,9 +4,9 @@
             {{ __('import_mapping.help') }}
         </p>
 
-        <x-filament-panels::form wire:submit="analyse">
+        <x-form wire:submit="analyse">
             {{ $this->form }}
-        </x-filament-panels::form>
+        </x-form>
     @endif
 
     @if ($step === \App\Filament\Pages\ImportMapping::STEP_ARCHIVE)

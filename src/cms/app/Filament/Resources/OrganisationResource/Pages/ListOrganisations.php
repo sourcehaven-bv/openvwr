@@ -6,7 +6,7 @@ namespace App\Filament\Resources\OrganisationResource\Pages;
 
 use App\Filament\Resources\OrganisationResource;
 use App\Filament\Resources\Pages\Concerns\PersistsFiltersInSession;
-use Filament\Actions;
+use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListOrganisations extends ListRecords
@@ -18,7 +18,7 @@ class ListOrganisations extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

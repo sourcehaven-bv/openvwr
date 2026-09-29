@@ -9,6 +9,7 @@ use App\Filament\Widgets\AwaitingEstablishmentWidget;
 use App\Filament\Widgets\MyApprovalsWidget;
 use App\Filament\Widgets\OpenDataBreachesWidget;
 use App\Filament\Widgets\OverdueItemsWidget;
+use BackedEnum;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Filament\Widgets\Widget;
 use Filament\Widgets\WidgetConfiguration;
@@ -24,7 +25,7 @@ use function __;
  */
 class Dashboard extends BaseDashboard
 {
-    protected static ?string $navigationIcon = 'heroicon-o-home';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-home';
     protected static ?int $navigationSort = -1;
 
     public function getTitle(): string

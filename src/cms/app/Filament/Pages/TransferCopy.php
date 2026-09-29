@@ -50,7 +50,7 @@ class TransferCopy extends Page
 {
     protected static ?string $slug = 'transfer-copy';
     protected static bool $shouldRegisterNavigation = false;
-    protected static string $view = 'filament.pages.transfer-copy';
+    protected string $view = 'filament.pages.transfer-copy';
 
     /**
      * The selected record type and ids arrive as query-string parameters from the bulk

@@ -10,7 +10,7 @@ use function __;
 
 class StakeholderDataItemsRepeatableEntry extends RepeatableEntry
 {
-    public static function make(string $name = 'stakeholderDataItems'): static
+    public static function make(?string $name = 'stakeholderDataItems'): static
     {
         return parent::make($name)
             ->label('')

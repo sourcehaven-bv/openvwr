@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\RelationManagers;
 
 use App\Filament\Resources\UserResource;
-use Filament\Tables\Actions\AttachAction;
-use Filament\Tables\Actions\DetachAction;
+use Filament\Actions\AttachAction;
+use Filament\Actions\DetachAction;
 use Filament\Tables\Table;
 
 use function __;
@@ -28,7 +28,7 @@ class UsersRelationManager extends RelationManager
                     ->multiple()
                     ->attachAnother(false),
             ])
-            ->actions([
+            ->recordActions([
                 DetachAction::make(),
             ]);
     }

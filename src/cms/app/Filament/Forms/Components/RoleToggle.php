@@ -6,8 +6,8 @@ namespace App\Filament\Forms\Components;
 
 use App\Enums\Authorization\Role;
 use Closure;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Section;
 
 use function __;
 use function sprintf;

@@ -13,7 +13,7 @@ use function __;
 
 class SnapshotUrlEntry extends TextEntry
 {
-    public static function make(string $name = 'snapshotSource.public_from'): static
+    public static function make(?string $name = 'snapshotSource.public_from'): static
     {
         return parent::make($name)
             ->label(__('snapshot.url'))

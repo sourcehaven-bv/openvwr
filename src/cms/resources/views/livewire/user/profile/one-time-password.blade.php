@@ -2,7 +2,7 @@
     /** @var App\Models\User $user */
     use App\Facades\Otp;
 @endphp
-<x-grid-section md=2 :title="__('user.profile.one_time_password.title')"
+<x-grid-section :title="__('user.profile.one_time_password.title')"
                 :description="__('user.profile.one_time_password.description')">
     <x-filament::card>
         <div class="mb-5">

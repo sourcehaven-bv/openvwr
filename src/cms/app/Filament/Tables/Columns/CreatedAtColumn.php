@@ -11,7 +11,7 @@ use function __;
 
 class CreatedAtColumn extends TextColumn
 {
-    public static function make(string $name = 'state'): static
+    public static function make(?string $name = 'state'): static
     {
         return parent::make('created_at')
             ->label(__('general.created_at'))

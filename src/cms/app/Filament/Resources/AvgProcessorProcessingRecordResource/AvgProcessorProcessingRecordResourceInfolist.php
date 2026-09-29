@@ -5,20 +5,20 @@ declare(strict_types=1);
 namespace App\Filament\Resources\AvgProcessorProcessingRecordResource;
 
 use App\Filament\Infolists\Components\ProcessingRecordTabs;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\Tabs\Tab;
-use Filament\Infolists\Infolist;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Schema;
 
 use function __;
 
 class AvgProcessorProcessingRecordResourceInfolist
 {
-    public static function stepsInfolist(Infolist $infolist): Infolist
+    public static function stepsInfolist(Schema $schema): Schema
     {
-        return $infolist
+        return $schema
             ->columns(1)
             ->extraAttributes(['class' => 'vertical'])
-            ->schema([
+            ->components([
                 ProcessingRecordTabs::make()
                     ->tabs([
                         Tab::make(__('avg_processor_processing_record.step_processing_name'))
@@ -53,10 +53,10 @@ class AvgProcessorProcessingRecordResourceInfolist
             ]);
     }
 
-    public static function onePageInfolist(Infolist $infolist): Infolist
+    public static function onePageInfolist(Schema $schema): Schema
     {
-        return $infolist
-            ->schema([
+        return $schema
+            ->components([
                 Section::make(__('avg_processor_processing_record.step_processing_name'))
                     ->schema(AvgProcessorProcessingRecordResourceInfolistSchemas::getProcessingName())
                     ->extraAttributes(['data-onepage-section' => 'step_processing_name']),

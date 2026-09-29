@@ -10,7 +10,7 @@ use function __;
 
 class SnapshotStatusColumn extends ViewColumn
 {
-    public static function make(string $name = 'snapshot_latest'): static
+    public static function make(?string $name = 'snapshot_latest'): static
     {
         return parent::make($name)
             ->label(__('snapshot.state'))

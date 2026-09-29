@@ -12,9 +12,9 @@ use App\Filament\Resources\AvgResponsibleProcessingRecordResource\AvgResponsible
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource\AvgResponsibleProcessingRecordResourceInfolistSchemas;
 use App\Filament\Resources\PublicWebsiteTreeResource;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\Tabs;
-use Filament\Infolists\Infolist;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Schema;
 use Tests\Helpers\LivewireTestHelper;
 use Tests\TestCase;
 
@@ -62,7 +62,7 @@ function visibleLabels(array $components): array
 function infolistTabLabels(): array
 {
     $infolist = AvgResponsibleProcessingRecordResourceInfolist::stepsInfolist(
-        Infolist::make(LivewireTestHelper::createTestFormComponent()),
+        Schema::make(LivewireTestHelper::createTestFormComponent()),
     );
 
     $tabs = $infolist->getComponents()[0];
@@ -77,7 +77,7 @@ function infolistTabLabels(): array
 function onePageInfolistSectionLabels(): array
 {
     $infolist = AvgResponsibleProcessingRecordResourceInfolist::onePageInfolist(
-        Infolist::make(LivewireTestHelper::createTestFormComponent()),
+        Schema::make(LivewireTestHelper::createTestFormComponent()),
     );
 
     return visibleLabels($infolist->getComponents());

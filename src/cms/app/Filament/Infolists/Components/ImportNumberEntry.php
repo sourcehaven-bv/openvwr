@@ -10,7 +10,7 @@ use function __;
 
 class ImportNumberEntry extends TextEntry
 {
-    public static function make(string $name = 'import_number'): static
+    public static function make(?string $name = 'import_number'): static
     {
         return parent::make($name)
             ->label(__('processing_record.import_number'));

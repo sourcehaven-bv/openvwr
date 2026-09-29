@@ -6,9 +6,9 @@ namespace App\Filament\Forms\Components\Section;
 
 use App\Config\Feature;
 use App\Models\Contracts\Publishable;
-use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Section;
 use Illuminate\Support\Collection;
 
 use function __;

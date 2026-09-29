@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource\AvgResponsibleProcessingRecordResourceForm;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Wizard;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Wizard;
 use Tests\Helpers\FilamentTestHelper;
 
 beforeEach(function (): void {

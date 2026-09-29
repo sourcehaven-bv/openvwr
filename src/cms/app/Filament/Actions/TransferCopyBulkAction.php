@@ -10,7 +10,7 @@ use App\Facades\Authorization;
 use App\Filament\Pages\TransferCopy;
 use App\Services\CrossOrgAuthorization;
 use App\Transfer\TransferEntityType;
-use Filament\Tables\Actions\BulkAction;
+use Filament\Actions\BulkAction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Webmozart\Assert\Assert;

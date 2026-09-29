@@ -1,5 +1,5 @@
 @php
-    use Filament\Forms\Components\Wizard\Step;
+    use Filament\Schemas\Components\Wizard\Step;
     $isContained = $isContained();
     $statePath = $getStatePath();
 @endphp

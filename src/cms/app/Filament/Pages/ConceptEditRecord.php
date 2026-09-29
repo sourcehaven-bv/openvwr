@@ -10,8 +10,8 @@ use App\Filament\Pages\Concerns\CoercesClearedRequiredFields;
 use App\Filament\Pages\Concerns\EnforcesRequiredFieldsWhenSubmitting;
 use App\Filament\Pages\Concerns\StoresConceptSnapshot;
 use App\Filament\Pages\Contracts\SavesConcepts;
-use Filament\Forms\Form;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Schemas\Schema;
 use Livewire\Attributes\On;
 use Webmozart\Assert\Assert;
 
@@ -33,7 +33,7 @@ abstract class ConceptEditRecord extends EditRecord implements SavesConcepts
 
     public const SUBMIT_FOR_REVIEW_EVENT = 'submit-concept-for-review-event';
 
-    protected function makeForm(): Form
+    protected function makeSchema(): Schema
     {
         return DraftableForm::make($this);
     }

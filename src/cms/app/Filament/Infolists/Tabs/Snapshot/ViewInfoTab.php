@@ -22,14 +22,16 @@ use App\Models\Snapshot;
 use App\Models\SnapshotApproval;
 use App\Services\Snapshot\SnapshotApprovalService;
 use App\Services\Snapshot\SnapshotDataMarkdownRenderer;
+use Closure;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
-use Filament\Infolists\Components\Actions\Action as InfolistAction;
-use Filament\Infolists\Components\Group;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\Tabs\Tab;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\ViewEntry;
-use Filament\Support\Enums\MaxWidth;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Support\Enums\Width;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Livewire\Component;
@@ -45,7 +47,7 @@ class ViewInfoTab extends Tab
 {
     public const string SECTION_KEY_STATUS_FLOW = 'status_flow_section';
 
-    public static function make(string $label): static
+    public static function make(Htmlable|Closure|string|null $label = null): static
     {
         return parent::make($label)
             ->icon('heroicon-o-information-circle')
@@ -223,9 +225,9 @@ class ViewInfoTab extends Tab
             ]);
     }
 
-    private static function getApproveAction(): InfolistAction
+    private static function getApproveAction(): Action
     {
-        return InfolistAction::make('snapshot_approval_approve_action')
+        return Action::make('snapshot_approval_approve_action')
             ->label(__('snapshot_approval.approve'))
             ->color('success')
             ->icon('heroicon-o-check-circle')
@@ -260,9 +262,9 @@ class ViewInfoTab extends Tab
                 $livewire->dispatch(ViewSnapshot::REFRESH_LIVEWIRE_COMPONENT);
             })
             ->requiresConfirmation()
-            ->modalWidth(MaxWidth::TwoExtraLarge)
+            ->modalWidth(Width::TwoExtraLarge)
             ->modalSubmitAction(false)
-            ->extraModalFooterActions(static function (InfolistAction $action, Snapshot $record): array {
+            ->extraModalFooterActions(static function (Action $action, Snapshot $record): array {
                 return [
                     $action->makeModalSubmitAction(__('snapshot_approval.confirm_next'), ['next' => true])
                         ->icon(null)
@@ -286,9 +288,9 @@ class ViewInfoTab extends Tab
             });
     }
 
-    private static function getDeclineAction(): InfolistAction
+    private static function getDeclineAction(): Action
     {
-        return InfolistAction::make('snapshot_approval_decline_action')
+        return Action::make('snapshot_approval_decline_action')
             ->label(__('snapshot_approval.decline'))
             ->color('danger')
             ->icon('heroicon-o-x-mark')
@@ -327,13 +329,13 @@ class ViewInfoTab extends Tab
             ->after(static function (Component $livewire): void {
                 $livewire->dispatch(ViewSnapshot::REFRESH_LIVEWIRE_COMPONENT);
             })
-            ->form([
+            ->schema([
                 Textarea::make('notes'),
             ])
             ->requiresConfirmation()
-            ->modalWidth(MaxWidth::TwoExtraLarge)
+            ->modalWidth(Width::TwoExtraLarge)
             ->modalSubmitAction(false)
-            ->extraModalFooterActions(static function (InfolistAction $action, Snapshot $record): array {
+            ->extraModalFooterActions(static function (Action $action, Snapshot $record): array {
                 return [
                     $action->makeModalSubmitAction(__('snapshot_approval.confirm_next'), ['next' => true])
                         ->icon(null)

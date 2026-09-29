@@ -8,12 +8,12 @@ use App\Facades\Authentication;
 use App\Models\User;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
-use Filament\Forms\Components\Group;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 use Livewire\Exceptions\PropertyNotFoundException;
@@ -81,10 +81,10 @@ class PersonalInfo extends Component implements HasActions, HasForms
             ->label(__('user.email'));
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema($this->getPersonalInfoFormSchema())->columns(3)
+        return $schema
+            ->components($this->getPersonalInfoFormSchema())->columns(3)
             ->statePath('data');
     }
 
@@ -111,10 +111,10 @@ class PersonalInfo extends Component implements HasActions, HasForms
     /**
      * @throws PropertyNotFoundException
      */
-    private function getPersonalInfoForm(): Form
+    private function getPersonalInfoForm(): Schema
     {
         $form = $this->__get('form');
-        Assert::isInstanceOf($form, Form::class);
+        Assert::isInstanceOf($form, Schema::class);
 
         return $form;
     }

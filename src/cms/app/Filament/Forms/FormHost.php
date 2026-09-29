@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms;
 
+use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Livewire\Component;
@@ -14,6 +15,7 @@ use Livewire\Component;
  */
 final class FormHost extends Component implements HasForms
 {
+    use InteractsWithActions;
     use InteractsWithForms;
 
     public function render(): string

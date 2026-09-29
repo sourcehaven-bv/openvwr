@@ -21,7 +21,7 @@ class AttachmentFileField extends SpatieMediaLibraryFileUpload
 {
     public const MEGABYTE = 1024 * 1024;
 
-    public static function make(string $name): static
+    public static function make(?string $name = null): static
     {
         $types = Config::array('media-library.permitted_file_types.attachment');
         Assert::allString($types);

@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\RelationManagers\AvgProcessorProcessingRecordRelationManager;
-use App\Filament\Resources\AvgProcessorProcessingRecordServiceResource\Pages;
+use App\Filament\Resources\AvgProcessorProcessingRecordServiceResource\Pages\CreateAvgProcessorProcessingRecordService;
+use App\Filament\Resources\AvgProcessorProcessingRecordServiceResource\Pages\EditAvgProcessorProcessingRecordService;
+use App\Filament\Resources\AvgProcessorProcessingRecordServiceResource\Pages\ListAvgProcessorProcessingRecordServices;
+use App\Filament\Resources\AvgProcessorProcessingRecordServiceResource\Pages\ViewAvgProcessorProcessingRecordService;
 use App\Models\Avg\AvgProcessorProcessingRecordService;
 
 use function __;
@@ -18,10 +21,10 @@ class AvgProcessorProcessingRecordServiceResource extends LookupListResource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAvgProcessorProcessingRecordServices::route('/'),
-            'create' => Pages\CreateAvgProcessorProcessingRecordService::route('/create'),
-            'edit' => Pages\EditAvgProcessorProcessingRecordService::route('/{record}/edit'),
-            'view' => Pages\ViewAvgProcessorProcessingRecordService::route('/{record}'),
+            'index' => ListAvgProcessorProcessingRecordServices::route('/'),
+            'create' => CreateAvgProcessorProcessingRecordService::route('/create'),
+            'edit' => EditAvgProcessorProcessingRecordService::route('/{record}/edit'),
+            'view' => ViewAvgProcessorProcessingRecordService::route('/{record}'),
         ];
     }
 

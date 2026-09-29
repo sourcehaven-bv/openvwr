@@ -8,13 +8,16 @@ use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\RelationManagers\AvgProcessorProcessingRecordRelationManager;
 use App\Filament\RelationManagers\AvgResponsibleProcessingRecordRelationManager;
 use App\Filament\RelationManagers\SnapshotsRelationManager;
-use App\Filament\Resources\ReceiverResource\Pages;
+use App\Filament\Resources\ReceiverResource\Pages\CreateReceiver;
+use App\Filament\Resources\ReceiverResource\Pages\EditReceiver;
+use App\Filament\Resources\ReceiverResource\Pages\ListReceivers;
+use App\Filament\Resources\ReceiverResource\Pages\ViewReceiver;
 use App\Filament\Resources\ReceiverResource\ReceiverResourceForm;
 use App\Filament\Resources\ReceiverResource\ReceiverResourceInfolist;
 use App\Filament\Resources\ReceiverResource\ReceiverResourceTable;
 use App\Models\Receiver;
-use Filament\Forms\Form;
-use Filament\Infolists\Infolist;
+use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 
 use function __;
@@ -22,7 +25,7 @@ use function __;
 class ReceiverResource extends Resource
 {
     protected static ?string $model = Receiver::class;
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-users';
     protected static ?int $navigationSort = 3;
 
     public static function getNavigationGroup(): ?string
@@ -30,14 +33,14 @@ class ReceiverResource extends Resource
         return __(NavigationGroup::MANAGEMENT->value);
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return ReceiverResourceForm::form($form);
+        return ReceiverResourceForm::form($schema);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return ReceiverResourceInfolist::infolist($infolist);
+        return ReceiverResourceInfolist::infolist($schema);
     }
 
     public static function table(Table $table): Table
@@ -57,10 +60,10 @@ class ReceiverResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListReceivers::route('/'),
-            'create' => Pages\CreateReceiver::route('/create'),
-            'view' => Pages\ViewReceiver::route('/{record}'),
-            'edit' => Pages\EditReceiver::route('/{record}/edit'),
+            'index' => ListReceivers::route('/'),
+            'create' => CreateReceiver::route('/create'),
+            'view' => ViewReceiver::route('/{record}'),
+            'edit' => EditReceiver::route('/{record}/edit'),
         ];
     }
 

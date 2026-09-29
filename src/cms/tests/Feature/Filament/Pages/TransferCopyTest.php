@@ -325,7 +325,7 @@ it('does not copy into an organisation the user may not import into', function (
 
     // and attempting to copy is forbidden
     expect(fn () => $component->call('copy'))
-        ->toThrow(Symfony\Component\HttpKernel\Exception\HttpException::class);
+        ->toThrow(HttpException::class);
 
     expect(AvgResponsibleProcessingRecord::query()->whereBelongsTo($destination)->exists())->toBeFalse();
 });

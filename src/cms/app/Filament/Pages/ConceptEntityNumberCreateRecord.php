@@ -9,7 +9,7 @@ use App\Filament\Pages\Concerns\CoercesClearedRequiredFields;
 use App\Filament\Pages\Concerns\EnforcesRequiredFieldsWhenSubmitting;
 use App\Filament\Pages\Concerns\StoresConceptSnapshot;
 use App\Filament\Pages\Contracts\SavesConcepts;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 
 /**
  * An {@see EntityNumberCreateRecord} whose record may be stored as a concept.
@@ -27,7 +27,7 @@ abstract class ConceptEntityNumberCreateRecord extends EntityNumberCreateRecord 
     use EnforcesRequiredFieldsWhenSubmitting;
     use StoresConceptSnapshot;
 
-    protected function makeForm(): Form
+    protected function makeSchema(): Schema
     {
         return DraftableForm::make($this);
     }
