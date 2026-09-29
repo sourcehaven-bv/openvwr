@@ -86,7 +86,11 @@ services:
     # `just minio-up`, and set FILESYSTEM_SHARED_DRIVER=s3 to actually use it.
     minio:
         profiles: ['object-storage']
-        image: 'minio/minio:RELEASE.2025-09-07T16-13-09Z'
+        # quay.io, not Docker Hub: the minio/minio Docker Hub repository no longer
+        # serves public pulls (anonymous pull returns "pull access denied ...
+        # repository does not exist"). quay.io/minio/minio still publishes the
+        # same releases, and this is the identical tag.
+        image: 'quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z'
         ports:
             - '${MINIO_PORT:-9000}:9000'
             - '${MINIO_CONSOLE_PORT:-9001}:9001'

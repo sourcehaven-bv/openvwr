@@ -35,8 +35,11 @@ assets en vult de database met testdata:
 just setup-native
 ```
 
-Het script is idempotent: het slaat over wat er al is, en laat een bestaande
-`.env` ongemoeid. Daarna:
+Het script is idempotent: het slaat over wat er al is. De native setup heeft
+een eigen omgevingsbestand, `src/cms/.env.native`; een Docker-`.env` op dezelfde
+machine blijft ongemoeid en de twee setups kunnen naast elkaar bestaan. Alle
+`just *-native`-commando's lezen `.env.native` (en vallen terug op `.env` als
+dat bestand er niet is). Daarna:
 
 ```bash
 just dev-native          # start op http://127.0.0.1:8000
@@ -57,8 +60,11 @@ Verdere commando's:
 | `just minio-native-up` / `-down` | Start of stopt minio als brew-service |
 
 Werkt er iets niet, draai dan `just doctor-native`: die controleert PHP-versie
-en -extensies, de tools, beide databases, `.env`, `APP_KEY`, dependencies en de
-gebouwde assets, en noemt per probleem het commando dat het oplost.
+en -extensies, de tools, beide databases, `.env.native`, `APP_KEY`, dependencies
+en de gebouwde assets, en noemt per probleem het commando dat het oplost.
+
+Meldt `just dev-native-login` "could not translate host name pgsql", dan las het
+commando de Docker-`.env`: draai `just setup-native`, dat maakt `.env.native` aan.
 
 De vier vereiste extensies (`pdo_pgsql`, `fileinfo`, `sockets`, `zip`) zitten
 ingebouwd in Homebrew's `php@8.4` — ontbreekt er één, dan wijst dat op een
@@ -78,9 +84,11 @@ PHP=$(brew --prefix php@8.4)/bin/php
 psql -h 127.0.0.1 -d postgres -c "CREATE ROLE sail LOGIN PASSWORD 'password' SUPERUSER;"
 psql -h 127.0.0.1 -d postgres -c "CREATE DATABASE openvwr_local OWNER sail;"
 
-# 2. Environment
-cp .env.nodocker.example .env
-$PHP artisan key:generate   # vóór het seeden, zie waarschuwing hieronder
+# 2. Environment (eigen bestand, naast een eventuele Docker-.env)
+cp .env.nodocker.example .env.native
+set -a; source .env.native; set +a          # artisan leest de variabelen uit de shell
+sed -i '' "s|^APP_KEY=.*|APP_KEY=$($PHP artisan key:generate --show)|" .env.native
+set -a; source .env.native; set +a          # vóór het seeden, zie waarschuwing hieronder
 
 # 3. Dependencies en assets
 $PHP $(command -v composer) install
@@ -107,7 +115,7 @@ De applicatie draait nu op <http://127.0.0.1:8000>.
 
 ## Wat wijkt af van de Docker-setup
 
-| Sail-service | Lokaal alternatief          | Sleutel in `.env.nodocker.example` |
+| Sail-service | Lokaal alternatief          | Sleutel in `.env.native`           |
 |--------------|-----------------------------|------------------------------------|
 | `pgsql`      | Lokale PostgreSQL           | `DB_HOST=127.0.0.1`                |
 | `clamav`     | Fake virusscanner           | `VIRUSSCANNER_DEFAULT=fake`        |
