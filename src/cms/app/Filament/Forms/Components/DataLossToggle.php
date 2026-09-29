@@ -58,9 +58,14 @@ class DataLossToggle extends Toggle
                     // Revert first: dismissing the modal must not discard anything.
                     $set($name, true);
 
+                    $statePath = $component->getStatePath();
+                    if ($statePath === null) {
+                        return;
+                    }
+
                     self::mountConfirmation(
                         $livewire,
-                        $component->getStatePath(),
+                        $statePath,
                         self::confirmActionName($name),
                     );
                 },

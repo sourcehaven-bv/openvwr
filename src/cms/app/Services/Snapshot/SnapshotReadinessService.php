@@ -92,11 +92,13 @@ class SnapshotReadinessService
 
         // A field is only reportable when it has a state path: that is what the
         // message points the user at. v5 allows it to be null.
+        $statePath = $component instanceof Field ? $component->getStatePath() : null;
+
         if (
             $component instanceof Field
             && $component->isRequired()
             && $this->isBlank($component)
-            && is_string($statePath = $component->getStatePath())
+            && is_string($statePath)
         ) {
             $missingRequiredFields[] = new MissingRequiredField(
                 statePath: $statePath,

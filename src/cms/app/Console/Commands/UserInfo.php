@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Collections\OrganisationUserRoleCollection;
+use App\Enums\Authorization\Role;
 use App\Models\OrganisationUserRole;
 use App\Models\User;
 use App\Models\UserGlobalRole;
@@ -88,7 +89,7 @@ class UserInfo extends Command
     }
 
     /**
-     * @return Collection<array-key, string>
+     * @return Collection<array-key, value-of<Role>>
      */
     private function getGlobalRoles(User $user): Collection
     {

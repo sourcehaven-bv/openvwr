@@ -201,7 +201,8 @@ class RelationTable extends Select
 
         // The record is passed along because the children picker's scope uses
         // it to exclude itself and its ancestors.
-        $scope($query, $this->getRecord());
+        $record = $this->getRecord();
+        $scope($query, $record instanceof Model ? $record : null);
 
         $recent = $query
             ->orderByDesc('updated_at')

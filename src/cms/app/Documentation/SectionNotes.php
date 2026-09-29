@@ -9,11 +9,13 @@ use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Component;
+use Filament\Schemas\Schema;
 use ReflectionClass;
 use ReflectionMethod;
 use Throwable;
 
 use function __;
+use function array_filter;
 use function array_values;
 use function basename;
 use function class_basename;
@@ -137,10 +139,19 @@ class SectionNotes
     public function childrenOf(Component $component): array
     {
         try {
-            return array_values($component->getDefaultChildComponents());
+            $children = $component->getDefaultChildComponents();
         } catch (Throwable) {
             return [];
         }
+
+        if ($children instanceof Schema) {
+            $children = $children->getComponents();
+        }
+
+        return array_values(array_filter(
+            $children,
+            static fn (mixed $child): bool => $child instanceof Component,
+        ));
     }
 
     private function nameOf(Field $field): ?string

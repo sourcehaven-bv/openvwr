@@ -50,7 +50,7 @@ class TransferExportJob implements ShouldQueue
 
     public function handle(BundleExporter $bundleExporter): void
     {
-        $organisation = Organisation::query()->findOrFail($this->organisationId);
+        $organisation = Organisation::query()->findOrFail($this->organisationId->toString());
 
         $path = $bundleExporter->export($this->recordType, $this->recordIds, $this->selectedRelated, $organisation);
 

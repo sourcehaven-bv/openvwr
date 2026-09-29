@@ -10,7 +10,6 @@ use App\Filament\Forms\FormHost;
 use App\Models\Organisation;
 use App\Models\User;
 use Filament\Facades\Filament;
-use Filament\Forms\Contracts\HasForms;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Auth;
@@ -93,7 +92,7 @@ class FormEnvironment
     /**
      * A Livewire component that only serves as a host for the form.
      */
-    public function makeFormHost(): HasForms
+    public function makeFormHost(): FormHost
     {
         return new FormHost();
     }

@@ -18,6 +18,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Text;
 use Illuminate\Contracts\Support\Htmlable;
 use Throwable;
 
@@ -154,9 +155,17 @@ class FieldDescriber
         // the method.
         if ($component instanceof Field) {
             try {
-                $helper = $this->toText($component->getHelperText());
-                if ($helper !== '') {
-                    $parts[] = $helper;
+                // v5 renders helperText() as a Text component below the field.
+                $below = $component->getChildSchema(Field::BELOW_CONTENT_SCHEMA_KEY);
+                foreach ($below?->getComponents() ?? [] as $child) {
+                    if (!$child instanceof Text) {
+                        continue;
+                    }
+
+                    $helper = $this->toText($child->getContent());
+                    if ($helper !== '') {
+                        $parts[] = $helper;
+                    }
                 }
             } catch (Throwable) {
                 // A helper text that can only be resolved while filling in the form is

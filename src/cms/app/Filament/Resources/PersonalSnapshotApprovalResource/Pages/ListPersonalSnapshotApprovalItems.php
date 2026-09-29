@@ -11,6 +11,8 @@ use App\Models\Builders\SnapshotApprovalBuilder;
 use App\Models\Builders\SnapshotBuilder;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Tabs\Tab;
+use Illuminate\Database\Eloquent\Builder;
+use Webmozart\Assert\Assert;
 
 use function __;
 
@@ -30,14 +32,16 @@ class ListPersonalSnapshotApprovalItems extends ListRecords
             self::TAB_ID_UNREVIEWED => Tab::make()
                 ->label(__('snapshot_approval.unreviewed'))
                 ->modifyQueryUsing(static function (SnapshotBuilder $query): void {
-                    $query->whereHas('snapshotApprovals', static function (SnapshotApprovalBuilder $query): void {
+                    $query->whereHas('snapshotApprovals', static function (Builder $query): void {
+                        Assert::isInstanceOf($query, SnapshotApprovalBuilder::class);
                         $query->unsigned()->assignedTo(Authentication::user());
                     });
                 }),
             self::TAB_ID_REVIEWED => Tab::make()
                 ->label(__('snapshot_approval.reviewed'))
                 ->modifyQueryUsing(static function (SnapshotBuilder $query): void {
-                    $query->whereHas('snapshotApprovals', static function (SnapshotApprovalBuilder $query): void {
+                    $query->whereHas('snapshotApprovals', static function (Builder $query): void {
+                        Assert::isInstanceOf($query, SnapshotApprovalBuilder::class);
                         $query->signed()->assignedTo(Authentication::user());
                     });
                 }),

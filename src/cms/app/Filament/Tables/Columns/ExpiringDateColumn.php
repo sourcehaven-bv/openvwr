@@ -17,8 +17,8 @@ class ExpiringDateColumn extends TextColumn
     {
         return parent::make($name)
             ->date(DateFormatService::FORMAT_DATE, DateFormatService::getDisplayTimezone())
-            ->color(static function (Model $model) use ($name): ?string {
-                $attribute = $model->getAttribute($name);
+            ->color(static function (Model $model, TextColumn $column): ?string {
+                $attribute = $model->getAttribute($column->getName());
                 Assert::nullOrIsInstanceOfAny($attribute, [
                     CalendarDate::class,
                     CarbonInterface::class,

@@ -49,8 +49,8 @@ class TransferImportJob implements ShouldQueue
         BuildContextService $buildContextService,
         TransferBundleStorage $bundleStorage,
     ): void {
-        $organisation = Organisation::query()->findOrFail($this->organisationId);
-        $user = User::query()->findOrFail($this->userId);
+        $organisation = Organisation::query()->findOrFail($this->organisationId->toString());
+        $user = User::query()->findOrFail($this->userId->toString());
 
         $buildContextService->disableBuild();
 

@@ -16,6 +16,7 @@ use Illuminate\Support\Str;
 use RuntimeException;
 
 use function __;
+use function array_filter;
 use function array_values;
 use function class_basename;
 use function implode;
@@ -221,7 +222,10 @@ class RegisterRenderer
             return [];
         }
 
-        return array_values($form->getComponents());
+        return array_values(array_filter(
+            $form->getComponents(),
+            static fn (mixed $component): bool => $component instanceof Component,
+        ));
     }
 
     /**
