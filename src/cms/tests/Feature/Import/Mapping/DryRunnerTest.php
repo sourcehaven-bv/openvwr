@@ -10,6 +10,19 @@ use App\Import\Mapping\MappingProfile;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\DataBreachRecord;
 
+/*
+ * A dry run validates each row against the record's own rules, and some of those
+ * (CurrentOrganisation) ask who is acting and in which tenant. Without a tenant
+ * they fail with "Expected an instance of Organisation. Got: NULL".
+ *
+ * These tests used to pass only when an earlier test in the same worker had left
+ * a tenant set, so whether they passed depended on how the suite was split across
+ * parallel processes. Setting one here makes them independent of that.
+ */
+beforeEach(function (): void {
+    $this->asFilamentUser();
+});
+
 function breachProfile(): MappingProfile
 {
     return new MappingProfile(DataBreachRecord::class, [

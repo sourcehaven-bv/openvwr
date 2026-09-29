@@ -35,4 +35,37 @@ interface AuthenticationStrategy
      * the current organisation.
      */
     public function principal(): Principal;
+
+    /**
+     * The middleware that gates a panel request under this strategy.
+     *
+     * Owned here rather than by the panel because "how is a request gated" is the
+     * same decision as "how is identity established" — a strategy that reads a
+     * session needs the session guard, one that reads a signed assertion needs
+     * the verifier instead. Leaving the two in separate places lets them drift:
+     * a panel that still checks for a session a strategy never creates.
+     *
+     * @return array<int, class-string>
+     */
+    public function panelMiddleware(): array;
+
+    /**
+     * The panel's login page, or null when this strategy has none.
+     *
+     * Null is not "use the default" — it means this application owns no login
+     * page at all, because something in front of it does.
+     *
+     * @return class-string|null
+     */
+    public function loginPage(): ?string;
+
+    /**
+     * Whether this application can send an unauthenticated visitor somewhere to
+     * sign in.
+     *
+     * False means something in front of the application owns the front door, so
+     * an unauthenticated request must be REFUSED rather than redirected. Asked
+     * as its own question because callers act on the answer, not on the page.
+     */
+    public function hasLoginPage(): bool;
 }

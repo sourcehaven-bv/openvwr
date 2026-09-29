@@ -6,10 +6,13 @@ namespace App\Services\Authentication;
 
 use App\Collections\OrganisationUserRoleCollection;
 use App\Collections\UserGlobalRoleCollection;
+use App\Filament\Pages\Login;
+use App\Http\Middleware\EnforceOneTimePassword;
 use App\Models\Organisation;
 use App\Models\Principal;
 use App\Models\User;
 use Filament\Facades\Filament;
+use Filament\Http\Middleware\Authenticate;
 use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException;
 
@@ -47,6 +50,31 @@ class BuiltinAuthenticationStrategy implements AuthenticationStrategy
         Assert::isInstanceOf($organisation, Organisation::class);
 
         return $organisation;
+    }
+
+    /**
+     * The session guard, then the mandatory second factor. This is the historical
+     * stack, unchanged.
+     *
+     * @return array<int, class-string>
+     */
+    public function panelMiddleware(): array
+    {
+        return [
+            Authenticate::class,
+            EnforceOneTimePassword::class,
+        ];
+    }
+
+    /** @return class-string */
+    public function loginPage(): string
+    {
+        return Login::class;
+    }
+
+    public function hasLoginPage(): bool
+    {
+        return true;
     }
 
     public function principal(): Principal

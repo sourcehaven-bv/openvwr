@@ -1,0 +1,75 @@
+# Pratique in front of OpenVWR, for a local end-to-end run.
+#
+# Native: no Docker. Reuses the Postgres already serving OpenVWR on :5432 (its
+# own `pratique` database) and a locally installed Mailpit for the login codes.
+#
+# Never point this at anything real: the signing key is wrapped with a throwaway
+# passphrase and there is no TLS.
+
+listen: ":8080"
+
+postgres:
+  dsn: "postgres://pratique:pratique@localhost:5432/pratique?sslmode=disable"
+  app_dsn: "postgres://pratique_app:pratique_app@localhost:5432/pratique?sslmode=disable"
+
+signing:
+  issuer: "http://localhost:8080"
+  encryption_key: "e2e-only-insecure-key"
+
+smtp:
+  host: "localhost"
+  port: 1025
+  from: "no-reply@openvwr.test"
+
+session:
+  cookie_name: "pratique_sid"
+
+upstream:
+  # OpenVWR served natively by `php artisan serve`.
+  target: "localhost:8000"
+
+  # MUST equal PRATIQUE_AUDIENCE in the app. A mismatch is the usual cause of an
+  # endless 403 loop, and a lenient check here would accept an assertion minted
+  # for a different upstream.
+  audience: "app://openvwr-e2e"
+
+  public_paths:
+    # Monitoring: no session, nothing user-specific behind it.
+    - "/health"
+    - "/up"
+    # The webhook receiver. Unauthenticated by necessity — the proxy holds no
+    # session when it calls us — so it verifies the ES256 signature itself.
+    - "/pratique/webhook"
+
+rbac:
+  # OpenVWR's seven organisation roles, one for one. `functional-manager` is
+  # deliberately absent: it is cross-tenant and stays in OpenVWR's own tables.
+  #
+  # These permissions gate only Pratique's own admin portal; who may do what
+  # inside OpenVWR still comes from config/permissions.php.
+  default_role: privacy-officer
+  roles:
+    chief-privacy-officer: ["*"]
+    privacy-officer: ["members.*"]
+    counselor: []
+    data-protection-official: []
+    input-processor: []
+    input-processor-databreach: []
+    mandate-holder: []
+
+signup:
+  # Tenancy is operator-driven here; self-serve would create empty tenants
+  # alongside the real ones.
+  self_serve_orgs: false
+
+webhooks:
+  enabled: true
+  endpoints:
+    # Straight to the app, not back through the proxy: the delivery carries no
+    # session, so routing it via :8080 would only bounce off the public-path
+    # rule for no reason.
+    - url: "http://localhost:8000/pratique/webhook"
+      events:
+        - "session.revoked"
+        - "membership.updated"
+        - "membership.deleted"

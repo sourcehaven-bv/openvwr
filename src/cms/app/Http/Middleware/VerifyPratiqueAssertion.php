@@ -10,6 +10,7 @@ use App\Services\Authentication\Pratique\PratiqueContext;
 use App\Services\Authentication\Pratique\PratiqueIdentityResolver;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -47,7 +48,19 @@ class VerifyPratiqueAssertion
             // failure, not a silent switch to whichever one wins.
             $this->assertTenantMatches($request, $assertion->organisationSlug);
 
-            $this->context->set($this->resolver->resolve($assertion));
+            $identity = $this->resolver->resolve($assertion);
+            $this->context->set($identity);
+
+            // Filament asks the auth guard directly — IdentifyTenant calls
+            // $panel->auth()->user() and 404s on null, and the policies reach for
+            // it too. Answering only through our own strategy would leave the
+            // framework believing nobody is signed in.
+            //
+            // setUser(), not login(): there is no session to establish. The
+            // assertion authenticates this ONE request, and the next request
+            // brings its own — which is exactly the property that makes a
+            // revoked assertion stop working immediately.
+            Auth::setUser($identity->user);
         } catch (PratiqueAssertionException $exception) {
             Log::warning('Pratique assertion rejected', [
                 'reason' => $exception->getMessage(),

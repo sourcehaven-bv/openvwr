@@ -16,6 +16,7 @@ enum RouteName: string
     case SNAPSHOT_SIGN_LOGIN_SINGLE_LOGIN = 'snapshot.sign_login.single_login';
     case SNAPSHOT_SIGN_LOGIN_SINGLE_OPEN = 'snapshot.sign_login.single_open';
     case TWO_FACTOR_AUTHENTICATION_REQUEST = 'two-factor-authentication.request';
+    case PRATIQUE_WEBHOOK = 'pratique.webhook';
 
     // filament
     case FILAMENT_ADMIN_AUTH_LOGIN = 'filament.admin.auth.login';

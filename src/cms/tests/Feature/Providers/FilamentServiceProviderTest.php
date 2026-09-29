@@ -7,6 +7,9 @@ use App\Filament\Pages\Login;
 use App\Http\Middleware\EnforceOneTimePassword;
 use App\Http\Middleware\VerifyPratiqueAssertion;
 use App\Providers\FilamentServiceProvider;
+use App\Services\Authentication\AuthenticationStrategy;
+use App\Services\Authentication\AuthenticationStrategyFactory;
+use App\Services\Authentication\PratiqueAuthenticationStrategy;
 use Filament\Facades\Filament;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Panel;
@@ -23,10 +26,25 @@ function buildPanel(string $driver): Panel
 {
     config(['auth.driver' => $driver]);
 
+    // The panel asks the bound strategy, and that binding is resolved once at
+    // boot — so swapping the config alone would leave the previous strategy in
+    // place and quietly test the wrong driver.
+    app()->forgetInstance(AuthenticationStrategy::class);
+    app()->instance(AuthenticationStrategy::class, AuthenticationStrategyFactory::make(
+        $driver,
+        app()->environment(),
+        fn (): AuthenticationStrategy => app(PratiqueAuthenticationStrategy::class),
+    ));
+
     $provider = new FilamentServiceProvider(app());
 
     return $provider->panel(Panel::make());
 }
+
+afterEach(function (): void {
+    // The strategy binding outlives a test, so put it back.
+    app()->forgetInstance(AuthenticationStrategy::class);
+});
 
 it('uses the passwordless login page under the builtin driver', function (): void {
     $panel = buildPanel('builtin');

@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\Authentication\Pratique\PratiqueAssertion;
 use App\Services\Authentication\Pratique\PratiqueAssertionException;
 use App\Services\Authentication\Pratique\PratiqueIdentityResolver;
+use Illuminate\Database\UniqueConstraintViolationException;
 
 /*
  * The proxy owns authentication; this app still owns its domain data, and
@@ -160,4 +161,23 @@ it('does not touch global roles', function (): void {
     $again = resolver()->resolve(assertionFor(['roles' => ['counselor']]));
 
     expect($again->user->globalRoles()->count())->toBe(1);
+});
+
+/*
+ * Adoption is what lets an existing local account survive the move to the proxy,
+ * but it must never reach across identities: if the address already belongs to
+ * another subject, taking it would hand one person another person's registers.
+ * The row is left alone, and the unique index on email stops the new identity
+ * from claiming the address as well.
+ */
+it('refuses to adopt an address that belongs to another subject', function (): void {
+    Organisation::factory()->create(['slug' => 'acme']);
+
+    $existing = User::factory()->create(['email' => 'alice@example.org']);
+    $existing->pratique_subject = 'usr_someone_else';
+    $existing->save();
+
+    expect(static fn () => resolver()->resolve(assertionFor()))
+        ->toThrow(UniqueConstraintViolationException::class)
+        ->and($existing->fresh()?->pratique_subject)->toBe('usr_someone_else');
 });

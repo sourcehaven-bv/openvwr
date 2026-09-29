@@ -3,6 +3,10 @@
 declare(strict_types=1);
 
 use App\Enums\Authorization\Role;
+use App\Filament\Pages\DevLogin;
+use App\Filament\Pages\Login;
+use App\Http\Middleware\EnforceOneTimePassword;
+use App\Http\Middleware\VerifyPratiqueAssertion;
 use App\Models\Organisation;
 use App\Models\Principal;
 use App\Models\User;
@@ -158,4 +162,34 @@ it('serves the facade through the bound strategy', function (): void {
 
     expect($service->user()->id->toString())->toBe($user->id->toString())
         ->and($service->organisation()->id->toString())->toBe($organisation->id->toString());
+});
+
+/*
+ * Gating is a per-strategy decision, so each strategy states its own. These pin
+ * the three answers that differ, because getting one wrong means either a panel
+ * looking for a session that is never created, or an unauthenticated visitor
+ * being sent to a login page that does not exist.
+ */
+it('states how the panel is gated', function (): void {
+    $builtin = new BuiltinAuthenticationStrategy();
+    $dev = new DevAuthenticationStrategy();
+    $pratique = app(PratiqueAuthenticationStrategy::class);
+
+    expect($builtin->panelMiddleware())->toContain(EnforceOneTimePassword::class)
+        ->and($dev->panelMiddleware())->not->toContain(EnforceOneTimePassword::class)
+        ->and($pratique->panelMiddleware())->toBe([VerifyPratiqueAssertion::class]);
+});
+
+it('states whether this application owns a login page', function (): void {
+    $builtin = new BuiltinAuthenticationStrategy();
+    $dev = new DevAuthenticationStrategy();
+    $pratique = app(PratiqueAuthenticationStrategy::class);
+
+    expect($builtin->hasLoginPage())->toBeTrue()
+        ->and($builtin->loginPage())->toBe(Login::class)
+        ->and($dev->hasLoginPage())->toBeTrue()
+        ->and($dev->loginPage())->toBe(DevLogin::class)
+        // The proxy owns the front door: no page, so callers must refuse.
+        ->and($pratique->hasLoginPage())->toBeFalse()
+        ->and($pratique->loginPage())->toBeNull();
 });

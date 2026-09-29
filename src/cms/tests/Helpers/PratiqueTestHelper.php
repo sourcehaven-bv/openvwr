@@ -10,8 +10,11 @@ use OpenSSLAsymmetricKey;
 use RuntimeException;
 
 use function base64_encode;
+use function bin2hex;
+use function gmdate;
 use function openssl_pkey_get_details;
 use function openssl_pkey_new;
+use function random_bytes;
 use function rtrim;
 use function strtr;
 use function time;
@@ -30,15 +33,26 @@ final class PratiqueTestHelper
     public const ISSUER = 'https://auth.test';
     public const AUDIENCE = 'app://openvwr-test';
     public const JWKS_URL = 'https://auth.test/.well-known/pratique/jwks.json';
-    public const KEY_ID = 'test-key-1';
+
+    /**
+     * Default key id prefix. Each helper appends a unique suffix, because two
+     * helpers generate DIFFERENT keypairs: sharing one id would let a token
+     * signed by helper A be checked against helper B's cached key — and since the
+     * ids matched, the verifier would see no reason to refetch. Tests running in
+     * parallel then fail with "OpenSSL unable to validate key" depending purely
+     * on interleaving.
+     */
+    public const KEY_ID = 'test-key';
 
     private OpenSSLAsymmetricKey $privateKey;
 
     /** @var array<string, mixed> */
     private array $jwk;
 
-    public function __construct(string $keyId = self::KEY_ID)
+    public function __construct(?string $keyId = null)
     {
+        $keyId ??= self::KEY_ID . '-' . bin2hex(random_bytes(8));
+
         $key = openssl_pkey_new([
             'digest_alg' => 'sha256',
             'private_key_type' => OPENSSL_KEYTYPE_EC,
@@ -74,13 +88,26 @@ final class PratiqueTestHelper
      */
     public function publishJwks(): void
     {
-        Cache::put('pratique:jwks', $this->jwks(), 300);
+        // Publish ONLY this helper's key, replacing whatever was cached.
+        //
+        // The cache key is one fixed string shared by every test in the process,
+        // so the set left behind by an earlier test is not this test's set. An
+        // earlier version merged instead, keeping the two most recent keys, to
+        // stop tests evicting each other — but a third publish in the same worker
+        // still evicted the first, and the owner of that key then failed with
+        // "OpenSSL unable to validate key" purely on ordering. That is how it
+        // passed locally on ten workers and failed on CI's four.
+        //
+        // Replacing is safe because no test depends on another's key surviving:
+        // each publishes what it needs. Tests that need several keys at once put
+        // them in one document themselves.
+        Cache::put('pratique:jwks', ['keys' => [$this->jwk]], 300);
     }
 
-    /** Publish a key set that does not contain the key this helper signs with. */
+    /** Publish only a key set that does NOT contain the key this helper signs with. */
     public function publishForeignJwks(): void
     {
-        Cache::put('pratique:jwks', (new self('someone-elses-key'))->jwks(), 300);
+        Cache::put('pratique:jwks', (new self())->jwks(), 300);
     }
 
     /**
@@ -114,13 +141,57 @@ final class PratiqueTestHelper
     }
 
     /**
+     * A signed webhook delivery, shaped as the proxy mints them: the whole body
+     * is a JWT carrying id/event/occurred_at/data, stamped with iss/iat/exp and
+     * — unlike an assertion — no `aud`.
+     *
+     * @param array<string, mixed> $data
+     * @param array<string, mixed> $overrides
+     */
+    public function webhook(string $event, array $data = [], array $overrides = []): string
+    {
+        $now = time();
+
+        $claims = [
+            'id' => 'evt_' . $now,
+            'event' => $event,
+            'occurred_at' => gmdate('c', $now),
+            'data' => $data,
+            'iss' => self::ISSUER,
+            'iat' => $now,
+            'exp' => $now + 300,
+            ...$overrides,
+        ];
+
+        return JWT::encode($claims, $this->privateKey, 'ES256', $this->jwk['kid']);
+    }
+
+    /**
+     * A webhook signed by a key the proxy does not publish.
+     *
+     * The key id is left to the unique default. A fixed one ("attacker-key") let
+     * two parallel workers mint DIFFERENT keypairs under the SAME id, and the
+     * verifier — which only refetches on an unknown kid — then had no reason to
+     * look again, so a token could be checked against the other worker's key.
+     * Unpublished is what makes this key foreign, not the name.
+     *
+     * @param array<string, mixed> $data
+     */
+    public static function webhookFromForeignKey(string $event, array $data = []): string
+    {
+        return (new self())->webhook($event, $data);
+    }
+
+    /**
      * An assertion signed by a different key than the one the JWKS publishes.
+     *
+     * Unique key id, for the reason given on webhookFromForeignKey().
      *
      * @param array<string, mixed> $overrides
      */
     public static function assertionFromForeignKey(array $overrides = []): string
     {
-        return (new self('attacker-key'))->assertion($overrides);
+        return (new self())->assertion($overrides);
     }
 
     /**

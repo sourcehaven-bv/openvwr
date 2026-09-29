@@ -69,6 +69,17 @@ class PratiqueIdentityResolver
      * matching on it would split one person across rows after a change of address.
      * The name and email are refreshed on every request so the local copy cannot
      * drift from the identity provider.
+     *
+     * ONE EXCEPTION, and only once per person: a row that predates the proxy has
+     * no subject yet. Rather than insert a second row for the same address — which
+     * the unique index on email refuses anyway — the existing row ADOPTS the
+     * subject the first time that person signs in through the proxy. That keeps
+     * everything already pointing at them (snapshot approvals, audit entries,
+     * mandate-holder links) attached to the same user.
+     *
+     * The adoption is deliberately narrow: only a row with NO subject can be
+     * claimed. A row already bound to a different subject is never re-pointed, so
+     * one person's proxy identity can never take over another's local account.
      */
     private function user(PratiqueAssertion $assertion): User
     {
@@ -77,9 +88,14 @@ class PratiqueIdentityResolver
             ->first();
 
         if (!$user instanceof User) {
-            $user = new User();
-            $user->pratique_subject = $assertion->subject;
+            $user = $this->adoptable($assertion);
         }
+
+        if (!$user instanceof User) {
+            $user = new User();
+        }
+
+        $user->pratique_subject = $assertion->subject;
 
         $user->email = $assertion->email;
 
@@ -93,6 +109,25 @@ class PratiqueIdentityResolver
         $user->save();
 
         return $user;
+    }
+
+    /**
+     * A pre-existing local row for this address that no proxy identity has
+     * claimed yet. Null when there is none, or when the row already belongs to a
+     * different subject.
+     */
+    private function adoptable(PratiqueAssertion $assertion): ?User
+    {
+        $user = User::query()
+            ->where('email', $assertion->email)
+            ->first();
+
+        if (!$user instanceof User) {
+            return null;
+        }
+
+        // Bound to someone else already: leave it entirely alone.
+        return ($user->pratique_subject ?? null) === null ? $user : null;
     }
 
     private function syncMembership(User $user, Organisation $organisation): void
