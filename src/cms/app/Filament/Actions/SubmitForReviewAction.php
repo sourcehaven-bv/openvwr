@@ -4,24 +4,31 @@ declare(strict_types=1);
 
 namespace App\Filament\Actions;
 
+use App\Collections\SnapshotCollection;
 use App\Enums\Authorization\Permission;
 use App\Facades\Authorization;
 use App\Filament\Pages\Contracts\SavesConcepts;
 use App\Filament\Resources\SnapshotResource;
 use App\Models\Contracts\SnapshotSource;
 use App\Models\Snapshot;
+use App\Models\States\Snapshot\Approved;
 use App\Models\States\Snapshot\Concept;
+use App\Models\States\Snapshot\InReview;
 use App\Models\States\SnapshotState;
 use App\Services\Snapshot\SnapshotStateTransitionService;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Support\Exceptions\Cancel;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Webmozart\Assert\Assert;
 
 use function __;
 use function app;
+use function implode;
+use function sprintf;
 
 /**
  * Starts the approval process for the record being edited: save, then send its concept
@@ -56,44 +63,115 @@ class SubmitForReviewAction extends Action
                 return $record instanceof SnapshotSource
                     && Authorization::hasPermission(Permission::SNAPSHOT_CREATE);
             })
-            // Deliberately no confirmation modal. Filament keeps a modal open when the
-            // action throws a validation error — it assumes the error belongs to a form
-            // inside the modal — which would cover the very fields being reported. Without
-            // one, a missing field simply lands on the field and the page stays usable.
-            // Nothing is lost by not asking: submitting only saves and moves the concept
-            // to review, and the record stays visible and editable either way.
+            // Saving and validating happens while mounting, before any modal can open.
+            //
+            // Filament keeps a modal open when the action throws a validation error — it
+            // assumes the error belongs to a form inside the modal — which would cover the
+            // very fields being reported. Doing the strict save here means a missing field
+            // lands on the field with nothing mounted on top of it, and it also settles
+            // what the concept contains before we ask whether to supersede a pending
+            // version: the question is about the versions, not about the form.
+            ->mountUsing(static function (Component $livewire): void {
+                self::saveConcept($livewire);
+            })
+            // The modal covers two different situations, so what it says and which buttons
+            // it carries are decided from what the save above just wrote.
+            //
+            // Hidden rather than not configured, because the ordinary path — something
+            // changed and nothing is pending — deserves no modal at all and runs straight
+            // through on the single press.
+            ->requiresConfirmation()
+            ->modalHidden(static function (Component $livewire): bool {
+                return !self::isUnchanged($livewire)
+                    && self::getPendingSnapshots(self::resolveRecord($livewire))->isEmpty();
+            })
+            ->modalIcon(static function (Component $livewire): string {
+                return self::isUnchanged($livewire)
+                    ? 'heroicon-o-information-circle'
+                    : 'heroicon-o-exclamation-triangle';
+            })
+            ->modalHeading(static function (Component $livewire): string {
+                return self::isUnchanged($livewire)
+                    ? __('snapshot.submit_for_review_unchanged_heading')
+                    : __('snapshot.submit_for_review_pending_heading');
+            })
+            ->modalDescription(static function (Component $livewire): string {
+                return self::describeModal($livewire);
+            })
+            // Nothing to confirm when nothing changed: there is no new version to make, so
+            // the modal only reports it and the submit button would be a button that must
+            // not be pressed. What is left is the close button, relabelled from "Annuleren"
+            // — there is no question to answer.
+            ->modalSubmitAction(static function (Action $action, Component $livewire): Action|bool {
+                return self::isUnchanged($livewire) ? false : $action;
+            })
+            ->modalSubmitActionLabel(__('snapshot.submit_for_review_pending_confirm'))
+            ->modalCancelActionLabel(static function (Component $livewire): string {
+                return self::isUnchanged($livewire)
+                    ? __('general.close')
+                    : __('general.cancel');
+            })
             ->action(static function (Component $livewire): void {
-                self::saveAndSubmit($livewire);
+                // Checked again here rather than trusted from the modal: the modal decides
+                // what to show, this decides what happens. Without it, the one path that
+                // skips the modal — nothing pending — would submit an unchanged concept
+                // whenever the modal was not consulted first.
+                if (self::isUnchanged($livewire)) {
+                    return;
+                }
+
+                self::submitConcept($livewire);
             });
     }
 
     /**
-     * Saves the live form the strict way, then moves the concept to review.
+     * Saves the live form the strict way, so the concept holds what is being submitted.
      *
      * The concept pages relax `required` while saving (see DraftableForm); this asks for
      * the unrelaxed rules, which is exactly the difference between "opslaan" and
      * "indienen" — and it makes a missing field land on the field itself.
      */
-    private static function saveAndSubmit(Component $livewire): void
+    private static function saveConcept(Component $livewire): void
     {
         Assert::isInstanceOf($livewire, EditRecord::class);
         Assert::isInstanceOf($livewire, SavesConcepts::class);
 
-        // Saving with required fields enforced: a missing one aborts here as an ordinary
-        // validation error on the field, so nothing is stored half-submitted.
-        $livewire->withRequiredFieldsEnforced(static function () use ($livewire): void {
-            $livewire->save(shouldRedirect: false);
-        });
+        try {
+            // Saving with required fields enforced: a missing one aborts here as an
+            // ordinary validation error on the field, so nothing is stored half-submitted.
+            $livewire->withRequiredFieldsEnforced(static function () use ($livewire): void {
+                $livewire->save(shouldRedirect: false);
+            });
+        } catch (ValidationException $validationException) {
+            // Cancel rather than letting the exception through: Filament unmounts the
+            // action for a Cancel, so the errors land on the fields with nothing mounted
+            // on top of them. Letting it propagate would leave the action mounted, and the
+            // confirmation below would then be shown over the very fields being reported.
+            $livewire->setErrorBag($validationException->validator->errors());
 
-        $record = $livewire->getRecord();
-        Assert::isInstanceOf($record, SnapshotSource::class);
+            throw new Cancel();
+        }
+    }
+
+    /**
+     * Moves the concept saved during mounting to review.
+     *
+     * Any version already in review or approved is superseded by this one — the
+     * transition service marks those "vervallen" — which is what the confirmation in
+     * front of this asked about.
+     */
+    private static function submitConcept(Component $livewire): void
+    {
+        $record = self::resolveRecord($livewire);
+
+        /** @var SnapshotStateTransitionService $snapshotStateTransitionService */
+        $snapshotStateTransitionService = app(SnapshotStateTransitionService::class);
+        $snapshotStateTransitionService->transitionSnapshotsToObsolete(self::getPendingSnapshots($record));
 
         $snapshot = self::resolveConcept($record);
         $reviewState = SnapshotState::make(SnapshotState::REVIEW_STATE::$name, $snapshot);
         Assert::isInstanceOf($reviewState, SnapshotState::class);
 
-        /** @var SnapshotStateTransitionService $snapshotStateTransitionService */
-        $snapshotStateTransitionService = app(SnapshotStateTransitionService::class);
         $snapshotStateTransitionService->transitionToSnapshotState($snapshot, $reviewState);
 
         Notification::make()
@@ -112,17 +190,120 @@ class SubmitForReviewAction extends Action
     /**
      * The concept that the save above just wrote.
      *
-     * Saving a concept page always stores one (see StoresConceptSnapshot), so its absence
-     * would mean that contract is broken rather than that this record has nothing to
-     * submit — hence an assertion instead of a fallback that would quietly paper over it.
+     * Submitting is guarded by isUnchanged(), which already returns for a record without
+     * one, so getting here without a concept would mean that guard is broken rather than
+     * that this record has nothing to submit — hence an assertion instead of a fallback
+     * that would quietly paper over it.
      *
      * @param Model&SnapshotSource $record
      */
     private static function resolveConcept(SnapshotSource $record): Snapshot
     {
-        $concept = $record->getSnapshotsWithState(Concept::class)->first();
+        $concept = self::findConcept($record);
         Assert::isInstanceOf($concept, Snapshot::class);
 
         return $concept;
+    }
+
+    /**
+     * The record's concept, if it has one.
+     *
+     * Read rather than asserted, because the modal's heading and buttons are resolved on
+     * every render of the page — including after this action submitted the concept and
+     * moved it out of that state, and for a record whose save wrote no concept because
+     * nothing changed.
+     *
+     * @param Model&SnapshotSource $record
+     */
+    private static function findConcept(SnapshotSource $record): ?Snapshot
+    {
+        $concept = $record->getSnapshotsWithState(Concept::class)->first();
+
+        return $concept instanceof Snapshot ? $concept : null;
+    }
+
+    /**
+     * @return Model&SnapshotSource
+     */
+    private static function resolveRecord(Component $livewire): SnapshotSource
+    {
+        Assert::isInstanceOf($livewire, EditRecord::class);
+
+        $record = $livewire->getRecord();
+        Assert::isInstanceOf($record, SnapshotSource::class);
+
+        return $record;
+    }
+
+    /**
+     * What the confirmation says: that nothing changed, or which pending version this
+     * submission would supersede.
+     */
+    private static function describeModal(Component $livewire): string
+    {
+        $record = self::resolveRecord($livewire);
+
+        if (!self::isUnchanged($livewire)) {
+            return self::describePendingSnapshots(self::getPendingSnapshots($record));
+        }
+
+        // The version the record turned out to be identical to. The save left it as the
+        // newest one by not adding a concept on top of it, so that is the one to name.
+        $unchangedSnapshot = $record->getLatestSnapshot();
+        Assert::isInstanceOf($unchangedSnapshot, Snapshot::class);
+
+        return __('snapshot.submit_for_review_unchanged_description', [
+            'version' => $unchangedSnapshot->version,
+        ]);
+    }
+
+    /**
+     * Whether there is nothing to submit.
+     *
+     * Which is the same as having no concept. The save during mounting writes one unless
+     * the record says exactly what its latest version already says, and takes an existing
+     * one away when an edit is undone (see ConceptSnapshotService) — so "geen concept" is
+     * precisely "niets gewijzigd", and a concept that survived that save is by definition
+     * something to submit.
+     */
+    private static function isUnchanged(Component $livewire): bool
+    {
+        return self::findConcept(self::resolveRecord($livewire)) === null;
+    }
+
+    /**
+     * The versions this submission would supersede: the ones already in the approval
+     * process.
+     *
+     * Concept and established are not among them. A concept is the form itself and is
+     * rewritten by saving; an established version is the one in force and stays in force
+     * until the new one is established in its turn. In review and approved are the states
+     * where people are part-way through work that submitting again throws away, which is
+     * exactly what the user is asked about.
+     */
+    private static function getPendingSnapshots(SnapshotSource $record): SnapshotCollection
+    {
+        $inReviewSnapshots = $record->getSnapshotsWithState(InReview::class);
+        $approvedSnapshots = $record->getSnapshotsWithState(Approved::class);
+
+        return $inReviewSnapshots->concat($approvedSnapshots);
+    }
+
+    /**
+     * Names the versions that would be marked "vervallen", with the status each is in, so
+     * the user is deciding about identifiable versions rather than about a count.
+     */
+    private static function describePendingSnapshots(SnapshotCollection $pendingSnapshots): string
+    {
+        $descriptions = $pendingSnapshots
+            ->map(static function (Snapshot $snapshot): string {
+                return __('snapshot.submit_for_review_pending_description', [
+                    'version' => $snapshot->version,
+                    'state' => __(sprintf('snapshot_state.label.%s', $snapshot->state::$name)),
+                ]);
+            })
+            ->all();
+
+        return implode(' ', $descriptions);
     }
 }

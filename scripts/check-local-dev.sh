@@ -115,11 +115,14 @@ fi
 
 # Only a problem when the .env opts in: on the default local driver there is
 # nothing to run, and a missing minio is the expected state.
-if grep -qE '^FILESYSTEM_SHARED_DRIVER=s3' "$CMS_DIR/.env" 2>/dev/null; then
+ENV_FILE="$CMS_DIR/.env.native"
+[[ -f "$ENV_FILE" ]] || ENV_FILE="$CMS_DIR/.env"
+
+if grep -qE '^FILESYSTEM_SHARED_DRIVER=s3' "$ENV_FILE" 2>/dev/null; then
     if curl -sf "http://127.0.0.1:${MINIO_PORT}/minio/health/live" >/dev/null 2>&1; then
         ok "Object storage reachable on port $MINIO_PORT (FILESYSTEM_SHARED_DRIVER=s3)"
     else
-        bad ".env sets FILESYSTEM_SHARED_DRIVER=s3 but nothing answers on 127.0.0.1:$MINIO_PORT"
+        bad "$(basename "$ENV_FILE") sets FILESYSTEM_SHARED_DRIVER=s3 but nothing answers on 127.0.0.1:$MINIO_PORT"
         hint "brew services start minio, or unset FILESYSTEM_SHARED_DRIVER to use local disks"
     fi
 else
@@ -128,13 +131,21 @@ fi
 
 # --- Application ------------------------------------------------------------
 
-if [[ -f "$CMS_DIR/.env" ]]; then
-    ok ".env exists"
-    grep -qE '^APP_KEY=.+' "$CMS_DIR/.env" \
+# The native recipes read .env.native; a Docker .env (DB_HOST=pgsql) next to it
+# is fine and is not consulted.
+if [[ -f "$CMS_DIR/.env.native" ]]; then
+    ok ".env.native exists"
+    grep -qE '^DB_HOST=127\.0\.0\.1' "$CMS_DIR/.env.native" \
+        && ok "DB_HOST points at the local PostgreSQL" \
+        || { bad ".env.native does not set DB_HOST=127.0.0.1"; hint "compare with .env.nodocker.example"; }
+    grep -qE '^APP_KEY=.+' "$CMS_DIR/.env.native" \
         && ok "APP_KEY is set" \
-        || { bad "APP_KEY is empty"; hint "cd src/cms && \"\$(brew --prefix $PHP_FORMULA)/bin/php\" artisan key:generate"; }
+        || { bad "APP_KEY is empty in .env.native"; hint "just setup-native generates one"; }
+elif [[ -f "$CMS_DIR/.env" ]] && grep -qE '^DB_HOST=pgsql' "$CMS_DIR/.env"; then
+    bad ".env.native missing and .env is the Docker one (DB_HOST=pgsql): the native recipes would try to reach the Sail database"
+    hint "just setup-native (creates .env.native from .env.nodocker.example)"
 else
-    bad ".env missing"; hint "just setup-native"
+    bad ".env.native missing"; hint "just setup-native"
 fi
 
 [[ -d "$CMS_DIR/vendor" ]] \

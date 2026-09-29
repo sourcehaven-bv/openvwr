@@ -11,23 +11,21 @@ use App\Facades\Authorization;
 use App\Facades\DateFormat;
 use App\Filament\Resources\SnapshotResource;
 use App\Models\Contracts\SnapshotSource;
-use App\Models\RelatedSnapshotSource;
 use App\Models\Snapshot;
+use App\Services\Snapshot\SnapshotComparisonService;
 use App\ValueObjects\Markdown;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Resources\Pages\Page;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
-use Illuminate\Support\Str;
 use Jfcherng\Diff\DiffHelper;
 use Livewire\Attributes\Url;
 use Webmozart\Assert\Assert;
 
 use function __;
 use function abort_unless;
-use function class_basename;
-use function implode;
+use function app;
 use function sprintf;
 
 class CompareSnapshots extends Page
@@ -187,8 +185,8 @@ class CompareSnapshots extends Page
         );
 
         $diffs[self::RELATED_SECTION] = $this->diffText(
-            $this->relatedSourcesText($from),
-            $this->relatedSourcesText($to),
+            $this->getSnapshotComparisonService()->getRelatedSourcesText($from),
+            $this->getSnapshotComparisonService()->getRelatedSourcesText($to),
         );
 
         return $diffs;
@@ -216,62 +214,15 @@ class CompareSnapshots extends Page
     }
 
     /**
-     * The many-to-many links (systems, processors, receivers, ...) captured on
-     * a snapshot live in `related_snapshot_sources`, not in the stored
-     * markdown -- the markdown only holds an inert placeholder tag that is
-     * identical across versions. Diffing the markdown alone therefore reports
-     * "no changes" even when a whole system was added or removed, so we render
-     * the captured links to a stable text block and diff that separately.
-     *
-     * Only the entity's identity is used. The renderer resolves each link to
-     * its currently-established snapshot at render time, which is not a
-     * function of this version and would produce phantom differences.
+     * Resolved per call rather than injected: a Livewire page is re-instantiated from the
+     * request, so a constructor dependency would have to survive hydration.
      */
-    private function relatedSourcesText(Snapshot $snapshot): string
+    private function getSnapshotComparisonService(): SnapshotComparisonService
     {
-        $entries = $snapshot->relatedSnapshotSources
-            ->toBase()
-            /** @return array{type: string, name: string, sort: string}|null */
-            ->map(static function (RelatedSnapshotSource $related): ?array {
-                // The morph target has no foreign key (uuidMorphs indexes only),
-                // so a hard-deleted source leaves an orphan row resolving to
-                // null. Skip it rather than take the whole compare page down.
-                $source = $related->snapshotSource;
+        /** @var SnapshotComparisonService $snapshotComparisonService */
+        $snapshotComparisonService = app(SnapshotComparisonService::class);
 
-                if ($source === null) {
-                    return null;
-                }
-
-                $name = $source->getDisplayName();
-
-                return [
-                    'type' => __(sprintf(
-                        '%s.model_singular',
-                        Str::snake(class_basename($related->snapshot_source_type)),
-                    )),
-                    'name' => $name,
-                    // Case-insensitive sort key: capitalisation drift between
-                    // versions must not reorder lines into a phantom diff.
-                    'sort' => Str::lower($name),
-                ];
-            })
-            ->filter();
-
-        // Sort on both levels so a merely reordered capture is not reported as
-        // a change: only genuine additions and removals should surface.
-        $lines = [];
-        $currentType = null;
-
-        foreach ($entries->sortBy(['type', 'sort'])->all() as $entry) {
-            if ($entry['type'] !== $currentType) {
-                $currentType = $entry['type'];
-                $lines[] = $currentType . ':';
-            }
-
-            $lines[] = sprintf('  - %s', $entry['name']);
-        }
-
-        return implode("\n", $lines);
+        return $snapshotComparisonService;
     }
 
     private function diffSection(?Markdown $from, ?Markdown $to): HtmlString

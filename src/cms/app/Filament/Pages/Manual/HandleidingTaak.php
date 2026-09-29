@@ -11,8 +11,10 @@ use App\Manual\Topic;
 use Filament\Panel;
 use Webmozart\Assert\Assert;
 
+use function __;
 use function abort;
 use function array_map;
+use function is_string;
 
 /**
  * One task, on its own page.
@@ -56,6 +58,24 @@ class HandleidingTaak extends ManualDetailPage
     public function capability(): TaskCapability
     {
         return $this->capabilityFor($this->task);
+    }
+
+    /**
+     * The name of the role this task comes with, for the sentence above the
+     * steps. Null when the user holds no role that the task mentions, in which
+     * case that sentence points at the roles topic instead.
+     */
+    public function decidingRoleName(): ?string
+    {
+        $role = $this->task->roles->decidingRoleFor($this->roles());
+
+        if ($role === null) {
+            return null;
+        }
+
+        $name = __('role.' . $role->value);
+
+        return is_string($name) ? $name : $role->value;
     }
 
     /**

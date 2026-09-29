@@ -90,24 +90,24 @@
                         <a href="{{ ManualUrls::task($task) }}" class="manual-taskcard">
                             <h3 class="manual-taskcard__title">{{ $task->title }}</h3>
                             <p class="manual-taskcard__summary">{{ $task->summary }}</p>
-                            <div class="manual-taskcard__meta">
-                                @if ($capability === TaskCapability::PERFORM)
-                                    <x-filament::badge color="success" size="sm">
-                                        {{ __('manual.capability_perform') }}
-                                    </x-filament::badge>
-                                @elseif ($capability === TaskCapability::READ)
+                            {{--
+                                Only a badge that limits the reader earns its
+                                place here. "U kunt dit uitvoeren" was on the
+                                majority of the cards and told nobody anything,
+                                and the step count was 3 or 4 on every task, so
+                                neither distinguished one card from the next.
+                                What is worth flagging is the exception: a task
+                                this role may only read, or not do at all.
+                            --}}
+                            @if ($capability !== TaskCapability::PERFORM)
+                                <div class="manual-taskcard__meta">
                                     <x-filament::badge color="gray" size="sm">
-                                        {{ __('manual.capability_read') }}
+                                        {{ $capability === TaskCapability::READ
+                                            ? __('manual.capability_read')
+                                            : __('manual.capability_none') }}
                                     </x-filament::badge>
-                                @else
-                                    <x-filament::badge color="gray" size="sm">
-                                        {{ __('manual.capability_none') }}
-                                    </x-filament::badge>
-                                @endif
-                                <x-filament::badge color="gray" size="sm">
-                                    {{ __('manual.step_count', ['count' => count($task->steps)]) }}
-                                </x-filament::badge>
-                            </div>
+                                </div>
+                            @endif
                         </a>
                     @endforeach
                 </div>

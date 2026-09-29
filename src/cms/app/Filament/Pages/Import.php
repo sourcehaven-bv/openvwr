@@ -8,7 +8,6 @@ use App\Enums\Authorization\Permission;
 use App\Events\StaticWebsite\BuildEvent;
 use App\Facades\Authentication;
 use App\Facades\Authorization;
-use App\Filament\NavigationGroups\NavigationGroup;
 use App\Import\ImportFailedException;
 use App\Import\ZipImporter;
 use App\Rules\Virusscanner;
@@ -31,8 +30,14 @@ class Import extends Page implements HasForms
 {
     use InteractsWithForms;
 
-    protected static ?string $slug = 'import';
+    protected static ?string $slug = 'import-archive';
     protected static ?int $navigationSort = 3;
+
+    /**
+     * Superseded by ImportMapping, which handles archives and spreadsheets in
+     * one place. Kept reachable so existing links and tests keep working.
+     */
+    protected static bool $shouldRegisterNavigation = false;
     protected string $view = 'filament.pages.import';
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-plus';
 
@@ -42,11 +47,6 @@ class Import extends Page implements HasForms
     public static function canAccess(): bool
     {
         return Authorization::hasPermission(Permission::CORE_ENTITY_IMPORT);
-    }
-
-    public static function getNavigationGroup(): ?string
-    {
-        return __(NavigationGroup::FUNCTIONAL_MANAGEMENT->value);
     }
 
     public function form(Schema $schema): Schema

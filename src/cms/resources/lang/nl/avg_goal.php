@@ -9,6 +9,7 @@ return [
     'add_action_label' => 'Doel toevoegen',
 
     'goal' => 'Doel',
+    'avg_goal_legal_base' => 'Grondslag',
     'remarks' => 'Toelichting bij gekozen rechtsgrond',
     'import_id' => 'Import ID',
 ];

@@ -9,6 +9,9 @@ use App\Models\User;
 use App\Services\Authentication\AuthenticationStrategy;
 use App\Services\Authentication\BuiltinAuthenticationStrategy;
 use App\Services\Authentication\DevAuthenticationStrategy;
+use App\Services\Authentication\Pratique\PratiqueContext;
+use App\Services\Authentication\Pratique\PratiqueIdentity;
+use App\Services\Authentication\PratiqueAuthenticationStrategy;
 use App\Services\AuthenticationService;
 use Filament\Facades\Filament;
 
@@ -18,17 +21,34 @@ use Filament\Facades\Filament;
  * through each strategy and assert the answers match — that is what stops the
  * interface from being indirection that happens to compile.
  *
- * When the Pratique strategy lands it becomes a third case here rather than new
- * scaffolding.
+ * The pratique strategy is the genuinely independent one: it reads a verified
+ * assertion rather than the session guard, so agreement between it and the other
+ * two is real evidence that the seam holds rather than a language guarantee.
  */
 
-/** @return array<string, AuthenticationStrategy> */
-function strategies(): array
+/**
+ * Every strategy, set up to answer about the same user in the same organisation.
+ *
+ * builtin and dev read the session guard and the Filament tenant, which the
+ * caller is expected to have set; pratique is handed the identity the middleware
+ * would have resolved.
+ *
+ * @return array<string, AuthenticationStrategy>
+ */
+function strategies(?User $user = null, ?Organisation $organisation = null): array
 {
-    return [
+    $strategies = [
         'builtin' => new BuiltinAuthenticationStrategy(),
         'dev' => new DevAuthenticationStrategy(),
     ];
+
+    if ($user instanceof User && $organisation instanceof Organisation) {
+        $context = new PratiqueContext();
+        $context->set(new PratiqueIdentity($user, $organisation));
+        $strategies['pratique'] = new PratiqueAuthenticationStrategy($context);
+    }
+
+    return $strategies;
 }
 
 it('resolves the same user under every strategy', function (): void {
@@ -39,7 +59,7 @@ it('resolves the same user under every strategy', function (): void {
     $this->be($user);
     Filament::setTenant($organisation);
 
-    foreach (strategies() as $name => $strategy) {
+    foreach (strategies($user, $organisation) as $name => $strategy) {
         expect($strategy->user()->id->toString())
             ->toBe($user->id->toString(), sprintf('strategy "%s" resolved a different user', $name));
     }
@@ -53,7 +73,7 @@ it('resolves the same organisation under every strategy', function (): void {
     $this->be($user);
     Filament::setTenant($organisation);
 
-    foreach (strategies() as $name => $strategy) {
+    foreach (strategies($user, $organisation) as $name => $strategy) {
         expect($strategy->organisation()->id->toString())
             ->toBe($organisation->id->toString(), sprintf('strategy "%s" resolved a different organisation', $name));
     }
@@ -70,7 +90,7 @@ it('resolves the same roles under every strategy', function (): void {
     Filament::setTenant($organisation);
 
     $roleSets = [];
-    foreach (strategies() as $name => $strategy) {
+    foreach (strategies($user, $organisation) as $name => $strategy) {
         $principal = $strategy->principal();
         expect($principal)->toBeInstanceOf(Principal::class);
 
@@ -83,7 +103,8 @@ it('resolves the same roles under every strategy', function (): void {
     expect($roleSets['builtin'])
         ->toContain(Role::PRIVACY_OFFICER->value)
         ->toContain(Role::FUNCTIONAL_MANAGER->value)
-        ->and($roleSets['dev'])->toBe($roleSets['builtin']);
+        ->and($roleSets['dev'])->toBe($roleSets['builtin'])
+        ->and($roleSets['pratique'])->toBe($roleSets['builtin']);
 });
 
 /*

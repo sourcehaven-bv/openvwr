@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Services\Authentication\AuthenticationStrategyFactory;
 use App\Services\Authentication\BuiltinAuthenticationStrategy;
 use App\Services\Authentication\DevAuthenticationStrategy;
+use App\Services\Authentication\PratiqueAuthenticationStrategy;
 
 it('builds the builtin strategy', function (): void {
     expect(AuthenticationStrategyFactory::make('builtin', 'production'))
@@ -41,6 +42,24 @@ it('reports whether dev is allowed per environment', function (): void {
  * default — a typo in AUTH_DRIVER should never silently change how requests are
  * authenticated.
  */
+it('builds the pratique strategy from the supplied resolver', function (): void {
+    $strategy = AuthenticationStrategyFactory::make(
+        'pratique',
+        'production',
+        fn (): PratiqueAuthenticationStrategy => app(PratiqueAuthenticationStrategy::class),
+    );
+
+    expect($strategy)->toBeInstanceOf(PratiqueAuthenticationStrategy::class);
+});
+
+/*
+ * Unlike the other two, this strategy has collaborators to inject. Building it
+ * without its resolver must fail loudly rather than produce a half-wired object.
+ */
+it('refuses to build the pratique strategy without its resolver', function (): void {
+    AuthenticationStrategyFactory::make('pratique', 'production');
+})->throws(RuntimeException::class);
+
 it('rejects an unknown driver', function (): void {
     AuthenticationStrategyFactory::make('nope', 'local');
 })->throws(RuntimeException::class, 'Unknown auth driver');

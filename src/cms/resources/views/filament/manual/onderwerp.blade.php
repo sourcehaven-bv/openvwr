@@ -27,32 +27,32 @@
     @endif
 
     <div class="manual-prose">
-        {!! $topic->html() !!}
+        {!! $this->body() !!}
     </div>
 
     {{--
         The backlinks. They are computed from the task definitions rather than
         written down here, so a topic can never claim to belong to work that
         does not in fact refer to it.
-    --}}
-    <section class="manual-usedin">
-        <h2 class="manual-usedin__title">{{ __('manual.used_in_tasks') }}</h2>
 
-        @if ($usedIn === [])
-            <p class="manual-usedin__empty">{{ __('manual.used_in_no_tasks') }}</p>
-        @else
+        A topic without any backlink is reference material you look up while
+        doing something else, which is the normal case for a chapter like
+        "Welkom". Saying so in an otherwise empty block adds nothing, so the
+        whole section stays out rather than announcing its own emptiness.
+    --}}
+    @if ($usedIn !== [])
+        <section class="manual-usedin">
+            <h2 class="manual-usedin__title">{{ __('manual.used_in_tasks') }}</h2>
+
             <ul class="manual-usedin__list">
                 @foreach ($usedIn as $task)
                     <li>
                         <a href="{{ ManualUrls::task($task) }}" class="manual-backlink">
                             {{ $task->title }}
-                            <span class="manual-backlink__steps">
-                                {{ __('manual.step_count', ['count' => count($task->steps)]) }}
-                            </span>
                         </a>
                     </li>
                 @endforeach
             </ul>
-        @endif
-    </section>
+        </section>
+    @endif
 </article>

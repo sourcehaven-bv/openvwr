@@ -166,6 +166,12 @@ login-link email="admin@example.com":
 # Native Development (no Docker)
 # ==============================
 # macOS + Homebrew only. See docs/local_development_without_docker.md.
+#
+# The native recipes read src/cms/.env.native, so they leave the Docker .env
+# alone and both setups can live side by side. Without that file they fall
+# back to .env.
+
+native_env := 'set -a; [ -f .env.native ] && . ./.env.native; set +a;'
 
 # Install dependencies, create the database, and seed test data
 setup-native:
@@ -181,20 +187,54 @@ doctor-native:
 
 # Serve the application natively on http://127.0.0.1:8000
 dev-native port="8000":
-    cd src/cms && "$(brew --prefix php@8.4)/bin/php" artisan serve --host=127.0.0.1 --port={{port}}
+    cd src/cms && {{native_env}} "$(brew --prefix php@8.4)/bin/php" artisan serve --host=127.0.0.1 --port={{port}}
 
 # Print a magic-link to log in (defaults to admin@example.com), pinned to PHP 8.4
 dev-native-login email="admin@example.com":
-    cd src/cms && "$(brew --prefix php@8.4)/bin/php" artisan dev:login-link --email={{email}}
+    cd src/cms && {{native_env}} "$(brew --prefix php@8.4)/bin/php" artisan dev:login-link --email={{email}}
 
 # Run the test suite natively (needs PHP 8.4; 8.5 fails on UUID casts)
 test-native +args="":
-    cd src/cms && "$(brew --prefix php@8.4)/bin/php" -d memory_limit=4G ./vendor/bin/pest {{args}}
+    cd src/cms && {{native_env}} "$(brew --prefix php@8.4)/bin/php" -d memory_limit=4G ./vendor/bin/pest {{args}}
 
 # Rebuild the native database from scratch and reseed
 dev-native-reset:
-    cd src/cms && "$(brew --prefix php@8.4)/bin/php" artisan migrate:fresh --force \
+    cd src/cms && {{native_env}} "$(brew --prefix php@8.4)/bin/php" artisan migrate:fresh --force \
         && "$(brew --prefix php@8.4)/bin/php" artisan db:seed --class=TestDataSeeder --force
+
+# Handleiding screenshots
+# =======================
+# See tools/screenshots/README.md. Run `just screenshots-seed`, start the app
+# with `just dev-native`, then `just screenshots`.
+
+# Seed the deterministic content the figures need, on top of TestDataSeeder
+screenshots-seed:
+    @echo "🌱 Seeding deterministic content for the figures..."
+    cd src/cms && {{native_env}} "$(brew --prefix php@8.4)/bin/php" artisan migrate:fresh --force \
+        && "$(brew --prefix php@8.4)/bin/php" artisan db:seed --class=TestDataSeeder --force \
+        && "$(brew --prefix php@8.4)/bin/php" artisan db:seed --class=ScreenshotSeeder --force
+
+# Install the capture tooling and its browser (once, or after a dependency bump)
+screenshots-setup:
+    cd tools/screenshots && npm install && npx playwright install chromium
+
+#   just screenshots                       # all of them, into public/handleiding
+#   just screenshots "--only registers"    # one figure
+#   just screenshots "--out ./preview"     # somewhere else, to compare first
+# Regenerate the figures; needs `just dev-native` (and `just dev-native-queue` for the exports)
+screenshots *args:
+    @echo "📸 Capturing the handleiding figures..."
+    # caffeinate: a full run takes minutes, and a laptop on battery sleeps
+    # partway through. The Playwright timeouts keep running while the process
+    # is frozen, so the rest of the run fails with timeouts that have nothing
+    # to do with the figures.
+    cd tools/screenshots && caffeinate -dimsu env CMS_DIR=../../src/cms \
+        PHP_BIN="$(brew --prefix php@8.4)/bin/php" \
+        node capture.mjs {{args}}
+
+# The queue worker the export figures wait on
+dev-native-queue:
+    cd src/cms && "$(brew --prefix php@8.4)/bin/php" artisan queue:work
 
 # Build frontend assets
 dev-build:

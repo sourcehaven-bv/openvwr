@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 return [
     'model_singular' => 'Algoritme',
+    'name' => 'Naam',
     'model_plural' => 'Algoritmes',
     'table_empty_heading' => 'Geen algoritmes',
     'register_description' => 'Algoritmes die uw organisatie inzet, met het oog op publicatie in het landelijke Algoritmeregister.',

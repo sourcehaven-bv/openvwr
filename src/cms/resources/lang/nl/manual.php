@@ -22,13 +22,11 @@ return [
     'search_clear' => 'Zoekopdracht wissen',
     'search_empty' => 'Niets gevonden. Probeer een ander woord.',
 
-    'capability_perform' => 'U kunt dit uitvoeren',
     'capability_read' => 'Alleen meelezen',
     'capability_none' => 'Niet voor uw rol',
-    'step_count' => ':count stappen',
 
-    'role_can_perform' => 'Met uw rol kunt u deze taak zelf uitvoeren.',
-    'role_can_read' => 'Met uw rol kunt u meelezen, maar deze taak niet zelf uitvoeren. De '
+    'role_can_perform' => 'Als :role kunt u deze taak zelf uitvoeren.',
+    'role_can_read' => 'Als :role kunt u meelezen, maar deze taak niet zelf uitvoeren. De '
         . 'stappen staan er zodat u weet wat er gebeurt en wie het doet.',
     'role_cannot' => 'Deze taak hoort niet bij uw rol. Wie dit wél kan, staat in',
     'role_see_roles' => 'Rollen en rechten.',
@@ -38,6 +36,4 @@ return [
 
     'available_for' => 'Beschikbaar voor',
     'used_in_tasks' => 'Gebruikt in deze taken',
-    'used_in_no_tasks' => 'Dit onderwerp is naslag zonder bijbehorende taak: u zoekt het op '
-        . 'terwijl u met iets anders bezig bent.',
 ];

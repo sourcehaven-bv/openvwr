@@ -10,7 +10,7 @@
 - **{{ __('processing_record.import_number') }}**: {!! Str::toSingleLineEscapedString($record->import_id) !!}
 - **{{ __('processing_record.name') }}**: {!! Str::toSingleLineEscapedString($record->name) !!}
 - **{{ __('general.data_collection_source') }}**: {{ __(sprintf('core_entity_level.%s', $record->data_collection_source->value)) }}
-- **{{ __('avg_processor_processing_record_service.model_singular') }}**: {!! Str::toSingleLineEscapedString($record->avgProcessorProcessingRecordService->name) !!}
+- **{{ __('avg_processor_processing_record_service.model_singular') }}**: {!! Str::toSingleLineEscapedString($record->avgProcessorProcessingRecordService?->name, '-') !!}
 - **{{ __('general.review_at') }}**: {{ DateFormat::toDate($record->review_at) }}
 - **{{ __('general.parent') }}**: {!! Str::toSingleLineEscapedString($record->parent?->getNumber(), '-') !!}
 

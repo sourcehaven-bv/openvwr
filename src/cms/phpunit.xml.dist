@@ -29,6 +29,9 @@
         <env name="MAIL_MAILER" value="array"/>
         <env name="ONE_TIME_PASSWORD_DRIVER" value="timed"/>
         <env name="OUTBOX_SMTP_FROM" value="hello@example.com"/>
+        <env name="PRATIQUE_ISSUER" value="https://auth.test"/>
+        <env name="PRATIQUE_AUDIENCE" value="app://openvwr-test"/>
+        <env name="PRATIQUE_JWKS_URL" value="https://auth.test/.well-known/pratique/jwks.json"/>
         <env name="PUBLIC_WEBSITE_FILESYSTEM" value="fake"/>
         <env name="PUBLIC_WEBSITE_GENERATOR" value="fake"/>
         <env name="STATIC_WEBSITE_FILESYSTEM" value="fake"/>

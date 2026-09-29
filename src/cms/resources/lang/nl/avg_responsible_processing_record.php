@@ -60,6 +60,7 @@ return [
     'dpia' => 'GEB (DPIA)',
     'has_processors' => 'Heeft verwerkers',
     'has_security' => 'Heeft beveiliging',
+    'service' => 'Dienst',
     'has_systems' => 'Heeft systemen / applicaties',
     'has_algorithms' => 'Heeft algoritmes',
     'responsibility_distribution' => 'Verdeling verantwoordelijkheid',

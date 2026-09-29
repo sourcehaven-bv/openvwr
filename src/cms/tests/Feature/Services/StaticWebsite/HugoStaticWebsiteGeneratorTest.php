@@ -147,3 +147,14 @@ it('logs error when build process fails', function (): void {
         expect($e->getMessage())->toContain('build process failed');
     }
 });
+
+it('throws BuildException when the base url is not configured', function (): void {
+    ConfigTestHelper::set('static-website.base_url', null);
+
+    Process::fake();
+
+    /** @var HugoStaticWebsiteGenerator $hugoWebsiteGenerator */
+    $hugoWebsiteGenerator = $this->app->get(HugoStaticWebsiteGenerator::class);
+
+    $hugoWebsiteGenerator->generate();
+})->throws(BuildException::class, 'STATIC_WEBSITE_BASE_URL is not configured');

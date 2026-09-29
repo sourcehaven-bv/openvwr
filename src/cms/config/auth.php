@@ -152,4 +152,32 @@ return [
             'decay_in_seconds' => 60,
         ],
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Pratique (identity proxy)
+    |--------------------------------------------------------------------------
+    |
+    | Settings for the "pratique" auth driver, where a proxy in front of the app
+    | authenticates the user and forwards a signed assertion. Only used when
+    | auth.driver is "pratique".
+    |
+    | The audience MUST match the proxy's upstream.audience exactly. A mismatch
+    | is the single most common cause of an endless 403 loop, and a lenient
+    | check here would be a confused-deputy hole: an assertion minted for
+    | another upstream would be accepted as ours.
+    |
+    | leeway_seconds allows for small clock drift between the proxy host and
+    | this one when checking exp/nbf. Keep it small — the assertion lives ~9
+    | minutes — and keep both hosts on NTP regardless.
+    |
+    */
+
+    'pratique' => [
+        'issuer' => env('PRATIQUE_ISSUER'),
+        'audience' => env('PRATIQUE_AUDIENCE'),
+        'jwks_url' => env('PRATIQUE_JWKS_URL'),
+        'jwks_cache_seconds' => env('PRATIQUE_JWKS_CACHE_SECONDS', 300),
+        'leeway_seconds' => env('PRATIQUE_LEEWAY_SECONDS', 60),
+    ],
 ];

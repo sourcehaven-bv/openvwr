@@ -47,4 +47,32 @@ readonly class TaskRoles
 
         return TaskCapability::NONE;
     }
+
+    /**
+     * The role that gives the user this task, so the page can name it instead
+     * of saying "uw rol".
+     *
+     * A user can hold several roles at once, of which more than one may cover
+     * the task. The first match wins: which of them is named matters less than
+     * naming one at all, and any of them is a true answer to "why may I do
+     * this?".
+     *
+     * @param array<Role> $roles the roles the current user holds
+     */
+    public function decidingRoleFor(array $roles): ?Role
+    {
+        foreach ($roles as $role) {
+            if (in_array($role, $this->performers, true)) {
+                return $role;
+            }
+        }
+
+        foreach ($roles as $role) {
+            if (in_array($role, $this->readers, true)) {
+                return $role;
+            }
+        }
+
+        return null;
+    }
 }

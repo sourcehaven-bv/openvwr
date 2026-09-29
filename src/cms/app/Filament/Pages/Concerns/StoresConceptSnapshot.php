@@ -12,10 +12,11 @@ use Illuminate\Support\Facades\App;
 /**
  * Writes the record's concept snapshot after every save.
  *
- * There is always a version: saving a record creates its concept snapshot, or updates
- * the existing one when it is still a concept. This is what replaced the old "Versie
- * aanmaken" button — the user no longer has to ask for a version, only to move the
- * concept on to review when it is ready.
+ * Saving a record creates its concept snapshot, or updates the existing one when it is
+ * still a concept. This is what replaced the old "Versie aanmaken" button — the user no
+ * longer has to ask for a version, only to move the concept on to review when it is
+ * ready. A save that leaves the record identical to its latest version writes nothing,
+ * so pressing save without editing does not put an empty concept next to it.
  *
  * Records that are not versioned (the data-breach register uses these same concept
  * pages) are skipped, hence the interface check.

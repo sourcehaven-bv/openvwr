@@ -47,6 +47,9 @@ final class TaskContent
     {
         return [
             self::verwerkingVastleggen(),
+            self::algoritmeVastleggen(),
+            self::dpiaPrescanDoen(),
+            self::dpiaUitvoeren(),
             self::wpgVerwerkingVastleggen(),
             self::datalekMelden(),
             self::versieIndienenEnLatenGoedkeuren(),
@@ -54,6 +57,7 @@ final class TaskContent
             self::overzichtOpvragen(),
             self::verwerkingPubliceren(),
             self::gebruikersEnRollenBeheren(),
+            self::tweefactorResetten(),
         ];
     }
 
@@ -65,8 +69,8 @@ final class TaskContent
             title: 'Een verwerking vastleggen',
             summary: 'Een nieuwe verwerking in het register zetten.',
             intro: 'U legt een verwerking van persoonsgegevens vast in een van de '
-                . 'verwerkingsregisters. U kunt tussentijds opslaan: pas bij het aanmaken van een '
-                . 'versie wordt gecontroleerd of alles is ingevuld.',
+                . 'verwerkingsregisters. U kunt tussentijds opslaan: pas als u de conceptversie '
+                . 'indient, wordt gecontroleerd of alles is ingevuld.',
             steps: [
                 new Step(
                     title: 'Open het register en maak een verwerking aan',
@@ -76,21 +80,16 @@ final class TaskContent
                 ),
                 new Step(
                     title: 'Vul de gegevens in',
-                    body: 'Loop de domeinen langs met het navigatiemenu rechts. Tussentijds '
-                        . 'opslaan mag; verplichte velden worden pas bij de versie gecontroleerd.',
-                    topicIds: ['verwerkingsregisters'],
+                    body: 'Loop de domeinen langs met het navigatiemenu rechts. Vul per gegeven '
+                        . 'een bewaartermijn in en ken in het veld "Labels" de afdeling, locatie '
+                        . 'of het werkterrein toe. Tussentijds opslaan mag.',
+                    topicIds: ['verwerkingsregisters', 'bewaartermijnen', 'labels-toekennen'],
                 ),
                 new Step(
-                    title: 'Vul de bewaartermijnen in',
-                    body: 'Kies per gegeven een bewaartermijn uit de lijst, of beschrijf de '
-                        . 'termijn zelf als geen van de opties past.',
-                    topicIds: ['bewaartermijnen'],
-                ),
-                new Step(
-                    title: 'Geef de verwerking een label',
-                    body: 'Ken in het veld "Labels" de afdeling, locatie of het werkterrein toe, '
-                        . 'zodat u de verwerking later terugvindt.',
-                    topicIds: ['labels-toekennen'],
+                    title: 'Dien de conceptversie in',
+                    body: 'Is de verwerking compleet, klik dan rechtsbovenin op "Start '
+                        . 'vaststellen". Pas dan worden de verplichte velden gecontroleerd.',
+                    topicIds: ['versie-indienen'],
                 ),
             ],
             roles: new TaskRoles(
@@ -98,7 +97,46 @@ final class TaskContent
                 readers: [Role::COUNSELOR, Role::DATA_PROTECTION_OFFICIAL, Role::MANDATE_HOLDER],
             ),
             done: 'De verwerking staat in het register en kan worden aangevuld. Is hij compleet, '
-                . 'maak dan een versie aan.',
+                . 'dien dan de conceptversie in.',
+        );
+    }
+
+    private static function algoritmeVastleggen(): Task
+    {
+        return new Task(
+            id: 'algoritme-vastleggen',
+            group: self::GROUP_REGISTREREN,
+            title: 'Een algoritme vastleggen',
+            summary: 'Een algoritme in het algoritmeregister zetten.',
+            intro: 'U legt een algoritme vast in het algoritmeregister. Dat register werkt '
+                . 'hetzelfde als de verwerkingsregisters, met een aantal eigen velden voor de '
+                . 'publicatiecategorie, het thema en de status van het algoritme.',
+            steps: [
+                new Step(
+                    title: 'Open het register en maak een algoritme aan',
+                    body: 'Kies "Algoritmes" in het navigatiemenu en klik op "Algoritme '
+                        . 'aanmaken". U komt op de detailpagina.',
+                    topicIds: ['algoritmes'],
+                ),
+                new Step(
+                    title: 'Vul de gegevens in',
+                    body: 'Loop de domeinen langs met het navigatiemenu rechts. Vul ook de '
+                        . 'publicatiecategorie, het thema en de status in, en ken labels toe.',
+                    topicIds: ['algoritmes', 'labels-toekennen'],
+                ),
+                new Step(
+                    title: 'Dien de conceptversie in',
+                    body: 'Is het algoritme compleet, klik dan rechtsbovenin op "Start '
+                        . 'vaststellen". Het goedkeuringsproces is gelijk aan dat van een '
+                        . 'verwerking.',
+                    topicIds: ['versie-indienen'],
+                ),
+            ],
+            roles: new TaskRoles(
+                performers: [Role::INPUT_PROCESSOR, Role::CHIEF_PRIVACY_OFFICER, Role::PRIVACY_OFFICER],
+                readers: [Role::COUNSELOR, Role::DATA_PROTECTION_OFFICIAL, Role::MANDATE_HOLDER],
+            ),
+            done: 'Het algoritme staat in het register en kan worden vastgesteld.',
         );
     }
 
@@ -256,8 +294,8 @@ final class TaskContent
                 ),
                 new Step(
                     title: 'Filter erop',
-                    body: 'Gebruik de filterknop boven een overzicht om alles van één label bij '
-                        . 'elkaar te zien.',
+                    body: 'Gebruik de filterknop - het trechter-icoon rechtsboven de tabel - om '
+                        . 'alles van één label bij elkaar te zien.',
                     topicIds: ['filteren-op-labels'],
                 ),
             ],
@@ -287,8 +325,8 @@ final class TaskContent
             steps: [
                 new Step(
                     title: 'Filter de tabel',
-                    body: 'Gebruik de filterknop rechtsboven het overzicht, bijvoorbeeld op label '
-                        . 'of op status.',
+                    body: 'Gebruik de filterknop - het trechter-icoon rechtsboven de tabel - '
+                        . 'bijvoorbeeld op label of op status.',
                     topicIds: ['filteren-op-labels'],
                 ),
                 new Step(
@@ -333,13 +371,15 @@ final class TaskContent
                 ),
                 new Step(
                     title: 'Zet de verwerking op openbaar',
-                    body: 'Geef op de detailpagina van de verwerking aan dat deze openbaar is.',
+                    body: 'Geef op de detailpagina van de verwerking aan dat deze openbaar is. '
+                        . 'Dat is de stap die bepaalt of hij op de website komt.',
                     topicIds: ['publiceren'],
                 ),
                 new Step(
-                    title: 'Richt de startpagina in',
-                    body: 'Onder "Openbare website" stelt u de tekst van de startpagina in.',
-                    topicIds: ['publiceren'],
+                    title: 'Controleer het resultaat op de website',
+                    body: 'De verwerking verschijnt op de openbare website. De inrichting van '
+                        . 'die website zelf ligt bij een Functioneel beheerder, niet bij u.',
+                    topicIds: ['publiceren', 'websitebeheer'],
                 ),
             ],
             roles: new TaskRoles(
@@ -385,6 +425,146 @@ final class TaskContent
             ),
             done: 'De collega kan inloggen en ziet de onderdelen die bij de toegekende rollen '
                 . 'horen.',
+        );
+    }
+
+    private static function tweefactorResetten(): Task
+    {
+        return new Task(
+            id: 'tweefactor-resetten',
+            group: self::GROUP_BEHEREN,
+            title: 'Tweefactorauthenticatie resetten voor een ander',
+            summary: 'Een collega weer laten inloggen na verlies van zijn authenticator.',
+            intro: 'Een collega die zijn authenticator kwijt is - bijvoorbeeld na de aanschaf '
+                . 'van een nieuw toestel - kan niet meer inloggen. U reset dan zijn '
+                . 'tweefactorauthenticatie, waarna hij die opnieuw instelt.',
+            steps: [
+                new Step(
+                    title: 'Controleer met wie u te maken heeft',
+                    body: 'Ga buiten het portaal om na of het verzoek echt van de collega zelf '
+                        . 'komt. De reset haalt een beveiligingslaag weg.',
+                    topicIds: ['tweefactor-resetten'],
+                ),
+                new Step(
+                    title: 'Open de gebruiker',
+                    body: 'Zoek de collega op in de gebruikerstabel en klik erop om de '
+                        . 'bewerkpagina te openen.',
+                    topicIds: ['gebruikers'],
+                ),
+                new Step(
+                    title: 'Reset de tweefactorauthenticatie',
+                    body: 'Klik rechtsbovenin op "2FA resetten" en bevestig.',
+                    topicIds: ['tweefactor-resetten'],
+                ),
+                new Step(
+                    title: 'Laat het de collega weten',
+                    body: 'Er gaat geen bericht uit. Meld zelf dat hij weer kan inloggen en de '
+                        . 'authenticator opnieuw moet instellen.',
+                    topicIds: ['authenticator-instellen'],
+                ),
+            ],
+            roles: new TaskRoles(
+                performers: [Role::CHIEF_PRIVACY_OFFICER, Role::PRIVACY_OFFICER],
+                readers: [Role::COUNSELOR, Role::DATA_PROTECTION_OFFICIAL],
+            ),
+            done: 'De collega kan weer inloggen en stelt bij de eerstvolgende keer zijn '
+                . 'authenticator opnieuw in.',
+        );
+    }
+
+    private static function dpiaPrescanDoen(): Task
+    {
+        return new Task(
+            id: 'dpia-prescan-doen',
+            group: self::GROUP_REGISTREREN,
+            title: 'Bepalen of een DPIA nodig is',
+            summary: 'Met een pre-scan toetsen of een verwerking een DPIA vraagt.',
+            intro: 'Bij een verwerking met een hoog privacyrisico is een DPIA verplicht. '
+                . 'Met een pre-scan stelt u vast of dat hier zo is - en legt u de afweging '
+                . 'vast, ook als het antwoord nee is.',
+            steps: [
+                new Step(
+                    title: 'Maak een pre-scan aan',
+                    body: 'Ga naar DPIA - Pre-scans DPIA en maak een pre-scan aan voor de '
+                        . 'verwerking die u wilt toetsen.',
+                    topicIds: ['dpia-prescan'],
+                ),
+                new Step(
+                    title: 'Doorloop de toets',
+                    body: 'Beantwoord de vragen over aanleiding, AP- en EDPB-criteria, '
+                        . 'doorgifte, en kinderen en algoritmes. Bij Uitkomst leest u wat '
+                        . 'de antwoorden betekenen.',
+                    topicIds: ['dpia-prescan'],
+                ),
+                new Step(
+                    title: 'Start een DPIA als dat nodig is',
+                    body: 'Geeft de uitkomst daar aanleiding toe, gebruik dan de knop '
+                        . '"DPIA starten". Naam en koppelingen gaan mee naar de nieuwe DPIA.',
+                    topicIds: ['dpia-prescan', 'dpia-invullen'],
+                ),
+            ],
+            roles: new TaskRoles(
+                performers: [
+                    Role::INPUT_PROCESSOR,
+                    Role::CHIEF_PRIVACY_OFFICER,
+                    Role::PRIVACY_OFFICER,
+                ],
+                readers: [
+                    Role::COUNSELOR,
+                    Role::DATA_PROTECTION_OFFICIAL,
+                    Role::MANDATE_HOLDER,
+                ],
+            ),
+            done: 'De afweging is vastgelegd, en waar nodig staat er een DPIA klaar.',
+        );
+    }
+
+    private static function dpiaUitvoeren(): Task
+    {
+        return new Task(
+            id: 'dpia-uitvoeren',
+            group: self::GROUP_REGISTREREN,
+            title: 'Een DPIA uitvoeren',
+            summary: "Persoonsgegevens, risico's en maatregelen vastleggen en laten "
+                . 'vaststellen.',
+            intro: 'Een DPIA volgt de paragrafen van het Model DPIA Rijksdienst. U vult hem '
+                . 'in stappen in, laat hem beoordelen en stelt hem vast - net als een '
+                . 'verwerking.',
+            steps: [
+                new Step(
+                    title: 'Vul de paragrafen in',
+                    body: 'Doorloop de stappen van Voorstel tot Maatregelen. Besteed extra '
+                        . 'aandacht aan paragraaf 2, Persoonsgegevens: daar legt u per '
+                        . 'gegeven type, bron en bewaartermijn vast.',
+                    topicIds: ['dpia-invullen'],
+                ),
+                new Step(
+                    title: "Weeg de risico's en beschrijf maatregelen",
+                    body: "Leg per risico kans en impact vast, en koppel de maatregelen die "
+                        . 'het risico beperken. Blijft een hoog restrisico staan, dan is de '
+                        . 'Autoriteit Persoonsgegevens raadplegen verplicht.',
+                    topicIds: ['dpia-risicos'],
+                ),
+                new Step(
+                    title: 'Laat de DPIA vaststellen',
+                    body: 'Dien de DPIA in met "Start vaststellen". Daarna volgt review '
+                        . 'door een Privacy Officer en het vaststellen.',
+                    topicIds: ['dpia-vaststellen'],
+                ),
+            ],
+            roles: new TaskRoles(
+                performers: [
+                    Role::INPUT_PROCESSOR,
+                    Role::CHIEF_PRIVACY_OFFICER,
+                    Role::PRIVACY_OFFICER,
+                ],
+                readers: [
+                    Role::COUNSELOR,
+                    Role::DATA_PROTECTION_OFFICIAL,
+                    Role::MANDATE_HOLDER,
+                ],
+            ),
+            done: 'De DPIA is vastgesteld en gekoppeld aan de verwerking.',
         );
     }
 }

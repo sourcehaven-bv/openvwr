@@ -6,8 +6,10 @@ namespace App\Filament\Exports;
 
 use App\Filament\Actions\Exports\ExportColumn;
 use App\Models\DataBreachRecord;
+use Illuminate\Support\Str;
 
 use function __;
+use function sprintf;
 
 class DataBreachRecordExporter extends Exporter
 {
@@ -27,6 +29,21 @@ class DataBreachRecordExporter extends Exporter
     }
 
     /**
+     * Several fields are labelled "Namelijk" on the form, where the field they
+     * elaborate on sits right above them. In a sheet they stand alone, so the
+     * parent's label is prefixed: "Aard van het incident — Namelijk". This is
+     * also how the import offers them, so an export reads back in as it is.
+     */
+    private static function otherLabel(string $attribute): string
+    {
+        return sprintf(
+            '%s — %s',
+            __(sprintf('data_breach_record.%s', Str::beforeLast($attribute, '_other'))),
+            __(sprintf('data_breach_record.%s', $attribute)),
+        );
+    }
+
+    /**
      * @return array<ExportColumn>
      */
     private static function identificationColumns(): array
@@ -37,7 +54,7 @@ class DataBreachRecordExporter extends Exporter
             ExportColumn::make('organisation.responsibleLegalEntity.name')
                 ->label(__('responsible_legal_entity.model_singular')),
             ExportColumn::make('number')
-                ->label(__('data_breach_record.entityNumber.number')),
+                ->label(__('data_breach_record.number')),
             ExportColumn::make('name')
                 ->label(__('data_breach_record.name')),
             ExportColumn::make('reported_at')
@@ -90,7 +107,7 @@ class DataBreachRecordExporter extends Exporter
             ExportColumn::make('nature_of_incident')
                 ->label(__('data_breach_record.nature_of_incident')),
             ExportColumn::make('nature_of_incident_other')
-                ->label(__('data_breach_record.nature_of_incident_other')),
+                ->label(self::otherLabel('nature_of_incident_other')),
             ExportColumn::make('summary')
                 ->label(__('data_breach_record.summary')),
             ExportColumn::make('involved_people')
@@ -98,17 +115,19 @@ class DataBreachRecordExporter extends Exporter
             ExportColumn::make('personal_data_categories')
                 ->label(__('data_breach_record.personal_data_categories')),
             ExportColumn::make('personal_data_categories_other')
-                ->label(__('data_breach_record.personal_data_categories_other')),
+                ->label(self::otherLabel('personal_data_categories_other')),
             ExportColumn::make('personal_data_special_categories')
                 ->label(__('data_breach_record.personal_data_special_categories')),
             ExportColumn::make('estimated_risk')
                 ->label(__('data_breach_record.estimated_risk')),
             ExportColumn::make('measures')
                 ->label(__('data_breach_record.measures')),
+            ExportColumn::make('reported_to_involved')
+                ->label(__('data_breach_record.reported_to_involved')),
             ExportColumn::make('reported_to_involved_communication')
                 ->label(__('data_breach_record.reported_to_involved_communication')),
             ExportColumn::make('reported_to_involved_communication_other')
-                ->label(__('data_breach_record.reported_to_involved_communication_other')),
+                ->label(self::otherLabel('reported_to_involved_communication_other')),
             ExportColumn::make('fg_reported')
                 ->label(__('data_breach_record.fg_reported')),
         ];
@@ -133,7 +152,7 @@ class DataBreachRecordExporter extends Exporter
             ExportColumn::make('affected_groups')
                 ->label(__('data_breach_record.affected_groups')),
             ExportColumn::make('affected_groups_other')
-                ->label(__('data_breach_record.affected_groups_other')),
+                ->label(self::otherLabel('affected_groups_other')),
             ExportColumn::make('affected_count_known')
                 ->label(__('data_breach_record.affected_count_known')),
             ExportColumn::make('affected_count')
@@ -149,11 +168,11 @@ class DataBreachRecordExporter extends Exporter
             ExportColumn::make('consequences_controller')
                 ->label(__('data_breach_record.consequences_controller')),
             ExportColumn::make('consequences_controller_other')
-                ->label(__('data_breach_record.consequences_controller_other')),
+                ->label(self::otherLabel('consequences_controller_other')),
             ExportColumn::make('consequences_data_subjects')
                 ->label(__('data_breach_record.consequences_data_subjects')),
             ExportColumn::make('consequences_data_subjects_other')
-                ->label(__('data_breach_record.consequences_data_subjects_other')),
+                ->label(self::otherLabel('consequences_data_subjects_other')),
             ExportColumn::make('risk_severity')
                 ->label(__('data_breach_record.risk_severity')),
             ExportColumn::make('reported_to_involved_count')
@@ -161,7 +180,7 @@ class DataBreachRecordExporter extends Exporter
             ExportColumn::make('other_supervisors')
                 ->label(__('data_breach_record.other_supervisors')),
             ExportColumn::make('other_supervisors_other')
-                ->label(__('data_breach_record.other_supervisors_other')),
+                ->label(self::otherLabel('other_supervisors_other')),
             ExportColumn::make('cross_border')
                 ->label(__('data_breach_record.cross_border')),
             ExportColumn::make('cross_border_countries')

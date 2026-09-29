@@ -173,6 +173,6 @@ final class RollenEnRechten
                 en globale instellingen. Deze rol kent rollen toe en heeft inzage in het
                 beheerlogboek. Het is een rol op applicatieniveau en niet binnen één
                 organisatie: een Functioneel beheerder werkt niet in de registers zelf.
-            MARKDOWN;
+                MARKDOWN;
     }
 }

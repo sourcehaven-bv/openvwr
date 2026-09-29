@@ -49,11 +49,17 @@ class AlgorithmRecordExporter extends Exporter
             ExportColumn::make('tags.name')
                 ->label(__('tag.model_plural')),
             ExportColumn::make('algorithmPublicationCategory.name')
-                ->label(__('algorithm_publication_category.model_singular')),
+                ->label(__('algorithm_record.publication_category')),
             ExportColumn::make('algorithmStatus.name')
-                ->label(__('algorithm_status.model_singular')),
+                ->label(__('algorithm_record.status')),
             ExportColumn::make('algorithmTheme.name')
-                ->label(__('algorithm_theme.model_singular')),
+                ->label(__('algorithm_record.theme')),
+            ExportColumn::make('avgResponsibleProcessingRecords.name')
+                ->label(__('avg_responsible_processing_record.model_plural')),
+            ExportColumn::make('avgProcessorProcessingRecords.name')
+                ->label(__('avg_processor_processing_record.model_plural')),
+            ExportColumn::make('wpgProcessingRecords.name')
+                ->label(__('wpg_processing_record.model_plural')),
             ExportColumn::make('start_date')
                 ->label(__('algorithm_record.start_date')),
             ExportColumn::make('end_date')

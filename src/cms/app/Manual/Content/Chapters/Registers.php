@@ -132,9 +132,30 @@ final class Registers
             id: 'algoritmes',
             title: 'Algoritmes',
             body: <<<'MARKDOWN'
-                Het algoritmeregister werkt op identieke wijze als de verwerkingregisters. In
-                de overzichtstabel zijn dezelfde kolommen zichtbaar omdat ze deze
-                eigenschappen delen met de verwerkingen.
+                In het algoritmeregister legt u vast welke algoritmes uw organisatie gebruikt.
+                Overheidsorganisaties leggen daarmee verantwoording af over geautomatiseerde
+                besluitvorming: burgers en volksvertegenwoordigers kunnen zo zien waar een
+                algoritme wordt ingezet, waarvoor, en wie ervoor verantwoordelijk is.
+
+                Daarnaast bestaat het landelijke
+                [Algoritmeregister](https://algoritmes.overheid.nl/) van de Nederlandse
+                overheid, waarin organisaties hun algoritmes publiceren. De velden in OpenVWR
+                sluiten daarop aan: u legt per algoritme een *thema*, een *status* en een
+                *publicatiecategorie* vast, net als in dat register.
+
+                > **Let op**: OpenVWR levert niets automatisch aan het landelijke
+                > Algoritmeregister. Publiceren daar is een aparte stap, die u zelf zet. Wat u
+                > hier vastlegt is uw eigen registratie; gebruik die als bron voor de
+                > publicatie, niet als vervanging ervan.
+
+                Verder werkt het algoritmeregister op identieke wijze als de
+                verwerkingsregisters. In de overzichtstabel zijn dezelfde kolommen zichtbaar
+                omdat ze deze eigenschappen delen met de verwerkingen, en een algoritme
+                doorloopt hetzelfde goedkeuringsproces.
+
+                > **Hint**: Verwerkt een algoritme persoonsgegevens, dan hoort daar vaak ook
+                > een verwerking bij. Leg beide vast en geef ze hetzelfde label, dan houdt u
+                > ze bij elkaar. Zie [Labels toekennen](#labels-toekennen).
                 MARKDOWN,
             roles: [
                 Role::INPUT_PROCESSOR,

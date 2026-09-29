@@ -12,6 +12,7 @@ use App\Filament\Forms\Components\RelationTableColumns;
 use App\Filament\Forms\Components\Section\InformationBlockSection;
 use App\Filament\Forms\Components\TagsInput;
 use App\Filament\Forms\Components\TextInput\EntityNumber;
+use App\Filament\Forms\Components\TextInput\ImportNumber;
 use App\Filament\Forms\FormHelper;
 use App\Filament\Resources\DocumentResource\DocumentResourceForm;
 use App\Filament\Resources\ResponsibleResource\ResponsibleResourceForm;
@@ -28,6 +29,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Grid;
 use Illuminate\Support\Arr;
 use Webmozart\Assert\Assert;
 
@@ -48,8 +50,12 @@ class DataBreachRecordResourceFormSchemas
                 __('information_blocks.data_breach_record.step_name_title'),
                 __('information_blocks.data_breach_record.step_name_info'),
             ),
-            EntityNumber::make()
-                ->label(__('data_breach_record.number')),
+            Grid::make()
+                ->schema([
+                    EntityNumber::make()
+                        ->label(__('data_breach_record.number')),
+                    ImportNumber::make(),
+                ]),
             TextInput::make('name')
                 ->label(__('data_breach_record.name'))
                 ->helperText(__('data_breach_record.help_name'))
