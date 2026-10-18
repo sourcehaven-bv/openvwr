@@ -602,8 +602,8 @@ away under *both* strategies, because it's a security liability in its own right
 `otp_recovery_codes` and `user_login_tokens` are *retained*, not dropped —
 they're live data for the builtin strategy. This removes the whole
 "drop columns in a later release so rollback doesn't lose data" dance from the
-old plan, and with it the `sql-generate` + hosting-changelog work
-(`DEPLOY_PROCEDURE.md`) that came with it.
+old plan, and with it the `sql-generate` + hosting-changelog work that came
+with it.
 
 Keep (unchanged under both strategies): `users`, `organisations`, roles tables,
 all 14 policies, `config/permissions.php`, `AuthorizationService`. Authorization
@@ -711,7 +711,8 @@ is only covered indirectly.
   public path safe. Pratique's own `/healthz` + `/readyz` cover the proxy itself.
 - **SQL generator**: `app/Console/Commands/SqlGenerate.php` /
   `app/Services/SqlExport/` emit the versioned schema files. Dropping OTP columns
-  and `user_login_tokens` must go through that pipeline, per `DEPLOY_PROCEDURE.md`.
+  and `user_login_tokens` must go through that pipeline, per the internal
+  release procedure.
 - **Session-dependent Filament features** (flash messages, `databaseNotifications`,
   unsaved-changes alerts) still need a Laravel session — the app keeps `StartSession`,
   it just no longer authenticates from it.

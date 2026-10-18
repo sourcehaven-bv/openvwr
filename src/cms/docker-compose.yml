@@ -86,22 +86,23 @@ services:
     # `just minio-up`, and set FILESYSTEM_SHARED_DRIVER=s3 to actually use it.
     minio:
         profiles: ['object-storage']
-        # quay.io, not Docker Hub: the minio/minio Docker Hub repository no longer
-        # serves public pulls (anonymous pull returns "pull access denied ...
-        # repository does not exist"). quay.io/minio/minio still publishes the
-        # same releases, and this is the identical tag.
-        image: 'quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z'
+        # Chainguard's build: MinIO no longer serves public pulls from Docker Hub
+        # or quay.io. Chainguard only offers `latest` for free, so pin the digest.
+        # Its entrypoint is already `minio`, and it runs as a non-root user by
+        # default, which cannot write to the root-owned volume.
+        image: 'cgr.dev/chainguard/minio@sha256:71674988a1c7ddd5724928633199152b11e4ddefd6c6ce2d60772ff4a8f22ca9'
         ports:
             - '${MINIO_PORT:-9000}:9000'
             - '${MINIO_CONSOLE_PORT:-9001}:9001'
         environment:
             MINIO_ROOT_USER: '${MINIO_ROOT_USER:-minioadmin}'
             MINIO_ROOT_PASSWORD: '${MINIO_ROOT_PASSWORD:-minioadmin}'
+        user: root
         volumes:
             - 'sail-minio:/minio_root'
         networks:
             - sail
-        command: minio server /minio_root --console-address ":9001"
+        command: server /minio_root --console-address ":9001"
         healthcheck:
             test: [ "CMD", "mc", "ready", "local" ]
             interval: 10s

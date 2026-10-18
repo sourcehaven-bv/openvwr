@@ -44,7 +44,7 @@ jobs:
           apt-get install -y git curl unzip nodejs npm php php-cli php-curl php-mbstring php-xml php-zip composer
 
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           # Build the requested ref, not the triggering ref. On a dispatched
           # run the triggering ref is the branch, which would otherwise package
@@ -54,7 +54,7 @@ jobs:
           ref: ${{ inputs.ref || inputs.version }}
 
       - name: Install just
-        uses: extractions/setup-just@v2
+        uses: extractions/setup-just@v4
 
       - name: Resolve build commit
         id: commit
@@ -91,7 +91,7 @@ jobs:
           echo "NAME=${ARCHIVE%.tar.gz}" >> $GITHUB_OUTPUT
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.archive.outputs.NAME }}
           path: ${{ steps.archive.outputs.ARCHIVE }}
@@ -138,7 +138,7 @@ jobs:
 
       - name: Upload documentation
         if: inputs.documentation
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.documentation.outputs.NAME }}
           path: openvwr-datamodel-*.pdf

@@ -13,10 +13,12 @@ use function base64_encode;
 use function openssl_pkey_get_details;
 use function openssl_pkey_new;
 use function rtrim;
+use function str_pad;
 use function strtr;
 use function time;
 
 use const OPENSSL_KEYTYPE_EC;
+use const STR_PAD_LEFT;
 
 /**
  * Mints assertions the way the proxy would, signed with a real ES256 key.
@@ -140,9 +142,18 @@ final class PratiqueTestHelper
             'kid' => $keyId,
             'alg' => 'ES256',
             'use' => 'sig',
-            'x' => self::base64Url($details['ec']['x']),
-            'y' => self::base64Url($details['ec']['y']),
+            'x' => self::base64Url(self::coordinate($details['ec']['x'])),
+            'y' => self::base64Url(self::coordinate($details['ec']['y'])),
         ];
+    }
+
+    /**
+     * OpenSSL drops leading zero bytes, but a P-256 JWK coordinate must be
+     * exactly 32 bytes. Without padding, about one key in 128 is unreadable.
+     */
+    private static function coordinate(string $binary): string
+    {
+        return str_pad($binary, 32, "\0", STR_PAD_LEFT);
     }
 
     private static function base64Url(string $binary): string
