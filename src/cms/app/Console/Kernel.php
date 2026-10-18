@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console;
 
+use App\Console\Commands\CleanupSoftDeleted;
 use App\Console\Commands\DocumentNotificationsSend;
 use App\Console\Commands\SnapshotApprovalBatchNotifications;
 use App\Console\Commands\StaticWebsiteRefresh;
@@ -34,6 +35,10 @@ class Kernel extends ConsoleKernel
             ->dailyAt('09:00');
         $schedule->command(UserDeleteWithoutOrganisation::class)
             ->daily();
+        // Ruimt verwijderde gegevens definitief op na de bewaartermijn.
+        // 's nachts, want een grote achterstand kan even duren.
+        $schedule->command(CleanupSoftDeleted::class)
+            ->dailyAt('03:00');
 
         // weekly
         $schedule->command(SnapshotApprovalBatchNotifications::class)
