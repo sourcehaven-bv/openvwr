@@ -33,6 +33,9 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: debian:13
+    # Callers may hold contents: write for publishing; the build only reads.
+    permissions:
+      contents: read
     outputs:
       archive: ${{ steps.archive.outputs.ARCHIVE }}
       documentation: ${{ steps.documentation.outputs.NAME }}
@@ -52,6 +55,21 @@ jobs:
           # into the archive and may not be a real ref (e.g. dev-<sha>), so
           # tag builds fall back to it while the dev path passes a SHA.
           ref: ${{ inputs.ref || inputs.version }}
+
+      # A run on the default branch can write that branch's Actions cache, which
+      # every other branch restores from. `ref` comes from a dispatch input, so
+      # refuse to run repository code from a commit that is not on the default
+      # branch: it has not been reviewed and could poison the cache. Builds of
+      # other commits can still be dispatched from their own branch.
+      - name: Require a commit from the default branch
+        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git fetch --no-tags --unshallow origin "+refs/heads/${GITHUB_REF_NAME}:refs/remotes/origin/${GITHUB_REF_NAME}"
+          if ! git merge-base --is-ancestor HEAD "origin/${GITHUB_REF_NAME}"; then
+            echo "::error::$(git rev-parse HEAD) is not on ${GITHUB_REF_NAME}; dispatch from the branch that holds it" >&2
+            exit 1
+          fi
 
       - name: Install just
         uses: extractions/setup-just@v4

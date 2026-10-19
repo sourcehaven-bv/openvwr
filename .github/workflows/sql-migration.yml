@@ -12,6 +12,9 @@ on:
       - src/cms/database/sql/**
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build:
 
