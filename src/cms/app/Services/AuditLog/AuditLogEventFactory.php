@@ -6,6 +6,8 @@ namespace App\Services\AuditLog;
 
 use App\Services\AuditLog\Authentication\AuthenticationFailedEvent;
 use App\Services\AuditLog\Authentication\AuthenticationSuccessEvent;
+use App\Services\AuditLog\Authentication\LogoutEvent;
+use App\Services\AuditLog\Authentication\TwoFactorFailedEvent;
 use App\Services\AuditLog\User\UserCreatedEvent;
 use App\Services\AuditLog\User\UserPermissionUpdatedEvent;
 use App\Services\AuditLog\User\UserTwoFactorResetEvent;
@@ -15,6 +17,8 @@ use MinVWS\AuditLogger\Events\Logging\AccountChangeLogEvent;
 use MinVWS\AuditLogger\Events\Logging\GeneralLogEvent;
 use MinVWS\AuditLogger\Events\Logging\UserCreatedLogEvent;
 use MinVWS\AuditLogger\Events\Logging\UserLoginLogEvent;
+use MinVWS\AuditLogger\Events\Logging\UserLoginTwoFactorFailedEvent;
+use MinVWS\AuditLogger\Events\Logging\UserLogoutLogEvent;
 use MinVWS\AuditLogger\Loggers\LogEventInterface;
 
 class AuditLogEventFactory
@@ -24,6 +28,8 @@ class AuditLogEventFactory
         return match ($event::class) {
             AuthenticationFailedEvent::class => $this->fromAuthenticationFailedEvent($event),
             AuthenticationSuccessEvent::class => $this->fromAuthenticationSuccessEvent($event),
+            LogoutEvent::class => $this->fromLogoutEvent($event),
+            TwoFactorFailedEvent::class => $this->fromTwoFactorFailedEvent($event),
             UserCreatedEvent::class => $this->fromUserCreatedEvent($event),
             UserPermissionUpdatedEvent::class => $this->fromUserPermissionUpdatedEvent($event),
             UserTwoFactorResetEvent::class => $this->fromUserTwoFactorResetEvent($event),
@@ -46,14 +52,37 @@ class AuditLogEventFactory
         $minvwsAuditLogEvent = new class extends GeneralLogEvent {
         };
         $minvwsAuditLogEvent->withEventCode($code);
+        $minvwsAuditLogEvent->withFailed(true, $event->type);
 
         return $minvwsAuditLogEvent;
     }
 
+    // Authentication events set the user as actor: the package takes the
+    // user id and email of a log entry from the actor, not from the target.
     private function fromAuthenticationSuccessEvent(AuthenticationSuccessEvent $event): UserLoginLogEvent
     {
         $minvwsAuditLogEvent = new UserLoginLogEvent();
+        $minvwsAuditLogEvent->withActor($event->user);
         $minvwsAuditLogEvent->withTarget($event->user);
+
+        return $minvwsAuditLogEvent;
+    }
+
+    private function fromLogoutEvent(LogoutEvent $event): UserLogoutLogEvent
+    {
+        $minvwsAuditLogEvent = new UserLogoutLogEvent();
+        $minvwsAuditLogEvent->withActor($event->user);
+        $minvwsAuditLogEvent->withTarget($event->user);
+
+        return $minvwsAuditLogEvent;
+    }
+
+    private function fromTwoFactorFailedEvent(TwoFactorFailedEvent $event): UserLoginTwoFactorFailedEvent
+    {
+        $minvwsAuditLogEvent = new UserLoginTwoFactorFailedEvent();
+        $minvwsAuditLogEvent->withActor($event->user);
+        $minvwsAuditLogEvent->withTarget($event->user);
+        $minvwsAuditLogEvent->withFailed(true, $event->reason);
 
         return $minvwsAuditLogEvent;
     }

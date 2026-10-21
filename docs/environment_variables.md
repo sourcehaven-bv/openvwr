@@ -113,6 +113,7 @@ The following environment variables are used to configure the application in `sr
 - `LOG_CHANNEL` (default: `stderr`)
 - `LOG_DEPRECATIONS_CHANNEL` (default: `null`)
 - `LOG_LEVEL` (default: `debug`)
+- `AUDIT_LOG_DBLOG_ENABLED` write audit events (logins, failed logins, logouts, account changes) to the `audit_logs` table (default: `true`)
 
 **MAIL:**
 
