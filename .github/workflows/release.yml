@@ -40,4 +40,5 @@ jobs:
           files: |
             *.tar.gz
             *.pdf
+            *.cdx.json
           generate_release_notes: true
