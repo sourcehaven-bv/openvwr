@@ -272,7 +272,7 @@ class TransferCopy extends Page
         }
 
         $authorized = app(CrossOrgAuthorization::class)
-            ->userHasPermissionInOrganisation(Authentication::user(), $target, Permission::CORE_ENTITY_IMPORT);
+            ->userHasPermissionInOrganisation(Authentication::user(), $target, Permission::TRANSFER_IMPORT);
 
         return $authorized && !$target->id->equals(Authentication::organisation()->id) ? $target : null;
     }
