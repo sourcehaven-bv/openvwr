@@ -178,6 +178,34 @@ it('records a failed audit event when a copy is rejected', function (): void {
         ->once();
 });
 
+it('records the exception class, not its message, when a copy fails after authorization', function (): void {
+    AuditLog::spy();
+
+    $source = Organisation::factory()->create();
+    $destination = Organisation::factory()->create();
+    $user = copyableUser($source, $destination);
+
+    $this->mock(BundleBuilder::class)
+        ->shouldReceive('build')
+        ->andThrow(new RuntimeException('details that must not reach the audit log'));
+
+    expect(fn () => app(CrossOrgCopier::class)->copy(
+        TransferEntityType::AVG_RESPONSIBLE_PROCESSING_RECORD,
+        [],
+        [],
+        [],
+        $source,
+        $destination,
+        $user,
+    ))->toThrow(RuntimeException::class);
+
+    AuditLog::shouldHaveReceived('register')
+        ->withArgs(fn (mixed $event): bool => $event instanceof TransferImportEvent
+            && $event->result === null
+            && $event->failedReason === 'RuntimeException')
+        ->once();
+});
+
 it('copies a document with its media into another organisation', function (): void {
     Storage::fake('media-library');
 
