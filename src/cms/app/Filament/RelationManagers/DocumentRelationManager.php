@@ -16,7 +16,7 @@ class DocumentRelationManager extends RelationManager
 
     public function table(Table $table): Table
     {
-        return DocumentResource::table($table)
+        return $this->detachSharedRecords(DocumentResource::table($table))
             ->recordUrl(static function (Model $record): string {
                 return DocumentResource::getUrl('view', ['record' => $record]);
             });
