@@ -19,17 +19,28 @@ readonly class TransferBundle
     ) {
     }
 
+    public function sourceOrganisationId(): ?string
+    {
+        $id = $this->sourceOrganisation()['id'] ?? null;
+
+        return is_string($id) && $id !== '' ? $id : null;
+    }
+
     public function sourceOrganisationName(): string
+    {
+        $name = $this->sourceOrganisation()['name'] ?? null;
+
+        return is_string($name) ? $name : '';
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    private function sourceOrganisation(): array
     {
         $sourceOrganisation = $this->manifest['source_organisation'] ?? null;
 
-        if (!is_array($sourceOrganisation)) {
-            return '';
-        }
-
-        $name = $sourceOrganisation['name'] ?? null;
-
-        return is_string($name) ? $name : '';
+        return is_array($sourceOrganisation) ? $sourceOrganisation : [];
     }
 
     public function exportedAt(): string

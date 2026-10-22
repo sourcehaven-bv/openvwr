@@ -7,8 +7,10 @@ namespace App\Jobs;
 use App\Components\Uuid\UuidInterface;
 use App\Enums\Queue;
 use App\Events\StaticWebsite\BuildEvent;
+use App\Facades\AuditLog;
 use App\Models\Organisation;
 use App\Models\User;
+use App\Services\AuditLog\Transfer\TransferImportEvent;
 use App\Services\BuildContextService;
 use App\Transfer\Import\BundleImporter;
 use App\Transfer\TransferBundleStorage;
@@ -64,6 +66,15 @@ class TransferImportJob implements ShouldQueue
         } catch (Throwable $exception) {
             Log::error('transfer import failed', ['message' => $exception->getMessage()]);
 
+            AuditLog::register(new TransferImportEvent(
+                $user,
+                TransferImportEvent::METHOD_BUNDLE,
+                $organisation->id->toString(),
+                null,
+                null,
+                $exception->getMessage(),
+            ));
+
             Notification::make()
                 ->title(__('transfer.import_failed'))
                 ->icon('heroicon-o-archive-box')
@@ -75,6 +86,14 @@ class TransferImportJob implements ShouldQueue
             $buildContextService->enableBuild();
             $bundleStorage->delete($this->bundlePath);
         }
+
+        AuditLog::register(new TransferImportEvent(
+            $user,
+            TransferImportEvent::METHOD_BUNDLE,
+            $organisation->id->toString(),
+            $result->sourceOrganisationId,
+            $result,
+        ));
 
         BuildEvent::dispatch();
 

@@ -3,10 +3,12 @@
 declare(strict_types=1);
 
 use App\Events\StaticWebsite\BuildEvent;
+use App\Facades\AuditLog;
 use App\Jobs\TransferImportJob;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Organisation;
 use App\Models\User;
+use App\Services\AuditLog\Transfer\TransferImportEvent;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
@@ -70,4 +72,56 @@ it('notifies the user of a failure and still deletes the bundle when the import 
         ->firstOrFail();
 
     expect($notification->data['title'])->toBe(__('transfer.import_failed'));
+});
+
+it('records an audit event for the import', function (): void {
+    Storage::fake('transfer');
+    Event::fake([BuildEvent::class]);
+    AuditLog::spy();
+
+    $sourceOrganisation = Organisation::factory()->create();
+    $destinationOrganisation = Organisation::factory()->create();
+    $user = User::factory()->create();
+
+    [$path, $plan] = createExportedBundle($sourceOrganisation, $user);
+
+    app()->call([new TransferImportJob($path, $plan, $destinationOrganisation->id, $user->id), 'handle']);
+
+    $imported = AvgResponsibleProcessingRecord::query()->whereBelongsTo($destinationOrganisation)->firstOrFail();
+
+    AuditLog::shouldHaveReceived('register')
+        ->withArgs(fn (mixed $event): bool => $event instanceof TransferImportEvent
+            && $event->method === TransferImportEvent::METHOD_BUNDLE
+            && $event->user?->id->equals($user->id) === true
+            && $event->sourceOrganisationId === $sourceOrganisation->id->toString()
+            && $event->destinationOrganisationId === $destinationOrganisation->id->toString()
+            && $event->failedReason === null
+            && in_array([
+                'type' => 'avg_responsible_processing_record',
+                'id' => $imported->id->toString(),
+                'action' => 'created',
+            ], $event->result?->records ?? [], true))
+        ->once();
+});
+
+it('records a failed audit event when the import throws', function (): void {
+    Storage::fake('transfer');
+    Event::fake([BuildEvent::class]);
+    AuditLog::spy();
+
+    $organisation = Organisation::factory()->create();
+    $user = User::factory()->create();
+
+    $path = 'transfer/imports/corrupt.zip';
+    Storage::disk('transfer')->put($path, 'not a real zip');
+
+    app()->call([new TransferImportJob($path, [], $organisation->id, $user->id), 'handle']);
+
+    AuditLog::shouldHaveReceived('register')
+        ->withArgs(fn (mixed $event): bool => $event instanceof TransferImportEvent
+            && $event->method === TransferImportEvent::METHOD_BUNDLE
+            && $event->destinationOrganisationId === $organisation->id->toString()
+            && $event->result === null
+            && $event->failedReason !== null)
+        ->once();
 });

@@ -33,3 +33,11 @@ it('returns an empty string when exported at is missing or not a string', functi
     expect($missing->exportedAt())->toBe('')
         ->and($nonString->exportedAt())->toBe('');
 });
+
+it('reads the source organisation id from the manifest', function (): void {
+    $bundle = new TransferBundle(['source_organisation' => ['id' => 'abc', 'name' => 'Bron BV']], []);
+
+    expect($bundle->sourceOrganisationId())->toBe('abc')
+        ->and((new TransferBundle([], []))->sourceOrganisationId())->toBeNull()
+        ->and((new TransferBundle(['source_organisation' => ['id' => '']], []))->sourceOrganisationId())->toBeNull();
+});
