@@ -756,11 +756,17 @@ function forgeSubmitForReview(
 ): void {
     $user = UserTestHelper::createForOrganisation($organisation);
 
-    $forge($test->withPermissions($user, $permissions)
+    $livewire = $test->withPermissions($user, $permissions)
         ->withFilamentSession($user, $organisation)
         ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
             'record' => $avgResponsibleProcessingRecord->id,
-        ]));
+        ]);
+
+    // Mounting normally writes the concept that is submitted. One of the requests skips
+    // mounting, so the concept is saved first.
+    $livewire->call('save');
+
+    $forge($livewire);
 }
 
 dataset('forged submit for review requests', [
@@ -770,13 +776,17 @@ dataset('forged submit for review requests', [
             $livewire->call('mountAction', 'snapshot_submit_for_review');
         },
     ],
-    // Marking the action as mounted directly skips mountAction() altogether.
+    // Marking the action as mounted in the same request skips mountAction() altogether.
     'calling an action marked as mounted' => [
         static function (Testable $livewire): void {
-            $livewire->set('mountedActions', ['snapshot_submit_for_review'])
-                ->set('mountedActionsArguments', [[]])
-                ->set('mountedActionsData', [[]])
-                ->call('callMountedAction');
+            $livewire->update(
+                calls: [['method' => 'callMountedAction', 'params' => [], 'path' => '']],
+                updates: [
+                    'mountedActions' => ['snapshot_submit_for_review'],
+                    'mountedActionsArguments' => [[]],
+                    'mountedActionsData' => [[]],
+                ],
+            );
         },
     ],
 ]);
@@ -811,14 +821,6 @@ it('submits a forged request for a user with permission to create versions', fun
         ->recycle($organisation)
         ->withValidState()
         ->create();
-
-    // The concept the action submits is normally written while mounting, which the second
-    // request skips, so it is saved here first.
-    $this->asFilamentOrganisationUser($organisation)
-        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
-            'record' => $avgResponsibleProcessingRecord->id,
-        ])
-        ->call('save');
 
     forgeSubmitForReview($this, $organisation, $avgResponsibleProcessingRecord, Permission::cases(), $forge);
 

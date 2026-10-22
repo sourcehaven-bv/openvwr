@@ -178,14 +178,19 @@ dataset('forged establish requests', [
                 ->call('callMountedInfolistAction');
         },
     ],
-    // Marking the action as mounted directly skips mountInfolistAction() altogether.
+    // Marking the action as mounted in the same request skips mountInfolistAction()
+    // altogether.
     'calling an action marked as mounted' => [
         static function (Testable $livewire): void {
-            $livewire->set('mountedInfolistActions', ['snapshot_establish'])
-                ->set('mountedInfolistActionsData', [[]])
-                ->set('mountedInfolistActionsComponent', ViewInfoTab::SECTION_KEY_STATUS_FLOW)
-                ->set('mountedInfolistActionsInfolist', 'infolist')
-                ->call('callMountedInfolistAction');
+            $livewire->update(
+                calls: [['method' => 'callMountedInfolistAction', 'params' => [], 'path' => '']],
+                updates: [
+                    'mountedInfolistActions' => ['snapshot_establish'],
+                    'mountedInfolistActionsData' => [[]],
+                    'mountedInfolistActionsComponent' => ViewInfoTab::SECTION_KEY_STATUS_FLOW,
+                    'mountedInfolistActionsInfolist' => 'infolist',
+                ],
+            );
         },
     ],
 ]);
