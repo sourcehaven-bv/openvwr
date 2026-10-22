@@ -49,6 +49,45 @@ bedoeld voor een ontwikkelserver zonder KMS, zoals de Homebrew-minio uit
 `just setup-native-object-storage`. Gebruik het niet in productie.
 Een `.env.native` van vóór deze instelling mist die regel; voeg hem zelf toe.
 
+## Downloads van bijlagen
+
+Bijlagen downloaden gaat via `GET /media/{media}` (`PrivateMediaController`).
+Die route controleert bij elk verzoek of de gebruiker is ingelogd, zet de
+organisatie, controleert `can('view')` en of het bestand gevalideerd is. Daarna
+streamt de app het bestand van de disk naar de browser. Het geheugengebruik
+blijft daarbij laag. Wel is een PHP-worker bezet zolang de overdracht duurt.
+Bijlagen mogen 20 MB zijn; de PHP-uploadgrens van een deployment kan hoger
+liggen, bijvoorbeeld 100 MB.
+
+### Waarom (nog) geen presigned URLs
+
+Een presigned URL laat de browser het bestand direct uit de bucket halen. We
+doen dat bewust niet:
+
+- Een presigned URL is een bearer token. Wie de URL heeft, kan het bestand
+  ophalen tot de URL verloopt. Intrekken kan niet.
+- De browser laadt het bestand dan van het domein van de opslag. Dat vraagt
+  aanpassingen in de CSP (`src/cms/app/Http/CspPolicy.php`) en CORS-instellingen
+  op de bucket, per deployment.
+- De app kan alleen vastleggen dat een URL is uitgegeven, niet dat het bestand
+  echt is gedownload.
+
+SSE-S3 staat presigned URLs niet in de weg; dat is dus geen reden.
+
+### Als de workerbelasting een probleem wordt
+
+Pak dit pas op als de belasting gemeten een probleem is. Er zijn twee opties.
+
+1. **Offload via de proxy (voorkeur).** De app controleert de rechten en geeft
+   een `X-Accel-Redirect` terug naar een interne nginx-location. Nginx haalt het
+   bestand op uit de opslag, bijvoorbeeld via een kortlevende presigned URL die
+   de browser nooit ziet. Dit vereist nginx vóór de app, en dat hangt af van de
+   hosting.
+2. **Presigned redirect, opt-in.** De app controleert de rechten en stuurt de
+   browser door naar een presigned URL die na 1 tot 5 minuten verloopt. Forceer
+   een download (`Content-Disposition: attachment`) en log het uitgeven van de
+   URL. Pas ook de CSP en de CORS-instellingen van de bucket aan.
+
 ## Configuratie
 
 ```dotenv
