@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Services\AuditLog\Transfer\TransferExportEvent;
 use App\Services\AuditLog\Transfer\TransferFailureReason;
 use App\Transfer\Export\BundleExporter;
+use App\Transfer\TransferBundleStorage;
 use App\Transfer\TransferEntityType;
 use Filament\Notifications\Actions\Action;
 use Filament\Notifications\Notification;
@@ -36,7 +37,7 @@ class TransferExportJob implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
-    private const int DOWNLOAD_VALID_DAYS = 7;
+    private const int DOWNLOAD_VALID_DAYS = TransferBundleStorage::RETENTION_DAYS;
 
     /**
      * @param list<string> $recordIds

@@ -30,6 +30,11 @@ class TransferBundleStorage
 {
     public const string DISK = 'transfer';
 
+    /**
+     * Days a bundle is kept. Export download links expire after the same period.
+     */
+    public const int RETENTION_DAYS = 7;
+
     public function disk(): Filesystem
     {
         return Storage::disk(self::DISK);
