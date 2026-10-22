@@ -59,7 +59,7 @@ class TransferExportJob implements ShouldQueue
 
         $path = $bundleExporter->export($this->recordType, $this->recordIds, $this->selectedRelated, $organisation);
 
-        $user = User::query()->find($this->userId);
+        $user = User::query()->find($this->userId->toString());
 
         AuditLog::register($this->auditEvent($user));
 
@@ -92,7 +92,7 @@ class TransferExportJob implements ShouldQueue
     public function failed(?Throwable $exception): void
     {
         AuditLog::register($this->auditEvent(
-            User::query()->find($this->userId),
+            User::query()->find($this->userId->toString()),
             TransferFailureReason::from($exception),
         ));
     }
