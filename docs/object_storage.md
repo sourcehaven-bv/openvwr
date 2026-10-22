@@ -16,10 +16,13 @@ deployments blijft alles op schijf staan.
 | `filament` | `EXPORTS_BUCKET` (`exports`) | Filament-exports (xlsx) |
 | `transfer` | `TRANSFER_BUCKET` (`transfer`) | Import/export-bundels tussen organisaties |
 
+Alle gedeelde disks zijn `private`. Op S3 wordt `public` een `public-read`
+object-ACL; een bestand is dan zonder inloggen op te halen. Exports bevatten
+registergegevens, dus ook de `filament`-disk is `private`. Downloads lopen via
+de route van Filament, die controleert of de gebruiker de export mag zien.
+
 `transfer` staat los van `filament` omdat een transfer-bundel de volledige
-registerinhoud van een organisatie bevat. De `filament`-disk is `public`; op een
-bucket zou dat betekenen dat die zips voor iedereen leesbaar zijn. De
-`transfer`-disk is daarom `private`.
+registerinhoud van een organisatie bevat.
 
 ## Configuratie
 
