@@ -24,6 +24,31 @@ de route van Filament, die controleert of de gebruiker de export mag zien.
 `transfer` staat los van `filament` omdat een transfer-bundel de volledige
 registerinhoud van een organisatie bevat.
 
+## Versleuteling at rest
+
+POLICY-014 eist dat vertrouwelijke gegevens versleuteld zijn opgeslagen, met
+minimaal AES-256. De gedeelde disks bevatten bijlagen en volledige
+registerexports, dus dat geldt hier.
+
+De app schrijft daarom elk object met server-side encryptie (SSE-S3, `AES256`).
+Dat staat standaard aan via `AWS_SERVER_SIDE_ENCRYPTION=AES256`. Een nieuwe
+bucket krijgt bij `storage:setup-buckets` dezelfde versleuteling als standaard,
+zodat ook objecten die buiten de app worden geschreven versleuteld zijn.
+Bestaande buckets blijven ongewijzigd.
+
+- **AWS S3** ondersteunt `AES256` zonder extra instellingen.
+- **MinIO** weigert versleutelde uploads zonder KMS-sleutel. Zet
+  `MINIO_KMS_SECRET_KEY` (formaat `<naam>:<base64 van 32 willekeurige bytes>`)
+  of koppel een externe KMS. Docker Compose en CI gebruiken een vaste
+  ontwikkelsleutel; gebruik die nooit in productie.
+- **Andere S3-compatibele servers**: controleer dat ze SSE-S3 ondersteunen
+  voordat je ze koppelt.
+
+`AWS_SERVER_SIDE_ENCRYPTION=none` zet de versleuteling uit. Dat is alleen
+bedoeld voor een ontwikkelserver zonder KMS, zoals de Homebrew-minio uit
+`just setup-native-object-storage`. Gebruik het niet in productie.
+Een `.env.native` van vóór deze instelling mist die regel; voeg hem zelf toe.
+
 ## Configuratie
 
 ```dotenv
@@ -33,6 +58,7 @@ AWS_ACCESS_KEY_ID=minioadmin
 AWS_SECRET_ACCESS_KEY=minioadmin
 AWS_DEFAULT_REGION=eu-central-1
 AWS_USE_PATH_STYLE_ENDPOINT=true
+AWS_SERVER_SIDE_ENCRYPTION=AES256
 ```
 
 Daarna moeten de buckets bestaan:

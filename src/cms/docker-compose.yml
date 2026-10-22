@@ -97,6 +97,9 @@ services:
         environment:
             MINIO_ROOT_USER: '${MINIO_ROOT_USER:-minioadmin}'
             MINIO_ROOT_PASSWORD: '${MINIO_ROOT_PASSWORD:-minioadmin}'
+            # The app writes every object with server-side encryption (AES256), which
+            # minio only accepts with a KMS key. A fixed key is fine for local data.
+            MINIO_KMS_SECRET_KEY: '${MINIO_KMS_SECRET_KEY:-openvwr-dev:+SLYGbnmr0BzxQZUxr6jTsPk0OA7Jz0PG7QEpCEMvj0=}'
         user: root
         volumes:
             - 'sail-minio:/minio_root'

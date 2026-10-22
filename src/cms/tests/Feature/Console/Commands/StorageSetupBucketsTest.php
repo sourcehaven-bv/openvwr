@@ -12,16 +12,21 @@ use Illuminate\Support\Facades\Storage;
 /**
  * Swap in a disk that reports itself as s3 and hands back the given client, so the
  * command can be exercised without an actual bucket service.
+ *
+ * @param array<string, string> $options the disks' default write options
  */
-function fakeS3Disk(S3Client $client): void
+function fakeS3Disk(S3Client $client, array $options = []): void
 {
     config([
         'filesystems.disks.media-library.driver' => 's3',
         'filesystems.disks.media-library.bucket' => 'uploads',
+        'filesystems.disks.media-library.options' => $options,
         'filesystems.disks.filament.driver' => 's3',
         'filesystems.disks.filament.bucket' => 'exports',
+        'filesystems.disks.filament.options' => $options,
         'filesystems.disks.transfer.driver' => 's3',
         'filesystems.disks.transfer.bucket' => 'transfer',
+        'filesystems.disks.transfer.options' => $options,
     ]);
 
     $adapter = Mockery::mock(AwsS3V3Adapter::class);
@@ -48,6 +53,7 @@ it('creates every bucket that does not exist yet', function (): void {
     $client = Mockery::mock(S3Client::class);
     $client->shouldReceive('doesBucketExistV2')->times(3)->andReturnFalse();
     $client->shouldReceive('createBucket')->times(3);
+    $client->shouldReceive('putBucketEncryption')->never();
 
     fakeS3Disk($client);
 
@@ -55,6 +61,22 @@ it('creates every bucket that does not exist yet', function (): void {
         ->expectsOutputToContain('Bucket uploads created successfully.')
         ->expectsOutputToContain('Bucket exports created successfully.')
         ->expectsOutputToContain('Bucket transfer created successfully.')
+        ->assertSuccessful();
+});
+
+it('sets default encryption on a new bucket when the disk encrypts', function (): void {
+    $client = Mockery::mock(S3Client::class);
+    $client->shouldReceive('doesBucketExistV2')->times(3)->andReturnFalse();
+    $client->shouldReceive('createBucket')->times(3);
+    $client->shouldReceive('putBucketEncryption')->times(3)->with(Mockery::on(
+        static fn (array $args): bool => $args['ServerSideEncryptionConfiguration']['Rules'][0]
+            === ['ApplyServerSideEncryptionByDefault' => ['SSEAlgorithm' => 'AES256']],
+    ));
+
+    fakeS3Disk($client, ['ServerSideEncryption' => 'AES256']);
+
+    $this->artisan('storage:setup-buckets')
+        ->expectsOutputToContain('Bucket uploads encrypts new objects with AES256 by default.')
         ->assertSuccessful();
 });
 
