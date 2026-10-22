@@ -58,7 +58,9 @@ Mogelijke richtingen, in volgorde van impact op de huisstijl:
 3. Accepteren en vastleggen als bewuste afwijking, eventueel met een
    toegankelijkheidsverklaring.
 
-Dit is een ontwerpbeslissing; dit document doet er geen uitspraak over.
+Gekozen is richting 2. Knoppen krijgen witte tekst op tint 700 van de primaire
+kleur, `#BA3B2B` (5.64:1). Accenten en andere elementen houden `#F84F39`. Zie
+`AccessibleButtonComponent`.
 
 ## Beperkingen
 

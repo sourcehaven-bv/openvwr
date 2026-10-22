@@ -4,12 +4,13 @@
 @import '../../app.css';
 
 /* Tailwind 4 leest de te scannen paden uit @source in plaats van uit de
-   `content` van een tailwind.config.js. De lijst is die van het oude
-   configbestand, dat met het v3-preset is komen te vervallen. */
-@source '../../../../app/Filament/**/*.php';
+   `content` van een tailwind.config.js. Het oude configbestand scande alleen
+   app/Filament en views/filament en views/livewire; dat volstond omdat de
+   v3-CSS de meeste utilities zelf al meeleverde. v5 gebruikt eigen fi-klassen,
+   dus alles wat de app zelf rendert moet hier gescand worden. */
+@source '../../../../app/**/*.php';
 @source '../../../../resources/lang/**/*.php';
-@source '../../../../resources/views/filament/**/*.blade.php';
-@source '../../../../resources/views/livewire/**/*.blade.php';
+@source '../../../../resources/views/**/*.blade.php';
 @source '../../../../vendor/filament/**/*.blade.php';
 @source '../../../../vendor/solution-forest/filament-tree/resources/**/*.blade.php';
 
@@ -152,7 +153,7 @@
 /* The size step that was missing: headings were text-base, same as body.
    Scoped to the section's own header so nested information blocks keep
    their smaller heading and the hierarchy stays readable. */
-.onepage-layout [data-onepage-section] > .fi-section-header .fi-section-header-heading {
+.onepage-layout [data-onepage-section] > .fi-section > .fi-section-header .fi-section-header-heading {
     @apply text-xl font-semibold;
 }
 
@@ -164,7 +165,7 @@
    border-radius rather than by clipping it at the section. The section must
    stay overflow-visible so select dropdowns can escape the card (see below),
    which rules out the overflow-hidden this used to rely on. */
-.onepage-layout [data-onepage-section] > .fi-section-header {
+.onepage-layout [data-onepage-section] > .fi-section > .fi-section-header {
     @apply border-l-4 border-primary-600 dark:border-primary-400;
     border-top-left-radius: theme('borderRadius.xl');
 }
@@ -295,38 +296,41 @@
  * container and the badge is drawn on the inner span instead, which is the
  * element that knows its colour.
  */
-.choices__list--multiple .choices__item:has(.fi-label-swatch) {
+.fi-select-input-value-badges-ctn .fi-badge:has(.fi-label-swatch) {
     background-color: transparent;
     padding: 0;
     --tw-ring-color: transparent;
+    box-shadow: none;
 }
 
-.choices__list--multiple .fi-label-swatch {
+/* Since v4 the palette properties hold complete colours rather than
+   "r, g, b" triplets, so they are used as-is and mixed for transparency. */
+.fi-select-input-value-badges-ctn .fi-label-swatch {
     @apply rounded-md text-xs font-medium ring-1 ring-inset;
     padding: 0.25rem 0.5rem;
-    background-color: rgb(var(--fi-label-color-50));
-    color: rgb(var(--fi-label-color-600));
-    --tw-ring-color: rgba(var(--fi-label-color-600), 0.1);
+    background-color: var(--fi-label-color-50);
+    color: var(--fi-label-color-600);
+    --tw-ring-color: color-mix(in oklab, var(--fi-label-color-600) 10%, transparent);
 }
 
-.dark .choices__list--multiple .fi-label-swatch {
-    background-color: rgba(var(--fi-label-color-400), 0.1);
-    color: rgb(var(--fi-label-color-400));
-    --tw-ring-color: rgba(var(--fi-label-color-400), 0.3);
+.dark .fi-select-input-value-badges-ctn .fi-label-swatch {
+    background-color: color-mix(in oklab, var(--fi-label-color-400) 10%, transparent);
+    color: var(--fi-label-color-400);
+    --tw-ring-color: color-mix(in oklab, var(--fi-label-color-400) 30%, transparent);
 }
 
 /*
  * Inside a coloured chip the dot is redundant: the badge already carries the
  * colour, and a dot in the same hue on top of it only adds noise.
  */
-.choices__list--multiple .fi-label-swatch__dot {
+.fi-select-input-value-badges-ctn .fi-label-swatch__dot {
     display: none;
 }
 
 /* The relation pickers offer the most recently edited records under a heading
    that explains that ordering; this keeps the heading a quiet label rather
    than something that competes with the options themselves. */
-.choices__list .choices__group .choices__heading {
+.fi-select-input-option-group > .fi-dropdown-header {
     @apply text-xs font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500;
     padding: 0.5rem 1rem 0.25rem;
 }

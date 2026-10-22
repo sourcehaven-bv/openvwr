@@ -35,7 +35,7 @@ class InformationBlockSection extends Section
     private static function makePlaceholderWithHtmlString(string $info, string $name): TextEntry
     {
         return TextEntry::make($name)
-            ->label('')
+            ->hiddenLabel()
             ->formatStateUsing(static function () use ($info): HtmlString {
                 return self::makeHtmlString($info);
             });

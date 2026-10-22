@@ -18,6 +18,16 @@
             return JSON.parse(this.$refs.tabsData.value)
         },
 
+        // The v5 tab panels bind their active state and their reveal-on-
+        // expand to these two, which Filament's own tabs component provides.
+        isTabSelected: function (key) {
+            return this.tab === key
+        },
+
+        revealTab: function (key) {
+            this.tab = key
+        },
+
         updateQueryString: function () {
             if (! @js($isTabPersistedInQueryString())) {
                 return
@@ -62,7 +72,9 @@
             ->merge($getExtraAttributes(), escape: false)
             ->merge($getExtraAlpineAttributes(), escape: false)
             ->class([
-                'fi-in-tabs flex flex-col',
+                // v5 hides inactive tabs and pads the active one with CSS
+                // scoped to fi-sc-tabs.
+                'fi-sc-tabs fi-in-tabs flex flex-col',
                 'fi-contained rounded-xl bg-white shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10' => $isContained,
             ])
     }}
@@ -72,7 +84,7 @@
         value="{{
             collect($getChildComponentContainer()->getComponents())
                 ->filter(static fn (Tab $tab): bool => $tab->isVisible())
-                ->map(static fn (Tab $tab) => $tab->getId())
+                ->map(static fn (Tab $tab) => $tab->getKey(isAbsolute: false))
                 ->values()
                 ->toJson()
         }}"
@@ -88,7 +100,7 @@
         <x-filament::tabs :contained="$isContained" :label="$getLabel()">
             @foreach ($getChildComponentContainer()->getComponents() as $tab)
                 @php
-                    $tabId = $tab->getId();
+                    $tabId = $tab->getKey(isAbsolute: false);
                 @endphp
 
                 <x-filament::tabs.item

@@ -143,7 +143,7 @@ class Approvals extends Component implements HasActions, HasForms, HasTable
 
         return [
             CheckboxList::makeWithValidatedOptions('user_ids', $allowedUserIds)
-                ->label(''),
+                ->hiddenLabel(),
         ];
     }
 }

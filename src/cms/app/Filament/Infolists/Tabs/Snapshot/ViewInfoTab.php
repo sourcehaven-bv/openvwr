@@ -111,7 +111,7 @@ class ViewInfoTab extends Tab
             ->visible(Feature::publishingEnabled())
             ->schema([
                 TextEntry::make('snapshotData.public_markdown')
-                    ->label('')
+                    ->hiddenLabel()
                     ->formatStateUsing(
                         static function (Snapshot $snapshot, SnapshotDataMarkdownRenderer $snapshotDataMarkdownRenderer): string {
                             Assert::notNull($snapshot->snapshotData);
@@ -140,7 +140,7 @@ class ViewInfoTab extends Tab
             ->description(new HtmlString(view('filament.infolists.components.entries.snapshot_data_description')->render()))
             ->schema([
                 TextEntry::make('snapshotData.private_markdown')
-                    ->label('')
+                    ->hiddenLabel()
                     ->formatStateUsing(
                         static function (Snapshot $snapshot, SnapshotDataMarkdownRenderer $snapshotDataMarkdownRenderer): string {
                             Assert::notNull($snapshot->snapshotData);

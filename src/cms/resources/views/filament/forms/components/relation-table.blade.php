@@ -1,6 +1,4 @@
 @php
-    use Filament\Support\Facades\FilamentView;
-
     $statePath = $getStatePath();
     $columns = $getTableColumns();
     $records = $getLinkedRecords();
@@ -83,8 +81,8 @@
             </div>
         @endif
 
-        {{-- Searchable "add" control. This is the standard Filament select input
-             (choices.js), entangled to the same state path as the table above, so
+        {{-- Searchable "add" control. This is the standard Filament select input,
+             entangled to the same state path as the table above, so
              linking a record adds a row and the inline "create option" action still
              works. Only the input control is rendered here — the label lives on the
              surrounding field wrapper. --}}
@@ -92,7 +90,7 @@
             {{-- The linked records are already shown in the table above, so the
                  selected-item chips are hidden here; this leaves a clean "add" box. --}}
             <style>
-                .fi-relation-table-add .choices__list--multiple {
+                .fi-relation-table-add .fi-select-input-value-badges-ctn {
                     display: none;
                 }
             </style>
@@ -105,44 +103,54 @@
                         ->class(['fi-fo-select', 'fi-relation-table-add'])
                 "
             >
+                {{-- Mirrors the non-native branch of Select::toEmbeddedHtml(). --}}
                 <div
-                    @if (FilamentView::hasSpaMode())
-                        {{-- format-ignore-start --}}x-load="visible || event (ax-modal-opened)"{{-- format-ignore-end --}}
-                    @else
-                        x-load
-                    @endif
+                    x-load
                     x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('select', 'filament/forms') }}"
                     x-data="selectFormComponent({
+                                canOptionLabelsWrap: @js($canOptionLabelsWrap()),
                                 canSelectPlaceholder: @js($canSelectPlaceholder()),
-                                isHtmlAllowed: @js($isHtmlAllowed()),
+                                clearButtonLabel: @js(__('filament-forms::components.select.actions.clear.label')),
+                                errorMessage: @js(__('filament-forms::components.select.error_message')),
                                 getOptionLabelUsing: async () => {
-                                    return await $wire.getFormSelectOptionLabel(@js($statePath))
+                                    return await Livewire.fireAction($wire.__instance, 'callSchemaComponentMethod', [@js($getKey()), 'getOptionLabel'], { async: true })
                                 },
                                 getOptionLabelsUsing: async () => {
-                                    return await $wire.getFormSelectOptionLabels(@js($statePath))
+                                    return await Livewire.fireAction($wire.__instance, 'callSchemaComponentMethod', [@js($getKey()), 'getOptionLabelsForJs'], { async: true })
                                 },
                                 getOptionsUsing: async () => {
-                                    return await $wire.getFormSelectOptions(@js($statePath))
+                                    return await Livewire.fireAction($wire.__instance, 'callSchemaComponentMethod', [@js($getKey()), 'getOptionsForJs'], { async: true })
                                 },
                                 getSearchResultsUsing: async (search) => {
-                                    return await $wire.getFormSelectSearchResults(@js($statePath), search)
+                                    return await Livewire.fireAction($wire.__instance, 'callSchemaComponentMethod', [@js($getKey()), 'getSearchResultsForJs', { search }], { async: true })
                                 },
-                                isAutofocused: @js($isAutofocused()),
-                                isMultiple: @js($isMultiple()),
-                                isSearchable: @js($isSearchable()),
-                                livewireId: @js($this->getId()),
                                 hasDynamicOptions: @js($hasDynamicOptions()),
                                 hasDynamicSearchResults: @js($hasDynamicSearchResults()),
+                                hasInitialNoOptionsMessage: false,
+                                id: @js($getId()),
+                                initialOptionLabel: null,
+                                initialOptionLabels: [],
+                                initialState: @js($getState()),
+                                isAutofocused: @js($isAutofocused()),
+                                isDisabled: false,
+                                isHtmlAllowed: @js($isHtmlAllowed()),
+                                isMultiple: @js($isMultiple()),
+                                isReorderable: false,
+                                isSearchable: @js($isSearchable()),
+                                livewireId: @js($this->getId()),
                                 loadingMessage: @js($getLoadingMessage()),
                                 maxItems: @js($getMaxItems()),
                                 maxItemsMessage: @js($getMaxItemsMessage()),
+                                noOptionsMessage: @js($getNoOptionsMessage()),
                                 noSearchResultsMessage: @js($getNoSearchResultsMessage()),
                                 options: @js($getOptionsForJs()),
                                 optionsLimit: @js($getOptionsLimit()),
                                 placeholder: @js($getPlaceholder()),
                                 position: @js($getPosition()),
+                                removeButtonLabel: @js(__('filament-forms::components.select.actions.remove_option.label')),
                                 searchDebounce: @js($getSearchDebounce()),
                                 searchingMessage: @js($getSearchingMessage()),
+                                searchLabel: @js(__('filament-forms::components.select.search_label')),
                                 searchPrompt: @js($getSearchPrompt()),
                                 searchableOptionFields: @js($getSearchableOptionFields()),
                                 state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }},
@@ -150,21 +158,9 @@
                             })"
                     wire:ignore
                     wire:key="{{ $this->getId() }}.{{ $statePath }}.{{ $field::class }}.add"
-                    x-on:keydown.esc="select.dropdown.isActive && $event.stopPropagation()"
+                    class="fi-select-input"
                 >
-                    <select
-                        x-ref="input"
-                        {{
-                            $getExtraInputAttributeBag()
-                                ->merge([
-                                    'id' => $getId(),
-                                    'multiple' => $isMultiple(),
-                                ], escape: false)
-                                ->class([
-                                    'h-9 w-full rounded-lg border-none bg-transparent !bg-none',
-                                ])
-                        }}
-                    ></select>
+                    <div x-ref="select"></div>
                 </div>
             </x-filament::input.wrapper>
         @endunless

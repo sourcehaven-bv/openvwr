@@ -1140,9 +1140,9 @@ async function passOtp(page, email = EMAIL) {
       process.env.OTP_FAKE === '0'
         ? totp(tinker(`echo App\\Models\\User::where("email", "${email}")->firstOrFail()->otp_secret;`))
         : '000000';
-    await page.locator('#code').fill(code);
+    await page.locator('input[autocomplete="one-time-code"]').fill(code);
     // Livewire form (action=null): clicking the button does not reliably submit.
-    await page.locator('#code').press('Enter');
+    await page.locator('input[autocomplete="one-time-code"]').press('Enter');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(1500);
 

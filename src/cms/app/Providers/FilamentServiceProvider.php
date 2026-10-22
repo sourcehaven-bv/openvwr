@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use App\Config\Config;
 use App\Facades\Authentication;
+use App\Filament\AccessibleButtonComponent;
 use App\Filament\LabelColorPalette;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\OnePageLayoutRenderHooks;
@@ -30,10 +31,15 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\NavigationGroup as FilamentNavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Schemas\Components\Fieldset;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Support\Assets\Css;
+use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Facades\FilamentColor;
 use Filament\Support\Facades\FilamentView;
+use Filament\Support\View\Components\ButtonComponent;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -66,14 +72,26 @@ class FilamentServiceProvider extends PanelProvider
         // Ensure primary color is set globally, including non-panel pages.
         // The label palette is registered alongside it so label badges render
         // outside the panel too.
+        // Buttons pick their shades through this component; see the class.
+        $this->app->bind(ButtonComponent::class, AccessibleButtonComponent::class);
+
         FilamentColor::register([
-            'primary' => '#F84F39',
+            'primary' => self::primaryPalette(),
             ...LabelColorPalette::all(),
         ]);
 
         FilamentAsset::register([
             Css::make('app', base_path('resources/css/app.css')),
         ]);
+
+        // v3 let these layout components span the full width; v4 dropped that
+        // default. Without it every form and infolist, which default to two
+        // columns, puts its sections side by side in narrow cards.
+        foreach ([Section::class, Fieldset::class, Grid::class] as $layoutComponent) {
+            $layoutComponent::configureUsing(
+                static fn (Section|Fieldset|Grid $component) => $component->columnSpanFull(),
+            );
+        }
 
         // BODY_START rather than a topbar hook: the banner spans the full width
         // above the panel chrome, and renders on the login page too, where an
@@ -107,6 +125,17 @@ class FilamentServiceProvider extends PanelProvider
         );
 
         OnePageLayoutRenderHooks::register();
+    }
+
+    /**
+     * The house colour as a v3-style ramp. v4 generates shades in OKLCH, which
+     * gives #F84F39 a duller 600 and 700 than production has.
+     *
+     * @return array<int, string>
+     */
+    private static function primaryPalette(): array
+    {
+        return Color::generateV3Palette('#F84F39');
     }
 
     /**
@@ -259,7 +288,7 @@ class FilamentServiceProvider extends PanelProvider
                 RouteFacade::redirect('/auth-profile', '/profile')->name('auth.profile');
             })
             ->colors([
-                'primary' => '#F84F39',
+                'primary' => self::primaryPalette(),
             ])
             ->defaultAvatarProvider(SimpleAvatarProvider::class)
             ->unsavedChangesAlerts()

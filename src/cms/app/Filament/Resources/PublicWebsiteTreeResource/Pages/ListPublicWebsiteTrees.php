@@ -15,12 +15,32 @@ use SolutionForest\FilamentTree\Resources\Pages\TreePage;
 use Webmozart\Assert\Assert;
 
 use function __;
+use function array_filter;
 use function view;
 
 class ListPublicWebsiteTrees extends TreePage
 {
     protected static string $resource = PublicWebsiteTreeResource::class;
     protected static ?string $breadcrumb = '';
+
+    /**
+     * The v4 tree page derives its title from the class name ("List Public
+     * Website Trees"); v2 used the resource label.
+     */
+    public function getTitle(): string
+    {
+        return PublicWebsiteTreeResource::getPluralModelLabel();
+    }
+
+    /**
+     * With an empty page crumb v5 still renders it, as a trailing separator.
+     *
+     * @return array<array-key, string>
+     */
+    public function getBreadcrumbs(): array
+    {
+        return array_filter(parent::getBreadcrumbs(), static fn (string $crumb): bool => $crumb !== '');
+    }
 
     protected function getHeaderActions(): array
     {

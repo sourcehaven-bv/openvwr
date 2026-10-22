@@ -44,7 +44,7 @@ class TransferExportBulkAction extends BulkAction
 
                 $schema = [
                     Placeholder::make('summary')
-                        ->label('')
+                        ->hiddenLabel()
                         ->content(__('transfer.export_summary', ['count' => $records->count()])),
                 ];
 

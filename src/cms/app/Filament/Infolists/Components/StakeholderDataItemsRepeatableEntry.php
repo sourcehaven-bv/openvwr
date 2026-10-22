@@ -13,7 +13,7 @@ class StakeholderDataItemsRepeatableEntry extends RepeatableEntry
     public static function make(?string $name = 'stakeholderDataItems'): static
     {
         return parent::make($name)
-            ->label('')
+            ->hiddenLabel()
             ->placeholder(__('general.none_selected'))
             ->schema([
                 TextareaEntry::make('description')
