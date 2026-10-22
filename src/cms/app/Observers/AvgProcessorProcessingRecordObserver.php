@@ -7,11 +7,14 @@ namespace App\Observers;
 use App\Models\Avg\AvgGoal;
 use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Stakeholder;
+use App\Observers\Concerns\DetachesSharedRecords;
 
 use function __;
 
 class AvgProcessorProcessingRecordObserver
 {
+    use DetachesSharedRecords;
+
     public function saving(AvgProcessorProcessingRecord $avgProcessorProcessingRecord): void
     {
         $this->resetProcessors($avgProcessorProcessingRecord);
@@ -27,7 +30,7 @@ class AvgProcessorProcessingRecordObserver
     private function resetProcessors(AvgProcessorProcessingRecord $avgProcessorProcessingRecord): void
     {
         if ($avgProcessorProcessingRecord->has_processors === false) {
-            $avgProcessorProcessingRecord->processors()->delete();
+            $this->detachShared($avgProcessorProcessingRecord, $avgProcessorProcessingRecord->processors());
         }
     }
 
@@ -57,21 +60,17 @@ class AvgProcessorProcessingRecordObserver
         }
     }
 
-    /**
-     * Detach only the pivot rows: the algorithm records themselves are
-     * shared registrations that outlive any single processing.
-     */
     private function resetAlgorithms(AvgProcessorProcessingRecord $avgProcessorProcessingRecord): void
     {
         if ($avgProcessorProcessingRecord->has_algorithms === false) {
-            $avgProcessorProcessingRecord->algorithmRecords()->detach();
+            $this->detachShared($avgProcessorProcessingRecord, $avgProcessorProcessingRecord->algorithmRecords());
         }
     }
 
     private function resetSystem(AvgProcessorProcessingRecord $avgProcessorProcessingRecord): void
     {
         if ($avgProcessorProcessingRecord->has_systems === false) {
-            $avgProcessorProcessingRecord->systems()->delete();
+            $this->detachShared($avgProcessorProcessingRecord, $avgProcessorProcessingRecord->systems());
         }
     }
 

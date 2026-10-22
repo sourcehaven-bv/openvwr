@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use App\Models\User;
 use App\Services\AuditLog\AuditLogEventFactory;
+use App\Services\AuditLog\Register\LinksDetachedEvent;
+use App\Services\AuditLog\Register\LinksDetachedLogEvent;
 use App\Services\AuditLog\Transfer\TransferExportEvent;
 use App\Services\AuditLog\Transfer\TransferExportLogEvent;
 use App\Services\AuditLog\Transfer\TransferImportEvent;
@@ -116,4 +118,44 @@ it('marks the source organisation of a bundle import as claimed', function (): v
     expect($logEvent->getLogData()['request'])
         ->toHaveKey('claimed_source_organisation_id', 'org-1')
         ->not->toHaveKey('source_organisation_id');
+});
+
+it('creates a links detached log event with the removed links', function (): void {
+    $user = User::factory()->create();
+
+    $logEvent = (new AuditLogEventFactory())->fromApplicationEvent(new LinksDetachedEvent(
+        $user,
+        'org-1',
+        'avg_responsible_processing_record',
+        'record-1',
+        'processors',
+        ['processor-1'],
+    ));
+
+    expect($logEvent)->toBeInstanceOf(LinksDetachedLogEvent::class)
+        ->and($logEvent->getLogData())->toMatchArray([
+            'user_id' => $user->id->toString(),
+            'event_code' => LinksDetachedLogEvent::EVENT_CODE,
+            'action_code' => 'U',
+            'request' => [
+                'organisation_id' => 'org-1',
+                'record_type' => 'avg_responsible_processing_record',
+                'record_id' => 'record-1',
+                'relation' => 'processors',
+                'related_ids' => ['processor-1'],
+            ],
+        ]);
+});
+
+it('creates a links detached log event without an actor', function (): void {
+    $logEvent = (new AuditLogEventFactory())->fromApplicationEvent(new LinksDetachedEvent(
+        null,
+        'org-1',
+        'wpg_processing_record',
+        'record-1',
+        'systems',
+        ['system-1'],
+    ));
+
+    expect($logEvent->getActor())->toBeNull();
 });

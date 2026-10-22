@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\Observers;
 
 use App\Models\Wpg\WpgProcessingRecord;
+use App\Observers\Concerns\DetachesSharedRecords;
 
 class WpgProcessingRecordObserver
 {
+    use DetachesSharedRecords;
+
     public function saving(WpgProcessingRecord $wpgProcessingRecord): void
     {
         $this->resetProcessors($wpgProcessingRecord);
@@ -22,7 +25,7 @@ class WpgProcessingRecordObserver
     private function resetProcessors(WpgProcessingRecord $wpgProcessingRecord): void
     {
         if ($wpgProcessingRecord->has_processors === false) {
-            $wpgProcessingRecord->processors()->delete();
+            $this->detachShared($wpgProcessingRecord, $wpgProcessingRecord->processors());
         }
     }
 
@@ -41,21 +44,17 @@ class WpgProcessingRecordObserver
         }
     }
 
-    /**
-     * Detach only the pivot rows: the algorithm records themselves are
-     * shared registrations that outlive any single processing.
-     */
     private function resetAlgorithms(WpgProcessingRecord $wpgProcessingRecord): void
     {
         if ($wpgProcessingRecord->has_algorithms === false) {
-            $wpgProcessingRecord->algorithmRecords()->detach();
+            $this->detachShared($wpgProcessingRecord, $wpgProcessingRecord->algorithmRecords());
         }
     }
 
     private function resetSystems(WpgProcessingRecord $wpgProcessingRecord): void
     {
         if ($wpgProcessingRecord->has_systems === false) {
-            $wpgProcessingRecord->systems()->delete();
+            $this->detachShared($wpgProcessingRecord, $wpgProcessingRecord->systems());
         }
     }
 

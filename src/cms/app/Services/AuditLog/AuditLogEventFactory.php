@@ -6,6 +6,8 @@ namespace App\Services\AuditLog;
 
 use App\Services\AuditLog\Authentication\AuthenticationFailedEvent;
 use App\Services\AuditLog\Authentication\AuthenticationSuccessEvent;
+use App\Services\AuditLog\Register\LinksDetachedEvent;
+use App\Services\AuditLog\Register\LinksDetachedLogEvent;
 use App\Services\AuditLog\Transfer\TransferExportEvent;
 use App\Services\AuditLog\Transfer\TransferExportLogEvent;
 use App\Services\AuditLog\Transfer\TransferImportEvent;
@@ -28,6 +30,7 @@ class AuditLogEventFactory
         return match ($event::class) {
             AuthenticationFailedEvent::class => $this->fromAuthenticationFailedEvent($event),
             AuthenticationSuccessEvent::class => $this->fromAuthenticationSuccessEvent($event),
+            LinksDetachedEvent::class => $this->fromLinksDetachedEvent($event),
             TransferExportEvent::class => $this->fromTransferExportEvent($event),
             TransferImportEvent::class => $this->fromTransferImportEvent($event),
             UserCreatedEvent::class => $this->fromUserCreatedEvent($event),
@@ -60,6 +63,25 @@ class AuditLogEventFactory
     {
         $minvwsAuditLogEvent = new UserLoginLogEvent();
         $minvwsAuditLogEvent->withTarget($event->user);
+
+        return $minvwsAuditLogEvent;
+    }
+
+    private function fromLinksDetachedEvent(LinksDetachedEvent $event): LinksDetachedLogEvent
+    {
+        $minvwsAuditLogEvent = new LinksDetachedLogEvent();
+        $minvwsAuditLogEvent->asUpdate();
+        $minvwsAuditLogEvent->withData([
+            'organisation_id' => $event->organisationId,
+            'record_type' => $event->recordType,
+            'record_id' => $event->recordId,
+            'relation' => $event->relation,
+            'related_ids' => $event->relatedIds,
+        ]);
+
+        if ($event->user !== null) {
+            $minvwsAuditLogEvent->withActor($event->user);
+        }
 
         return $minvwsAuditLogEvent;
     }
