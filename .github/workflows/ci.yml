@@ -151,6 +151,9 @@ jobs:
       # as its command, and service containers cannot set one -- the entrypoint
       # then just prints its help and exits. Same pinned image as docker-compose.
       #
+      # The KMS key lets minio accept the server-side encryption every write asks
+      # for (AWS_SERVER_SIDE_ENCRYPTION defaults to AES256).
+      #
       # Pulled from Chainguard: MinIO no longer serves public pulls from Docker
       # Hub or quay.io. Chainguard only offers `latest` for free, so pin the digest.
       - name: Start MinIO
@@ -160,6 +163,7 @@ jobs:
             -p 9000:9000 \
             -e "MINIO_ROOT_USER=minioadmin" \
             -e "MINIO_ROOT_PASSWORD=minioadmin" \
+            -e "MINIO_KMS_SECRET_KEY=openvwr-dev:+SLYGbnmr0BzxQZUxr6jTsPk0OA7Jz0PG7QEpCEMvj0=" \
             cgr.dev/chainguard/minio@sha256:71674988a1c7ddd5724928633199152b11e4ddefd6c6ce2d60772ff4a8f22ca9 \
             server /data
 

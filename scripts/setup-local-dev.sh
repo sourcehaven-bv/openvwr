@@ -181,6 +181,9 @@ AWS_ACCESS_KEY_ID=minioadmin
 AWS_SECRET_ACCESS_KEY=minioadmin
 AWS_DEFAULT_REGION=eu-central-1
 AWS_USE_PATH_STYLE_ENDPOINT=true
+# Homebrew's minio runs without a KMS key, so it rejects encrypted writes.
+# Production keeps the AES256 default; see docs/object_storage.md.
+AWS_SERVER_SIDE_ENCRYPTION=none
 EOF
     set -a
     # shellcheck disable=SC1091

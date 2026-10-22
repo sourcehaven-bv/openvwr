@@ -21,6 +21,9 @@ use function sprintf;
  * the disks actually run on s3: on a local disk the directories are created on
  * demand and there is nothing to provision. Safe to run repeatedly -- existing
  * buckets are left alone.
+ *
+ * A new bucket gets the disk's server-side encryption as its default, so objects
+ * written outside the application are encrypted at rest too.
  */
 #[AsCommand(name: 'storage:setup-buckets', description: 'Create the buckets for the shared object-storage disks')]
 class StorageSetupBuckets extends Command
@@ -67,6 +70,18 @@ class StorageSetupBuckets extends Command
 
             $s3Client->createBucket(['Bucket' => $bucket]);
             $this->info(sprintf('Bucket %s created successfully.', $bucket));
+
+            $algorithm = Config::stringOrNull(sprintf('filesystems.disks.%s.options.ServerSideEncryption', $diskName));
+
+            if ($algorithm !== null) {
+                $s3Client->putBucketEncryption([
+                    'Bucket' => $bucket,
+                    'ServerSideEncryptionConfiguration' => [
+                        'Rules' => [['ApplyServerSideEncryptionByDefault' => ['SSEAlgorithm' => $algorithm]]],
+                    ],
+                ]);
+                $this->info(sprintf('Bucket %s encrypts new objects with %s by default.', $bucket, $algorithm));
+            }
         } catch (Throwable $e) {
             $this->error(sprintf('Error with bucket %s: %s', $bucket, $e->getMessage()));
 
