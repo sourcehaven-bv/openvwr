@@ -105,6 +105,7 @@ class BundleImporter
         User $user,
     ): TransferImportResult {
         $result = new TransferImportResult();
+        $result->claimedSourceOrganisationId = $bundle->sourceOrganisationId();
 
         $this->idMap = [];
         $this->written = [];
@@ -241,7 +242,7 @@ class BundleImporter
         }
 
         if ($existing !== null && $strategy === ConflictStrategy::OVERWRITE) {
-            $this->overwriteEntity($id, $entity, $existing, $mediaResolver, $result);
+            $this->overwriteEntity($type, $id, $entity, $existing, $mediaResolver, $result);
 
             return;
         }
@@ -259,6 +260,7 @@ class BundleImporter
      * @param array<string, mixed> $entity
      */
     private function overwriteEntity(
+        TransferEntityType $type,
         string $id,
         array $entity,
         Model $existing,
@@ -277,6 +279,7 @@ class BundleImporter
         $this->idMap[$id] = $existing;
         $this->written[$id] = true;
         $result->overwritten++;
+        $result->records[] = ['type' => $type->value, 'id' => ModelGraph::id($existing), 'action' => 'overwritten'];
 
         if ($existing instanceof Document) {
             $this->documentMediaImporter->sync($existing, $entity, $mediaResolver);
@@ -311,6 +314,7 @@ class BundleImporter
         $this->idMap[$id] = $model;
         $this->written[$id] = true;
         $result->created++;
+        $result->records[] = ['type' => $type->value, 'id' => ModelGraph::id($model), 'action' => 'created'];
 
         if ($model instanceof Document) {
             $this->documentMediaImporter->import($model, $entity, $mediaResolver);

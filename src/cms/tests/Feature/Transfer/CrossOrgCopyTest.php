@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Enums\Authorization\Permission;
 use App\Enums\Authorization\Role;
 use App\Enums\Media\MediaGroup;
+use App\Facades\AuditLog;
 use App\Models\Avg\AvgGoal;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Document;
@@ -12,6 +13,7 @@ use App\Models\Organisation;
 use App\Models\System;
 use App\Models\Tag;
 use App\Models\User;
+use App\Services\AuditLog\Transfer\TransferImportEvent;
 use App\Services\CrossOrgAuthorization;
 use App\Transfer\CrossOrgCopier;
 use App\Transfer\Export\BundleBuilder;
@@ -120,6 +122,94 @@ it('rejects a copy when the user may not export from the source organisation', f
         $user,
     );
 })->throws(TransferException::class);
+
+it('records an audit event for a successful copy', function (): void {
+    AuditLog::spy();
+
+    $source = Organisation::factory()->create();
+    $destination = Organisation::factory()->create();
+    $user = copyableUser($source, $destination);
+    [$record] = seedCopyableRecord($source);
+
+    app(CrossOrgCopier::class)->copy(
+        TransferEntityType::AVG_RESPONSIBLE_PROCESSING_RECORD,
+        [$record->id->toString()],
+        [],
+        [$record->id->toString() => ['selected' => true, 'strategy' => null]],
+        $source,
+        $destination,
+        $user,
+    );
+
+    $copied = AvgResponsibleProcessingRecord::query()->whereBelongsTo($destination)->firstOrFail();
+
+    AuditLog::shouldHaveReceived('register')
+        ->withArgs(fn (mixed $event): bool => $event instanceof TransferImportEvent
+            && $event->method === TransferImportEvent::METHOD_COPY
+            && $event->user?->id->equals($user->id) === true
+            && $event->sourceOrganisationId === $source->id->toString()
+            && $event->destinationOrganisationId === $destination->id->toString()
+            && $event->failedReason === null
+            && $event->result?->records === [
+                [
+                    'type' => TransferEntityType::AVG_RESPONSIBLE_PROCESSING_RECORD->value,
+                    'id' => $copied->id->toString(),
+                    'action' => 'created',
+                ]])
+        ->once();
+});
+
+it('records a failed audit event when a copy is rejected', function (): void {
+    AuditLog::spy();
+
+    $organisation = Organisation::factory()->create();
+    $user = copyableUser($organisation, Organisation::factory()->create());
+
+    expect(fn () => app(CrossOrgCopier::class)->copy(
+        TransferEntityType::AVG_RESPONSIBLE_PROCESSING_RECORD,
+        [],
+        [],
+        [],
+        $organisation,
+        $organisation,
+        $user,
+    ))->toThrow(TransferException::class);
+
+    AuditLog::shouldHaveReceived('register')
+        ->withArgs(fn (mixed $event): bool => $event instanceof TransferImportEvent
+            && $event->method === TransferImportEvent::METHOD_COPY
+            && $event->result === null
+            && $event->failedReason === 'cannot copy an organisation into itself')
+        ->once();
+});
+
+it('records the exception class, not its message, when a copy fails after authorization', function (): void {
+    AuditLog::spy();
+
+    $source = Organisation::factory()->create();
+    $destination = Organisation::factory()->create();
+    $user = copyableUser($source, $destination);
+
+    $this->mock(BundleBuilder::class)
+        ->shouldReceive('build')
+        ->andThrow(new RuntimeException('details that must not reach the audit log'));
+
+    expect(fn () => app(CrossOrgCopier::class)->copy(
+        TransferEntityType::AVG_RESPONSIBLE_PROCESSING_RECORD,
+        [],
+        [],
+        [],
+        $source,
+        $destination,
+        $user,
+    ))->toThrow(RuntimeException::class);
+
+    AuditLog::shouldHaveReceived('register')
+        ->withArgs(fn (mixed $event): bool => $event instanceof TransferImportEvent
+            && $event->result === null
+            && $event->failedReason === 'RuntimeException')
+        ->once();
+});
 
 it('copies a document with its media into another organisation', function (): void {
     Storage::fake('media-library');

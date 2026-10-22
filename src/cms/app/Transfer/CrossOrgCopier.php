@@ -5,13 +5,17 @@ declare(strict_types=1);
 namespace App\Transfer;
 
 use App\Enums\Authorization\Permission;
+use App\Facades\AuditLog;
 use App\Models\Organisation;
 use App\Models\User;
+use App\Services\AuditLog\Transfer\TransferFailureReason;
+use App\Services\AuditLog\Transfer\TransferImportEvent;
 use App\Services\CrossOrgAuthorization;
 use App\Transfer\Export\BundleBuilder;
 use App\Transfer\Import\BundleImporter;
 use App\Transfer\Import\LibraryMediaResolver;
 use App\Transfer\Import\TransferImportResult;
+use Throwable;
 
 /**
  * Copies register content directly from one organisation into another on the same instance,
@@ -46,11 +50,44 @@ readonly class CrossOrgCopier
         Organisation $destination,
         User $user,
     ): TransferImportResult {
-        $this->assertAuthorized($user, $source, $destination);
+        try {
+            $this->assertAuthorized($user, $source, $destination);
+        } catch (TransferException $exception) {
+            // assertAuthorized() only throws the fixed messages defined below.
+            $this->audit($user, $source, $destination, null, $exception->getMessage());
 
-        $bundle = $this->bundleBuilder->build($recordType, $recordIds, $selectedRelated, $source);
+            throw $exception;
+        }
 
-        return $this->bundleImporter->import($bundle, new LibraryMediaResolver(), $plan, $destination, $user);
+        try {
+            $bundle = $this->bundleBuilder->build($recordType, $recordIds, $selectedRelated, $source);
+            $result = $this->bundleImporter->import($bundle, new LibraryMediaResolver(), $plan, $destination, $user);
+        } catch (Throwable $exception) {
+            $this->audit($user, $source, $destination, null, TransferFailureReason::from($exception));
+
+            throw $exception;
+        }
+
+        $this->audit($user, $source, $destination, $result);
+
+        return $result;
+    }
+
+    private function audit(
+        User $user,
+        Organisation $source,
+        Organisation $destination,
+        ?TransferImportResult $result,
+        ?string $failedReason = null,
+    ): void {
+        AuditLog::register(new TransferImportEvent(
+            $user,
+            TransferImportEvent::METHOD_COPY,
+            $destination->id->toString(),
+            $source->id->toString(),
+            $result,
+            $failedReason,
+        ));
     }
 
     /**
