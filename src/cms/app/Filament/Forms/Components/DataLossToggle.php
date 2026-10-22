@@ -5,15 +5,16 @@ declare(strict_types=1);
 namespace App\Filament\Forms\Components;
 
 use Filament\Actions\Action;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Livewire\Component;
+use Webmozart\Assert\Assert;
 
 use function __;
 use function filled;
 use function is_array;
-use function method_exists;
 use function sprintf;
 
 /**
@@ -58,14 +59,12 @@ class DataLossToggle extends Toggle
                     // Revert first: dismissing the modal must not discard anything.
                     $set($name, true);
 
-                    $statePath = $component->getStatePath();
-                    if ($statePath === null) {
-                        return;
-                    }
+                    $componentKey = $component->getKey();
+                    Assert::string($componentKey);
 
                     self::mountConfirmation(
                         $livewire,
-                        $statePath,
+                        $componentKey,
                         self::confirmActionName($name),
                     );
                 },
@@ -92,21 +91,19 @@ class DataLossToggle extends Toggle
     /**
      * Opens the confirmation modal.
      *
-     * Filament mounts form component actions through HasFormComponentActions, a trait
-     * on the Livewire page component rather than an interface, so there is no type to
-     * hint against here.
+     * Filament v5 identifies field actions by schema key, rather than state path.
      */
-    private static function mountConfirmation(Component $livewire, string $statePath, string $actionName): void
+    private static function mountConfirmation(Component $livewire, string $componentKey, string $actionName): void
     {
-        // Every Filament page that renders a form has this trait, so this guard is
+        // Every Filament page that renders this field implements HasActions; this guard is
         // unreachable in practice; it only keeps the call type-safe.
         // @codeCoverageIgnoreStart
-        if (!method_exists($livewire, 'mountFormComponentAction')) {
+        if (!$livewire instanceof HasActions) {
             return;
         }
         // @codeCoverageIgnoreEnd
 
-        $livewire->mountFormComponentAction($statePath, $actionName);
+        $livewire->mountAction($actionName, context: ['schemaComponent' => $componentKey]);
     }
 
     /**

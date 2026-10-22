@@ -11,6 +11,7 @@ use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Schema;
 use Tests\Fixtures\Documentation\AwkwardNotesResource;
 
 beforeEach(function (): void {
@@ -99,4 +100,20 @@ it('skips notes that cannot be resolved', function (): void {
     $this->notes->load(AwkwardNotesResource::class);
 
     expect($this->notes->forSection([TextInput::make('untranslated')]))->toBeNull();
+});
+
+
+it('ignores a dynamic section that cannot resolve outside its form', function (): void {
+    $section = Grid::make()->schema(static function (): array {
+        throw new RuntimeException('Requires an active record');
+    });
+
+    expect($this->notes->childrenOf($section))->toBe([]);
+});
+
+it('reads nested fields supplied as a schema', function (): void {
+    $field = TextInput::make('nested');
+    $section = Grid::make()->schema(Schema::make($this->environment->makeFormHost())->components([$field]));
+
+    expect($this->notes->childrenOf($section))->toBe([$field]);
 });

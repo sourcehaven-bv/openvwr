@@ -139,7 +139,11 @@ class SectionNotes
     public function childrenOf(Component $component): array
     {
         try {
-            $children = $component->getDefaultChildComponents();
+            // Resolve through the child schema so nested fields keep their
+            // container, which v5 needs to evaluate helper-text schemas.
+            $children = $component->hasContainer()
+                ? ($component->getChildSchema()?->getComponents(withHidden: true) ?? [])
+                : $component->getDefaultChildComponents();
         } catch (Throwable) {
             return [];
         }

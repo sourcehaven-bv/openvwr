@@ -54,17 +54,6 @@ class SelectSingleWithLookup extends Select
                 Hidden::make('organisation_id')
                     ->default(Authentication::organisation()->id->toString()),
             ])
-            ->formatStateUsing(static function (string|UuidInterface|null $state): ?string {
-                if ($state === null) {
-                    return null;
-                }
-
-                if ($state instanceof UuidInterface) {
-                    return $state->toString();
-                }
-
-                return $state;
-            })
             ->createOptionUsing(static function (array $data) use ($relatedModel): string {
                 Assert::isMap($data);
 

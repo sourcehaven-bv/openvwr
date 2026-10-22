@@ -204,6 +204,31 @@ class FilamentServiceProvider extends PanelProvider
             ->label(__('general.manual'));
     }
 
+    private function profileMenuItem(): Action
+    {
+        return Action::make('profile')
+            ->url(static function (): string {
+                $panel = Filament::getCurrentOrDefaultPanel();
+                Assert::isInstanceOf($panel, Panel::class);
+
+                $route = request()->route();
+                Assert::isInstanceOf($route, Route::class);
+
+                try {
+                    $tenant = Organisation::where(['slug' => $route->parameter('tenant')])->firstOrFail();
+                } catch (ModelNotFoundException) {
+                    abort(404);
+                }
+
+                return Profile::getUrl(panel: $panel->getId(), tenant: $tenant);
+            })
+            // Label and icon came from Filament's own profile item as long
+            // as this was keyed 'account'; under our own key they are ours
+            // to give.
+            ->icon('heroicon-o-user-circle')
+            ->label(Profile::getLabel());
+    }
+
     /**
      * @throws Exception
      */
@@ -291,27 +316,7 @@ class FilamentServiceProvider extends PanelProvider
                 // getProfileUrl() to the panel's auth profile route, which a
                 // tenant page like ours never registers. Claiming the key keeps
                 // our own tenant-aware url instead.
-                'profile' => Action::make('profile')
-                    ->url(static function (): string {
-                        $panel = Filament::getCurrentOrDefaultPanel();
-                        Assert::isInstanceOf($panel, Panel::class);
-
-                        $route = request()->route();
-                        Assert::isInstanceOf($route, Route::class);
-
-                        try {
-                            $tenant = Organisation::where(['slug' => $route->parameter('tenant')])->firstOrFail();
-                        } catch (ModelNotFoundException) {
-                            abort(404);
-                        }
-
-                        return Profile::getUrl(panel: $panel->getId(), tenant: $tenant);
-                    })
-                    // Label and icon came from Filament's own profile item as long
-                    // as this was keyed 'account'; under our own key they are ours
-                    // to give.
-                    ->icon('heroicon-o-user-circle')
-                    ->label(Profile::getLabel()),
+                'profile' => $this->profileMenuItem(),
                 'manual' => $this->manualMenuItem(),
             ])
             ->maxContentWidth('screen-2xl')

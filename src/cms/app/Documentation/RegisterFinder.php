@@ -14,7 +14,6 @@ use function __;
 use function array_search;
 use function in_array;
 use function is_string;
-use function sprintf;
 use function usort;
 
 use const PHP_INT_MAX;
@@ -36,12 +35,6 @@ class RegisterFinder
         $panel = is_string($panelId) && $panelId !== ''
             ? Filament::getPanel($panelId)
             : Filament::getDefaultPanel();
-
-        // Filament falls back to the default panel for an unknown id, so a typo
-        // in --panel would silently document the wrong thing.
-        if (is_string($panelId) && $panelId !== '' && $panel->getId() !== $panelId) {
-            throw new RuntimeException(sprintf('Unknown Filament panel "%s".', $panelId));
-        }
 
         $groups = $this->navigationGroups();
 

@@ -8,6 +8,9 @@ use App\Filament\Forms\DraftableForm;
 use App\Filament\Pages\Concerns\EnforcesRequiredFieldsWhenSubmitting;
 use App\Filament\Pages\Contracts\SavesConcepts;
 use App\Services\Snapshot\SnapshotReadinessService;
+use Filament\Actions\Action;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -70,9 +73,10 @@ $readinessForm = static function (array $state = []): Schema {
  * @param array<int, mixed> $schema
  */
 $conceptForm = static function (array $schema): Schema {
-    $livewire = new class extends Component implements HasForms, SavesConcepts
+    $livewire = new class extends Component implements HasActions, HasForms, SavesConcepts
     {
         use EnforcesRequiredFieldsWhenSubmitting;
+        use InteractsWithActions;
         use InteractsWithForms;
 
         /** @var array<string, mixed> */
@@ -303,4 +307,20 @@ it('reports the section as the step in the one page layout', function (): void {
         ->toBe(1)
         ->and($missingRequiredFields[0]->stepLabel)
         ->toBe('Verwerkingsdoel');
+});
+
+
+it('checks required fields alongside top-level and nested actions', function () use ($conceptForm): void {
+    $form = $conceptForm([
+        Action::make('top_action'),
+        Section::make('Gegevens')->schema([
+            Action::make('nested_action'),
+            TextInput::make('name')->label('Naam')->required(),
+        ]),
+    ]);
+
+    $missing = (new SnapshotReadinessService())->getMissingRequiredFields($form);
+
+    expect(count($missing))->toBe(1)
+        ->and($missing[0]->label)->toBe('Naam');
 });

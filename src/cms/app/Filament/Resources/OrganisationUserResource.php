@@ -17,15 +17,18 @@ use App\Filament\Resources\OrganisationUserResource\Pages\ListOrganisationUsers;
 use App\Filament\Resources\OrganisationUserResource\Pages\ViewOrganisationUser;
 use App\Models\User;
 use BackedEnum;
+use Filament\Panel;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use UnitEnum;
 
 use function __;
 
+/** @extends Resource<User> */
 class OrganisationUserResource extends Resource
 {
     protected static bool $isScopedToTenant = true;
@@ -33,6 +36,29 @@ class OrganisationUserResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-user';
     protected static ?int $navigationSort = 1;
     protected static ?string $tenantOwnershipRelationshipName = 'organisations';
+
+    /**
+     * Users are shared identities. Scope the resource, rather than every User
+     * query in the request: login and attaching an existing account must also
+     * find users who do not yet belong to the current organisation.
+     *
+     * @return Builder<User>
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return static::scopeEloquentQueryToTenant(parent::getEloquentQuery(), null);
+    }
+
+    public static function registerTenancyModelGlobalScope(Panel $panel): void
+    {
+        // Membership is scoped by getEloquentQuery(), not on the shared model.
+    }
+
+    public static function observeTenancyModelCreation(Panel $panel): void
+    {
+        // Creating an identity must not grant membership. The create page
+        // explicitly attaches the account after validating the invitation.
+    }
 
     /**
      * v5 routes every access check through getAuthorizationResponse():

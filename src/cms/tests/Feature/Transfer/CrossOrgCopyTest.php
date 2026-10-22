@@ -15,9 +15,14 @@ use App\Models\User;
 use App\Services\CrossOrgAuthorization;
 use App\Transfer\CrossOrgCopier;
 use App\Transfer\Export\BundleBuilder;
+use App\Transfer\Import\BundleImporter;
+use App\Transfer\Import\LibraryMediaResolver;
 use App\Transfer\Import\PreviewBuilder;
+use App\Transfer\Import\RelationRestorer;
+use App\Transfer\Import\TransferBundle;
 use App\Transfer\TransferEntityType;
 use App\Transfer\TransferException;
+use Filament\Facades\Filament;
 use Illuminate\Support\Facades\Storage;
 
 it('copies a record and its related graph into another organisation', function (): void {
@@ -202,4 +207,40 @@ it('takes the user global roles into account when resolving permissions in an or
     );
 
     expect($authorized)->toBeTrue();
+});
+
+
+it('restores the source tenant when importing a copy fails', function (): void {
+    $source = Organisation::factory()->create();
+    $destination = Organisation::factory()->create();
+    $user = copyableUser($source, $destination);
+    $this->withFilamentSession($user, $source);
+
+    $this->mock(RelationRestorer::class)
+        ->shouldReceive('restore')->once()
+        ->andThrow(new RuntimeException('Failed to restore relations'));
+
+    expect(fn () => app(BundleImporter::class)->import(
+        new TransferBundle([], []),
+        new LibraryMediaResolver(),
+        [],
+        $destination,
+        $user,
+    ))->toThrow(RuntimeException::class, 'Failed to restore relations');
+
+    expect(Filament::getTenant())->toBe($source);
+});
+
+it('restores the source tenant when building a copy preview fails', function (): void {
+    $source = Organisation::factory()->create();
+    $destination = Organisation::factory()->create();
+    $user = copyableUser($source, $destination);
+    $this->withFilamentSession($user, $source);
+
+    expect(fn () => app(PreviewBuilder::class)->build(
+        new TransferBundle([], ['invalid' => ['type' => null]]),
+        $destination,
+    ))->toThrow(InvalidArgumentException::class);
+
+    expect(Filament::getTenant())->toBe($source);
 });

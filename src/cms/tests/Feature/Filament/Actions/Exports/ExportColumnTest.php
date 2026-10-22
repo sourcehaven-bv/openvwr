@@ -9,6 +9,7 @@ use App\Enums\YesNoUnknown;
 use App\Filament\Actions\Exports\ExportColumn;
 use App\Services\DateFormatService;
 use Carbon\CarbonImmutable;
+use Tests\Fixtures\Filament\FormattedExportLabel;
 
 use function expect;
 use function fake;
@@ -53,4 +54,10 @@ it('can format enum that implements hasLabel', function (): void {
 
     expect($output)
         ->toBe($enum->getLabel());
+});
+
+
+it('exports a rich enum label as plain spreadsheet text', function (): void {
+    expect((new ExportColumn('status'))->formatState(FormattedExportLabel::EXAMPLE))
+        ->toBe('Leesbare waarde');
 });

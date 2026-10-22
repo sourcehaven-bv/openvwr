@@ -9,6 +9,7 @@ use App\Filament\Tables\Columns\SnapshotStateColumn;
 use App\Models\Snapshot;
 use App\Models\SnapshotTransition;
 use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Columns\TextColumn;
@@ -21,7 +22,7 @@ use Livewire\Component;
 use function __;
 use function view;
 
-class Transitions extends Component implements HasForms, HasTable
+class Transitions extends Component implements HasActions, HasForms, HasTable
 {
     use InteractsWithActions;
     use InteractsWithTable;

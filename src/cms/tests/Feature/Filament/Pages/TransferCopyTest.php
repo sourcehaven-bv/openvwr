@@ -9,6 +9,7 @@ use App\Models\Organisation;
 use App\Models\Processor;
 use App\Models\User;
 use App\Transfer\TransferEntityType;
+use Filament\Facades\Filament;
 use Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException;
 use Livewire\Livewire;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -112,7 +113,11 @@ it('ignores malformed related selections when copying', function (): void {
         ->call('analyse')
         ->call('copy');
 
-    expect(AvgResponsibleProcessingRecord::query()->whereBelongsTo($destination)->exists())->toBeTrue();
+    expect(
+        AvgResponsibleProcessingRecord::query()->withoutGlobalScope(Filament::getPanel('admin')->getTenancyScopeName())->whereBelongsTo(
+            $destination,
+        )->exists(),
+    )->toBeTrue();
 });
 
 it('protects the server-set record ids from client tampering', function (): void {
@@ -183,7 +188,14 @@ it('analyses, resets and copies into the target organisation', function (): void
 
     $component->call('analyse')->call('copy');
 
-    expect(AvgResponsibleProcessingRecord::query()->whereBelongsTo($destination)->where('name', 'Verwerking')->exists())
+    expect(
+        AvgResponsibleProcessingRecord::query()->withoutGlobalScope(Filament::getPanel('admin')->getTenancyScopeName())->whereBelongsTo(
+            $destination,
+        )->where(
+            'name',
+            'Verwerking',
+        )->exists(),
+    )
         ->toBeTrue();
 });
 
@@ -299,7 +311,11 @@ it('notifies and does not copy when the copier rejects the transfer', function (
 
     $component->call('copy')->assertNotified();
 
-    expect(AvgResponsibleProcessingRecord::query()->whereBelongsTo($destination)->exists())->toBeFalse();
+    expect(
+        AvgResponsibleProcessingRecord::query()->withoutGlobalScope(Filament::getPanel('admin')->getTenancyScopeName())->whereBelongsTo(
+            $destination,
+        )->exists(),
+    )->toBeFalse();
 });
 
 it('does not copy into an organisation the user may not import into', function (): void {
@@ -327,5 +343,9 @@ it('does not copy into an organisation the user may not import into', function (
     expect(fn () => $component->call('copy'))
         ->toThrow(HttpException::class);
 
-    expect(AvgResponsibleProcessingRecord::query()->whereBelongsTo($destination)->exists())->toBeFalse();
+    expect(
+        AvgResponsibleProcessingRecord::query()->withoutGlobalScope(Filament::getPanel('admin')->getTenancyScopeName())->whereBelongsTo(
+            $destination,
+        )->exists(),
+    )->toBeFalse();
 });

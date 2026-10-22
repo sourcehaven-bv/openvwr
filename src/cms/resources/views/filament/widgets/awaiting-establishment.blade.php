@@ -29,7 +29,7 @@
         </ul>
 
         @if ($this->hasMore())
-            <x-slot name="footerActions">
+            <x-slot name="footer">
                 <x-filament::link :href="$this->getAllUrl()" size="sm">
                     {{ __('dashboard.show_all') }}
                 </x-filament::link>

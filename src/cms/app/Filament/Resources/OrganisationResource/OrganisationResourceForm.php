@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrganisationResource;
 
-use App\Components\Uuid\UuidInterface;
 use App\Config\Feature;
 use App\Enums\Authorization\Permission;
 use App\Enums\Media\MediaGroup;
@@ -64,14 +63,7 @@ class OrganisationResourceForm
                     ->relationship('responsibleLegalEntity', 'name')
                     ->searchable(['name'])
                     ->required()
-                    ->exists(ResponsibleLegalEntity::class, 'id')
-                    ->formatStateUsing(static function (string|UuidInterface $state): string {
-                        if ($state instanceof UuidInterface) {
-                            return $state->toString();
-                        }
-
-                        return $state;
-                    }),
+                    ->exists(ResponsibleLegalEntity::class, 'id'),
             ]);
     }
 

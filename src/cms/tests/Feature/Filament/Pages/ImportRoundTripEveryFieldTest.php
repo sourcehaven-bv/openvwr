@@ -151,7 +151,8 @@ function fullRecord(ImportTarget $target): Model
 
             if ($withDetails && $entity instanceof Processor) {
                 $entity->address()->create([
-                    'address' => fake()->streetAddress(),
+                    // Comma-space separates related values in the exported sheet.
+                    'address' => 'Dorpsstraat 12',
                     'postal_code' => fake()->postcode(),
                     'city' => fake()->city(),
                     'country' => 'Nederland',

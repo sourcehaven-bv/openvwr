@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms\Components;
 
-use App\Config\Config;
 use App\Config\Feature;
 use App\Facades\Authentication;
 use App\Filament\Forms\Components\DatePicker\DateTimePicker;
-use App\Services\DateFormatService;
 use Carbon\CarbonImmutable;
 use Filament\Actions\Action;
 use Filament\Schemas\Components\Utilities\Set;
@@ -37,11 +35,10 @@ class PublicFromField extends DateTimePicker
                         return Authentication::user()->can('update', $record);
                     })
                     ->action(static function (Set $set): void {
-                        $publicFromNow = CarbonImmutable::now(Config::string('app.display_timezone'))
-                            ->floorMinute()
-                            ->format(DateFormatService::FORMAT_DATE_TIME_INPUT);
-
-                        $set('public_from', $publicFromNow);
+                        // Set accepts model state in v5 and applies the picker's
+                        // timezone cast. Keep the instant instead of passing an
+                        // already-localised string through that cast twice.
+                        $set('public_from', CarbonImmutable::now()->floorMinute());
                     }),
             )
             ->visible(Feature::publishingEnabled());

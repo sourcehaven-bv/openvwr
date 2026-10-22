@@ -20,7 +20,7 @@ it('selects the newly created option after inline creation', function (): void {
     $instance = $component->instance();
 
     expect($instance->form->getRawState()['algorithm_theme_id'])->toBe($theme->id->toString())
-        ->and($instance->getFormSelectOptionLabel('data.algorithm_theme_id'))->toBe($name);
+        ->and($instance->form->getComponent('algorithm_theme_id')->getOptionLabel())->toBe($name);
 });
 
 it('casts lookup list ids to the uuid value object', function (): void {

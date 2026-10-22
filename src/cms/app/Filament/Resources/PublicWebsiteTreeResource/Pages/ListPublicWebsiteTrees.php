@@ -22,10 +22,10 @@ class ListPublicWebsiteTrees extends TreePage
     protected static string $resource = PublicWebsiteTreeResource::class;
     protected static ?string $breadcrumb = '';
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()
+            $this->configureCreateAction(CreateAction::make())
                 ->label(__('public_website_tree.create')),
         ];
     }

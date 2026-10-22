@@ -455,7 +455,7 @@ it('does not offer a status change on a concept version', function (): void {
     $snapshot = $avgResponsibleProcessingRecord->refresh()->snapshots->sole();
 
     $test->createLivewireTestable(ViewSnapshot::class, ['record' => $snapshot->id])
-        ->assertInfolistActionHidden(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_status_change');
+        ->assertInfolistActionDoesNotExist(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_status_change');
 });
 
 // The versions table below the form asks the page to submit, because only the page can

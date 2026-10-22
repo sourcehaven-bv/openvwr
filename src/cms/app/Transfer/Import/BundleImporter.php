@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Transfer\Import;
 
-use App\Components\Uuid\UuidInterface;
 use App\Models\Document;
 use App\Models\Organisation;
 use App\Models\User;
 use App\Transfer\ConflictStrategy;
 use App\Transfer\ModelGraph;
 use App\Transfer\TransferEntityType;
+use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -109,32 +109,42 @@ class BundleImporter
         $this->idMap = [];
         $this->written = [];
 
-        DB::transaction(function () use ($bundle, $mediaResolver, $plan, $organisation, $user, $result): void {
-            foreach ($this->sortedEntities($bundle) as $id => $entity) {
-                $type = $this->typeOf($entity);
+        // Filament v5 scopes queries and creation observers to its active
+        // tenant. Run all matching, writes and relation restoration in the
+        // destination, then restore the caller's tenant even on failure.
+        $previousTenant = Filament::getTenant();
+        Filament::setTenant($organisation, isQuiet: true);
 
-                if ($type->isLookup()) {
-                    $this->idMap[$id] = $this->importLookup($type, $entity, $organisation);
-                    continue;
+        try {
+            DB::transaction(function () use ($bundle, $mediaResolver, $plan, $organisation, $user, $result): void {
+                foreach ($this->sortedEntities($bundle) as $id => $entity) {
+                    $type = $this->typeOf($entity);
+
+                    if ($type->isLookup()) {
+                        $this->idMap[$id] = $this->importLookup($type, $entity, $organisation);
+                        continue;
+                    }
+
+                    if ($type->isOwned()) {
+                        $this->importOwned($type, $entity, $user);
+                        continue;
+                    }
+
+                    $this->importEntity($type, $id, $entity, $plan, $organisation, $mediaResolver, $result);
                 }
 
-                if ($type->isOwned()) {
-                    $this->importOwned($type, $entity, $user);
-                    continue;
-                }
+                $this->relationRestorer->restore($bundle, $this->idMap, $this->written);
 
-                $this->importEntity($type, $id, $entity, $plan, $organisation, $mediaResolver, $result);
-            }
-
-            $this->relationRestorer->restore($bundle, $this->idMap, $this->written);
-
-            // Re-stamp after the relations exist. markSynced() during the loop above
-            // runs before the pivots are written, so their updated_at can land a
-            // whole second later than the watermark (both columns are second
-            // precision) and EditDetector would then read a freshly written copy back
-            // as locally edited.
-            $this->markWrittenSynced();
-        });
+                // Re-stamp after the relations exist. markSynced() during the loop above
+                // runs before the pivots are written, so their updated_at can land a
+                // whole second later than the watermark (both columns are second
+                // precision) and EditDetector would then read a freshly written copy back
+                // as locally edited.
+                $this->markWrittenSynced();
+            });
+        } finally {
+            Filament::setTenant($previousTenant, isQuiet: true);
+        }
 
         return $result;
     }
@@ -407,34 +417,11 @@ class BundleImporter
     }
 
     /**
-     * Save a record into the organisation it is being imported into.
-     *
-     * Filament v5 attaches the tenant to a new record from a `creating`
-     * observer, and that tenant is the organisation being worked in -- the
-     * source of a cross-organisation copy, not its destination. It would
-     * therefore silently overwrite the organisation set just above and write
-     * the copy straight back into the source. Filament's own observer is a
-     * model event, so it is switched off for this one save; the organisation
-     * is already decided by the caller.
+     * Save a record into the destination while retaining all application observers.
      */
     private function saveInto(Model $model, Organisation $organisation): void
     {
         $model->setAttribute('organisation_id', $organisation->id->toString());
         $model->save();
-
-        // Filament v5 attaches the tenant from a `creating` observer, and that
-        // tenant is the organisation being worked in -- the source of a
-        // cross-organisation copy, not its destination. It therefore overwrites
-        // the organisation set above, which would write the copy straight back
-        // into the source. Only that one column is put back; switching the
-        // events off wholesale would also skip our own observers.
-        $current = $model->getAttribute('organisation_id');
-
-        if ($current instanceof UuidInterface && $organisation->id->equals($current)) {
-            return;
-        }
-
-        $model->setAttribute('organisation_id', $organisation->id->toString());
-        $model->saveQuietly();
     }
 }

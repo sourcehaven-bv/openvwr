@@ -240,6 +240,7 @@ it('shows the link to the public page when the record is published', function ()
             'public_from' => $publishedAt,
         ]);
     Snapshot::factory()
+        ->recycle($organisation)
         ->for($avgResponsibleProcessingRecord, 'snapshotSource')
         ->create([
             'state' => Established::class,
@@ -276,6 +277,7 @@ it('shows the data of the publications when the record is published', function (
         ->recycle($organisation)
         ->create();
     $snapshot = Snapshot::factory()
+        ->recycle($organisation)
         ->for($avgResponsibleProcessingRecord, 'snapshotSource')
         ->create([
             'state' => Established::class,

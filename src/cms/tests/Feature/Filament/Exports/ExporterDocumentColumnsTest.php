@@ -53,10 +53,11 @@ it('adds a column per enabled document type of the current organisation', functi
 
 it('leaves out document types of another organisation', function (): void {
     $organisation = OrganisationTestHelper::create();
+    DocumentType::factory()->for(OrganisationTestHelper::create())->create(['name' => 'Andermans type']);
+
     $this->asFilamentOrganisationUser($organisation);
 
     DocumentType::factory()->for($organisation)->create(['name' => 'VWO']);
-    DocumentType::factory()->for(OrganisationTestHelper::create())->create(['name' => 'Andermans type']);
 
     expect(columnLabels())
         ->toContain('VWO')

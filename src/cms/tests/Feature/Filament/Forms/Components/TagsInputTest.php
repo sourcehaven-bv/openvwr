@@ -65,9 +65,9 @@ it('labels nothing when no labels are selected', function (): void {
 it('does not label selected labels from another organisation', function (): void {
     $organisation = OrganisationTestHelper::create();
     $user = UserTestHelper::createForOrganisation($organisation);
-    $this->withFilamentSession($user, $organisation);
-
     $otherTag = Tag::factory()->create();
+
+    $this->withFilamentSession($user, $organisation);
 
     $tagsInput = TagsInput::make();
     $tagsInput->container(FilamentTestHelper::createTestForm());

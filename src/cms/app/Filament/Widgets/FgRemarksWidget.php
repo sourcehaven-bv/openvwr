@@ -8,6 +8,7 @@ use App\Enums\Authorization\Permission;
 use App\Facades\Authorization;
 use App\Models\FgRemark;
 use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -21,7 +22,7 @@ use Webmozart\Assert\Assert;
 
 use function __;
 
-class FgRemarksWidget extends Widget implements HasForms
+class FgRemarksWidget extends Widget implements HasActions, HasForms
 {
     use InteractsWithActions;
     use InteractsWithForms;

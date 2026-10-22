@@ -20,6 +20,7 @@ use App\Services\Snapshot\SnapshotApprovalService;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Columns\IconColumn;
@@ -35,7 +36,7 @@ use Webmozart\Assert\Assert;
 use function __;
 use function view;
 
-class Approvals extends Component implements HasForms, HasTable
+class Approvals extends Component implements HasActions, HasForms, HasTable
 {
     use InteractsWithActions;
     use InteractsWithTable;
