@@ -4,12 +4,20 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Observers;
 
+use App\Facades\AuditLog;
 use App\Models\Algorithm\AlgorithmRecord;
+use App\Models\Processor;
+use App\Models\System;
+use App\Models\User;
 use App\Models\Wpg\WpgProcessingRecord;
+use App\Services\AuditLog\Register\LinksDetachedEvent;
 
+use function collect;
+use function count;
 use function expect;
 use function fake;
 use function it;
+use function strval;
 
 it('resets processor data on save', function (): void {
     $wpgProcessingRecord = WpgProcessingRecord::factory()
@@ -123,4 +131,58 @@ it('resets algorithm links on save but keeps the algorithms themselves', functio
 
     expect($wpgProcessingRecord->algorithmRecords)->toHaveCount(0)
         ->and(AlgorithmRecord::count())->toBe(2);
+});
+
+it('keeps the linked processors and systems and audit logs the removed links', function (): void {
+    AuditLog::spy();
+
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $wpgProcessingRecord = WpgProcessingRecord::factory()
+        ->withProcessors(2)
+        ->withSystems(3)
+        ->create([
+            'has_processors' => true,
+            'has_systems' => true,
+        ]);
+    $processorIds = $wpgProcessingRecord->processors()->pluck('processors.id')->map(strval(...))->sort()->values()->all();
+
+    $wpgProcessingRecord->has_processors = false;
+    $wpgProcessingRecord->has_systems = false;
+    $wpgProcessingRecord->save();
+    $wpgProcessingRecord->refresh();
+
+    expect($wpgProcessingRecord->processors)->toHaveCount(0)
+        ->and($wpgProcessingRecord->systems)->toHaveCount(0)
+        ->and(Processor::count())->toBe(2)
+        ->and(System::count())->toBe(3);
+
+    AuditLog::shouldHaveReceived('register')
+        ->withArgs(fn (mixed $event): bool => $event instanceof LinksDetachedEvent
+            && $event->user?->id->equals($user->id) === true
+            && $event->organisationId === $wpgProcessingRecord->organisation->id->toString()
+            && $event->recordType === $wpgProcessingRecord->getMorphClass()
+            && $event->recordId === $wpgProcessingRecord->id->toString()
+            && $event->relation === 'processors'
+            && collect($event->relatedIds)->sort()->values()->all() === $processorIds)
+        ->once();
+    AuditLog::shouldHaveReceived('register')
+        ->withArgs(fn (mixed $event): bool => $event instanceof LinksDetachedEvent
+            && $event->relation === 'systems'
+            && count($event->relatedIds) === 3)
+        ->once();
+});
+
+it('does not audit log when there are no links to remove', function (): void {
+    AuditLog::spy();
+
+    $wpgProcessingRecord = WpgProcessingRecord::factory()->create([
+        'has_processors' => false,
+        'has_systems' => false,
+        'has_algorithms' => false,
+    ]);
+    $wpgProcessingRecord->save();
+
+    AuditLog::shouldNotHaveReceived('register');
 });
