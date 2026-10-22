@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Filament\Actions;
 
+use App\Enums\Authorization\Permission;
 use App\Filament\Infolists\Tabs\Snapshot\ViewInfoTab;
 use App\Filament\Pages\ConceptEditRecord;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\EditAvgResponsibleProcessingRecord;
 use App\Filament\Resources\SnapshotResource;
 use App\Filament\Resources\SnapshotResource\Pages\ViewSnapshot;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
+use App\Models\Organisation;
 use App\Models\Snapshot;
 use App\Models\States\Snapshot\Approved;
 use App\Models\States\Snapshot\Concept;
@@ -19,10 +21,17 @@ use App\Models\States\Snapshot\Obsolete;
 use App\Models\States\SnapshotState;
 use App\Services\Snapshot\SnapshotStateTransitionService;
 use App\ValueObjects\CalendarDate;
+use Closure;
+use Livewire\Features\SupportTesting\Testable;
+use Tests\Feature\FeatureTestCase;
 use Tests\Helpers\Model\OrganisationTestHelper;
+use Tests\Helpers\Model\UserTestHelper;
 
 use function __;
 use function app;
+use function array_filter;
+use function array_values;
+use function dataset;
 use function expect;
 use function it;
 
@@ -731,3 +740,88 @@ it('survives the modal being resolved again after the concept has been submitted
         ->and($snapshots->first()->state)->toBeInstanceOf(Obsolete::class)
         ->and($snapshots->last()->state)->toBeInstanceOf(InReview::class);
 });
+
+/**
+ * Calls "Start vaststellen" the way a forged request from the browser would: raw Livewire
+ * calls, without the visibility assertion the testing helpers put in front of them.
+ *
+ * @param array<Permission> $permissions
+ */
+function forgeSubmitForReview(
+    FeatureTestCase $test,
+    Organisation $organisation,
+    AvgResponsibleProcessingRecord $avgResponsibleProcessingRecord,
+    array $permissions,
+    Closure $forge,
+): void {
+    $user = UserTestHelper::createForOrganisation($organisation);
+
+    $forge($test->withPermissions($user, $permissions)
+        ->withFilamentSession($user, $organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->id,
+        ]));
+}
+
+dataset('forged submit for review requests', [
+    // Mounting runs the action straight away, because no modal is needed here.
+    'mounting the action' => [
+        static function (Testable $livewire): void {
+            $livewire->call('mountAction', 'snapshot_submit_for_review');
+        },
+    ],
+    // Marking the action as mounted directly skips mountAction() altogether.
+    'calling an action marked as mounted' => [
+        static function (Testable $livewire): void {
+            $livewire->set('mountedActions', ['snapshot_submit_for_review'])
+                ->set('mountedActionsArguments', [[]])
+                ->set('mountedActionsData', [[]])
+                ->call('callMountedAction');
+        },
+    ],
+]);
+
+// The button is hidden without the permission, and Filament treats a hidden action as
+// disabled when it is mounted or called. A request that calls it anyway is refused on
+// the server, not only left off the page.
+it('refuses to submit for a user without permission to create versions', function (Closure $forge): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->withValidState()
+        ->create();
+
+    $permissions = array_values(array_filter(
+        Permission::cases(),
+        static fn (Permission $permission): bool => $permission !== Permission::SNAPSHOT_CREATE,
+    ));
+
+    forgeSubmitForReview($this, $organisation, $avgResponsibleProcessingRecord, $permissions, $forge);
+
+    expect($avgResponsibleProcessingRecord->refresh()->snapshots->filter(
+        static fn (Snapshot $snapshot): bool => $snapshot->state instanceof InReview,
+    ))->toBeEmpty();
+})->with('forged submit for review requests');
+
+// The same request does submit for a user who may, so the refusal above comes from the
+// permission and not from the way the request is made.
+it('submits a forged request for a user with permission to create versions', function (Closure $forge): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->withValidState()
+        ->create();
+
+    // The concept the action submits is normally written while mounting, which the second
+    // request skips, so it is saved here first.
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->id,
+        ])
+        ->call('save');
+
+    forgeSubmitForReview($this, $organisation, $avgResponsibleProcessingRecord, Permission::cases(), $forge);
+
+    expect($avgResponsibleProcessingRecord->refresh()->snapshots->sole()->state)
+        ->toBeInstanceOf(InReview::class);
+})->with('forged submit for review requests');
