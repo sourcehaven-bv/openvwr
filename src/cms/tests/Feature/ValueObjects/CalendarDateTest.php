@@ -125,5 +125,20 @@ it('can return today', function (): void {
     $timezone = fake()->timezone();
     $today = CalendarDate::instance(CarbonImmutable::now($timezone));
 
-    $this->assertEquals(CarbonImmutable::now($timezone)->utc()->format('Y-m-d'), $today->format('Y-m-d'));
+    $this->assertEquals(CarbonImmutable::now($timezone)->format('Y-m-d'), $today->format('Y-m-d'));
+});
+
+it('keeps the local day just after midnight ahead of UTC', function (): void {
+    // 00:30 in Amsterdam (CEST) is still 22:30 on the previous day in UTC.
+    $afterMidnight = CarbonImmutable::create(2026, 10, 21, 0, 30, 0, 'Europe/Amsterdam');
+
+    $this->assertEquals('2026-10-21', CalendarDate::instance($afterMidnight)->format('Y-m-d'));
+    $this->assertEquals('2027-04-21', CalendarDate::instance($afterMidnight)->addMonths(6)->format('Y-m-d'));
+});
+
+it('keeps the local day late in the evening behind UTC', function (): void {
+    // 21:00 in New York (EDT) is already 01:00 on the next day in UTC.
+    $lateEvening = CarbonImmutable::create(2026, 10, 20, 21, 0, 0, 'America/New_York');
+
+    $this->assertEquals('2026-10-20', CalendarDate::instance($lateEvening)->format('Y-m-d'));
 });

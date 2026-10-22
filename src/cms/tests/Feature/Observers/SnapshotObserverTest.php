@@ -12,6 +12,7 @@ use App\Models\States\Snapshot\Established;
 use App\Models\States\Snapshot\InReview;
 use App\Models\States\Snapshot\Obsolete;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Event;
 
 use function expect;
@@ -81,6 +82,32 @@ it('will set the review_at if snapshotSource is reviewable and not set', functio
 
     expect($avgResponsibleProcessingRecord->review_at)
         ->not()->toBeNull();
+});
+
+it('sets review_at from the display-timezone day late in the UTC evening', function (): void {
+    // 22:30 UTC is already the next day in Amsterdam (CEST, UTC+2).
+    $this->travelTo(CarbonImmutable::create(2026, 10, 20, 22, 30, 0, 'UTC'));
+    $this->be(User::factory()->create());
+
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->create([
+            'review_at' => null,
+        ]);
+    $snapshot = Snapshot::factory()
+        ->for($avgResponsibleProcessingRecord, 'snapshotSource')
+        ->create([
+            'state' => Approved::class,
+        ]);
+    $snapshot->state->transitionTo(Established::class);
+
+    $avgResponsibleProcessingRecord->refresh();
+
+    $expectedReviewAt = CarbonImmutable::create(2026, 10, 21, 0, 0, 0, 'UTC')
+        ->addMonths($snapshot->organisation->review_at_default_in_months)
+        ->format('Y-m-d');
+
+    expect($avgResponsibleProcessingRecord->review_at?->format('Y-m-d'))
+        ->toBe($expectedReviewAt);
 });
 
 it('will not set the review_at if snapshotSource is reviewable but set', function (): void {
