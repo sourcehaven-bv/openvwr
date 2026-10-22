@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Transfer\ConflictStrategy;
 use App\Transfer\ModelGraph;
 use App\Transfer\TransferEntityType;
+use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -109,32 +110,42 @@ class BundleImporter
         $this->idMap = [];
         $this->written = [];
 
-        DB::transaction(function () use ($bundle, $mediaResolver, $plan, $organisation, $user, $result): void {
-            foreach ($this->sortedEntities($bundle) as $id => $entity) {
-                $type = $this->typeOf($entity);
+        // Filament v5 scopes queries and creation observers to its active
+        // tenant. Run all matching, writes and relation restoration in the
+        // destination, then restore the caller's tenant even on failure.
+        $previousTenant = Filament::getTenant();
+        Filament::setTenant($organisation, isQuiet: true);
 
-                if ($type->isLookup()) {
-                    $this->idMap[$id] = $this->importLookup($type, $entity, $organisation);
-                    continue;
+        try {
+            DB::transaction(function () use ($bundle, $mediaResolver, $plan, $organisation, $user, $result): void {
+                foreach ($this->sortedEntities($bundle) as $id => $entity) {
+                    $type = $this->typeOf($entity);
+
+                    if ($type->isLookup()) {
+                        $this->idMap[$id] = $this->importLookup($type, $entity, $organisation);
+                        continue;
+                    }
+
+                    if ($type->isOwned()) {
+                        $this->importOwned($type, $entity, $user);
+                        continue;
+                    }
+
+                    $this->importEntity($type, $id, $entity, $plan, $organisation, $mediaResolver, $result);
                 }
 
-                if ($type->isOwned()) {
-                    $this->importOwned($type, $entity, $user);
-                    continue;
-                }
+                $this->relationRestorer->restore($bundle, $this->idMap, $this->written);
 
-                $this->importEntity($type, $id, $entity, $plan, $organisation, $mediaResolver, $result);
-            }
-
-            $this->relationRestorer->restore($bundle, $this->idMap, $this->written);
-
-            // Re-stamp after the relations exist. markSynced() during the loop above
-            // runs before the pivots are written, so their updated_at can land a
-            // whole second later than the watermark (both columns are second
-            // precision) and EditDetector would then read a freshly written copy back
-            // as locally edited.
-            $this->markWrittenSynced();
-        });
+                // Re-stamp after the relations exist. markSynced() during the loop above
+                // runs before the pivots are written, so their updated_at can land a
+                // whole second later than the watermark (both columns are second
+                // precision) and EditDetector would then read a freshly written copy back
+                // as locally edited.
+                $this->markWrittenSynced();
+            });
+        } finally {
+            Filament::setTenant($previousTenant, isQuiet: true);
+        }
 
         return $result;
     }
@@ -197,8 +208,7 @@ class BundleImporter
 
         $model = $type->modelClass()::query()->newModelInstance();
         $model->forceFill($attributes);
-        $model->setAttribute('organisation_id', $organisation->id->toString());
-        $model->save();
+        $this->saveInto($model, $organisation);
 
         return $model;
     }
@@ -298,8 +308,7 @@ class BundleImporter
 
         $model = $type->modelClass()::query()->newModelInstance();
         $model->forceFill($attributes);
-        $model->setAttribute('organisation_id', $organisation->id->toString());
-        $model->save();
+        $this->saveInto($model, $organisation);
         $this->markSynced($model);
 
         $this->idMap[$id] = $model;
@@ -409,5 +418,14 @@ class BundleImporter
         }
 
         $relation->updateOrCreate([], $type === TransferEntityType::ADDRESS ? $attributes : ['body' => $body]);
+    }
+
+    /**
+     * Save a record into the destination while retaining all application observers.
+     */
+    private function saveInto(Model $model, Organisation $organisation): void
+    {
+        $model->setAttribute('organisation_id', $organisation->id->toString());
+        $model->save();
     }
 }

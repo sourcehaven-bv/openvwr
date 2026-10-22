@@ -13,6 +13,7 @@ use App\Filament\Resources\DataBreachRecordResource;
 use App\Filament\Resources\DpiaPrescanRecordResource;
 use App\Filament\Resources\DpiaRecordResource;
 use App\Filament\Resources\WpgProcessingRecordResource;
+use Filament\Facades\Filament;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Resources\Pages\ViewRecord;
@@ -87,6 +88,13 @@ class OnePageLayoutRenderHooks
      */
     private static function isOnePageRegisterPage(): bool
     {
+        // The hook also runs while a page renders without a resolved user, such
+        // as the response to an action that redirects. There is no layout to
+        // decorate then, and asking for the user would fail on the assertion.
+        if (!Filament::auth()->check()) {
+            return false;
+        }
+
         if (Authentication::user()->register_layout !== RegisterLayout::ONE_PAGE) {
             return false;
         }

@@ -151,7 +151,8 @@ function fullRecord(ImportTarget $target): Model
 
             if ($withDetails && $entity instanceof Processor) {
                 $entity->address()->create([
-                    'address' => fake()->streetAddress(),
+                    // Comma-space separates related values in the exported sheet.
+                    'address' => 'Dorpsstraat 12',
                     'postal_code' => fake()->postcode(),
                     'city' => fake()->city(),
                     'country' => 'Nederland',
@@ -182,7 +183,7 @@ function fullRecord(ImportTarget $target): Model
  *
  * @return array<string, mixed>
  */
-function exportRow(string $exporterClass, Model $record): array
+function exportRow(string $exporterClass, Model $record, ImportTarget $target): array
 {
     $columnMap = [];
     foreach ($exporterClass::getColumns() as $column) {
@@ -190,7 +191,15 @@ function exportRow(string $exporterClass, Model $record): array
     }
 
     $exporter = (new Export(['exporter' => $exporterClass]))->getExporter($columnMap, []);
-    $values = $exporter($record->fresh());
+    $record = $record->fresh();
+    // These relationships are unordered sets. Compare every name and its
+    // positional details in the same order, independently of PostgreSQL's
+    // query plan or the new UUIDs assigned to the imported records.
+    foreach ($target->relations() as $relation) {
+        $record->setRelation($relation->key, $relation->relationFor($record)->get()->sortBy($relation->nameAttribute));
+    }
+
+    $values = $exporter($record);
 
     $row = [];
     foreach (array_keys($columnMap) as $index => $name) {
@@ -246,7 +255,7 @@ it('exports a copy of a full record exactly as it exported the original', functi
     $organisationId = Authentication::organisation()->id;
 
     $original = fullRecord($target);
-    $before = exportRow($exporterClass, $original);
+    $before = exportRow($exporterClass, $original, $target);
     $workbook = workbookOf($exporterClass, $before);
 
     // The FG's note stays with the FG: it is on the record, never in the sheet.
@@ -270,7 +279,7 @@ it('exports a copy of a full record exactly as it exported the original', functi
 
     $modelClass = $target->modelClass();
     $copy = $modelClass::query()->where('organisation_id', $organisationId)->where('name', $name)->firstOrFail();
-    $after = exportRow($exporterClass, $copy);
+    $after = exportRow($exporterClass, $copy, $target);
 
     $differences = [];
     foreach ($before as $column => $value) {

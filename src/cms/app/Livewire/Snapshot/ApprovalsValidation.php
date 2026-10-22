@@ -7,6 +7,8 @@ namespace App\Livewire\Snapshot;
 use App\Enums\Snapshot\SnapshotApprovalStatus;
 use App\Models\Snapshot;
 use App\Models\SnapshotApproval;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Columns\IconColumn;
@@ -20,8 +22,9 @@ use Livewire\Component;
 use function __;
 use function view;
 
-class ApprovalsValidation extends Component implements HasForms, HasTable
+class ApprovalsValidation extends Component implements HasActions, HasForms, HasTable
 {
+    use InteractsWithActions;
     use InteractsWithTable;
     use InteractsWithForms;
 

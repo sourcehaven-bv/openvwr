@@ -10,7 +10,7 @@ use function __;
 
 class WpgGoalsRepeatableEntry extends RepeatableEntry
 {
-    public static function make(string $name = 'wpgGoals'): static
+    public static function make(?string $name = 'wpgGoals'): static
     {
         return parent::make($name)
             ->label(__('wpg_goal.model_plural'))

@@ -38,7 +38,7 @@ class AwaitingEstablishmentWidget extends Widget
     // one is only ever actionable by a different person than that list is.
     protected static ?int $sort = 1;
     protected int|string|array $columnSpan = 'full';
-    protected static string $view = 'filament.widgets.awaiting-establishment';
+    protected string $view = 'filament.widgets.awaiting-establishment';
 
     /** @var array<string, SnapshotCollection> */
     private static array $snapshots = [];

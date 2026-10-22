@@ -15,7 +15,8 @@ class OrganisationAwarePathGenerator extends DefaultPathGenerator
 {
     protected function getBasePath(SpatieMedia $media): string
     {
-        $organisationId = $media->organisation_id;
+        // Read raw: Media declares ?string, but HasOrganisation casts it to a Uuid.
+        $organisationId = $media->getAttribute('organisation_id');
 
         if (is_string($organisationId)) {
             return sprintf('%s/%s/%s', $organisationId, $media->collection_name, $media->uuid);

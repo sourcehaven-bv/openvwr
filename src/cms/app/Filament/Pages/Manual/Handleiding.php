@@ -23,7 +23,7 @@ class Handleiding extends Page
     use ManualPage;
 
     protected static ?string $slug = 'handleiding';
-    protected static string $view = 'filament.manual.handleiding';
+    protected string $view = 'filament.manual.handleiding';
     protected static bool $shouldRegisterNavigation = false;
 
     #[Url(as: 'q', keep: false)]

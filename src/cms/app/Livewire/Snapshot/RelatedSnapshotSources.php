@@ -7,6 +7,8 @@ namespace App\Livewire\Snapshot;
 use App\Filament\Resources\RelatedSnapshotSourceResource;
 use App\Models\RelatedSnapshotSource;
 use App\Models\Snapshot;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Concerns\InteractsWithTable;
@@ -17,8 +19,9 @@ use Livewire\Component;
 
 use function view;
 
-class RelatedSnapshotSources extends Component implements HasForms, HasTable
+class RelatedSnapshotSources extends Component implements HasActions, HasForms, HasTable
 {
+    use InteractsWithActions;
     use InteractsWithForms;
     use InteractsWithTable;
 

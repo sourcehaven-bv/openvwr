@@ -90,8 +90,8 @@ async function login(page) {
   await page.getByRole('button', { name: /^Inloggen$/i }).first().click();
   await page.waitForLoadState('networkidle');
   if (page.url().includes('two-factor-authentication')) {
-    await page.locator('#code').fill('000000');
-    await page.locator('#code').press('Enter');
+    await page.locator('input[autocomplete="one-time-code"]').fill('000000');
+    await page.locator('input[autocomplete="one-time-code"]').press('Enter');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(1500);
   }

@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\RetentionPeriodResource\Pages;
+use App\Filament\Resources\RetentionPeriodResource\Pages\CreateRetentionPeriod;
+use App\Filament\Resources\RetentionPeriodResource\Pages\EditRetentionPeriod;
+use App\Filament\Resources\RetentionPeriodResource\Pages\ListRetentionPeriods;
+use App\Filament\Resources\RetentionPeriodResource\Pages\ViewRetentionPeriod;
 use App\Models\RetentionPeriod;
 
 use function __;
@@ -17,10 +20,10 @@ class RetentionPeriodResource extends LookupListResource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListRetentionPeriods::route('/'),
-            'create' => Pages\CreateRetentionPeriod::route('/create'),
-            'edit' => Pages\EditRetentionPeriod::route('/{record}/edit'),
-            'view' => Pages\ViewRetentionPeriod::route('/{record}'),
+            'index' => ListRetentionPeriods::route('/'),
+            'create' => CreateRetentionPeriod::route('/create'),
+            'edit' => EditRetentionPeriod::route('/{record}/edit'),
+            'view' => ViewRetentionPeriod::route('/{record}'),
         ];
     }
 

@@ -9,7 +9,7 @@ use Filament\Infolists\Components\TextEntry;
 
 class DateEntry extends TextEntry
 {
-    public static function make(string $name): static
+    public static function make(?string $name = null): static
     {
         return parent::make($name)
             ->dateTime(DateFormatService::FORMAT_DATE, DateFormatService::getDisplayTimezone());

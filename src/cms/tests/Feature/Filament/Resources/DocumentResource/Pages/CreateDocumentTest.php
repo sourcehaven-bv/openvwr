@@ -79,7 +79,7 @@ it('hides the notify_at_expires_at action if expires_at not set', function (): v
             'expires_at' => null,
             'document_type_id' => $documentType->id,
         ])
-        ->assertFormComponentActionHidden('notify_at', 'notify_at_expires_at');
+        ->assertFormComponentActionDoesNotExist('notify_at', 'notify_at_expires_at');
 });
 
 it('can use the notify_at_1_month_before action', function (): void {
@@ -123,7 +123,7 @@ it('hides the notify_at_1_month_before action if expires_at not set', function (
             'expires_at' => null,
             'document_type_id' => $documentType->id,
         ])
-        ->assertFormComponentActionHidden('notify_at', 'notify_at_1_month_before');
+        ->assertFormComponentActionDoesNotExist('notify_at', 'notify_at_1_month_before');
 });
 
 it('can use the notify_at_3_months_before action', function (): void {
@@ -167,5 +167,5 @@ it('hides the notify_at_3_months_before action if expires_at not set', function 
             'expires_at' => null,
             'document_type_id' => $documentType->id,
         ])
-        ->assertFormComponentActionHidden('notify_at', 'notify_at_3_months_before');
+        ->assertFormComponentActionDoesNotExist('notify_at', 'notify_at_3_months_before');
 });

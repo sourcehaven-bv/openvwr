@@ -11,7 +11,7 @@ use function __;
 
 class TagsColumn extends TextColumn
 {
-    public static function make(string $name = 'tags'): static
+    public static function make(?string $name = 'tags'): static
     {
         return parent::make($name)
             ->label(__('tag.model_plural'))

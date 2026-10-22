@@ -9,10 +9,10 @@ use App\Filament\Infolists\Components\DateTimeEntry;
 use App\Filament\Infolists\Components\EntityNumberPrefixEntry;
 use App\Filament\Infolists\Components\TextareaEntry;
 use App\Models\Organisation;
-use Filament\Infolists\Components\Component;
-use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Illuminate\Support\HtmlString;
 
 use function __;
@@ -20,11 +20,11 @@ use function view;
 
 class OrganisationResourceInfolist
 {
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist
+        return $schema
             ->columns(1)
-            ->schema(self::getSchema());
+            ->components(self::getSchema());
     }
 
     /**

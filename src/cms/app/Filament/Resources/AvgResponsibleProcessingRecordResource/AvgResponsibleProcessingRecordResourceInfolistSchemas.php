@@ -24,11 +24,11 @@ use App\Filament\Infolists\Components\ToggleEntry;
 use App\Filament\Infolists\Group\ProcessingRecordContactPersons;
 use App\Filament\Infolists\InfolistHelper;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
-use Filament\Infolists\Components\Component;
-use Filament\Infolists\Components\Grid;
-use Filament\Infolists\Components\Group;
-use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
 
 use function __;
 use function array_map;

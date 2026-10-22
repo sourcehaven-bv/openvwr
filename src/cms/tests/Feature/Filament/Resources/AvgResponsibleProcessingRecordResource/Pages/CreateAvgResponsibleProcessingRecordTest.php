@@ -74,9 +74,7 @@ it('can create an entry with a new tag', function (): void {
             'avg_responsible_processing_record_service_id' => $avgResponsibleProcessingRecordService->id->toString(),
             'responsible_id' => [$responsible->id->toString()],
         ])
-        ->call('mountFormComponentAction', 'data.tags', 'createOption')
-        ->set('mountedFormComponentActionsData.0.name', $tagName)
-        ->call('callMountedFormComponentAction')
+        ->callFormComponentAction('tags', 'createOption', data: ['name' => $tagName])
         ->assertHasNoFormErrors()
         ->call('create')
         ->assertHasNoFormErrors();
@@ -188,7 +186,7 @@ it('can use the publishFromNow action', function (): void {
             'avg_responsible_processing_record_service_id' => $avgResponsibleProcessingRecordService->id->toString(),
             'responsible_id' => [$responsible->id->toString()],
         ])
-        ->mountFormComponentAction('public_from', 'public_from_set_now')
+        ->callFormComponentAction('public_from', 'public_from_set_now')
         ->assertFormComponentActionVisible('public_from', 'public_from_set_now')
         ->call('create')
         ->assertHasNoFormErrors();
@@ -317,12 +315,12 @@ it('can create an entry using form components', function (): void {
 
     $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(CreateAvgResponsibleProcessingRecord::class)
-        ->call('mountFormComponentAction', 'data.avg_responsible_processing_record_service_id', 'createOption')
-        ->set('mountedFormComponentActionsData.0.name', $avgResponsibleProcessingRecordService->name)
-        ->call('callMountedFormComponentAction')
-        ->call('mountFormComponentAction', 'data.responsible_id', 'createOption')
-        ->set('mountedFormComponentActionsData.0.name', $responsible->name)
-        ->call('callMountedFormComponentAction')
+        ->callFormComponentAction(
+            'avg_responsible_processing_record_service_id',
+            'createOption',
+            data: ['name' => $avgResponsibleProcessingRecordService->name],
+        )
+        ->callFormComponentAction('responsible_id', 'createOption', data: ['name' => $responsible->name])
         ->set('data.name', fake()->word())
         ->call('create')
         ->assertHasNoFormErrors();

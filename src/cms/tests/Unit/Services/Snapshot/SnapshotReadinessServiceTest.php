@@ -8,14 +8,17 @@ use App\Filament\Forms\DraftableForm;
 use App\Filament\Pages\Concerns\EnforcesRequiredFieldsWhenSubmitting;
 use App\Filament\Pages\Contracts\SavesConcepts;
 use App\Services\Snapshot\SnapshotReadinessService;
+use Filament\Actions\Action;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\CheckboxList;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Wizard;
-use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Wizard;
+use Filament\Schemas\Components\Wizard\Step;
+use Filament\Schemas\Schema;
 use Illuminate\Support\HtmlString;
 use Livewire\Component;
 use Tests\Helpers\LivewireTestHelper;
@@ -36,7 +39,7 @@ uses(TestCase::class);
  *
  * @param array<string, mixed> $state
  */
-$readinessForm = static function (array $state = []): Form {
+$readinessForm = static function (array $state = []): Schema {
     $livewire = LivewireTestHelper::createTestFormComponent();
     $livewire->data = $state;
 
@@ -69,10 +72,11 @@ $readinessForm = static function (array $state = []): Form {
  *
  * @param array<int, mixed> $schema
  */
-$conceptForm = static function (array $schema): Form {
-    $livewire = new class extends Component implements HasForms, SavesConcepts
+$conceptForm = static function (array $schema): Schema {
+    $livewire = new class extends Component implements HasActions, HasForms, SavesConcepts
     {
         use EnforcesRequiredFieldsWhenSubmitting;
+        use InteractsWithActions;
         use InteractsWithForms;
 
         /** @var array<string, mixed> */
@@ -213,7 +217,7 @@ it('reads a label that renders as html', function (): void {
         ->toBe('Naam');
 });
 
-it('falls back to the field name when it has no label', function (): void {
+it('falls back to the generated label when the field has none', function (): void {
     $livewire = LivewireTestHelper::createTestFormComponent();
     $livewire->data = [];
 
@@ -227,8 +231,10 @@ it('falls back to the field name when it has no label', function (): void {
 
     $missingRequiredFields = (new SnapshotReadinessService())->getMissingRequiredFields($form);
 
+    // v4 generates a label from the field name ("name" -> "Name") rather than
+    // leaving it empty, so the message names the field the way the form does.
     expect($missingRequiredFields[0]->label)
-        ->toBe('name');
+        ->toBe('Name');
 });
 
 it('summarises the remainder when many required fields are missing', function (): void {
@@ -301,4 +307,20 @@ it('reports the section as the step in the one page layout', function (): void {
         ->toBe(1)
         ->and($missingRequiredFields[0]->stepLabel)
         ->toBe('Verwerkingsdoel');
+});
+
+
+it('checks required fields alongside top-level and nested actions', function () use ($conceptForm): void {
+    $form = $conceptForm([
+        Action::make('top_action'),
+        Section::make('Gegevens')->schema([
+            Action::make('nested_action'),
+            TextInput::make('name')->label('Naam')->required(),
+        ]),
+    ]);
+
+    $missing = (new SnapshotReadinessService())->getMissingRequiredFields($form);
+
+    expect(count($missing))->toBe(1)
+        ->and($missing[0]->label)->toBe('Naam');
 });

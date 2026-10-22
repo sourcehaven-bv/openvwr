@@ -13,12 +13,14 @@ use App\Filament\Resources\DataBreachRecord\DataBreachRecordResourceForm;
 use App\Filament\Resources\DpiaPrescanRecordResource\DpiaPrescanRecordResourceForm;
 use App\Filament\Resources\DpiaRecordResource\DpiaRecordResourceForm;
 use App\Filament\Resources\WpgProcessingRecordResource\WpgProcessingRecordResourceForm;
-use Filament\Forms\Components\Component;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Forms\Components\Field;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
 use Webmozart\Assert\Assert;
 
@@ -89,9 +91,9 @@ class FormFields
     /**
      * The one-page layout, which lists every field the steps layout does.
      */
-    private static function form(ImportTarget $target): Form
+    private static function form(ImportTarget $target): Schema
     {
-        $form = Form::make(new FormHost());
+        $form = Schema::make(new FormHost());
 
         return match ($target) {
             ImportTarget::DataBreachRecord => DataBreachRecordResourceForm::onePageForm($form),
@@ -110,12 +112,16 @@ class FormFields
      * Sections and groups are walked into, hidden or not: a field behind a
      * toggle is still a field of the form.
      *
-     * @param array<Component> $components
+     * @param array<Action|ActionGroup|Component> $components
      * @param array<string, FormField> $fields
      */
     private static function collect(array $components, array &$fields): void
     {
         foreach ($components as $component) {
+            if (!$component instanceof Component) {
+                continue;
+            }
+
             if ($component instanceof Field && !$component instanceof Hidden) {
                 $name = $component->getName();
                 $fields[$name] ??= new FormField(
@@ -129,7 +135,7 @@ class FormFields
                 continue;
             }
 
-            foreach ($component->getChildComponentContainers(withHidden: true) as $container) {
+            foreach ($component->getChildSchemas(withHidden: true) as $container) {
                 self::collect($container->getComponents(withHidden: true), $fields);
             }
         }

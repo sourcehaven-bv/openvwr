@@ -47,7 +47,11 @@ abstract class EntityNumberCreateRecord extends CreateRecord
                 ->title(__('general.number_create_failed'))
                 ->send();
 
-            throw new Halt($exception->getMessage(), $exception->getCode(), $exception);
+            // A PDOException carries a SQLSTATE such as "23502" as its code, which
+            // is a string; Halt inherits Exception and only takes an int. Passing
+            // it through would replace the real failure with a TypeError, so the
+            // code is dropped and the original exception kept as the previous one.
+            throw new Halt($exception->getMessage(), 0, $exception);
         }
 
         return $model;

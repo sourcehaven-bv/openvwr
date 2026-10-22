@@ -6,41 +6,40 @@
         $toId = $this->toId;
     @endphp
 
+    {{-- Outside .snapshot-diff: its overflow clips the input ring. --}}
     <x-filament::section>
-        <div class="snapshot-diff">
-            <table class="snapshot-diff-pickers">
-                <colgroup>
-                    <col style="width: 50%;">
-                    <col style="width: 50%;">
-                </colgroup>
-                <tr>
-                    <th>
-                        <label for="compare-from" class="snapshot-diff-picker-label">
-                            {{ __('snapshot.compare_from') }}
-                        </label>
-                        <x-filament::input.wrapper>
-                            <x-filament::input.select wire:model.live="fromId" id="compare-from">
-                                @foreach ($options as $id => $label)
-                                    <option value="{{ $id }}" @selected($id === $fromId)>{{ $label }}</option>
-                                @endforeach
-                            </x-filament::input.select>
-                        </x-filament::input.wrapper>
-                    </th>
-                    <th>
-                        <label for="compare-to" class="snapshot-diff-picker-label">
-                            {{ __('snapshot.compare_to') }}
-                        </label>
-                        <x-filament::input.wrapper>
-                            <x-filament::input.select wire:model.live="toId" id="compare-to">
-                                @foreach ($options as $id => $label)
-                                    <option value="{{ $id }}" @selected($id === $toId)>{{ $label }}</option>
-                                @endforeach
-                            </x-filament::input.select>
-                        </x-filament::input.wrapper>
-                    </th>
-                </tr>
-            </table>
-        </div>
+        <table class="snapshot-diff-pickers">
+            <colgroup>
+                <col style="width: 50%;">
+                <col style="width: 50%;">
+            </colgroup>
+            <tr>
+                <th>
+                    <label for="compare-from" class="snapshot-diff-picker-label">
+                        {{ __('snapshot.compare_from') }}
+                    </label>
+                    <x-filament::input.wrapper>
+                        <x-filament::input.select wire:model.live="fromId" id="compare-from">
+                            @foreach ($options as $id => $label)
+                                <option value="{{ $id }}" @selected($id === $fromId)>{{ $label }}</option>
+                            @endforeach
+                        </x-filament::input.select>
+                    </x-filament::input.wrapper>
+                </th>
+                <th>
+                    <label for="compare-to" class="snapshot-diff-picker-label">
+                        {{ __('snapshot.compare_to') }}
+                    </label>
+                    <x-filament::input.wrapper>
+                        <x-filament::input.select wire:model.live="toId" id="compare-to">
+                            @foreach ($options as $id => $label)
+                                <option value="{{ $id }}" @selected($id === $toId)>{{ $label }}</option>
+                            @endforeach
+                        </x-filament::input.select>
+                    </x-filament::input.wrapper>
+                </th>
+            </tr>
+        </table>
     </x-filament::section>
 
     @foreach ($diffs as $section => $diff)

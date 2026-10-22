@@ -68,11 +68,9 @@ it('does not offer established in the status change list', function (): void {
     $test = $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(ViewSnapshot::class, ['record' => $snapshot->id]);
 
-    expect(static function () use ($test): void {
-        $test->callInfolistAction(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_status_change', data: [
-            'state' => Established::$name,
-        ]);
-    })->toThrow(InvalidArgumentException::class);
+    $test->callInfolistAction(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_status_change', data: [
+        'state' => Established::$name,
+    ])->assertHasFormErrors(['state']);
 
     expect($snapshot->refresh()->state)
         ->toBeInstanceOf(Approved::class);
@@ -100,7 +98,7 @@ it('is hidden on a version that is finished', function (): void {
 
     $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(ViewSnapshot::class, ['record' => $snapshot->id])
-        ->assertInfolistActionHidden(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_establish');
+        ->assertInfolistActionDoesNotExist(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_establish');
 });
 
 // The button's colour is the readiness signal: green once the approvals are in and every

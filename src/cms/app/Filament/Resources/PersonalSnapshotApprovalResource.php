@@ -8,26 +8,40 @@ use App\Enums\Authorization\Permission;
 use App\Facades\Authentication;
 use App\Facades\Authorization;
 use App\Filament\NavigationGroups\NavigationGroup;
-use App\Filament\Resources\PersonalSnapshotApprovalResource\Pages;
+use App\Filament\Resources\PersonalSnapshotApprovalResource\Pages\ListPersonalSnapshotApprovalItems;
 use App\Filament\Resources\PersonalSnapshotApprovalResource\PersonalSnapshotApprovalResourceTable;
 use App\Filament\Resources\SnapshotResource\Pages\ViewSnapshot;
 use App\Models\Snapshot;
+use BackedEnum;
 use Filament\Tables\Table;
+use Illuminate\Auth\Access\Response;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use UnitEnum;
 
 use function __;
 
+/**
+ * @extends Resource<Snapshot>
+ */
 class PersonalSnapshotApprovalResource extends Resource
 {
     protected static ?string $model = Snapshot::class;
-    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-check';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-check';
     protected static bool $hasNavigationBadge = true;
     protected static ?int $navigationSort = 1;
 
-    public static function can(string $action, ?Model $record = null): bool
+    /**
+     * v5 routes every access check through getAuthorizationResponse():
+     * canCreate(), canEdit() and friends call it directly, and can() is
+     * only a thin wrapper around it. Overriding can() alone would leave
+     * those paths on the policy and lock the page behind a 403.
+     */
+    public static function getAuthorizationResponse(string|UnitEnum $action, ?Model $record = null): Response
     {
-        return Authorization::hasPermission(Permission::SNAPSHOT_APPROVAL_UPDATE_PERSONAL);
+        return Authorization::hasPermission(Permission::SNAPSHOT_APPROVAL_UPDATE_PERSONAL)
+            ? Response::allow()
+            : Response::deny();
     }
 
     /**
@@ -54,7 +68,7 @@ class PersonalSnapshotApprovalResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPersonalSnapshotApprovalItems::route('/'),
+            'index' => ListPersonalSnapshotApprovalItems::route('/'),
             'view' => ViewSnapshot::route('{record}'),
         ];
     }

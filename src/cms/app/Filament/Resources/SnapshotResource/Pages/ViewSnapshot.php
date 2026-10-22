@@ -16,10 +16,10 @@ use App\Filament\Resources\SnapshotResource;
 use App\Models\Snapshot;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
-use Filament\Infolists\Components\Tabs;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\On;
@@ -105,9 +105,9 @@ class ViewSnapshot extends ViewRecord
         return parent::render();
     }
 
-    public function infolist(Infolist $infolist): Infolist
+    public function infolist(Schema $schema): Schema
     {
-        return $infolist
+        return $schema
             ->schema([
                 Tabs::make()
                     ->tabs([

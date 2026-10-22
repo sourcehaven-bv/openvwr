@@ -16,25 +16,61 @@ use App\Filament\Resources\OrganisationUserResource\Pages\EditOrganisationUser;
 use App\Filament\Resources\OrganisationUserResource\Pages\ListOrganisationUsers;
 use App\Filament\Resources\OrganisationUserResource\Pages\ViewOrganisationUser;
 use App\Models\User;
-use Filament\Forms\Form;
-use Filament\Infolists\Infolist;
+use BackedEnum;
+use Filament\Panel;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Illuminate\Auth\Access\Response;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use UnitEnum;
 
 use function __;
 
+/** @extends Resource<User> */
 class OrganisationUserResource extends Resource
 {
     protected static bool $isScopedToTenant = true;
     protected static ?string $model = User::class;
-    protected static ?string $navigationIcon = 'heroicon-o-user';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-user';
     protected static ?int $navigationSort = 1;
     protected static ?string $tenantOwnershipRelationshipName = 'organisations';
 
-    public static function can(string $action, ?Model $record = null): bool
+    /**
+     * Users are shared identities. Scope the resource, rather than every User
+     * query in the request: login and attaching an existing account must also
+     * find users who do not yet belong to the current organisation.
+     *
+     * @return Builder<User>
+     */
+    public static function getEloquentQuery(): Builder
     {
-        return Authorization::hasPermission(Permission::USER_ROLE_ORGANISATION_MANAGE);
+        return static::scopeEloquentQueryToTenant(parent::getEloquentQuery(), null);
+    }
+
+    public static function registerTenancyModelGlobalScope(Panel $panel): void
+    {
+        // Membership is scoped by getEloquentQuery(), not on the shared model.
+    }
+
+    public static function observeTenancyModelCreation(Panel $panel): void
+    {
+        // Creating an identity must not grant membership. The create page
+        // explicitly attaches the account after validating the invitation.
+    }
+
+    /**
+     * v5 routes every access check through getAuthorizationResponse():
+     * canCreate(), canEdit() and friends call it directly, and can() is
+     * only a thin wrapper around it. Overriding can() alone would leave
+     * those paths on the policy and lock the page behind a 403.
+     */
+    public static function getAuthorizationResponse(string|UnitEnum $action, ?Model $record = null): Response
+    {
+        return Authorization::hasPermission(Permission::USER_ROLE_ORGANISATION_MANAGE)
+            ? Response::allow()
+            : Response::deny();
     }
 
     public static function getNavigationGroup(): ?string
@@ -42,14 +78,14 @@ class OrganisationUserResource extends Resource
         return __(NavigationGroup::ORGANISATION->value);
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return OrganisationUserResourceForm::form($form);
+        return OrganisationUserResourceForm::form($schema);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return OrganisationUserResourceInfolist::infolist($infolist);
+        return OrganisationUserResourceInfolist::infolist($schema);
     }
 
     public static function table(Table $table): Table

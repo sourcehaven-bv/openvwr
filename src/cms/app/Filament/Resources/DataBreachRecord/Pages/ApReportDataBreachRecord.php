@@ -32,7 +32,7 @@ class ApReportDataBreachRecord extends Page
     use InteractsWithRecord;
 
     protected static string $resource = DataBreachRecordResource::class;
-    protected static string $view = 'filament.pages.ap-report';
+    protected string $view = 'filament.pages.ap-report';
 
     public function mount(string|int $record): void
     {

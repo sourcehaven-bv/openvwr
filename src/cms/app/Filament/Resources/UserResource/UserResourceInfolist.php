@@ -10,21 +10,21 @@ use App\Filament\Infolists\Components\Section\OrganisationUserRolesSection;
 use App\Filament\Infolists\Components\Section\UserGlobalRolesSection;
 use App\Filament\Infolists\Components\Section\UserSection;
 use App\Models\User;
-use Filament\Infolists\Components\Component;
-use Filament\Infolists\Infolist;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Schema;
 
 use function __;
 
 class UserResourceInfolist
 {
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
         /** @var User $user */
-        $user = $infolist->record;
+        $user = $schema->getRecord();
 
-        return $infolist
+        return $schema
             ->columns(1)
-            ->schema(self::getSchema($user));
+            ->components(self::getSchema($user));
     }
 
     /**

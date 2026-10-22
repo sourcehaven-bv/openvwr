@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\Filament\Pages\DevLogin;
 use App\Models\Organisation;
 use App\Models\User;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 
 use function Pest\Livewire\livewire;
@@ -52,11 +51,10 @@ it('only offers users that belong to an organisation', function (): void {
     // The option list is presentation only — Livewire takes the submitted value
     // from the client — so assert the server refuses an orgless user outright
     // rather than merely hiding them from the dropdown.
-    expect(static function () use ($withoutOrganisation): void {
-        livewire(DevLogin::class)
-            ->fillForm(['userId' => $withoutOrganisation->id->toString()])
-            ->call('authenticate');
-    })->toThrow(ModelNotFoundException::class);
+    livewire(DevLogin::class)
+        ->fillForm(['userId' => $withoutOrganisation->id->toString()])
+        ->call('authenticate')
+        ->assertHasFormErrors(['userId']);
 
     expect(Auth::check())->toBeFalse();
 

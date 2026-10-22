@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Enums\Authorization\Permission;
 use App\Enums\Snapshot\SnapshotApprovalStatus;
+use App\Facades\DateFormat;
 use App\Filament\Infolists\Components\SnapshotStatusChangeAction;
 use App\Filament\Infolists\Tabs\Snapshot\ViewInfoTab;
 use App\Filament\Resources\SnapshotResource;
@@ -368,7 +369,7 @@ it('offers no status change on a concept', function (): void {
         ->createLivewireTestable(ViewSnapshot::class, [
             'record' => $snapshot->getRouteKey(),
         ])
-        ->assertInfolistActionHidden(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_status_change');
+        ->assertInfolistActionDoesNotExist(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_status_change');
 
     expect(transitionOptions($snapshot))
         ->toBe([]);
@@ -805,7 +806,7 @@ it('hides a forward skip transition when the user lacks the target permission', 
         ->createLivewireTestable(ViewSnapshot::class, [
             'record' => $snapshot->getRouteKey(),
         ])
-        ->assertInfolistActionHidden(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_establish');
+        ->assertInfolistActionDoesNotExist(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_establish');
 });
 
 it('establishes straight from review when the skip transition is triggered from the page', function (): void {
@@ -913,4 +914,20 @@ it('does not mark a not-yet-reached station as skipped', function (): void {
             'record' => $snapshot->getRouteKey(),
         ])
         ->assertDontSee(__('snapshot.status_flow_skipped'));
+});
+
+
+it('displays the signed-in reviewers decision and review date', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation);
+    $snapshot = Snapshot::factory()->recycle($organisation)->create(['state' => InReview::class]);
+    $approval = SnapshotApproval::factory()->for($snapshot)->create([
+        'assigned_to' => $user->id,
+        'status' => SnapshotApprovalStatus::APPROVED,
+    ]);
+
+    $this->asFilamentUser($user)
+        ->createLivewireTestable(ViewSnapshot::class, ['record' => $snapshot->getRouteKey()])
+        ->assertSee(__('snapshot_approval_status.approved'))
+        ->assertSee(DateFormat::toDateTime($approval->updated_at));
 });

@@ -1,5 +1,5 @@
 @php
-    use Filament\Forms\Components\Wizard\Step;
+    use Filament\Schemas\Components\Wizard\Step;
     $isContained = $isContained();
     $statePath = $getStatePath();
 @endphp
@@ -98,6 +98,8 @@
             ->merge($getExtraAlpineAttributes(), escape: false)
             ->class([
                 'fi-fo-wizard',
+                // v5 hides the inactive steps with CSS scoped to this class.
+                'fi-sc-wizard',
             ])
     }}
 >
@@ -133,6 +135,13 @@
 
         .wizzard-layout__steps .fi-fo-wizard-header-step-label {
             text-align: left;
+        }
+
+        /* v5 pads a step only inside a contained wizard root, but here the
+           card is the content column rather than the root. */
+        .wizzard-layout__content > .fi-sc-wizard-step.fi-active {
+            margin-top: 0;
+            padding: 1.5rem;
         }
     </style>
 

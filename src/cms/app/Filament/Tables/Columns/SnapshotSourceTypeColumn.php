@@ -13,7 +13,7 @@ use function sprintf;
 
 class SnapshotSourceTypeColumn extends TextColumn
 {
-    public static function make(string $name = 'snapshot_source_type'): static
+    public static function make(?string $name = 'snapshot_source_type'): static
     {
         return parent::make($name)
             ->label(__('snapshot.snapshot_source_type'))

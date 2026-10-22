@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Filament\Resources\AdminLogEntryResource;
 use App\Filament\Resources\AdminLogEntryResource\Pages\ListAdminLogEntries;
 use App\Models\AdminLogEntry;
 use Illuminate\Database\Eloquent\Factories\Sequence;
@@ -31,4 +32,9 @@ it('can handle non-string values in the context', function (): void {
     $this->asFilamentUser()
         ->createLivewireTestable(ListAdminLogEntries::class)
         ->assertCanSeeTableRecords($adminLogEntries);
+});
+
+
+it('uses the Dutch audit record label', function (): void {
+    expect(AdminLogEntryResource::getModelLabel())->toBe('Admin Logregel');
 });

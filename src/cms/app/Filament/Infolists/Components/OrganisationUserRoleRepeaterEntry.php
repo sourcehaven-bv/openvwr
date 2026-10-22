@@ -16,7 +16,7 @@ class OrganisationUserRoleRepeaterEntry extends RepeatableEntry
     public static function makeForUser(string $name, User $user): static
     {
         return parent::make($name)
-            ->label('')
+            ->hiddenLabel()
             ->columns()
             ->schema([
                 TextEntry::make('name')

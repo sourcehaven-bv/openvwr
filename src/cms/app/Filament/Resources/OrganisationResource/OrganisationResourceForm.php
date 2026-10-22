@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrganisationResource;
 
-use App\Components\Uuid\UuidInterface;
 use App\Config\Feature;
 use App\Enums\Authorization\Permission;
 use App\Enums\Media\MediaGroup;
@@ -18,12 +17,12 @@ use App\Models\Organisation;
 use App\Models\ResponsibleLegalEntity;
 use App\Rules\IPRanges;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
-use Filament\Forms\Set;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Unique;
 
@@ -31,10 +30,10 @@ use function __;
 
 class OrganisationResourceForm
 {
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 self::generalSection(),
                 self::prefixSection(),
                 self::apSection(),
@@ -64,14 +63,7 @@ class OrganisationResourceForm
                     ->relationship('responsibleLegalEntity', 'name')
                     ->searchable(['name'])
                     ->required()
-                    ->exists(ResponsibleLegalEntity::class, 'id')
-                    ->formatStateUsing(static function (string|UuidInterface $state): string {
-                        if ($state instanceof UuidInterface) {
-                            return $state->toString();
-                        }
-
-                        return $state;
-                    }),
+                    ->exists(ResponsibleLegalEntity::class, 'id'),
             ]);
     }
 

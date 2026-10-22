@@ -8,8 +8,8 @@ use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\TagsColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
 use App\Filament\Tables\TagFilter;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -42,13 +42,13 @@ class ProcessorResourceTable
             ->defaultSort('processors.updated_at', 'desc')
             ->emptyStateHeading(__('processor.table_empty_heading'))
             ->emptyStateDescription(null)
-            ->actionsColumnLabel(__('general.edit'))
-            ->actions([
+            ->recordActionsColumnLabel(__('general.edit'))
+            ->recordActions([
                 EditAction::make()
                     ->hiddenLabel()
                     ->tooltip(static fn (EditAction $action) => $action->getLabel()),
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 DeleteBulkAction::make(),
             ]);
     }

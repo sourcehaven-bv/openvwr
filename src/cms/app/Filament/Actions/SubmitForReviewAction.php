@@ -17,7 +17,6 @@ use App\Models\States\Snapshot\InReview;
 use App\Models\States\SnapshotState;
 use App\Services\Snapshot\SnapshotStateTransitionService;
 use Filament\Actions\Action;
-use Filament\Actions\StaticAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Support\Exceptions\Cancel;
@@ -103,7 +102,7 @@ class SubmitForReviewAction extends Action
             // the modal only reports it and the submit button would be a button that must
             // not be pressed. What is left is the close button, relabelled from "Annuleren"
             // — there is no question to answer.
-            ->modalSubmitAction(static function (StaticAction $action, Component $livewire): StaticAction|bool {
+            ->modalSubmitAction(static function (Action $action, Component $livewire): Action|bool {
                 return self::isUnchanged($livewire) ? false : $action;
             })
             ->modalSubmitActionLabel(__('snapshot.submit_for_review_pending_confirm'))

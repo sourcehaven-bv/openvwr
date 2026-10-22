@@ -16,13 +16,16 @@ use Tests\Helpers\Model\OrganisationTestHelper;
 use Tests\Helpers\Model\UserTestHelper;
 
 it('loads the table', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
         ->create();
     $snapshot = Snapshot::factory()
+        ->recycle($organisation)
         ->for($avgResponsibleProcessingRecord, 'snapshotSource')
         ->create();
 
-    $this->asFilamentUser()
+    $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(SnapshotsRelationManager::class, [
             'ownerRecord' => $avgResponsibleProcessingRecord,
             'pageClass' => EditAvgResponsibleProcessingRecord::class,
@@ -56,6 +59,7 @@ it('hides the row action from a user who may not edit the record', function (): 
         ->recycle($organisation)
         ->create();
     $snapshot = Snapshot::factory()
+        ->recycle($organisation)
         ->for($avgResponsibleProcessingRecord, 'snapshotSource')
         ->create(['state' => Concept::class]);
 
@@ -83,6 +87,7 @@ it('offers no submit link on the page that submits', function (): void {
         ->recycle($organisation)
         ->create();
     $snapshot = Snapshot::factory()
+        ->recycle($organisation)
         ->for($avgResponsibleProcessingRecord, 'snapshotSource')
         ->create(['state' => Concept::class]);
 
@@ -105,6 +110,7 @@ it('submits from the concept row instead of linking to the current page', functi
         ->withValidState()
         ->create();
     $snapshot = Snapshot::factory()
+        ->recycle($organisation)
         ->for($avgResponsibleProcessingRecord, 'snapshotSource')
         ->create(['state' => Concept::class]);
 
@@ -130,6 +136,7 @@ it('links to the edit page when the table is not on it', function (): void {
         ->recycle($organisation)
         ->create();
     $snapshot = Snapshot::factory()
+        ->recycle($organisation)
         ->for($avgResponsibleProcessingRecord, 'snapshotSource')
         ->create(['state' => Concept::class]);
 
@@ -155,6 +162,7 @@ it('hides the row action from a user who may not submit', function (): void {
         ->recycle($organisation)
         ->create();
     $snapshot = Snapshot::factory()
+        ->recycle($organisation)
         ->for($avgResponsibleProcessingRecord, 'snapshotSource')
         ->create(['state' => Concept::class]);
 
@@ -181,6 +189,7 @@ it('hides the row action on a version that is no longer a concept', function ():
         ->recycle($organisation)
         ->create();
     $snapshot = Snapshot::factory()
+        ->recycle($organisation)
         ->for($avgResponsibleProcessingRecord, 'snapshotSource')
         ->create(['state' => Established::class]);
 

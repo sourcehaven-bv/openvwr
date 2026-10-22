@@ -165,7 +165,7 @@ it('asks before superseding a version under review', function (): void {
     ])
         ->fillForm(['name' => 'Tweede ronde'])
         ->mountAction('snapshot_submit_for_review')
-        ->assertSee(__('snapshot.submit_for_review_pending_heading'));
+        ->assertMountedActionModalSee(__('snapshot.submit_for_review_pending_heading'));
 
     // Only asked, not confirmed: the pending version is untouched and nothing new has been
     // sent in. Saving the concept during the mount is expected, so it is the version under
@@ -199,7 +199,7 @@ it('asks before superseding an approved version', function (): void {
     ])
         ->fillForm(['name' => 'Tweede ronde'])
         ->mountAction('snapshot_submit_for_review')
-        ->assertSee(__('snapshot.submit_for_review_pending_heading'));
+        ->assertMountedActionModalSee(__('snapshot.submit_for_review_pending_heading'));
 
     $submittedSnapshots = $avgResponsibleProcessingRecord->refresh()->snapshots
         ->reject(static fn (Snapshot $snapshot): bool => $snapshot->state instanceof Concept);
@@ -455,7 +455,7 @@ it('does not offer a status change on a concept version', function (): void {
     $snapshot = $avgResponsibleProcessingRecord->refresh()->snapshots->sole();
 
     $test->createLivewireTestable(ViewSnapshot::class, ['record' => $snapshot->id])
-        ->assertInfolistActionHidden(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_status_change');
+        ->assertInfolistActionDoesNotExist(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_status_change');
 });
 
 // The versions table below the form asks the page to submit, because only the page can

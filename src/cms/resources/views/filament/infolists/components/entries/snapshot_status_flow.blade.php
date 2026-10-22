@@ -14,9 +14,10 @@
     // Only the active (current) station is coloured; reached-but-past stations
     // are neutral, and not-yet-reached stations are faint. Colours come from
     // Filament's CSS custom properties (bg-{color}-500 utilities are not all
-    // generated, so info/success would otherwise render transparent).
+    // generated, so info/success would otherwise render transparent). Since v4
+    // these properties hold complete colours, no longer "r, g, b" triplets.
     $currentColor = static function (array $s): string {
-        return "rgb(var(--{$s['color']}-500))";
+        return "var(--{$s['color']}-500)";
     };
 @endphp
 

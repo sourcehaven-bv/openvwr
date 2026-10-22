@@ -12,12 +12,13 @@ use App\Import\ImportFailedException;
 use App\Import\ZipImporter;
 use App\Rules\Virusscanner;
 use App\Services\BuildContextService;
+use BackedEnum;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Log;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Webmozart\Assert\Assert;
@@ -37,8 +38,8 @@ class Import extends Page implements HasForms
      * one place. Kept reachable so existing links and tests keep working.
      */
     protected static bool $shouldRegisterNavigation = false;
-    protected static string $view = 'filament.pages.import';
-    protected static ?string $navigationIcon = 'heroicon-o-document-plus';
+    protected string $view = 'filament.pages.import';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-plus';
 
     /** @var ?array<TemporaryUploadedFile> $files */
     public ?array $files;
@@ -48,9 +49,9 @@ class Import extends Page implements HasForms
         return Authorization::hasPermission(Permission::CORE_ENTITY_IMPORT);
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->components([
             FileUpload::make('files')
                 ->required()
                 ->label(__('import.files'))

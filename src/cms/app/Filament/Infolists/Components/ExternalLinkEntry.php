@@ -17,7 +17,7 @@ use Filament\Infolists\Components\TextEntry;
  */
 class ExternalLinkEntry extends TextEntry
 {
-    public static function make(string $name): static
+    public static function make(?string $name = null): static
     {
         return parent::make($name)
             ->view('filament.infolists.components.entries.external-link-entry')

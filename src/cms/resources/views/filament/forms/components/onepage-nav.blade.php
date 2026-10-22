@@ -35,10 +35,11 @@
             const elements = layout.querySelectorAll('[data-onepage-section]')
 
             this.sections = Array.from(elements).map((element) => {
-                // Direct child header only: sections contain nested information
-                // blocks, whose headings would otherwise win the lookup.
+                // Own header only: sections contain nested information blocks,
+                // whose headings would otherwise win the lookup. The anchor sits
+                // on the wrapper around the <section>, not on the section itself.
                 const heading = element.querySelector(
-                    ':scope > .fi-section-header .fi-section-header-heading',
+                    ':scope > .fi-section > .fi-section-header .fi-section-header-heading',
                 )
 
                 return {

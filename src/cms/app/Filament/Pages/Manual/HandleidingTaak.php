@@ -8,6 +8,7 @@ use App\Manual\Manual;
 use App\Manual\Task;
 use App\Manual\TaskCapability;
 use App\Manual\Topic;
+use Filament\Panel;
 use Webmozart\Assert\Assert;
 
 use function __;
@@ -26,13 +27,13 @@ use function is_string;
 class HandleidingTaak extends ManualDetailPage
 {
     protected static ?string $slug = 'handleiding/taken';
-    protected static string $view = 'filament.manual.taak';
+    protected string $view = 'filament.manual.taak';
 
     public string $taak = '';
 
     private Task $task;
 
-    public static function getRoutePath(): string
+    public static function getRoutePath(Panel $panel): string
     {
         return '/' . static::getSlug() . '/{taak}';
     }

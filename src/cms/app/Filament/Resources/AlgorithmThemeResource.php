@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\RelationManagers\AlgorithmRecordRelationManager;
-use App\Filament\Resources\AlgorithmThemeResource\Pages;
+use App\Filament\Resources\AlgorithmThemeResource\Pages\CreateAlgorithmTheme;
+use App\Filament\Resources\AlgorithmThemeResource\Pages\EditAlgorithmTheme;
+use App\Filament\Resources\AlgorithmThemeResource\Pages\ListAlgorithmThemes;
+use App\Filament\Resources\AlgorithmThemeResource\Pages\ViewAlgorithmTheme;
 use App\Models\Algorithm\AlgorithmTheme;
 
 use function __;
@@ -18,10 +21,10 @@ class AlgorithmThemeResource extends LookupListResource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAlgorithmThemes::route('/'),
-            'create' => Pages\CreateAlgorithmTheme::route('/create'),
-            'edit' => Pages\EditAlgorithmTheme::route('/{record}/edit'),
-            'view' => Pages\ViewAlgorithmTheme::route('/{record}'),
+            'index' => ListAlgorithmThemes::route('/'),
+            'create' => CreateAlgorithmTheme::route('/create'),
+            'edit' => EditAlgorithmTheme::route('/{record}/edit'),
+            'view' => ViewAlgorithmTheme::route('/{record}'),
         ];
     }
 
