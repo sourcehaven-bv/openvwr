@@ -89,17 +89,19 @@ return [
             'throw' => false,
         ],
 
-        // used by filament, .e.g export
+        // used by filament, e.g. exports. Private: exports hold register data and
+        // are downloaded through Filament's authorised download route. On s3 a
+        // public visibility would become a public-read object ACL.
         'filament' => $sharedDisk('exports', 'EXPORTS_BUCKET', [
             'throw' => false,
             'allowed_mimetypes' => ['xlsx'],
             'max_file_size' => '20mb',
-            'visibility' => 'public',
+            'visibility' => 'private',
         ]),
 
         // Transfer bundles: exports awaiting download and uploaded imports being
         // staged. Private, and separate from 'filament' because these zips hold a
-        // full register export -- on a public bucket they would be world-readable.
+        // full register export.
         'transfer' => $sharedDisk('transfer', 'TRANSFER_BUCKET', [
             'throw' => false,
             'visibility' => 'private',

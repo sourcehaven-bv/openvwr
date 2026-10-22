@@ -1,0 +1,10 @@
+# osv-scanner configuration for src/cms; see .github/workflows/security-scan.yml.
+
+[[IgnoredVulns]]
+id = "GHSA-vfj7-8cjw-p6xm"
+reason = """\
+braces is a dev-only dependency: tailwindcss 3 pulls it in through chokidar, \
+fast-glob and micromatch, and it only runs during the front-end build, never in \
+production. No patched version exists. It goes away with Tailwind 4, which the \
+CMS can only adopt together with the Filament upgrade (#146).\
+"""

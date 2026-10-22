@@ -25,8 +25,10 @@ jobs:
 
       - name: Generate version tag
         id: version
+        env:
+          ALPHA: ${{ inputs.alpha }}
         run: |
-          if [ "${{ inputs.alpha }}" = "true" ]; then
+          if [ "$ALPHA" = "true" ]; then
             VERSION=$(./scripts/generate-version-tag.sh --alpha)
           else
             VERSION=$(./scripts/generate-version-tag.sh)
@@ -47,11 +49,12 @@ jobs:
       - name: Summary
         env:
           VERSION: ${{ steps.version.outputs.VERSION }}
+          ALPHA: ${{ inputs.alpha }}
         run: |
           echo "### Release Tagged :rocket:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Version:** \`$VERSION\`" >> $GITHUB_STEP_SUMMARY
-          echo "**Alpha:** ${{ inputs.alpha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Alpha:** $ALPHA" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "The build and publish jobs will now package and release this version." >> $GITHUB_STEP_SUMMARY
 
@@ -82,4 +85,5 @@ jobs:
           files: |
             *.tar.gz
             *.pdf
+            *.cdx.json
           generate_release_notes: true

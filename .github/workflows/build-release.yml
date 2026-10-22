@@ -27,14 +27,21 @@ on:
       documentation:
         description: "Artifact name holding the data-model documentation PDFs"
         value: ${{ jobs.build.outputs.documentation }}
+      sbom:
+        description: "The SBOM filename (CycloneDX JSON) for the release archive"
+        value: ${{ jobs.sbom.outputs.sbom }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
     container:
       image: debian:13
+    # Callers may hold contents: write for publishing; the build only reads.
+    permissions:
+      contents: read
     outputs:
       archive: ${{ steps.archive.outputs.ARCHIVE }}
+      name: ${{ steps.archive.outputs.NAME }}
       documentation: ${{ steps.documentation.outputs.NAME }}
 
     steps:
@@ -52,6 +59,21 @@ jobs:
           # into the archive and may not be a real ref (e.g. dev-<sha>), so
           # tag builds fall back to it while the dev path passes a SHA.
           ref: ${{ inputs.ref || inputs.version }}
+
+      # A run on the default branch can write that branch's Actions cache, which
+      # every other branch restores from. `ref` comes from a dispatch input, so
+      # refuse to run repository code from a commit that is not on the default
+      # branch: it has not been reviewed and could poison the cache. Builds of
+      # other commits can still be dispatched from their own branch.
+      - name: Require a commit from the default branch
+        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git fetch --no-tags --unshallow origin "+refs/heads/${GITHUB_REF_NAME}:refs/remotes/origin/${GITHUB_REF_NAME}"
+          if ! git merge-base --is-ancestor HEAD "origin/${GITHUB_REF_NAME}"; then
+            echo "::error::$(git rev-parse HEAD) is not on ${GITHUB_REF_NAME}; dispatch from the branch that holds it" >&2
+            exit 1
+          fi
 
       - name: Install just
         uses: extractions/setup-just@v4
@@ -142,4 +164,85 @@ jobs:
         with:
           name: ${{ steps.documentation.outputs.NAME }}
           path: openvwr-datamodel-*.pdf
+          retention-days: 7
+
+  # CycloneDX SBOM of the release archive, published next to it as
+  # openvwr-cms-<tag>.cdx.json, so its URL follows from the tag:
+  #   https://github.com/Sourcehaven-BV/openvwr/releases/download/<tag>/openvwr-cms-<tag>.cdx.json
+  # Atlas reads it nightly to query OSV for known vulnerabilities.
+  #
+  # It scans the built archive, not the source tree:
+  #   - PHP: vendor/composer/installed.json (exactly what was installed, --no-dev).
+  #   - npm: static-website/pnpm-lock.yaml, plus src/cms/package-lock.json from
+  #     the same commit. The archive ships no node_modules, but Vite bundles
+  #     npm code into public/build. Every package there is a devDependency, so
+  #     dev dependencies are included; build tools such as vite are listed too.
+  #   - Binaries shipped inside vendor/ (e.g. a Go binary in rabbitevents).
+  # Lockfiles nested in vendor/ describe each library's own development setup
+  # and GitHub workflow files in vendor/ are not deployed code; both are left
+  # out. PHP itself comes from the host's OS packages and is not covered.
+  sbom:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      sbom: ${{ steps.sbom.outputs.SBOM }}
+    env:
+      SYFT_VERSION: "1.54.1"
+      # sha256 of syft_${SYFT_VERSION}_linux_amd64.tar.gz, from that release's checksums.txt.
+      SYFT_SHA256: "c069905b391cc4c20a5ba65ad5c10be2a7ba074f8ea6ad203e24d14e303dad47"
+    steps:
+      - name: Checkout package-lock.json
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref || inputs.version }}
+          persist-credentials: false
+          sparse-checkout: src/cms/package-lock.json
+          sparse-checkout-cone-mode: false
+
+      - name: Download archive
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ needs.build.outputs.name }}
+
+      - name: Install syft
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/bin" && cd "$RUNNER_TEMP/bin"
+          gh release download "v$SYFT_VERSION" -R anchore/syft -p "syft_${SYFT_VERSION}_linux_amd64.tar.gz"
+          echo "$SYFT_SHA256  syft_${SYFT_VERSION}_linux_amd64.tar.gz" | sha256sum -c -
+          tar xzf "syft_${SYFT_VERSION}_linux_amd64.tar.gz" syft
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+
+      - name: Generate SBOM
+        id: sbom
+        env:
+          ARCHIVE: ${{ needs.build.outputs.archive }}
+          VERSION: ${{ inputs.version }}
+          SYFT_CHECK_FOR_APP_UPDATE: "false"
+          SYFT_JAVASCRIPT_INCLUDE_DEV_DEPENDENCIES: "true"
+        run: |
+          set -euo pipefail
+          SBOM="${ARCHIVE%.tar.gz}.cdx.json"
+          mkdir sbom-root
+          tar xzf "$ARCHIVE" -C sbom-root
+          cp src/cms/package-lock.json sbom-root/package-lock.json
+          syft scan dir:sbom-root \
+            --source-name openvwr-cms --source-version "$VERSION" \
+            --select-catalogers "+php-composer-installed-cataloger,-github-actions-usage-cataloger,-github-action-workflow-usage-cataloger" \
+            --exclude './vendor/**/package-lock.json' --exclude './vendor/**/composer.lock' \
+            -o "cyclonedx-json=$SBOM"
+          # An SBOM without the PHP dependencies would read as "no vulnerabilities".
+          jq -e '[.components[] | select(.purl // "" | startswith("pkg:composer/"))] | length > 0' "$SBOM" > /dev/null
+          jq -e '[.components[] | select(.purl // "" | startswith("pkg:npm/"))] | length > 0' "$SBOM" > /dev/null
+          echo "SBOM=${SBOM}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ needs.build.outputs.name }}-sbom
+          path: ${{ steps.sbom.outputs.SBOM }}
           retention-days: 7
