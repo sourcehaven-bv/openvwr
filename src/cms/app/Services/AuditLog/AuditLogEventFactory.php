@@ -6,6 +6,10 @@ namespace App\Services\AuditLog;
 
 use App\Services\AuditLog\Authentication\AuthenticationFailedEvent;
 use App\Services\AuditLog\Authentication\AuthenticationSuccessEvent;
+use App\Services\AuditLog\Transfer\TransferExportEvent;
+use App\Services\AuditLog\Transfer\TransferExportLogEvent;
+use App\Services\AuditLog\Transfer\TransferImportEvent;
+use App\Services\AuditLog\Transfer\TransferImportLogEvent;
 use App\Services\AuditLog\User\UserCreatedEvent;
 use App\Services\AuditLog\User\UserPermissionUpdatedEvent;
 use App\Services\AuditLog\User\UserTwoFactorResetEvent;
@@ -24,6 +28,8 @@ class AuditLogEventFactory
         return match ($event::class) {
             AuthenticationFailedEvent::class => $this->fromAuthenticationFailedEvent($event),
             AuthenticationSuccessEvent::class => $this->fromAuthenticationSuccessEvent($event),
+            TransferExportEvent::class => $this->fromTransferExportEvent($event),
+            TransferImportEvent::class => $this->fromTransferImportEvent($event),
             UserCreatedEvent::class => $this->fromUserCreatedEvent($event),
             UserPermissionUpdatedEvent::class => $this->fromUserPermissionUpdatedEvent($event),
             UserTwoFactorResetEvent::class => $this->fromUserTwoFactorResetEvent($event),
@@ -54,6 +60,56 @@ class AuditLogEventFactory
     {
         $minvwsAuditLogEvent = new UserLoginLogEvent();
         $minvwsAuditLogEvent->withTarget($event->user);
+
+        return $minvwsAuditLogEvent;
+    }
+
+    private function fromTransferExportEvent(TransferExportEvent $event): TransferExportLogEvent
+    {
+        $minvwsAuditLogEvent = new TransferExportLogEvent();
+        $minvwsAuditLogEvent->asRead();
+        $minvwsAuditLogEvent->withData([
+            'source_organisation_id' => $event->sourceOrganisationId,
+            'record_type' => $event->recordType->value,
+            'record_ids' => $event->recordIds,
+            'related_ids' => $event->selectedRelated,
+        ]);
+
+        if ($event->user !== null) {
+            $minvwsAuditLogEvent->withActor($event->user);
+        }
+
+        if ($event->failedReason !== null) {
+            $minvwsAuditLogEvent->withFailed(true, $event->failedReason);
+        }
+
+        return $minvwsAuditLogEvent;
+    }
+
+    private function fromTransferImportEvent(TransferImportEvent $event): TransferImportLogEvent
+    {
+        $minvwsAuditLogEvent = new TransferImportLogEvent();
+        $minvwsAuditLogEvent->asCreate();
+        $minvwsAuditLogEvent->withData([
+            'method' => $event->method,
+            // a bundle's source is only claimed by its unsigned manifest; a copy's is verified
+            $event->method === TransferImportEvent::METHOD_BUNDLE
+                ? 'claimed_source_organisation_id'
+                : 'source_organisation_id' => $event->sourceOrganisationId,
+            'destination_organisation_id' => $event->destinationOrganisationId,
+            'created' => $event->result?->created,
+            'overwritten' => $event->result?->overwritten,
+            'skipped' => $event->result?->skipped,
+            'records' => $event->result->records ?? [],
+        ]);
+
+        if ($event->user !== null) {
+            $minvwsAuditLogEvent->withActor($event->user);
+        }
+
+        if ($event->failedReason !== null) {
+            $minvwsAuditLogEvent->withFailed(true, $event->failedReason);
+        }
 
         return $minvwsAuditLogEvent;
     }

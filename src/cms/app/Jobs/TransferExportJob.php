@@ -7,8 +7,11 @@ namespace App\Jobs;
 use App\Components\Uuid\UuidInterface;
 use App\Enums\Queue;
 use App\Enums\RouteName;
+use App\Facades\AuditLog;
 use App\Models\Organisation;
 use App\Models\User;
+use App\Services\AuditLog\Transfer\TransferExportEvent;
+use App\Services\AuditLog\Transfer\TransferFailureReason;
 use App\Transfer\Export\BundleExporter;
 use App\Transfer\TransferEntityType;
 use Filament\Notifications\Actions\Action;
@@ -19,6 +22,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\URL;
+use Throwable;
 
 use function __;
 use function basename;
@@ -55,6 +59,9 @@ class TransferExportJob implements ShouldQueue
         $path = $bundleExporter->export($this->recordType, $this->recordIds, $this->selectedRelated, $organisation);
 
         $user = User::query()->find($this->userId);
+
+        AuditLog::register($this->auditEvent($user));
+
         if ($user === null) {
             return;
         }
@@ -79,5 +86,25 @@ class TransferExportJob implements ShouldQueue
                     ->url($downloadUrl),
             ])
             ->sendToDatabase($user);
+    }
+
+    public function failed(?Throwable $exception): void
+    {
+        AuditLog::register($this->auditEvent(
+            User::query()->find($this->userId),
+            TransferFailureReason::from($exception),
+        ));
+    }
+
+    private function auditEvent(?User $user, ?string $failedReason = null): TransferExportEvent
+    {
+        return new TransferExportEvent(
+            $user,
+            $this->organisationId->toString(),
+            $this->recordType,
+            $this->recordIds,
+            $this->selectedRelated,
+            $failedReason,
+        );
     }
 }
