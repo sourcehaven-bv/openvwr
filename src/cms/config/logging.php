@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use MinVWS\Logging\Laravel\Models\AuditLog;
+use App\Models\AuditLog;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
@@ -134,7 +134,7 @@ return [
     /**
      * RDO Audit logs (minvws/laravel-logging, see minvws/laravel-logging package)
      */
-    'dblog_enabled' => env('AUDIT_LOG_DBLOG_ENABLED', false),
+    'dblog_enabled' => env('AUDIT_LOG_DBLOG_ENABLED', true),
     'dblog_encrypt' => env('AUDIT_LOG_DBLOG_THEIR_PUB_KEY') !== null,
     'dblog_pubkey' => env('AUDIT_LOG_DBLOG_THEIR_PUB_KEY'),
     'dblog_secret' => env('AUDIT_LOG_DBLOG_OUR_PRIV_KEY'),

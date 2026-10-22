@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use App\Events\StaticWebsite\BuildEvent;
 use App\Events\User\UserCreatedEvent;
+use App\Listeners\Authentication\LogoutHandler;
 use App\Listeners\PostMediaUploadHandler;
 use App\Listeners\StaticWebsite\BuildHandler;
 use App\Listeners\User\Import\UserCreatedHandler;
@@ -40,6 +41,7 @@ use App\Observers\UserAuditLogs;
 use App\Observers\UserObserver;
 use App\Observers\WpgProcessingRecordObserver;
 use App\Vendor\MediaLibrary\Media;
+use Illuminate\Auth\Events\Logout;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Spatie\MediaLibrary\MediaCollections\Events\MediaHasBeenAddedEvent;
 
@@ -51,6 +53,9 @@ class EventServiceProvider extends ServiceProvider
             PostMediaUploadHandler::class,
         ],
         UserCreatedEvent::class => [UserCreatedHandler::class],
+
+        // authentication
+        Logout::class => [LogoutHandler::class],
 
         // static website
         BuildEvent::class => [BuildHandler::class],

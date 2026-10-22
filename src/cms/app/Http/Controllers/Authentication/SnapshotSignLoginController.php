@@ -13,8 +13,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Organisation;
 use App\Models\Snapshot;
 use App\Models\User;
-use App\Services\AuditLog\AuditLogger;
-use App\Services\AuditLog\Authentication\AuthenticationSuccessEvent;
 use App\Services\UserLoginToken\UserLoginService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -30,7 +28,6 @@ use function sprintf;
 class SnapshotSignLoginController extends Controller
 {
     public function __construct(
-        private readonly AuditLogger $auditLogger,
         private readonly UserLoginService $userLoginService,
         private readonly Factory $view,
     ) {
@@ -42,8 +39,7 @@ class SnapshotSignLoginController extends Controller
         $user = $this->getUserFromRequest($request);
 
         try {
-            $auhtenticatedUser = Authentication::user();
-            $this->auditLogger->register(new AuthenticationSuccessEvent($auhtenticatedUser));
+            Authentication::user();
         } catch (Throwable) {
             return $this->view->make('auth.snapshot_sign', [
                 'postUrl' => URL::signedRoute(RouteName::SNAPSHOT_SIGN_LOGIN_BATCH_LOGIN, [
@@ -78,8 +74,7 @@ class SnapshotSignLoginController extends Controller
         $user = $this->getUserFromRequest($request);
 
         try {
-            $auhtenticatedUser = Authentication::user();
-            $this->auditLogger->register(new AuthenticationSuccessEvent($auhtenticatedUser));
+            Authentication::user();
         } catch (Throwable) {
             return $this->view->make('auth.snapshot_sign', [
                 'postUrl' => URL::signedRoute(RouteName::SNAPSHOT_SIGN_LOGIN_SINGLE_LOGIN, [
