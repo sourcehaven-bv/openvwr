@@ -13,8 +13,11 @@ class TransferImportResult
      */
     public array $records = [];
 
-    /** The organisation the bundle was exported from, as recorded in its manifest. */
-    public ?string $sourceOrganisationId = null;
+    /**
+     * The organisation the bundle claims to come from. Unverified: taken from the
+     * manifest of an uploaded bundle (see TransferBundle::sourceOrganisationId()).
+     */
+    public ?string $claimedSourceOrganisationId = null;
 
     public function __construct(
         public int $created = 0,

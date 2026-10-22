@@ -102,6 +102,6 @@ it('records a failed audit event when the export job fails', function (): void {
     AuditLog::shouldHaveReceived('register')
         ->withArgs(fn (mixed $event): bool => $event instanceof TransferExportEvent
             && $event->user?->id->equals($user->id) === true
-            && $event->failedReason === 'disk full')
+            && $event->failedReason === 'RuntimeException')
         ->once();
 });

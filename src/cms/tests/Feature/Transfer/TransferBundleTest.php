@@ -35,9 +35,11 @@ it('returns an empty string when exported at is missing or not a string', functi
 });
 
 it('reads the source organisation id from the manifest', function (): void {
-    $bundle = new TransferBundle(['source_organisation' => ['id' => 'abc', 'name' => 'Bron BV']], []);
+    $uuid = '01a162a5-6ebe-714f-a88c-329c06d87a25';
+    $bundle = new TransferBundle(['source_organisation' => ['id' => $uuid, 'name' => 'Bron BV']], []);
 
-    expect($bundle->sourceOrganisationId())->toBe('abc')
+    expect($bundle->sourceOrganisationId())->toBe($uuid)
         ->and((new TransferBundle([], []))->sourceOrganisationId())->toBeNull()
-        ->and((new TransferBundle(['source_organisation' => ['id' => '']], []))->sourceOrganisationId())->toBeNull();
+        ->and((new TransferBundle(['source_organisation' => ['id' => '']], []))->sourceOrganisationId())->toBeNull()
+        ->and((new TransferBundle(['source_organisation' => ['id' => 'not a uuid']], []))->sourceOrganisationId())->toBeNull();
 });

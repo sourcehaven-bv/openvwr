@@ -104,7 +104,7 @@ class BundleImporter
         User $user,
     ): TransferImportResult {
         $result = new TransferImportResult();
-        $result->sourceOrganisationId = $bundle->sourceOrganisationId();
+        $result->claimedSourceOrganisationId = $bundle->sourceOrganisationId();
 
         $this->idMap = [];
         $this->written = [];

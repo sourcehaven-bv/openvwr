@@ -17,6 +17,11 @@ class TransferImportEvent implements AuditEvent
     public const string METHOD_BUNDLE = 'bundle';
     public const string METHOD_COPY = 'copy';
 
+    /**
+     * @param ?string $sourceOrganisationId verified for a copy; for a bundle only the
+     *                                      unverified id claimed by the manifest
+     * @param ?string $failedReason a fixed reason code, never raw exception text
+     */
     public function __construct(
         public readonly ?User $user,
         public readonly string $method,

@@ -11,6 +11,7 @@ use App\Facades\AuditLog;
 use App\Models\Organisation;
 use App\Models\User;
 use App\Services\AuditLog\Transfer\TransferExportEvent;
+use App\Services\AuditLog\Transfer\TransferFailureReason;
 use App\Transfer\Export\BundleExporter;
 use App\Transfer\TransferEntityType;
 use Filament\Notifications\Actions\Action;
@@ -91,7 +92,7 @@ class TransferExportJob implements ShouldQueue
     {
         AuditLog::register($this->auditEvent(
             User::query()->find($this->userId),
-            $exception?->getMessage() ?? 'unknown error',
+            TransferFailureReason::from($exception),
         ));
     }
 

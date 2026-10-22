@@ -10,6 +10,7 @@ use App\Events\StaticWebsite\BuildEvent;
 use App\Facades\AuditLog;
 use App\Models\Organisation;
 use App\Models\User;
+use App\Services\AuditLog\Transfer\TransferFailureReason;
 use App\Services\AuditLog\Transfer\TransferImportEvent;
 use App\Services\BuildContextService;
 use App\Transfer\Import\BundleImporter;
@@ -72,7 +73,7 @@ class TransferImportJob implements ShouldQueue
                 $organisation->id->toString(),
                 null,
                 null,
-                $exception->getMessage(),
+                TransferFailureReason::from($exception),
             ));
 
             Notification::make()
@@ -91,7 +92,7 @@ class TransferImportJob implements ShouldQueue
             $user,
             TransferImportEvent::METHOD_BUNDLE,
             $organisation->id->toString(),
-            $result->sourceOrganisationId,
+            $result->claimedSourceOrganisationId,
             $result,
         ));
 

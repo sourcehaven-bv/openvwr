@@ -92,7 +92,10 @@ class AuditLogEventFactory
         $minvwsAuditLogEvent->asCreate();
         $minvwsAuditLogEvent->withData([
             'method' => $event->method,
-            'source_organisation_id' => $event->sourceOrganisationId,
+            // a bundle's source is only claimed by its unsigned manifest; a copy's is verified
+            $event->method === TransferImportEvent::METHOD_BUNDLE
+                ? 'claimed_source_organisation_id'
+                : 'source_organisation_id' => $event->sourceOrganisationId,
             'destination_organisation_id' => $event->destinationOrganisationId,
             'created' => $event->result?->created,
             'overwritten' => $event->result?->overwritten,

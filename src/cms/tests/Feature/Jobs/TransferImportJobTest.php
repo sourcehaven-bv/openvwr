@@ -122,6 +122,33 @@ it('records a failed audit event when the import throws', function (): void {
             && $event->method === TransferImportEvent::METHOD_BUNDLE
             && $event->destinationOrganisationId === $organisation->id->toString()
             && $event->result === null
-            && $event->failedReason !== null)
+            && $event->failedReason === 'TransferException')
+        ->once();
+});
+
+it('does not log a source organisation id from the manifest that is not a uuid', function (): void {
+    Storage::fake('transfer');
+    Event::fake([BuildEvent::class]);
+    AuditLog::spy();
+
+    $destinationOrganisation = Organisation::factory()->create();
+    $user = User::factory()->create();
+
+    [$path, $plan] = createExportedBundle(Organisation::factory()->create(), $user);
+
+    // the manifest of an uploaded bundle is user-controlled
+    $zip = new ZipArchive();
+    $zip->open(Storage::disk('transfer')->path($path));
+    $manifest = json_decode((string) $zip->getFromName('manifest.json'), true);
+    $manifest['source_organisation'] = ['id' => str_repeat('x', 5000), 'name' => 'Bron'];
+    $zip->addFromString('manifest.json', (string) json_encode($manifest));
+    $zip->close();
+
+    app()->call([new TransferImportJob($path, $plan, $destinationOrganisation->id, $user->id), 'handle']);
+
+    AuditLog::shouldHaveReceived('register')
+        ->withArgs(fn (mixed $event): bool => $event instanceof TransferImportEvent
+            && $event->failedReason === null
+            && $event->sourceOrganisationId === null)
         ->once();
 });

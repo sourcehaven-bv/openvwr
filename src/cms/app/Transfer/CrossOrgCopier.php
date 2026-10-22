@@ -8,6 +8,7 @@ use App\Enums\Authorization\Permission;
 use App\Facades\AuditLog;
 use App\Models\Organisation;
 use App\Models\User;
+use App\Services\AuditLog\Transfer\TransferFailureReason;
 use App\Services\AuditLog\Transfer\TransferImportEvent;
 use App\Services\CrossOrgAuthorization;
 use App\Transfer\Export\BundleBuilder;
@@ -51,11 +52,18 @@ readonly class CrossOrgCopier
     ): TransferImportResult {
         try {
             $this->assertAuthorized($user, $source, $destination);
+        } catch (TransferException $exception) {
+            // assertAuthorized() only throws the fixed messages defined below.
+            $this->audit($user, $source, $destination, null, $exception->getMessage());
 
+            throw $exception;
+        }
+
+        try {
             $bundle = $this->bundleBuilder->build($recordType, $recordIds, $selectedRelated, $source);
             $result = $this->bundleImporter->import($bundle, new LibraryMediaResolver(), $plan, $destination, $user);
         } catch (Throwable $exception) {
-            $this->audit($user, $source, $destination, null, $exception->getMessage());
+            $this->audit($user, $source, $destination, null, TransferFailureReason::from($exception));
 
             throw $exception;
         }

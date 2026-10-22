@@ -103,3 +103,17 @@ it('marks failed transfer events as failed', function (): void {
     expect($export->getLogData())->toMatchArray(['user_id' => null, 'failed' => true, 'failed_reason' => 'boom'])
         ->and($import->getLogData())->toMatchArray(['user_id' => null, 'failed' => true, 'failed_reason' => 'bad zip']);
 });
+
+it('marks the source organisation of a bundle import as claimed', function (): void {
+    $logEvent = (new AuditLogEventFactory())->fromApplicationEvent(new TransferImportEvent(
+        null,
+        TransferImportEvent::METHOD_BUNDLE,
+        'org-2',
+        'org-1',
+        new TransferImportResult(),
+    ));
+
+    expect($logEvent->getLogData()['request'])
+        ->toHaveKey('claimed_source_organisation_id', 'org-1')
+        ->not->toHaveKey('source_organisation_id');
+});
