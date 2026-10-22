@@ -7,6 +7,7 @@ namespace App\Console;
 use App\Console\Commands\DocumentNotificationsSend;
 use App\Console\Commands\SnapshotApprovalBatchNotifications;
 use App\Console\Commands\StaticWebsiteRefresh;
+use App\Console\Commands\TransferPruneBundles;
 use App\Console\Commands\UserDeleteExpiredLoginTokens;
 use App\Console\Commands\UserDeleteWithoutOrganisation;
 use Illuminate\Console\Scheduling\Schedule;
@@ -34,6 +35,8 @@ class Kernel extends ConsoleKernel
             ->dailyAt('09:00');
         $schedule->command(UserDeleteWithoutOrganisation::class)
             ->daily();
+        $schedule->command(TransferPruneBundles::class)
+            ->dailyAt('02:00');
 
         // weekly
         $schedule->command(SnapshotApprovalBatchNotifications::class)
