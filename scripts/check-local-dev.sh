@@ -76,6 +76,16 @@ for tool in composer node npm psql; do
     fi
 done
 
+# Optional: runs the app, queue and vite together; the separate just recipes
+# still work without it.
+if command -v process-compose >/dev/null; then
+    ok "process-compose found (just dev will work)"
+else
+    printf '%s!%s process-compose not installed — use `just dev-native` and `just dev-native-queue` separately.\n' \
+        "$C_YELLOW" "$C_OFF"
+    hint "brew install f1bonacc1/tap/process-compose"
+fi
+
 # Optional: only the static-website generator needs it.
 if command -v hugo >/dev/null; then
     ok "hugo found (static-website tests will run)"
