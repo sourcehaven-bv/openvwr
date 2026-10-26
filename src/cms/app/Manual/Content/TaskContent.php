@@ -53,6 +53,7 @@ final class TaskContent
             self::wpgVerwerkingVastleggen(),
             self::datalekMelden(),
             self::versieIndienenEnLatenGoedkeuren(),
+            self::akkoordGevenOpEenVersie(),
             self::labelsGebruiken(),
             self::overzichtOpvragen(),
             self::verwerkingPubliceren(),
@@ -260,6 +261,51 @@ final class TaskContent
                 ],
             ),
             done: 'De versie is vastgesteld en geldt als de geldende versie van de verwerking.',
+        );
+    }
+
+    private static function akkoordGevenOpEenVersie(): Task
+    {
+        return new Task(
+            id: 'akkoord-geven-op-versie',
+            group: self::GROUP_VASTSTELLEN,
+            title: 'Akkoord geven op een versie',
+            summary: 'Als Mandaathouder een versie beoordelen die u is voorgelegd.',
+            intro: 'Koppelt een collega u als Mandaathouder aan een versie, dan vraagt die om uw '
+                . 'akkoord. U bekijkt de versie en geeft akkoord of niet akkoord. Daarna stelt een '
+                . 'Privacy Officer de versie vast.',
+            steps: [
+                new Step(
+                    title: 'Open de versies die op u wachten',
+                    body: 'Kies in het navigatiemenu "Overzichten" > "Mijn ondertekeningen". Op '
+                        . 'het dashboard staan dezelfde versies onder "Te ondertekenen".',
+                    topicIds: ['akkoord-geven'],
+                ),
+                new Step(
+                    title: 'Bekijk de versie',
+                    body: 'Klik op een versie in de lijst. Het tabblad "Informatie" toont de '
+                        . 'inhoud zoals die is ingediend.',
+                    topicIds: ['akkoord-geven', 'versiestatussen'],
+                ),
+                new Step(
+                    title: 'Geef akkoord of niet akkoord',
+                    body: 'Klik onderaan het tabblad op "Akkoord" of "Niet akkoord" en daarna op '
+                        . '"Bevestigen". Bij "Niet akkoord" kunt u een notitie achterlaten.',
+                    topicIds: ['akkoord-geven'],
+                ),
+                new Step(
+                    title: 'Ga door naar de volgende versie',
+                    body: 'Wacht er nog een versie op u, kies dan "Bevestigen en volgende". U '
+                        . 'komt direct bij die versie.',
+                    topicIds: ['akkoord-geven'],
+                ),
+            ],
+            roles: new TaskRoles(
+                performers: [Role::MANDATE_HOLDER],
+                readers: [Role::CHIEF_PRIVACY_OFFICER, Role::PRIVACY_OFFICER, Role::INPUT_PROCESSOR],
+            ),
+            done: 'Uw oordeel staat bij de versie onder "Ondertekeningen". Een Privacy Officer '
+                . 'ziet het daar en kan de versie vaststellen.',
         );
     }
 
