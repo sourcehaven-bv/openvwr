@@ -17,6 +17,14 @@ Assert::string($staticWebsiteRoot);
 $sharedDriver = env('FILESYSTEM_SHARED_DRIVER', 'local');
 Assert::inArray($sharedDriver, ['local', 's3'], 'FILESYSTEM_SHARED_DRIVER must be "local" or "s3", got "%s".');
 
+// Server-side encryption at rest for the s3 disks (POLICY-014: confidential data
+// is stored encrypted, AES-256 at minimum). On by default: every object is written
+// with SSE-S3 (AES256). AWS S3 supports this as is; MinIO needs a KMS key
+// (MINIO_KMS_SECRET_KEY), or it rejects the upload. 'none' is only for a
+// development server without KMS. See docs/object_storage.md.
+$serverSideEncryption = env('AWS_SERVER_SIDE_ENCRYPTION', 'AES256');
+Assert::inArray($serverSideEncryption, ['AES256', 'none'], 'AWS_SERVER_SIDE_ENCRYPTION must be "AES256" or "none", got "%s".');
+
 /**
  * Build a shared disk definition for whichever driver is configured.
  *
@@ -35,6 +43,7 @@ $sharedDisk = static function (
 ) use (
     $sharedDriver,
     $sharedStoragePath,
+    $serverSideEncryption,
 ): array {
     if ($sharedDriver === 'local') {
         return ['driver' => 'local', 'root' => $sharedStoragePath . '/' . $subPath, ...$extra];
@@ -48,6 +57,8 @@ $sharedDisk = static function (
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'eu-central-1'),
         'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true),
+        // passed to every write, so each object is stored encrypted
+        'options' => $serverSideEncryption === 'none' ? [] : ['ServerSideEncryption' => $serverSideEncryption],
         ...$extra,
     ];
 };
@@ -89,17 +100,19 @@ return [
             'throw' => false,
         ],
 
-        // used by filament, .e.g export
+        // used by filament, e.g. exports. Private: exports hold register data and
+        // are downloaded through Filament's authorised download route. On s3 a
+        // public visibility would become a public-read object ACL.
         'filament' => $sharedDisk('exports', 'EXPORTS_BUCKET', [
             'throw' => false,
             'allowed_mimetypes' => ['xlsx'],
             'max_file_size' => '20mb',
-            'visibility' => 'public',
+            'visibility' => 'private',
         ]),
 
         // Transfer bundles: exports awaiting download and uploaded imports being
         // staged. Private, and separate from 'filament' because these zips hold a
-        // full register export -- on a public bucket they would be world-readable.
+        // full register export.
         'transfer' => $sharedDisk('transfer', 'TRANSFER_BUCKET', [
             'throw' => false,
             'visibility' => 'private',

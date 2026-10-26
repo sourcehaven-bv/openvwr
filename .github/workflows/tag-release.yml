@@ -10,23 +10,27 @@ on:
         default: false
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   tag:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     outputs:
       version: ${{ steps.version.outputs.VERSION }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Generate version tag
         id: version
+        env:
+          ALPHA: ${{ inputs.alpha }}
         run: |
-          if [ "${{ inputs.alpha }}" = "true" ]; then
+          if [ "$ALPHA" = "true" ]; then
             VERSION=$(./scripts/generate-version-tag.sh --alpha)
           else
             VERSION=$(./scripts/generate-version-tag.sh)
@@ -47,11 +51,12 @@ jobs:
       - name: Summary
         env:
           VERSION: ${{ steps.version.outputs.VERSION }}
+          ALPHA: ${{ inputs.alpha }}
         run: |
           echo "### Release Tagged :rocket:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Version:** \`$VERSION\`" >> $GITHUB_STEP_SUMMARY
-          echo "**Alpha:** ${{ inputs.alpha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Alpha:** $ALPHA" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "The build and publish jobs will now package and release this version." >> $GITHUB_STEP_SUMMARY
 
@@ -60,6 +65,8 @@ jobs:
   # so a chained trigger would never run.
   build:
     needs: tag
+    permissions:
+      contents: read
     uses: ./.github/workflows/build-release.yml
     with:
       version: ${{ needs.tag.outputs.version }}
@@ -68,18 +75,21 @@ jobs:
   publish:
     needs: [tag, build]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: openvwr-*
           merge-multiple: true
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ needs.tag.outputs.version }}
           files: |
             *.tar.gz
             *.pdf
+            *.cdx.json
           generate_release_notes: true

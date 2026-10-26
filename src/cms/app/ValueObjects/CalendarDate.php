@@ -15,10 +15,15 @@ class CalendarDate
 
     private CarbonInterface $date;
 
+    /**
+     * Keeps the calendar day as seen in the timezone of the given date.
+     * Converting to UTC first would shift late-evening times in a zone ahead
+     * of UTC (such as Europe/Amsterdam) back to the previous day.
+     */
     private function __construct(
         CarbonInterface $date,
     ) {
-        $this->date = $date->utc()
+        $this->date = $date->shiftTimezone('UTC')
             ->floorDay();
     }
 
