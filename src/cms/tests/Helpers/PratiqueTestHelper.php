@@ -12,6 +12,7 @@ use RuntimeException;
 use function base64_encode;
 use function bin2hex;
 use function gmdate;
+use function is_array;
 use function openssl_pkey_get_details;
 use function openssl_pkey_new;
 use function random_bytes;
@@ -88,20 +89,26 @@ final class PratiqueTestHelper
      */
     public function publishJwks(): void
     {
-        // Publish ONLY this helper's key, replacing whatever was cached.
+        // ADD this helper's key to whatever is already published, and never drop
+        // one.
         //
-        // The cache key is one fixed string shared by every test in the process,
-        // so the set left behind by an earlier test is not this test's set. An
-        // earlier version merged instead, keeping the two most recent keys, to
-        // stop tests evicting each other — but a third publish in the same worker
-        // still evicted the first, and the owner of that key then failed with
-        // "OpenSSL unable to validate key" purely on ordering. That is how it
-        // passed locally on ten workers and failed on CI's four.
+        // The cache key is a single fixed string, so every helper in a test shares
+        // one document. Removing an earlier helper's key breaks the owner of that
+        // key: the verifier sees an unknown `kid`, treats it as a rotation it has
+        // not picked up, and refetches — and under `Http::fake()` the refetch
+        // returns an empty body, so the failure surfaces as "no keys array" or
+        // "OpenSSL unable to validate key" depending on what was left behind.
         //
-        // Replacing is safe because no test depends on another's key surviving:
-        // each publishes what it needs. Tests that need several keys at once put
-        // them in one document themselves.
-        Cache::put('pratique:jwks', ['keys' => [$this->jwk]], 300);
+        // Two earlier attempts got this wrong in opposite directions: keeping only
+        // the most recent two keys evicted the first of three publishers, and
+        // replacing outright evicted everyone but the last. There is no reason to
+        // bound the set — a test process publishes a handful of keys and the cache
+        // dies with the test.
+        $cached = Cache::get('pratique:jwks');
+        $keys = is_array($cached) && is_array($cached['keys'] ?? null) ? $cached['keys'] : [];
+        $keys[] = $this->jwk;
+
+        Cache::put('pratique:jwks', ['keys' => $keys], 300);
     }
 
     /** Publish only a key set that does NOT contain the key this helper signs with. */
