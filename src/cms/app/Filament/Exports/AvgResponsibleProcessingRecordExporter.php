@@ -148,6 +148,8 @@ class AvgResponsibleProcessingRecordExporter extends Exporter
             // overig
             ExportColumn::make('public_from')
                 ->label(__('general.public_from')),
+            ExportColumn::make('public_summary')
+                ->label(__('avg_responsible_processing_record.public_summary')),
             ExportColumn::make('created_at')
                 ->label(__('general.created_at')),
             ExportColumn::make('updated_at')

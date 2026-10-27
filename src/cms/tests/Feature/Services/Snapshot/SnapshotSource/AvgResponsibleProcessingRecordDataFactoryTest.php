@@ -40,6 +40,7 @@ it('can generate private markdown', function (): void {
             'geb_dpia_criteria_wp248' => false,
             'geb_dpia_high_risk_freedoms' => false,
             'public_from' => '2012-05-24',
+            'public_summary' => 'Ut enim ad minim veniam.',
             'avg_responsible_processing_record_service_id' => AvgResponsibleProcessingRecordService::factory()->state([
                 'name' => 'In modi dolore aspernatur nobis ullam magni minus ipsum.',
                 'enabled' => true,
@@ -64,6 +65,10 @@ it('can generate public frontmatter', function (): void {
             'entity_number_id' => EntityNumber::factory()->state([
                 'number' => $number,
             ]),
+            'public_summary' => 'Een korte uitleg.',
+            'has_processors' => false,
+            'outside_eu' => false,
+            'decision_making' => false,
         ]);
     $snapshot = Snapshot::factory()
         ->for($avgResponsibleProcessingRecord, 'snapshotSource')
@@ -78,6 +83,16 @@ it('can generate public frontmatter', function (): void {
                 'reference' => $number,
                 'title' => $name,
                 'description' => '',
+                'details' => [
+                    'summary' => 'Een korte uitleg.',
+                    'goals' => [],
+                    'stakeholders' => [],
+                    'receivers' => [],
+                    'responsibles' => [],
+                    'has_processors' => false,
+                    'outside_eu' => ['applies' => false, 'description' => null, 'adequacy_decision' => null, 'safeguards' => null],
+                    'automated_decision_making' => ['applies' => false, 'logic' => null, 'consequences' => null],
+                ],
             ],
         ]);
 });
