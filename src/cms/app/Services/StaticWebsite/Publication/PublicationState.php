@@ -31,11 +31,6 @@ enum PublicationState: string
     case NOT_ORGANISATION_NOT_ON_WEBSITE = 'not_organisation_not_on_website';
     case NOT_WEBSITE_SECTION_NOT_PUBLIC = 'not_website_section_not_public';
 
-    public function isOnline(): bool
-    {
-        return $this === self::PUBLISHED || $this === self::UPDATING || $this === self::REMOVING;
-    }
-
     /**
      * Whether the next build leaves the record out. PENDING and NOT_CONFIRMED
      * records do qualify; they are just not confirmed online yet.

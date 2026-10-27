@@ -190,6 +190,18 @@ it('notices a newer version that is not established yet', function (): void {
         ->and($status->versionInProgress?->version)->toBe(2);
 });
 
+it('ignores a draft older than the established version', function (): void {
+    [$record] = qualifyingRecord();
+    Snapshot::factory()
+        ->for($record, 'snapshotSource')
+        ->recycle($record->getOrganisation())
+        ->create(['state' => Concept::class, 'version' => 0]);
+
+    $status = (new PublicationStatusResolver())->resolve($record);
+
+    expect($status->versionInProgress)->toBeNull();
+});
+
 it('reports publishing disabled', function (): void {
     config()->set('features.publishing', false);
     [$record] = qualifyingRecord();

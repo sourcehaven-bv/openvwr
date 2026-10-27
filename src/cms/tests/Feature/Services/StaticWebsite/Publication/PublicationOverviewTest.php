@@ -38,6 +38,8 @@ it('lists qualifying records the last check did not confirm, across the public t
     $root = PublicWebsiteTree::factory()->create(['parent_id' => null, 'public_from' => '2026-01-01', 'organisation_id' => null]);
     $child = PublicWebsiteTree::factory()->create(['parent_id' => $root->id, 'public_from' => '2026-01-01', 'organisation_id' => null]);
     $hiddenChild = PublicWebsiteTree::factory()->create(['parent_id' => $root->id, 'public_from' => null, 'organisation_id' => null]);
+    // A section that only groups other sections.
+    PublicWebsiteTree::factory()->create(['parent_id' => $root->id, 'public_from' => '2026-01-01', 'organisation_id' => null]);
 
     $confirmed = publishableRecordUnder($root);
     $unconfirmed = publishableRecordUnder($child);

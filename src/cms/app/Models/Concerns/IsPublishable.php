@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace App\Models\Concerns;
 
-use App\Collections\StaticWebsiteSnapshotEntryCollection;
 use App\Events\StaticWebsite\BuildEvent;
 use App\Models\StaticWebsiteSnapshotEntry;
 use App\Observers\PublishableObserver;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Webmozart\Assert\Assert;
 
@@ -43,17 +41,6 @@ trait IsPublishable
         }
 
         return $staticWebsiteSnapshotEntry->end_date === null;
-    }
-
-    final public function getStaticWebsiteSnapshotEntries(Collection $snapshotIds): StaticWebsiteSnapshotEntryCollection
-    {
-        $staticWebsiteSnapshotEntries = StaticWebsiteSnapshotEntry::whereIn('snapshot_id', $snapshotIds)
-            ->orderBy('start_date', 'desc')
-            ->get();
-
-        Assert::isInstanceOf($staticWebsiteSnapshotEntries, StaticWebsiteSnapshotEntryCollection::class);
-
-        return $staticWebsiteSnapshotEntries;
     }
 
     /**
