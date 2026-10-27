@@ -84,6 +84,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $measures_description
  * @property CoreEntityDataCollectionSource $data_collection_source
  * @property string|null $published_at
+ * @property string|null $public_summary
  *
  * @property-read AvgResponsibleProcessingRecordService|null $avgResponsibleProcessingRecordService
  * @property-read DataBreachRecordCollection $dataBreachRecords
@@ -148,6 +149,7 @@ class AvgResponsibleProcessingRecord extends Model implements Cloneable, EntityN
         'decision_making',
         'logic',
         'importance_consequences',
+        'public_summary',
         'import_id',
         'has_processors',
         'has_security',

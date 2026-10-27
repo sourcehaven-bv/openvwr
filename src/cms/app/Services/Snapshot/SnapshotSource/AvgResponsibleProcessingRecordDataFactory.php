@@ -19,7 +19,7 @@ class AvgResponsibleProcessingRecordDataFactory extends DataFactory implements S
     }
 
     /**
-     * @return array<string, string|array<string, string>>
+     * @return array<string, mixed>
      */
     public function generatePublicFrontmatter(Snapshot $snapshot): array
     {
@@ -37,6 +37,7 @@ class AvgResponsibleProcessingRecordDataFactory extends DataFactory implements S
                 'reference' => $record->getNumber(),
                 'title' => $record->name,
                 'description' => $description,
+                'details' => (new AvgResponsibleProcessingRecordPublicDetails())->forRecord($record),
             ],
         ];
     }

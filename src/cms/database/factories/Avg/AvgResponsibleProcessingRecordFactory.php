@@ -53,6 +53,7 @@ class AvgResponsibleProcessingRecordFactory extends Factory
             'outside_eu_protection_level_description' => $this->faker->optional()->sentence(),
             'decision_making' => $decision_making,
             'logic' => $decision_making ? $this->faker->sentence() : null,
+            'public_summary' => $this->faker->sentence(),
             'importance_consequences' => $decision_making ? $this->faker->sentence() : null,
             'geb_dpia_executed' => $this->faker->boolean(),
             'geb_dpia_automated' => $this->faker->boolean(),
