@@ -9,6 +9,7 @@ use App\Facades\Authentication;
 use App\Models\Organisation;
 use App\Models\OrganisationUserRole;
 use App\Services\Authentication\AuthenticationStrategy;
+use App\Services\Authentication\Pratique\PratiqueContext;
 use Filament\Facades\Filament;
 use Filament\Panel;
 use Illuminate\Http\RedirectResponse;
@@ -22,8 +23,20 @@ use function route;
 
 class RedirectToTenantController
 {
+    public function __construct(
+        private readonly PratiqueContext $pratiqueContext,
+    ) {
+    }
+
     public function __invoke(): RedirectResponse
     {
+        // Under pratique the proxy has already selected the organisation. The
+        // local memberships can hold more than that one, and every other tenant
+        // URL would be refused, so follow the assertion rather than guess.
+        if ($this->pratiqueContext->has()) {
+            return $this->redirectToOrganisation($this->pratiqueContext->get()->organisation);
+        }
+
         try {
             $user = Authentication::user();
         } catch (Throwable) {

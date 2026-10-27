@@ -241,9 +241,23 @@ it('keeps gated content out of the menu as well', function (): void {
     $this->asFilamentOrganisationUser($organisation)
         ->get(manualUrl($organisation->slug))
         ->assertOk()
-        ->assertDontSee('Een Wpg-verwerking vastleggen')
         ->assertDontSee('Een verwerking publiceren');
 });
+
+it('shows a gated step and paragraph only while their flag is on', function (bool $enabled): void {
+    ConfigTestHelper::set('features.wpg', $enabled);
+
+    $organisation = OrganisationTestHelper::create();
+    $this->asFilamentOrganisationUser($organisation);
+
+    $task = $this->get(manualUrl($organisation->slug, '/taken/verwerking-vastleggen'))->assertOk();
+    $topic = $this->get(manualUrl($organisation->slug, '/naslag/verwerkingsregisters'))->assertOk();
+
+    $assert = $enabled ? 'assertSee' : 'assertDontSee';
+
+    $task->{$assert}('Kies bij politiegegevens het register voor de Wpg');
+    $topic->{$assert}('Daaronder staat het register Verwerkingen WPG verantwoordelijke');
+})->with([true, false]);
 
 it('refuses an unauthenticated visitor on every page of the manual', function (): void {
     $organisation = OrganisationTestHelper::create();

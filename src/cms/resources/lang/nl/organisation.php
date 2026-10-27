@@ -37,7 +37,6 @@ return [
     'entity_number_prefix_edit' => 'Prefix aanpassen',
     'entity_number_unique_validation_message' => 'Deze prefix is al (eerder) in gebruik genomen, mogelijk door een andere organisatie: deze is niet meer beschikbaar.',
 
-    'public_from_hint_icon_text' => 'Let op: Indien u dit veld leeg laat zal de verwerking op geen enkel moment gepubliceerd worden naar de publieke website.',
     'section_ap' => 'Gegevens voor datalekmeldingen',
     'coc_number' => 'KvK-nummer',
     'fg_registration_number' => 'Registratienummer FG',

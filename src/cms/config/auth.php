@@ -171,6 +171,9 @@ return [
     | this one when checking exp/nbf. Keep it small — the assertion lives ~9
     | minutes — and keep both hosts on NTP regardless.
     |
+    | logout_url is the proxy's logout page. It follows the proxy's route
+    | prefix, which defaults to /__pratique.
+    |
     */
 
     'pratique' => [
@@ -179,5 +182,6 @@ return [
         'jwks_url' => env('PRATIQUE_JWKS_URL'),
         'jwks_cache_seconds' => env('PRATIQUE_JWKS_CACHE_SECONDS', 300),
         'leeway_seconds' => env('PRATIQUE_LEEWAY_SECONDS', 60),
+        'logout_url' => env('PRATIQUE_LOGOUT_URL', '/__pratique/auth/logout'),
     ],
 ];

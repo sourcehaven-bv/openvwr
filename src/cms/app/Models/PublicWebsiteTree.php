@@ -66,6 +66,15 @@ class PublicWebsiteTree extends Model implements HasMedia
         ];
     }
 
+    /**
+     * Whether this node itself may appear on the public website. Its ancestors
+     * must be public too; the content generator only descends into public nodes.
+     */
+    public function isPublic(): bool
+    {
+        return $this->public_from !== null && !$this->public_from->isFuture();
+    }
+
     public function getFilamentPoster(): ?Media
     {
         return $this->getFirstMedia(MediaGroup::PUBLIC_WEBSITE_TREE->value);

@@ -9,8 +9,12 @@ use App\Enums\Authorization\Permission;
 use App\Facades\Authorization;
 use App\Filament\Forms\Components\MarkdownEditor\MarkdownEditor;
 use App\Filament\NavigationGroups\NavigationGroup;
+use App\Models\Contracts\Publishable;
 use App\Models\PublicWebsite as PublicWebsiteModel;
 use App\Repositories\PublicWebsiteRepository;
+use App\Services\DateFormatService;
+use App\Services\StaticWebsite\Publication\PublicationOverview;
+use App\Services\StaticWebsite\Publication\PublicationStatus;
 use Filament\Actions\Action;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -20,6 +24,7 @@ use Filament\Pages\Page;
 use Webmozart\Assert\Assert;
 
 use function __;
+use function app;
 
 class PublicWebsite extends Page implements HasForms
 {
@@ -99,6 +104,20 @@ class PublicWebsite extends Page implements HasForms
             Action::make('save')
                 ->label(__('filament-panels::resources/pages/edit-record.form.actions.save.label'))
                 ->submit('save'),
+        ];
+    }
+
+    /**
+     * @return array{checked_at: ?string, confirmed: int, unconfirmed: list<array{record: Publishable, status: PublicationStatus}>}
+     */
+    public function getPublicationOverview(): array
+    {
+        $publicationOverview = app(PublicationOverview::class);
+
+        return [
+            'checked_at' => DateFormatService::toDateTime($publicationOverview->getLatestCheckDate()),
+            'confirmed' => $publicationOverview->getConfirmedCount(),
+            'unconfirmed' => $publicationOverview->getUnconfirmedRecords(),
         ];
     }
 

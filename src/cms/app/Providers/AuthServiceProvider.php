@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Config\Config;
+use App\Http\Responses\PratiqueLogoutResponse;
 use App\Models\AdminLogEntry;
 use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Avg\AvgGoal;
@@ -56,6 +57,7 @@ use App\Services\OneTimePassword\OneTimePasswordManager;
 use App\Services\OneTimePassword\TimedOneTimePassword;
 use App\Services\OtpService;
 use Filament\Actions\Exports\Models\Export;
+use Filament\Http\Responses\Auth\Contracts\LogoutResponse;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as IlluminateAuthServiceProvider;
 use Illuminate\Http\Client\Factory as Http;
@@ -135,6 +137,10 @@ class AuthServiceProvider extends IlluminateAuthServiceProvider
         // leaked roles across tenants when the builtin strategy memoised on a
         // singleton.
         $this->app->scoped(PratiqueContext::class);
+
+        if (Config::string('auth.driver') === AuthenticationStrategyFactory::DRIVER_PRATIQUE) {
+            $this->app->bind(LogoutResponse::class, PratiqueLogoutResponse::class);
+        }
 
         $this->app->singleton(JwksProvider::class, fn (): JwksProvider => new JwksProvider(
             $this->app->make(Http::class),

@@ -65,6 +65,11 @@ class ContentGenerator
 
         $parentSlugs[] = $publicWebsiteTree->slug;
         foreach ($publicWebsiteTree->children as $child) {
+            // Children honour their own public_from, like the root nodes above.
+            if (!$child->isPublic()) {
+                continue;
+            }
+
             $this->addPublicWebsiteTreeGeneratorJob($child, $parentSlugs);
         }
     }

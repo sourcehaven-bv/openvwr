@@ -161,7 +161,9 @@ it('hides the go to public page action when publishing is disabled', function ()
     expect(GoToPublicPageAction::make()->isHidden())->toBeTrue();
 });
 
-it('shows the public from entry on the organisation infolist when publishing is enabled', function (): void {
+// The organisation has no publication date of its own: its website tree node
+// decides whether it is on the public website.
+it('shows no public from entry on the organisation infolist when publishing is enabled', function (): void {
     $section = organisationInfolistSection(__('organisation.section_public'));
 
     expect($section)->not->toBeNull();
@@ -175,7 +177,9 @@ it('shows the public from entry on the organisation infolist when publishing is 
         $labels[] = (string) $entry->getLabel();
     }
 
-    expect($labels)->toContain(__('general.public_from'));
+    expect($labels)
+        ->not->toContain(__('general.public_from'))
+        ->toContain(__('organisation.slug'));
 });
 
 it('hides the public from entry on the organisation infolist when publishing is disabled', function (): void {

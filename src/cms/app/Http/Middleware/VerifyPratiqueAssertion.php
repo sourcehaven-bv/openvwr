@@ -9,8 +9,8 @@ use App\Services\Authentication\Pratique\PratiqueAssertionVerifier;
 use App\Services\Authentication\Pratique\PratiqueContext;
 use App\Services\Authentication\Pratique\PratiqueIdentityResolver;
 use Closure;
+use Filament\Facades\Filament;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -51,16 +51,11 @@ class VerifyPratiqueAssertion
             $identity = $this->resolver->resolve($assertion);
             $this->context->set($identity);
 
-            // Filament asks the auth guard directly — IdentifyTenant calls
-            // $panel->auth()->user() and 404s on null, and the policies reach for
-            // it too. Answering only through our own strategy would leave the
-            // framework believing nobody is signed in.
-            //
-            // setUser(), not login(): there is no session to establish. The
-            // assertion authenticates this ONE request, and the next request
-            // brings its own — which is exactly the property that makes a
-            // revoked assertion stop working immediately.
-            Auth::setUser($identity->user);
+            // Filament's IdentifyTenant resolves the URL tenant against the panel
+            // guard's user, and 404s when there is none. Setting the user for this
+            // request only (no session write) lets that check, and anything else
+            // that asks the guard, see the identity the assertion established.
+            Filament::auth()->setUser($identity->user);
         } catch (PratiqueAssertionException $exception) {
             Log::warning('Pratique assertion rejected', [
                 'reason' => $exception->getMessage(),

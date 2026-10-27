@@ -37,7 +37,6 @@ return [
     'entity_number_prefix_edit' => 'Edit prefix',
     'entity_number_unique_validation_message' => 'This prefix is already (or has previously been) in use, possibly by another organisation: it is no longer available.',
 
-    'public_from_hint_icon_text' => 'Please note: if you leave this field empty, the processing activity will never be published to the public website.',
     'section_ap' => 'Details for data breach notifications',
     'coc_number' => 'Chamber of Commerce number',
     'fg_registration_number' => 'DPO registration number',

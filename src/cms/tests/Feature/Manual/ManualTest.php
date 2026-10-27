@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Enums\Authorization\Role;
 use App\Manual\Chapter;
 use App\Manual\FeatureGate;
+use App\Manual\Fragment;
 use App\Manual\Manual;
 use App\Manual\Step;
 use App\Manual\Task;
@@ -257,6 +258,80 @@ it('reports no visible topics when they are all hidden', function (): void {
     expect($chapter->visibleTopics())->toBeEmpty();
 });
 
+it('treats a step or fragment without a gate as always visible', function (): void {
+    expect((new Step('a', 'b'))->isVisible())->toBeTrue()
+        ->and((new Fragment('b'))->isVisible())->toBeTrue();
+});
+
+it('drops a gated step from a task when its flag is off, and keeps it when on', function (): void {
+    $task = new Task(
+        id: 'x',
+        group: 'g',
+        title: 't',
+        summary: 's',
+        intro: 'i',
+        steps: [
+            new Step('Altijd', 'Gewone uitleg', ['export']),
+            new Step('Alleen met vlag', 'Politiegegevens', ['wpg-register'], FeatureGate::WPG),
+        ],
+        roles: new TaskRoles(performers: []),
+    );
+
+    ConfigTestHelper::set('features.wpg', true);
+
+    expect($task->visibleSteps())->toHaveCount(2)
+        ->and($task->topicIds())->toBe(['export', 'wpg-register'])
+        ->and($task->searchText())->toContain('Politiegegevens');
+
+    ConfigTestHelper::set('features.wpg', false);
+
+    expect(array_map(static fn (Step $step): string => $step->title, $task->visibleSteps()))
+        ->toBe(['Altijd'])
+        ->and($task->topicIds())->toBe(['export'])
+        ->and($task->searchText())->not->toContain('Politiegegevens');
+});
+
+it('drops a gated fragment from a topic when its flag is off, and keeps it when on', function (): void {
+    $topic = new Topic(
+        id: 'x',
+        title: 't',
+        body: ['Eerste alinea.', new Fragment('**Politiegegevens**', FeatureGate::WPG), 'Laatste alinea.'],
+    );
+
+    ConfigTestHelper::set('features.wpg', true);
+
+    expect($topic->body())->toBe("Eerste alinea.\n\n**Politiegegevens**\n\nLaatste alinea.")
+        ->and($topic->html())->toContain('<strong>Politiegegevens</strong>')
+        ->and($topic->searchText())->toContain('Politiegegevens');
+
+    ConfigTestHelper::set('features.wpg', false);
+
+    expect($topic->body())->toBe("Eerste alinea.\n\nLaatste alinea.")
+        ->and($topic->html())->not->toContain('Politiegegevens')
+        ->and($topic->searchText())->not->toContain('Politiegegevens');
+});
+
+/**
+ * The Wpg has no task of its own: it is a gated step of the general task and a
+ * gated paragraph of the general topic. Lock both down on the real content.
+ */
+it('folds the wpg register into the general register task and topic', function (bool $enabled): void {
+    ConfigTestHelper::set('features.wpg', $enabled);
+
+    $manual = new Manual();
+    $task = array_values(array_filter(
+        $manual->tasks(),
+        static fn (Task $task): bool => $task->id === 'verwerking-vastleggen',
+    ))[0];
+    $topic = $manual->topic('verwerkingsregisters');
+
+    expect($topic)->not->toBeNull()
+        ->and(str_contains($task->searchText(), 'Wpg'))->toBe($enabled)
+        ->and(in_array('wpg-register', $task->topicIds(), true))->toBe($enabled)
+        ->and(str_contains($topic->body(), 'Verwerkingen WPG verantwoordelijke'))->toBe($enabled)
+        ->and(count($manual->search('Wpg')['tasks']) > 0)->toBe($enabled);
+})->with([true, false]);
+
 it('renders a topic body to html', function (): void {
     $topic = new Topic(id: 'x', title: 't', body: '**vet**');
 
@@ -335,9 +410,13 @@ it('references only figures that exist on disk', function (): void {
     $manual = new Manual();
     $bodies = [];
 
+    // Walk every fragment and step, gated or not, so a figure behind a flag is
+    // checked too.
     foreach ($manual->chapters() as $chapter) {
         foreach ($chapter->topics as $topic) {
-            $bodies[$topic->id] = $topic->body;
+            foreach ($topic->fragments as $i => $fragment) {
+                $bodies[$topic->id . ' fragment ' . ($i + 1)] = $fragment->markdown;
+            }
         }
     }
 
