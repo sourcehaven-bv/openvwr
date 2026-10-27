@@ -1,44 +1,61 @@
 # Audit log
 
-OpenVWR writes audit events, such as logins and account changes, to syslog. It
-also writes them to the `audit_logs` table when `AUDIT_LOG_DBLOG_ENABLED` is set.
+OpenVWR records audit events in their own log stream, separate from the
+application log. Audit events are logins, failed logins, logouts, account
+changes, transfers and removed links between records.
 
-## Append-only table
+## Where events go
 
-The `audit_logs` table is append-only. A PostgreSQL trigger,
-`audit_logs_append_only`, rejects every `UPDATE`, `DELETE` and `TRUNCATE` on the
-table. Inserts still work. The trigger also blocks raw SQL, so a bug or an SQL
-injection in the application cannot change or remove audit events.
+The `audit` log channel writes each event to syslog:
 
-The migration `make_audit_logs_append_only` creates the trigger.
+- identifier `openvwr-audit`
+- facility `authpriv`
+- one JSON object per line
 
-## Limits
+The level is fixed. `LOG_LEVEL` does not filter audit events. To use another
+channel, set `AUDIT_LOG_CHANNEL`.
 
-The table owner can disable or drop the trigger. In a default deployment, the
-application connects as the table owner. Someone with the application's database
-credentials can therefore still remove events.
+On a systemd host the events end up in journald. Read them with:
 
-For stronger protection, run migrations as a separate owner role. Give the
-application role only the rights it needs on this table:
-
-```sql
-REVOKE ALL ON audit_logs FROM <app_role>;
-GRANT SELECT, INSERT ON audit_logs TO <app_role>;
+```sh
+journalctl -t openvwr-audit -o cat
 ```
 
-## Removing old events
+The application cannot change or remove events once journald has them. Forward
+Secure Sealing (FSS) and the central logging protect them further.
 
-The application never removes audit events. To remove events after their
-retention period, a database administrator disables the trigger for one
-transaction:
+## Routing and access
+
+Route `authpriv`, or identifier `openvwr-audit`, to a separate destination. Give
+that destination its own access rights and retention period. Only authorised
+administrators may read it.
+
+## What an event contains
+
+| Field | Meaning |
+|---|---|
+| `created_at` | time of the event (ISO 8601) |
+| `event_code` | what happened, for example `091111` for a login |
+| `action_code` | `C` create, `R` read, `U` update, `D` delete, `E` execute |
+| `failed` | whether the attempt failed |
+| `failed_reason` | why it failed, for example `InvalidCode` |
+| `user_id` | id of the user who acted, if any |
+| `target_id` | id of the user who was affected, if any |
+| `data` | ids and counts that belong to the event, such as record ids of a transfer |
+
+Events contain no email addresses, names, codes or request data. A user id only
+identifies a person through the database.
+
+## The old `audit_logs` table
+
+Earlier versions wrote events to the `audit_logs` table. The migration
+`drop_audit_logs` removes the table when it is empty.
+
+When the table still has rows, the migration leaves it in place, with its
+append-only trigger. Archive the rows first. Then remove the table and the
+trigger function as the table owner:
 
 ```sql
-BEGIN;
-ALTER TABLE audit_logs DISABLE TRIGGER audit_logs_append_only;
-DELETE FROM audit_logs WHERE created_at < now() - interval '<retention period>';
-ALTER TABLE audit_logs ENABLE TRIGGER audit_logs_append_only;
-COMMIT;
+DROP TABLE audit_logs;
+DROP FUNCTION audit_logs_append_only();
 ```
-
-`ALTER TABLE` locks the table until the transaction ends. Inserts by the
-application wait during that time.

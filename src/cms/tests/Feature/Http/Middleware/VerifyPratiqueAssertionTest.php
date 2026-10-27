@@ -10,6 +10,7 @@ use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Tests\Helpers\AuditLogTestHelper;
 use Tests\Helpers\PratiqueTestHelper;
 
 /*
@@ -44,6 +45,8 @@ beforeEach(function (): void {
     $this->pratique = new PratiqueTestHelper();
     $this->pratique->publishJwks();
     Log::spy();
+    // The spy replaces the log manager, so give the audit logger a channel of its own.
+    AuditLogTestHelper::capture();
 });
 
 /*

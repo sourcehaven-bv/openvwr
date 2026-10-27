@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\User;
+use App\Services\AuditLog\AuditLogger;
+use App\Services\AuditLog\Authentication\AuthenticationSuccessEvent;
+use App\Services\AuditLog\Authentication\TwoFactorFailedEvent;
 use App\Services\OneTimePassword\OneTimePassword;
 use App\ValueObjects\OneTimePassword\Code;
 use App\ValueObjects\OneTimePassword\Secret;
@@ -19,6 +22,7 @@ class OtpService
     public function __construct(
         private readonly OneTimePassword $oneTimePassword,
         private readonly Session $session,
+        private readonly AuditLogger $auditLogger,
     ) {
     }
 
@@ -39,11 +43,20 @@ class OtpService
         $isValid = $this->oneTimePassword->isCodeValid($code, Secret::fromString($otpSecret));
 
         if ($isValid === false) {
+            $this->auditLogger->register(TwoFactorFailedEvent::invalidCode($user));
+
             return false;
         }
 
         $user->otp_confirmed_at = CarbonImmutable::now();
         $user->save();
+
+        // The login is complete once the session passes the second factor.
+        // Confirming a code again in an already-verified session (for
+        // example when re-enrolling in the profile) is not a new login.
+        if (!$this->hasValidSession()) {
+            $this->auditLogger->register(new AuthenticationSuccessEvent($user));
+        }
 
         $this->setValidSession();
 

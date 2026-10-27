@@ -6,6 +6,8 @@ namespace App\Services\AuditLog;
 
 use App\Services\AuditLog\Authentication\AuthenticationFailedEvent;
 use App\Services\AuditLog\Authentication\AuthenticationSuccessEvent;
+use App\Services\AuditLog\Authentication\LogoutEvent;
+use App\Services\AuditLog\Authentication\TwoFactorFailedEvent;
 use App\Services\AuditLog\Register\LinksDetachedEvent;
 use App\Services\AuditLog\Register\LinksDetachedLogEvent;
 use App\Services\AuditLog\Transfer\TransferExportEvent;
@@ -17,15 +19,20 @@ use App\Services\AuditLog\User\UserPermissionUpdatedEvent;
 use App\Services\AuditLog\User\UserTwoFactorResetEvent;
 use App\Services\AuditLog\User\UserUpdatedEvent;
 use InvalidArgumentException;
+use MinVWS\AuditLogger\Contracts\LoggableUser;
 use MinVWS\AuditLogger\Events\Logging\AccountChangeLogEvent;
 use MinVWS\AuditLogger\Events\Logging\GeneralLogEvent;
 use MinVWS\AuditLogger\Events\Logging\UserCreatedLogEvent;
 use MinVWS\AuditLogger\Events\Logging\UserLoginLogEvent;
-use MinVWS\AuditLogger\Loggers\LogEventInterface;
+use MinVWS\AuditLogger\Events\Logging\UserLoginTwoFactorFailedEvent;
+use MinVWS\AuditLogger\Events\Logging\UserLogoutLogEvent;
 
 class AuditLogEventFactory
 {
-    public function fromApplicationEvent(AuditEvent $event): LogEventInterface
+    /**
+     * @param LoggableUser|null $actor The logged-in user, recorded as actor of account changes.
+     */
+    public function fromApplicationEvent(AuditEvent $event, ?LoggableUser $actor = null): GeneralLogEvent
     {
         return match ($event::class) {
             AuthenticationFailedEvent::class => $this->fromAuthenticationFailedEvent($event),
@@ -33,10 +40,12 @@ class AuditLogEventFactory
             LinksDetachedEvent::class => $this->fromLinksDetachedEvent($event),
             TransferExportEvent::class => $this->fromTransferExportEvent($event),
             TransferImportEvent::class => $this->fromTransferImportEvent($event),
-            UserCreatedEvent::class => $this->fromUserCreatedEvent($event),
-            UserPermissionUpdatedEvent::class => $this->fromUserPermissionUpdatedEvent($event),
-            UserTwoFactorResetEvent::class => $this->fromUserTwoFactorResetEvent($event),
-            UserUpdatedEvent::class => $this->fromUserUpdatedEvent($event),
+            LogoutEvent::class => $this->fromLogoutEvent($event),
+            TwoFactorFailedEvent::class => $this->fromTwoFactorFailedEvent($event),
+            UserCreatedEvent::class => $this->fromUserCreatedEvent($event, $actor),
+            UserPermissionUpdatedEvent::class => $this->fromUserPermissionUpdatedEvent($event, $actor),
+            UserTwoFactorResetEvent::class => $this->fromUserTwoFactorResetEvent($event, $actor),
+            UserUpdatedEvent::class => $this->fromUserUpdatedEvent($event, $actor),
             default => throw new InvalidArgumentException('Unknown audit event'),
         };
     }
@@ -55,13 +64,17 @@ class AuditLogEventFactory
         $minvwsAuditLogEvent = new class extends GeneralLogEvent {
         };
         $minvwsAuditLogEvent->withEventCode($code);
+        $minvwsAuditLogEvent->withFailed(true, $event->type);
 
         return $minvwsAuditLogEvent;
     }
 
+    // Authentication events set the user as actor: the audit record takes its
+    // user_id from the actor, not from the target.
     private function fromAuthenticationSuccessEvent(AuthenticationSuccessEvent $event): UserLoginLogEvent
     {
         $minvwsAuditLogEvent = new UserLoginLogEvent();
+        $minvwsAuditLogEvent->withActor($event->user);
         $minvwsAuditLogEvent->withTarget($event->user);
 
         return $minvwsAuditLogEvent;
@@ -136,37 +149,67 @@ class AuditLogEventFactory
         return $minvwsAuditLogEvent;
     }
 
-    private function fromUserCreatedEvent(UserCreatedEvent $event): UserCreatedLogEvent
+    private function fromLogoutEvent(LogoutEvent $event): UserLogoutLogEvent
     {
-        $minvwsAuditLogEvent = new UserCreatedLogEvent();
+        $minvwsAuditLogEvent = new UserLogoutLogEvent();
+        $minvwsAuditLogEvent->withActor($event->user);
         $minvwsAuditLogEvent->withTarget($event->user);
 
         return $minvwsAuditLogEvent;
     }
 
-    private function fromUserPermissionUpdatedEvent(UserPermissionUpdatedEvent $event): AccountChangeLogEvent
+    private function fromTwoFactorFailedEvent(TwoFactorFailedEvent $event): UserLoginTwoFactorFailedEvent
+    {
+        $minvwsAuditLogEvent = new UserLoginTwoFactorFailedEvent();
+        $minvwsAuditLogEvent->withActor($event->user);
+        $minvwsAuditLogEvent->withTarget($event->user);
+        $minvwsAuditLogEvent->withFailed(true, $event->reason);
+
+        return $minvwsAuditLogEvent;
+    }
+
+    private function fromUserCreatedEvent(UserCreatedEvent $event, ?LoggableUser $actor): UserCreatedLogEvent
+    {
+        $minvwsAuditLogEvent = new UserCreatedLogEvent();
+        $minvwsAuditLogEvent->withTarget($event->user);
+        $this->withActor($minvwsAuditLogEvent, $actor);
+
+        return $minvwsAuditLogEvent;
+    }
+
+    private function fromUserPermissionUpdatedEvent(UserPermissionUpdatedEvent $event, ?LoggableUser $actor): AccountChangeLogEvent
     {
         $minvwsAuditLogEvent = new AccountChangeLogEvent();
         $minvwsAuditLogEvent->withEventCode(AccountChangeLogEvent::EVENTCODE_ROLES);
         $minvwsAuditLogEvent->withTarget($event->user);
+        $this->withActor($minvwsAuditLogEvent, $actor);
 
         return $minvwsAuditLogEvent;
     }
 
-    private function fromUserTwoFactorResetEvent(UserTwoFactorResetEvent $event): AccountChangeLogEvent
+    private function fromUserTwoFactorResetEvent(UserTwoFactorResetEvent $event, ?LoggableUser $actor): AccountChangeLogEvent
     {
         $minvwsAuditLogEvent = new AccountChangeLogEvent();
         $minvwsAuditLogEvent->withEventCode(AccountChangeLogEvent::EVENTCODE_RESET);
         $minvwsAuditLogEvent->withTarget($event->user);
+        $this->withActor($minvwsAuditLogEvent, $actor);
 
         return $minvwsAuditLogEvent;
     }
 
-    private function fromUserUpdatedEvent(UserUpdatedEvent $event): AccountChangeLogEvent
+    private function fromUserUpdatedEvent(UserUpdatedEvent $event, ?LoggableUser $actor): AccountChangeLogEvent
     {
         $minvwsAuditLogEvent = new AccountChangeLogEvent();
         $minvwsAuditLogEvent->withTarget($event->user);
+        $this->withActor($minvwsAuditLogEvent, $actor);
 
         return $minvwsAuditLogEvent;
+    }
+
+    private function withActor(GeneralLogEvent $logEvent, ?LoggableUser $actor): void
+    {
+        if ($actor !== null) {
+            $logEvent->withActor($actor);
+        }
     }
 }

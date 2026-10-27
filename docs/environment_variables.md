@@ -115,6 +115,7 @@ The following environment variables are used to configure the application in `sr
 - `LOG_CHANNEL` (default: `stderr`)
 - `LOG_DEPRECATIONS_CHANNEL` (default: `null`)
 - `LOG_LEVEL` (default: `debug`)
+- `AUDIT_LOG_CHANNEL` log channel for audit events: logins, failed logins, logouts and account changes (default: `audit`). The `audit` channel writes one JSON object per line to syslog with identifier `openvwr-audit` and facility `authpriv`, at a fixed level that `LOG_LEVEL` does not filter. Each event holds only the event code, the outcome and user ids; no email addresses or names.
 
 **MAIL:**
 
