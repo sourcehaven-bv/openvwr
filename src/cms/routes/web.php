@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Config\Config;
 use App\Enums\RouteName;
 use App\Filament\Pages\OneTimePasswordValidation;
 use App\Http\Controllers\Authentication\PasswordlessLoginController;
@@ -9,9 +10,16 @@ use App\Http\Controllers\Authentication\SnapshotSignLoginController;
 use App\Http\Controllers\PrivateMediaController;
 use App\Http\Controllers\RedirectToTenantController;
 use App\Http\Controllers\TransferExportDownloadController;
+use App\Http\Middleware\VerifyPratiqueAssertion;
+use App\Services\Authentication\AuthenticationStrategyFactory;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', RedirectToTenantController::class)->name(RouteName::HOME);
+// The landing redirect sits outside the panel, so it does not get the panel's
+// auth middleware. Under pratique it needs the assertion to know who is asking
+// and which organisation the proxy selected.
+Route::get('/', RedirectToTenantController::class)
+    ->middleware(Config::string('auth.driver') === AuthenticationStrategyFactory::DRIVER_PRATIQUE ? [VerifyPratiqueAssertion::class] : [])
+    ->name(RouteName::HOME);
 
 Route::prefix('/login/consume')->middleware('signed')->group(static function (): void {
     Route::get('/', [PasswordlessLoginController::class, 'consume'])->name(RouteName::PASSWORDLESS_LOGIN_VALIDATE_CONSUME);
