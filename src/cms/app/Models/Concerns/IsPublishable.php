@@ -6,7 +6,6 @@ namespace App\Models\Concerns;
 
 use App\Collections\StaticWebsiteSnapshotEntryCollection;
 use App\Events\StaticWebsite\BuildEvent;
-use App\Models\States\Snapshot\Established;
 use App\Models\StaticWebsiteSnapshotEntry;
 use App\Observers\PublishableObserver;
 use Carbon\CarbonImmutable;
@@ -57,15 +56,16 @@ trait IsPublishable
         return $staticWebsiteSnapshotEntries;
     }
 
+    /**
+     * The entry visitors see now, or else the most recent one. While a new
+     * version is being published the open entry still belongs to an older
+     * snapshot, so this looks across all of the record's snapshots.
+     */
     final public function getLatestStaticWebsiteSnapshotEntry(): ?StaticWebsiteSnapshotEntry
     {
-        $snapshot = $this->getLatestSnapshotWithState([Established::class]);
-
-        if ($snapshot === null) {
-            return null;
-        }
-
-        return StaticWebsiteSnapshotEntry::where('snapshot_id', $snapshot->id)
+        return StaticWebsiteSnapshotEntry::query()
+            ->whereIn('snapshot_id', $this->snapshots()->toBase()->select('id'))
+            ->orderByRaw('end_date IS NULL DESC')
             ->orderBy('start_date', 'desc')
             ->first();
     }

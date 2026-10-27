@@ -7,6 +7,16 @@ return [
 
     'home_content' => 'Homepage text',
 
+    'overview' => [
+        'title' => 'Publication status',
+        'subtitle' => 'After each publication we check which processing activities are on the public website.',
+        'checked_at' => 'Last check',
+        'never_checked' => 'Not checked yet',
+        'confirmed' => 'Processing activities online',
+        'all_confirmed' => 'All processing activities that should be published are online.',
+        'unconfirmed' => 'These processing activities should be published but are not online (yet):',
+    ],
+
     'content' => [
         'home_title' => 'OpenVWR',
         'privacy_statement' => 'Privacy statement',
