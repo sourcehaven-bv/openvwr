@@ -127,8 +127,14 @@ Wat het **niet** doet, en niet kan:
 - **Globale rollen overzetten.** `functional-manager` blijft in OpenVWR.
 - **Mail versturen.** Het script nodigt niemand uit; het richt alleen in.
 
-Draai het eerst tegen een kopie van productiedata. Een fout in de slugs levert
-lege parallelle tenants op naast de echte, en dat is achteraf lastig opruimen.
+Doe eerst een proefrun. Een fout in de slugs levert lege parallelle tenants op
+naast de echte, en dat is achteraf lastig opruimen.
+
+Gebruik voor de proefrun een gepseudonimiseerde kopie: echte slugs en
+organisatienamen, maar verzonnen namen en e-mailadressen van gebruikers. Een
+kopie met echte persoonsgegevens mag alleen als de testomgeving aantoonbaar
+minstens hetzelfde beveiligingsniveau heeft als productie, en volgens een
+procedure die de Security Engineer of CISO heeft goedgekeurd (POLICY-015 §6).
 
 ## 4. Na de omzetting controleren
 

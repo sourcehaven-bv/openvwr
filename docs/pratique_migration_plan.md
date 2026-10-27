@@ -3,7 +3,7 @@
 Status: in progress. Phase 0 (decisions), 1a (strategy seam + dev driver, #92),
 1b (the Pratique strategy, #159) and 2a (webhook receiver, #161) zijn klaar.
 Phase 2 is deels gedaan: de app-kant van het inrichten staat er, mTLS uitrollen
-en een proefrun tegen productiedata niet. Phase 3 en 4 zijn nog voorstel.
+en een proefrun tegen een gepseudonimiseerde kopie niet. Phase 3 en 4 zijn nog voorstel.
 
 ## 1. What we have today
 
@@ -487,7 +487,10 @@ Wat het bouwen opleverde en niet in het plan stond:
 - **`-org` wil een org-id, geen slug.** Vandaar dat het script de id opvangt die
   `get-org`/`create-org` op stdout zetten.
 
-Rest: mTLS daadwerkelijk uitrollen en tegen een kopie van productiedata draaien.
+Rest: mTLS daadwerkelijk uitrollen en een proefrun doen. Die proefrun gebruikt
+een gepseudonimiseerde kopie (zie `pratique_deployment.md` §3): echte persoonsgegevens
+alleen in een omgeving met minstens het beveiligingsniveau van productie en
+volgens een goedgekeurde procedure (POLICY-015 §6).
 
 Oorspronkelijk plan:
 
@@ -510,7 +513,9 @@ Oorspronkelijk plan:
      lost — but every user re-bootstraps via email code on first login, and their
      **TOTP enrolment is gone**. If 2FA is a compliance requirement, passkeys are
      the replacement and that's a user-communication task, not just a code task.
-4. Verify against a copy of production data before touching anything real.
+4. Verify against a pseudonymised copy before touching anything real. Real
+   personal data in a test environment needs at least production's security
+   level and a procedure the Security Engineer or CISO approved (POLICY-015 §6).
 
 ### Phase 2a — webhook receiver (optional, strictly additive) ✅ built
 
@@ -708,7 +713,7 @@ CI should run the suite under both drivers. That roughly doubles the auth-test
 matrix but is the only way the builtin path stays honest once attention moves to
 Pratique.
 
-Cutover: staging with production-shaped data → verify each of the 8 roles →
+Cutover: staging with production-shaped, pseudonymised data → verify each of the 8 roles →
 flip `AUTH_DRIVER` per environment. Rollback is a config flip, not a redeploy.
 
 ## 6. Pre-existing bug found while surveying

@@ -4,12 +4,20 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Facades\AdminLog;
 use App\Models\Organisation;
 use App\Models\User;
 use Illuminate\Console\Command;
 
+use function array_column;
+use function array_merge;
+use function array_unique;
+use function count;
+use function getenv;
 use function implode;
 use function json_encode;
+use function posix_geteuid;
+use function posix_getpwuid;
 use function sprintf;
 use function str_replace;
 
@@ -26,6 +34,10 @@ use const JSON_UNESCAPED_UNICODE;
  * here and not in the proxy. Running it against production is safe, which is the
  * point: the risky half (the `pratique admin` calls) is a separate step that a
  * human runs against a plan they have read.
+ *
+ * The one thing it does write is an admin log entry. The plan holds every
+ * member's name and email across all organisations, outside the tenant
+ * boundary, so who exported it and when must be on record (CONTROL-8-18).
  *
  * What does NOT come across, and cannot:
  *
@@ -58,11 +70,35 @@ class PratiqueExportProvisioning extends Command
             ];
         }
 
-        $this->line($this->option('format') === 'sh'
+        $format = $this->option('format') === 'sh' ? 'sh' : 'json';
+
+        AdminLog::log('pratique provisioning exported', [
+            'os_user' => self::osUser(),
+            // Set by sudo, which is how an operator or Ansible runs this as the
+            // application user: the person behind the account above.
+            'sudo_user' => (string) getenv('SUDO_USER'),
+            'format' => $format,
+            'organisations' => (string) count($plan),
+            'users' => (string) count(array_unique(array_column(
+                array_merge([], ...array_column($plan, 'members')),
+                'email',
+            ))),
+        ]);
+
+        $this->line($format === 'sh'
             ? $this->script($plan)
             : json_encode($plan, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
 
         return self::SUCCESS;
+    }
+
+    /** The account this process runs as, or its uid when it has no name. */
+    private static function osUser(): string
+    {
+        $uid = posix_geteuid();
+        $entry = posix_getpwuid($uid);
+
+        return $entry === false ? (string) $uid : $entry['name'];
     }
 
     /**

@@ -18,17 +18,28 @@ use Illuminate\Pipeline\Pipeline;
  * whichever strategy happened to be bound at boot. This resolves the list per
  * request instead, which keeps a route on the `web` group gated the same way the
  * panel is without duplicating the driver decision here.
+ *
+ * With the WITHOUT_LOGIN_PAGE parameter it gates only under a strategy that has
+ * no login page of its own. See AppServiceProvider::gateLivewireUpdates.
  */
 class ResolveAuthGate
 {
+    public const WITHOUT_LOGIN_PAGE = 'without-login-page';
+
     public function __construct(
         private readonly Application $app,
     ) {
     }
 
-    public function handle(Request $request, Closure $next): mixed
+    public function handle(Request $request, Closure $next, ?string $only = null): mixed
     {
-        $gate = $this->app->make(AuthenticationStrategy::class)->panelMiddleware();
+        $strategy = $this->app->make(AuthenticationStrategy::class);
+
+        if ($only === self::WITHOUT_LOGIN_PAGE && $strategy->hasLoginPage()) {
+            return $next($request);
+        }
+
+        $gate = $strategy->panelMiddleware();
 
         if ($gate === []) {
             return $next($request);

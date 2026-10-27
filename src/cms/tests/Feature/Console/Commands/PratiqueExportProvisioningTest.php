@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Enums\Authorization\Role;
+use App\Models\AdminLogEntry;
 use App\Models\Organisation;
 use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
@@ -142,6 +143,27 @@ it('escapes a quote in an organisation name', function (): void {
     Organisation::factory()->create(['slug' => 'acme', 'name' => "Bob's Bureau"]);
 
     expect(exportScript())->toContain("'Bob'\\''s Bureau'");
+});
+
+/*
+ * The plan crosses the tenant boundary, so each export leaves an audit entry:
+ * who ran it, in which format, and how much it covered (CONTROL-8-18).
+ */
+it('records who exported what', function (): void {
+    $acme = Organisation::factory()->create(['slug' => 'acme']);
+    $other = Organisation::factory()->create(['slug' => 'other']);
+    $alice = User::factory()->create(['email' => 'alice@example.org']);
+    $alice->organisations()->attach([$acme->id, $other->id]);
+    User::factory()->create(['email' => 'bob@example.org'])->organisations()->attach($acme);
+
+    exportScript();
+
+    $entry = AdminLogEntry::query()->where('message', 'pratique provisioning exported')->sole();
+    expect($entry->context)->toMatchArray([
+        'format' => 'sh',
+        'organisations' => '2',
+        'users' => '2',
+    ])->and($entry->context['os_user'])->not->toBe('');
 });
 
 /* It reports; it never provisions. */

@@ -57,6 +57,10 @@ class AppServiceProvider extends ServiceProvider
      * server-rendered pages load, while every modal, select and form field
      * fails. Read-only checks walk straight past it.
      *
+     * Only a strategy without a login page is gated here. A login page posts
+     * its form through this same route before anyone is logged in, so under
+     * builtin and dev the gate (Authenticate) would refuse the login itself.
+     *
      * ResolveAuthGate resolves the strategy per request rather than at
      * registration, which matters here because this route is registered once and
      * cached like any other.
@@ -68,7 +72,7 @@ class AppServiceProvider extends ServiceProvider
         Livewire::setUpdateRoute(
             /** @param array{0: class-string, 1: string}|callable $handle */
             static fn (array|callable $handle): Route => RouteFacade::post('/livewire/update', $handle)
-                ->middleware(['web', ResolveAuthGate::class]),
+                ->middleware(['web', ResolveAuthGate::class . ':' . ResolveAuthGate::WITHOUT_LOGIN_PAGE]),
         );
     }
 
