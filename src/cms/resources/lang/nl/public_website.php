@@ -7,6 +7,16 @@ return [
 
     'home_content' => 'Homepage tekst',
 
+    'overview' => [
+        'title' => 'Publicatiestatus',
+        'subtitle' => 'Na elke publicatie controleren we welke verwerkingen op de publieke website staan.',
+        'checked_at' => 'Laatste controle',
+        'never_checked' => 'Nog niet gecontroleerd',
+        'confirmed' => 'Verwerkingen online',
+        'all_confirmed' => 'Alle verwerkingen die gepubliceerd moeten worden, staan online.',
+        'unconfirmed' => 'Deze verwerkingen moeten gepubliceerd worden, maar staan (nog) niet online:',
+    ],
+
     'content' => [
         'home_title' => 'OpenVWR',
         'privacy_statement' => 'Privacyverklaring',

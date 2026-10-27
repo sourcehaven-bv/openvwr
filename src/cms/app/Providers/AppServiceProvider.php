@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use App\Config\Config;
 use App\Routing\UrlGenerator;
+use App\Services\StaticWebsite\Publication\PublicationStatusResolver;
 use App\Services\StringService;
 use App\Services\Virusscanner\Virusscanner;
 use App\Services\Virusscanner\VirusscannerManager;
@@ -38,6 +39,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function register(): void
     {
+        // Scoped so a table rendering many rows loads the latest check once.
+        $this->app->scoped(PublicationStatusResolver::class);
+
         $this->app->singleton('url', static function (Application $app): UrlGenerator {
             /** @var Request $request */
             $request = $app->rebinding('request', static function (Application $app, Request $request): void {
