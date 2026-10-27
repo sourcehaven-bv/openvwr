@@ -28,7 +28,9 @@ it('will call the correct generators on generate', function (): void {
 
 it('skips website tree children without a past public from date', function (): void {
     $root = PublicWebsiteTree::factory()->create(['parent_id' => null, 'public_from' => '2026-01-01', 'organisation_id' => null]);
-    $publicChild = PublicWebsiteTree::factory()->create(['parent_id' => $root->id, 'public_from' => '2026-01-01', 'organisation_id' => null]);
+    $publicChild = PublicWebsiteTree::factory()->create(
+        ['parent_id' => $root->id, 'public_from' => '2026-01-01', 'organisation_id' => null],
+    );
     PublicWebsiteTree::factory()->create(['parent_id' => $root->id, 'public_from' => null, 'organisation_id' => null]);
     PublicWebsiteTree::factory()->create(['parent_id' => $root->id, 'public_from' => '2999-01-01', 'organisation_id' => null]);
 

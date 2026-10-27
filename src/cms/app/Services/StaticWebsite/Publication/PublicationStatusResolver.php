@@ -14,6 +14,7 @@ use App\Models\States\Snapshot\Established;
 use App\Models\States\Snapshot\InReview;
 use App\Models\StaticWebsiteCheck;
 use App\Models\StaticWebsiteSnapshotEntry;
+use Carbon\CarbonImmutable;
 
 use function max;
 
@@ -75,6 +76,21 @@ class PublicationStatusResolver
             return new PublicationStatus(PublicationState::NOT_NO_ESTABLISHED_VERSION);
         }
 
+        $blocker = $this->getContentOrWebsiteBlocker($publishable, $establishedSnapshot);
+        if ($blocker !== null) {
+            return $blocker;
+        }
+
+        $publicAt = $this->getPublicAt($publishable, $publicFrom);
+        if ($publicAt->isFuture()) {
+            return new PublicationStatus(PublicationState::SCHEDULED, date: $publicAt);
+        }
+
+        return $this->resolveOnlineState($establishedSnapshot, $onlineEntry, $publicAt);
+    }
+
+    private function getContentOrWebsiteBlocker(Publishable $publishable, Snapshot $establishedSnapshot): ?PublicationStatus
+    {
         if ($establishedSnapshot->snapshotData?->public_markdown === null) {
             return new PublicationStatus(PublicationState::NOT_NO_PUBLIC_CONTENT);
         }
@@ -84,20 +100,39 @@ class PublicationStatusResolver
             return new PublicationStatus(PublicationState::NOT_ORGANISATION_NOT_ON_WEBSITE);
         }
 
-        $publicFromDates = [$publicFrom];
         foreach ($this->getPathToRoot($websiteTree) as $node) {
             if ($node->public_from === null) {
                 return new PublicationStatus(PublicationState::NOT_WEBSITE_SECTION_NOT_PUBLIC, sectionTitle: $node->title);
             }
-
-            $publicFromDates[] = $node->public_from;
         }
 
-        $publicAt = max($publicFromDates);
-        if ($publicAt->isFuture()) {
-            return new PublicationStatus(PublicationState::SCHEDULED, date: $publicAt);
+        return null;
+    }
+
+    /**
+     * The latest of the record's public_from and those of its website sections.
+     * Only call this once getContentOrWebsiteBlocker() found no blocker.
+     */
+    private function getPublicAt(Publishable $publishable, CarbonImmutable $publicFrom): CarbonImmutable
+    {
+        $publicFromDates = [$publicFrom];
+        $websiteTree = $publishable->getOrganisation()->publicWebsiteTree;
+        if ($websiteTree !== null) {
+            foreach ($this->getPathToRoot($websiteTree) as $node) {
+                if ($node->public_from !== null) {
+                    $publicFromDates[] = $node->public_from;
+                }
+            }
         }
 
+        return max($publicFromDates);
+    }
+
+    private function resolveOnlineState(
+        Snapshot $establishedSnapshot,
+        ?StaticWebsiteSnapshotEntry $onlineEntry,
+        CarbonImmutable $publicAt,
+    ): PublicationStatus {
         if ($onlineEntry !== null && $onlineEntry->snapshot_id->equals($establishedSnapshot->id)) {
             return new PublicationStatus(PublicationState::PUBLISHED, date: $onlineEntry->start_date);
         }
