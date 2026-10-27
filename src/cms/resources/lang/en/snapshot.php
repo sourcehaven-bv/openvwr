@@ -44,6 +44,8 @@ return [
     'status_change_confirm' => 'Change status',
     'properties' => 'Details',
     'public_data' => 'Public data',
+    'public_details' => 'Public fields for the website',
+    'public_details_help' => 'A website theme can show these fields as well, next to the text above.',
     'private_data' => 'Private data',
     'data' => 'Record data',
     'related_snapshot_sources' => 'Related entities',

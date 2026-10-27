@@ -7,6 +7,7 @@ namespace App\Enums;
 use function __;
 use function array_search;
 use function is_array;
+use function is_string;
 
 /**
  * The six bases of article 6(1) AVG. A goal stores its basis as the label the
@@ -37,5 +38,13 @@ enum AvgLegalBasis: string
         }
 
         return null;
+    }
+
+    public function label(): string
+    {
+        $options = __('avg_goal_legal_base.options');
+        $index = array_search($this, self::cases(), true);
+
+        return is_array($options) && isset($options[$index]) && is_string($options[$index]) ? $options[$index] : $this->value;
     }
 }
