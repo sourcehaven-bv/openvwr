@@ -23,6 +23,10 @@ use function trim;
  * topic or task whose flag is off does not exist as far as the rest of the
  * application is concerned, so it cannot be reached by scrolling, by anchor or
  * by search.
+ *
+ * A gate can also sit on a single step of a task or a single fragment of a
+ * topic body. Task::visibleSteps() and Topic::body() drop those, so the page,
+ * the backlinks and the search see only the parts whose flag is on.
  */
 class Manual
 {
