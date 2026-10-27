@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 use App\Models\Avg\AvgGoal;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
-use App\Models\Receiver;
-use App\Models\Responsible;
 use App\Models\Stakeholder;
 use App\Models\StakeholderDataItem;
 use App\Services\Snapshot\SnapshotSource\AvgResponsibleProcessingRecordPublicDetails;
@@ -58,8 +56,6 @@ it('describes a record for the public website', function (): void {
         'stakeholder_consequences' => 'Wordt niet getoond',
     ]));
     $record->stakeholders()->attach($stakeholder);
-    $record->receivers()->attach(Receiver::factory()->create(['description' => 'Parkeerhandhaving']));
-    $record->responsibles()->attach(Responsible::factory()->create(['name' => 'Gemeente Den Haag']));
 
     expect((new AvgResponsibleProcessingRecordPublicDetails())->forRecord($record->refresh()))->toBe([
         'summary' => 'Woont u in een straat met betaald parkeren?',
@@ -90,8 +86,6 @@ it('describes a record for the public website', function (): void {
                     ],
                 ],
             ]],
-        'receivers' => ['Parkeerhandhaving'],
-        'responsibles' => ['Gemeente Den Haag'],
         'has_processors' => true,
         'outside_eu' => [
             'applies' => true,

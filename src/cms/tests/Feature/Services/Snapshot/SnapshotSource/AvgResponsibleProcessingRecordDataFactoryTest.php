@@ -87,8 +87,6 @@ it('can generate public frontmatter', function (): void {
                     'summary' => 'Een korte uitleg.',
                     'goals' => [],
                     'stakeholders' => [],
-                    'receivers' => [],
-                    'responsibles' => [],
                     'has_processors' => false,
                     'outside_eu' => ['applies' => false, 'description' => null, 'adequacy_decision' => null, 'safeguards' => null],
                     'automated_decision_making' => ['applies' => false, 'logic' => null, 'consequences' => null],

@@ -53,11 +53,14 @@ readonly class SnapshotDataMarkdownRenderer
     }
 
     /**
+     * The latest established snapshot of each related source of a type. Only
+     * those are public: a related source that was never approved stays out.
+     *
      * @param class-string<SnapshotSource> $snapshotSource
      *
-     * @return Collection<int, SnapshotSource>
+     * @return Collection<int, Snapshot>
      */
-    private function getRelatedSnapshots(Snapshot $snapshot, string $snapshotSource): Collection
+    public function getRelatedSnapshots(Snapshot $snapshot, string $snapshotSource): Collection
     {
         $relatedSnapshots = new Collection();
 

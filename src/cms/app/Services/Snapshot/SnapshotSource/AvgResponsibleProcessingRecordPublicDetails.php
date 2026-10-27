@@ -7,8 +7,6 @@ namespace App\Services\Snapshot\SnapshotSource;
 use App\Enums\AvgLegalBasis;
 use App\Models\Avg\AvgGoal;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
-use App\Models\Receiver;
-use App\Models\Responsible;
 use App\Models\Stakeholder;
 use App\Models\StakeholderDataItem;
 
@@ -22,7 +20,9 @@ use function array_keys;
  * generic text.
  *
  * Only fields that article 13 and 14 AVG require towards residents are here;
- * internal fields such as security measures or the DPIA stay private.
+ * internal fields such as security measures or the DPIA stay private. The
+ * receivers have their own approval, so the publication adds those from their
+ * established snapshots, like the markdown does.
  */
 class AvgResponsibleProcessingRecordPublicDetails
 {
@@ -51,10 +51,6 @@ class AvgResponsibleProcessingRecordPublicDetails
             ])->values()->all(),
             'stakeholders' => $record->stakeholders->map(
                 fn (Stakeholder $stakeholder): array => $this->stakeholder($stakeholder),
-            )->values()->all(),
-            'receivers' => $record->receivers->map(static fn (Receiver $receiver): ?string => $receiver->description)->values()->all(),
-            'responsibles' => $record->responsibles->map(
-                static fn (Responsible $responsible): string => $responsible->name,
             )->values()->all(),
             'has_processors' => $record->has_processors,
             'outside_eu' => [

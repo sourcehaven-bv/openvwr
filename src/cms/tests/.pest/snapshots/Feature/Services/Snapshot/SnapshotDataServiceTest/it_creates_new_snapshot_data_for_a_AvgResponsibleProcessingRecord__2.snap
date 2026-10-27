@@ -4,6 +4,28 @@
     "record": {
         "reference": "AVGR6018277448",
         "title": "blanditiis",
-        "description": "Quos non maiores non."
+        "description": "Quos non maiores non.",
+        "details": {
+            "summary": "Een korte uitleg voor inwoners.",
+            "goals": [
+                {
+                    "goal": "Quos non maiores non.",
+                    "legal_basis": "consent"
+                }
+            ],
+            "stakeholders": [],
+            "has_processors": false,
+            "outside_eu": {
+                "applies": true,
+                "description": null,
+                "adequacy_decision": false,
+                "safeguards": "Quaerat consectetur repellat iure aut."
+            },
+            "automated_decision_making": {
+                "applies": true,
+                "logic": "Voluptatem voluptatem quis unde accusamus iusto corporis.",
+                "consequences": "Ab dicta deleniti pariatur perferendis sed fugit magnam qui."
+            }
+        }
     }
 }
