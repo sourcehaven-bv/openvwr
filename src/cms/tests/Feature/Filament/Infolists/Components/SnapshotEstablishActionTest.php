@@ -172,26 +172,36 @@ function forgeEstablish(
 dataset('forged establish requests', [
     'mounting and calling the action' => [
         static function (Testable $livewire): void {
-            $livewire->call('mountInfolistAction', 'snapshot_establish', ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'infolist')
-                ->call('callMountedInfolistAction');
+            $livewire->call('mountAction', 'snapshot_establish', [], establishActionContext())
+                ->call('callMountedAction');
         },
     ],
-    // Marking the action as mounted in the same request skips mountInfolistAction()
+    // Marking the action as mounted in the same request skips mountAction()
     // altogether.
     'calling an action marked as mounted' => [
         static function (Testable $livewire): void {
             $livewire->update(
-                calls: [['method' => 'callMountedInfolistAction', 'params' => [], 'path' => '']],
+                calls: [['method' => 'callMountedAction', 'params' => [], 'path' => '']],
                 updates: [
-                    'mountedInfolistActions' => ['snapshot_establish'],
-                    'mountedInfolistActionsData' => [[]],
-                    'mountedInfolistActionsComponent' => ViewInfoTab::SECTION_KEY_STATUS_FLOW,
-                    'mountedInfolistActionsInfolist' => 'infolist',
+                    'mountedActions' => [
+                        [
+                            'name' => 'snapshot_establish',
+                            'arguments' => [],
+                            'context' => establishActionContext(),
+                            'data' => [],
+                        ],
+                    ],
                 ],
             );
         },
     ],
 ]);
+
+/** @return array{schemaComponent: string} */
+function establishActionContext(): array
+{
+    return ['schemaComponent' => 'infolist.' . ViewInfoTab::SECTION_KEY_STATUS_FLOW];
+}
 
 // The button is hidden without the permission, and Filament treats a hidden action as
 // disabled when it is mounted or called. A request that calls it anyway is refused on

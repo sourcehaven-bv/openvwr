@@ -782,9 +782,14 @@ dataset('forged submit for review requests', [
             $livewire->update(
                 calls: [['method' => 'callMountedAction', 'params' => [], 'path' => '']],
                 updates: [
-                    'mountedActions' => ['snapshot_submit_for_review'],
-                    'mountedActionsArguments' => [[]],
-                    'mountedActionsData' => [[]],
+                    'mountedActions' => [
+                        [
+                            'name' => 'snapshot_submit_for_review',
+                            'arguments' => [],
+                            'context' => [],
+                            'data' => [],
+                        ],
+                    ],
                 ],
             );
         },
