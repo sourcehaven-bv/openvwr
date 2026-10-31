@@ -56,6 +56,8 @@ return [
     'outside_eu' => 'Doorgifte buiten EER',
     'decision_making' => 'Geautomatiseerde besluitvorming',
     'logic' => 'Toelichting besluitvorming',
+    'public_summary' => 'Uitleg voor inwoners',
+    'help_public_summary' => 'Twee of drie zinnen in gewone taal (B1): wat doet de gemeente en waarom zijn de gegevens nodig? Bijvoorbeeld: "Woont u in een straat met betaald parkeren? Dan kunt u een parkeervergunning aanvragen. Hier leest u welke gegevens wij daarvoor gebruiken."',
     'importance_consequences' => 'Toelichting belang en gevolgen',
     'dpia' => 'GEB (DPIA)',
     'has_processors' => 'Heeft verwerkers',

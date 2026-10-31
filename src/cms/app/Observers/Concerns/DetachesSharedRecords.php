@@ -24,17 +24,18 @@ trait DetachesSharedRecords
      * the organisation that outlive any single processing. Each removal is audit logged.
      *
      * @param BelongsToMany<covariant Model, covariant Model, covariant Pivot, covariant string> $relation
+     * @param list<string>|null $relatedIds the links to remove; null removes all
      */
-    private function detachShared(Model&TenantAware $record, BelongsToMany $relation): void
+    private function detachShared(Model&TenantAware $record, BelongsToMany $relation, ?array $relatedIds = null): void
     {
-        $relatedIds = array_values($relation->allRelatedIds()->all());
+        $relatedIds ??= array_values($relation->allRelatedIds()->all());
         Assert::allString($relatedIds);
 
         if ($relatedIds === []) {
             return;
         }
 
-        $relation->detach();
+        $relation->detach($relatedIds);
 
         $user = Auth::user();
         $recordId = $record->getKey();

@@ -43,7 +43,7 @@ class PublicWebsiteTreeResourceForm
                     ->url()
                     ->maxLength(255),
                 PublicFromField::makeForModel(PublicWebsiteTree::class)
-                    ->hintIcon('heroicon-o-information-circle', __('organisation.public_from_hint_icon_text')),
+                    ->hintIcon('heroicon-o-information-circle', __('public_website_tree.public_from_hint_icon_text')),
                 MarkdownEditor::make('public_website_content')
                     ->label(__('organisation.public_website_content')),
                 PosterFileField::make('poster')

@@ -359,6 +359,8 @@ class AvgResponsibleProcessingRecordResourceInfolistSchemas
         return [
             DateTimeEntry::make('public_from')
                 ->label(__('general.public_from')),
+            TextareaEntry::make('public_summary')
+                ->label(__('avg_responsible_processing_record.public_summary')),
             StaticWebsiteCheckSection::makeTable(),
             InformationBlockSection::makeCollapsible(
                 __('information_blocks.avg_responsible_processing_record.step_publish_title'),

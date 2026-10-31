@@ -489,6 +489,10 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
                 __('information_blocks.avg_responsible_processing_record.step_publish_info'),
             ),
             PublicFromField::makeForModel(AvgResponsibleProcessingRecord::class),
+            Textarea::make('public_summary')
+                ->label(__('avg_responsible_processing_record.public_summary'))
+                ->helperText(__('avg_responsible_processing_record.help_public_summary'))
+                ->rows(3),
             StaticWebsiteCheckSection::makeTable(),
         ];
     }

@@ -99,11 +99,11 @@ readonly class CrossOrgCopier
             throw new TransferException('cannot copy an organisation into itself');
         }
 
-        if (!$this->crossOrgAuthorization->userHasPermissionInOrganisation($user, $source, Permission::EXPORT)) {
+        if (!$this->crossOrgAuthorization->userHasPermissionInOrganisation($user, $source, Permission::TRANSFER_EXPORT)) {
             throw new TransferException('user may not export from the source organisation');
         }
 
-        if (!$this->crossOrgAuthorization->userHasPermissionInOrganisation($user, $destination, Permission::CORE_ENTITY_IMPORT)) {
+        if (!$this->crossOrgAuthorization->userHasPermissionInOrganisation($user, $destination, Permission::TRANSFER_IMPORT)) {
             throw new TransferException('user may not import into the destination organisation');
         }
     }

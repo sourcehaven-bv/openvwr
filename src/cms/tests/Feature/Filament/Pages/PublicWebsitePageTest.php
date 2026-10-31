@@ -31,7 +31,9 @@ it('loads the page', function (): void {
         ->get(sprintf('%s/public-website', $organisation->slug))
         ->assertOk()
         ->assertSee(__('public_website.public_website'))
-        ->assertSee(__('public_website.home_content'));
+        ->assertSee(__('public_website.home_content'))
+        ->assertSee(__('public_website.overview.title'))
+        ->assertSee(__('public_website.overview.never_checked'));
 });
 
 it('can edit the properties', function (): void {

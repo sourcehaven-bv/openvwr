@@ -23,6 +23,7 @@ function jwksProvider(Http $http): JwksProvider
 
 beforeEach(function (): void {
     app(Cache::class)->forget('pratique:jwks');
+    app(Cache::class)->forget('pratique:jwks:refetched');
 });
 
 it('fetches and parses the published keys', function (): void {
@@ -31,7 +32,9 @@ it('fetches and parses the published keys', function (): void {
     $http = new Http();
     $http->fake([PratiqueTestHelper::JWKS_URL => $http::response($helper->jwks())]);
 
-    expect(jwksProvider($http)->keys())->toHaveKey(PratiqueTestHelper::KEY_ID);
+    $publishedKid = $helper->jwks()['keys'][0]['kid'];
+
+    expect(jwksProvider($http)->keys())->toHaveKey($publishedKid);
 });
 
 it('serves later calls from the cache instead of refetching', function (): void {
@@ -63,6 +66,44 @@ it('refetches when asked for fresh keys', function (): void {
     $provider->freshKeys();
 
     $http->assertSentCount(2);
+});
+
+/*
+ * The key id that triggers a refetch comes from an unverified token on a public
+ * endpoint. Without a limit, every request with a made-up key id would cost a
+ * synchronous fetch, and a struggling JWKS endpoint would take every login down.
+ */
+it('refetches at most once per cooldown', function (): void {
+    $helper = new PratiqueTestHelper();
+
+    $http = new Http();
+    $http->fake([PratiqueTestHelper::JWKS_URL => $http::response($helper->jwks())]);
+
+    $provider = jwksProvider($http);
+    $provider->keys();
+    $provider->freshKeys();
+    $provider->freshKeys();
+    $provider->freshKeys();
+
+    $http->assertSentCount(2);
+});
+
+it('keeps the cached keys when a refetch fails', function (): void {
+    $helper = new PratiqueTestHelper();
+    $publishedKid = $helper->jwks()['keys'][0]['kid'];
+
+    $http = new Http();
+    $http->fake([
+        PratiqueTestHelper::JWKS_URL => $http->sequence()
+            ->push($helper->jwks())
+            ->push('', 503),
+    ]);
+
+    $provider = jwksProvider($http);
+    $provider->keys();
+
+    expect(static fn () => $provider->freshKeys())->toThrow(PratiqueAssertionException::class)
+        ->and($provider->keys())->toHaveKey($publishedKid);
 });
 
 it('reports an unreachable endpoint rather than returning no keys', function (): void {

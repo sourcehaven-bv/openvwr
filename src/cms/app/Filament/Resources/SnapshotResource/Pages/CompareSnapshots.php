@@ -13,6 +13,7 @@ use App\Filament\Resources\SnapshotResource;
 use App\Models\Contracts\SnapshotSource;
 use App\Models\Snapshot;
 use App\Services\Snapshot\SnapshotComparisonService;
+use App\Services\Snapshot\SnapshotPublicDetailsMarkdown;
 use App\ValueObjects\Markdown;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Resources\Pages\Page;
@@ -173,9 +174,12 @@ class CompareSnapshots extends Page
         // markdown, so diffing it anyway would report the public part
         // vanishing -- a change in what we render, not in the registration.
         if (Feature::publishingEnabled()) {
-            $diffs[SnapshotDataSection::PUBLIC->value] = $this->diffSection(
-                $from->snapshotData?->public_markdown,
-                $to->snapshotData?->public_markdown,
+            // The public fields a theme can show count as public too, so the
+            // approver sees changes to them next to the public markdown.
+            $publicDetailsMarkdown = $this->getPublicDetailsMarkdown();
+            $diffs[SnapshotDataSection::PUBLIC->value] = $this->diffText(
+                $this->publicText($from->snapshotData?->public_markdown, $publicDetailsMarkdown->render($from)),
+                $this->publicText($to->snapshotData?->public_markdown, $publicDetailsMarkdown->render($to)),
             );
         }
 
@@ -223,6 +227,21 @@ class CompareSnapshots extends Page
         $snapshotComparisonService = app(SnapshotComparisonService::class);
 
         return $snapshotComparisonService;
+    }
+
+    private function getPublicDetailsMarkdown(): SnapshotPublicDetailsMarkdown
+    {
+        /** @var SnapshotPublicDetailsMarkdown $publicDetailsMarkdown */
+        $publicDetailsMarkdown = app(SnapshotPublicDetailsMarkdown::class);
+
+        return $publicDetailsMarkdown;
+    }
+
+    private function publicText(?Markdown $markdown, ?string $details): string
+    {
+        $text = (string) $markdown?->toString();
+
+        return $details === null ? $text : $text . "\n\n" . $details;
     }
 
     private function diffSection(?Markdown $from, ?Markdown $to): HtmlString

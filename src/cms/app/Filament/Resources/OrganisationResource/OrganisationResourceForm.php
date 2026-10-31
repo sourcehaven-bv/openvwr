@@ -10,10 +10,8 @@ use App\Enums\Media\MediaGroup;
 use App\Facades\Authentication;
 use App\Facades\Authorization;
 use App\Filament\Forms\Components\MarkdownEditor\MarkdownEditor;
-use App\Filament\Forms\Components\PublicFromField;
 use App\Filament\Forms\Components\TextInput\EntityNumberPrefix;
 use App\Filament\Forms\Components\Upload\PosterFileField;
-use App\Models\Organisation;
 use App\Models\ResponsibleLegalEntity;
 use App\Rules\IPRanges;
 use Filament\Forms\Components\Repeater;
@@ -126,8 +124,6 @@ class OrganisationResourceForm
                     })
                     ->required()
                     ->maxLength(255),
-                PublicFromField::makeForModel(Organisation::class)
-                    ->hintIcon('heroicon-o-information-circle', __('organisation.public_from_hint_icon_text')),
                 Textarea::make('allowed_ips')
                     ->label(__('organisation.allowed_ips'))
                     ->helperText(__('organisation.help_allowed_ips'))

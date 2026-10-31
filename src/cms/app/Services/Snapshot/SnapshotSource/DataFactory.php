@@ -15,7 +15,7 @@ abstract class DataFactory
     }
 
     /**
-     * @return array<string, string|array<string, string>>
+     * @return array<string, mixed>
      */
     public function generatePublicFrontmatter(Snapshot $snapshot): array
     {

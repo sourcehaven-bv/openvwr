@@ -49,6 +49,8 @@ return [
     'status_change_confirm' => 'Status aanpassen',
     'properties' => 'Gegevens',
     'public_data' => 'Publieke gegevens',
+    'public_details' => 'Openbare velden voor de website',
+    'public_details_help' => 'Een website-thema kan deze velden ook tonen, naast de tekst hierboven.',
     'private_data' => 'Private gegevens',
     'data' => 'Gegevens van de registratie',
     'related_snapshot_sources' => 'Gerelateerde entiteiten',

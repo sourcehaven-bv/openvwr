@@ -151,4 +151,5 @@
 ## {{ __('avg_responsible_processing_record.step_publish') }}
 
 - **{{ __('general.public_from') }}**: {{ $record->public_from ? DateFormat::toDateTime($record->public_from) : '-' }}
+- **{{ __('avg_responsible_processing_record.public_summary') }}**: {!! Str::toSingleLineEscapedString($record->public_summary, '-') !!}
 @endif

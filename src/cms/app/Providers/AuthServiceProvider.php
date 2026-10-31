@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Config\Config;
+use App\Http\Responses\PratiqueLogoutResponse;
 use App\Models\AdminLogEntry;
 use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Avg\AvgGoal;
@@ -47,6 +48,7 @@ use App\Services\Authentication\Pratique\JwksProvider;
 use App\Services\Authentication\Pratique\PratiqueAssertionException;
 use App\Services\Authentication\Pratique\PratiqueAssertionVerifier;
 use App\Services\Authentication\Pratique\PratiqueContext;
+use App\Services\Authentication\Pratique\Webhooks\PratiqueWebhookVerifier;
 use App\Services\Authentication\PratiqueAuthenticationStrategy;
 use App\Services\AuthorizationService;
 use App\Services\CrossOrgAuthorization;
@@ -55,6 +57,7 @@ use App\Services\OneTimePassword\OneTimePasswordManager;
 use App\Services\OneTimePassword\TimedOneTimePassword;
 use App\Services\OtpService;
 use Filament\Actions\Exports\Models\Export;
+use Filament\Auth\Http\Responses\Contracts\LogoutResponse;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as IlluminateAuthServiceProvider;
 use Illuminate\Http\Client\Factory as Http;
@@ -135,6 +138,10 @@ class AuthServiceProvider extends IlluminateAuthServiceProvider
         // singleton.
         $this->app->scoped(PratiqueContext::class);
 
+        if (Config::string('auth.driver') === AuthenticationStrategyFactory::DRIVER_PRATIQUE) {
+            $this->app->bind(LogoutResponse::class, PratiqueLogoutResponse::class);
+        }
+
         $this->app->singleton(JwksProvider::class, fn (): JwksProvider => new JwksProvider(
             $this->app->make(Http::class),
             $this->app->make(Cache::class),
@@ -148,6 +155,19 @@ class AuthServiceProvider extends IlluminateAuthServiceProvider
                 $this->app->make(JwksProvider::class),
                 self::requiredPratiqueSetting('issuer'),
                 self::requiredPratiqueSetting('audience'),
+                Config::integer('auth.pratique.leeway_seconds'),
+            ),
+        );
+
+        // The webhook verifier shares the key handling with assertions but not
+        // the audience check: a webhook token carries no `aud`, and relaxing the
+        // assertion verifier to match would weaken the guard on every
+        // authenticated request. See PratiqueWebhookVerifier.
+        $this->app->singleton(
+            PratiqueWebhookVerifier::class,
+            fn (): PratiqueWebhookVerifier => new PratiqueWebhookVerifier(
+                $this->app->make(JwksProvider::class),
+                self::requiredPratiqueSetting('issuer'),
                 Config::integer('auth.pratique.leeway_seconds'),
             ),
         );

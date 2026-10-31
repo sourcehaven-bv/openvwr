@@ -22,6 +22,7 @@ use App\Models\Snapshot;
 use App\Models\SnapshotApproval;
 use App\Services\Snapshot\SnapshotApprovalService;
 use App\Services\Snapshot\SnapshotDataMarkdownRenderer;
+use App\Services\Snapshot\SnapshotPublicDetailsMarkdown;
 use Closure;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
@@ -123,6 +124,16 @@ class ViewInfoTab extends Tab
                             );
                         },
                     )
+                    ->columnSpan(2)
+                    ->markdown(),
+                TextEntry::make('public_details')
+                    ->label('')
+                    ->state(
+                        static fn (Snapshot $snapshot, SnapshotPublicDetailsMarkdown $publicDetailsMarkdown): ?string => $publicDetailsMarkdown->render(
+                            $snapshot,
+                        ),
+                    )
+                    ->visible(static fn (?string $state): bool => $state !== null)
                     ->columnSpan(2)
                     ->markdown(),
             ]);

@@ -11,6 +11,7 @@ use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\EntityNumber;
 use App\Filament\Tables\Columns\ExpiringDateColumn;
 use App\Filament\Tables\Columns\ImportNumberColumn;
+use App\Filament\Tables\Columns\PublicationStatusColumn;
 use App\Filament\Tables\Columns\SnapshotStatusColumn;
 use App\Filament\Tables\Columns\TagsColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
@@ -40,6 +41,7 @@ class AvgResponsibleProcessingRecordResourceTable
                     ->sortable()
                     ->searchable(),
                 SnapshotStatusColumn::make(),
+                PublicationStatusColumn::make(),
                 ExpiringDateColumn::make('review_at')
                     ->label(__('general.review_at')),
                 ImportNumberColumn::make(),

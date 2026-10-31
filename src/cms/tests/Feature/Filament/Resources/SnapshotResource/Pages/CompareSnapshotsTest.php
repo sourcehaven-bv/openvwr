@@ -512,3 +512,24 @@ it('still diffs the public part across a flag change when publishing is enabled'
         // A null on one side is diffed as an empty document, not a crash.
         ->assertSee('publieke-inhoud');
 });
+
+it('diffs the public fields for the website as part of the public data', function (): void {
+    config()->set('features.publishing', true);
+
+    $organisation = OrganisationTestHelper::create();
+    $source = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create();
+    [$from, $to] = createComparableSnapshots($source, 'zelfde', 'zelfde');
+    $from->snapshotData->update(['public_frontmatter' => ['record' => ['details' => ['summary' => 'oudeuitleg']]]]);
+    $to->snapshotData->update(['public_frontmatter' => ['record' => ['details' => ['summary' => 'nieuweuitleg']]]]);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(CompareSnapshots::class, [
+            'record' => $to->getRouteKey(),
+        ])
+        ->assertOk()
+        ->assertSee(__('snapshot.public_details'))
+        ->assertSee('oudeuitleg')
+        ->assertSee('nieuweuitleg');
+});

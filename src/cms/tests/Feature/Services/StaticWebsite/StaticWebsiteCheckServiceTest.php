@@ -153,7 +153,7 @@ it('will not skip (with log entry) if entry with this date already exists but fo
 
     httpFake([
         '*' => Http::response(json_encode([
-            'date' => fake()->dateTime()->format('Y-m-d H:i:s'),
+            'date' => $date->format('Y-m-d H:i:s'),
             'pages' => [
                 [
                     'type' => fake()->word(),

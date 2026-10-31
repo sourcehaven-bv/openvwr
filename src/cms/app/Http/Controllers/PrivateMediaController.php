@@ -10,16 +10,13 @@ use App\Models\Organisation;
 use App\Services\AuthenticationService;
 use App\Vendor\MediaLibrary\Media;
 use Filament\Facades\Filament;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Webmozart\Assert\Assert;
-use Webmozart\Assert\InvalidArgumentException;
 
 use function abort;
 use function abort_if;
-use function redirect;
 use function str_contains;
 use function str_starts_with;
 
@@ -30,13 +27,15 @@ class PrivateMediaController extends Controller
     ) {
     }
 
-    public function __invoke(string $id): RedirectResponse|StreamedResponse
+    public function __invoke(string $id): StreamedResponse
     {
-        try {
-            $user = $this->authenticationService->user();
-        } catch (InvalidArgumentException) {
-            return redirect('login');
-        }
+        // Who is asking is settled before this runs: the route carries
+        // ResolveAuthGate, so an unauthenticated request is redirected or refused
+        // by the active strategy rather than here. Catching it again would be a
+        // second answer to the same question, and under a driver with no login
+        // page of its own the redirect it used to return pointed at a route that
+        // does not exist.
+        $user = $this->authenticationService->user();
 
         $media = Media::where('uuid', $id)->firstOrFail();
         $model = $media->model;

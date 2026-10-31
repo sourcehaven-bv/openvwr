@@ -26,6 +26,7 @@ use App\Transfer\TransferEntityType;
 use App\Transfer\TransferException;
 use Filament\Facades\Filament;
 use Illuminate\Support\Facades\Storage;
+use Tests\Helpers\ConfigTestHelper;
 
 it('copies a record and its related graph into another organisation', function (): void {
     $source = Organisation::factory()->create();
@@ -293,12 +294,11 @@ it('takes the user global roles into account when resolving permissions in an or
     $authorized = app(CrossOrgAuthorization::class)->userHasPermissionInOrganisation(
         $user,
         $organisation,
-        Permission::CORE_ENTITY_IMPORT,
+        Permission::TRANSFER_IMPORT,
     );
 
     expect($authorized)->toBeTrue();
 });
-
 
 it('restores the source tenant when importing a copy fails', function (): void {
     $source = Organisation::factory()->create();
@@ -333,4 +333,55 @@ it('restores the source tenant when building a copy preview fails', function ():
     ))->toThrow(InvalidArgumentException::class);
 
     expect(Filament::getTenant())->toBe($source);
+});
+
+it('rejects a copy when the user has generic export and import rights but no transfer rights', function (
+    array $sourcePermissions,
+    array $destinationPermissions,
+): void {
+    ConfigTestHelper::set('permissions.roles_and_permissions', [
+        Role::CHIEF_PRIVACY_OFFICER->value => array_map(static fn (Permission $p): string => $p->value, $sourcePermissions),
+        Role::PRIVACY_OFFICER->value => array_map(static fn (Permission $p): string => $p->value, $destinationPermissions),
+    ]);
+
+    $source = Organisation::factory()->create();
+    $destination = Organisation::factory()->create();
+    $user = User::factory()->hasAttached(collect([$source, $destination]))->create();
+    $user->organisationRoles()->create(['organisation_id' => $source->id, 'role' => Role::CHIEF_PRIVACY_OFFICER]);
+    $user->organisationRoles()->create(['organisation_id' => $destination->id, 'role' => Role::PRIVACY_OFFICER]);
+    [$record] = seedCopyableRecord($source);
+
+    app(CrossOrgCopier::class)->copy(
+        TransferEntityType::AVG_RESPONSIBLE_PROCESSING_RECORD,
+        [$record->id->toString()],
+        [],
+        [$record->id->toString() => ['selected' => true, 'strategy' => null]],
+        $source,
+        $destination,
+        $user,
+    );
+})->with([
+    'no transfer export in source' => [
+        [Permission::EXPORT, Permission::CORE_ENTITY_IMPORT],
+        [Permission::EXPORT, Permission::CORE_ENTITY_IMPORT, Permission::TRANSFER_IMPORT],
+    ],
+    'no transfer import in destination' => [
+        [Permission::EXPORT, Permission::TRANSFER_EXPORT],
+        [Permission::EXPORT, Permission::CORE_ENTITY_IMPORT],
+    ],
+])->throws(TransferException::class);
+
+it('does not offer organisations where the user only has generic import rights as copy targets', function (): void {
+    ConfigTestHelper::set('permissions.roles_and_permissions', [
+        Role::CHIEF_PRIVACY_OFFICER->value => [Permission::TRANSFER_EXPORT->value],
+        Role::PRIVACY_OFFICER->value => [Permission::CORE_ENTITY_IMPORT->value],
+    ]);
+
+    $source = Organisation::factory()->create();
+    $destination = Organisation::factory()->create();
+    $user = User::factory()->hasAttached(collect([$source, $destination]))->create();
+    $user->organisationRoles()->create(['organisation_id' => $source->id, 'role' => Role::CHIEF_PRIVACY_OFFICER]);
+    $user->organisationRoles()->create(['organisation_id' => $destination->id, 'role' => Role::PRIVACY_OFFICER]);
+
+    expect(app(CrossOrgAuthorization::class)->copyTargetsFor($user, $source))->toBe([]);
 });

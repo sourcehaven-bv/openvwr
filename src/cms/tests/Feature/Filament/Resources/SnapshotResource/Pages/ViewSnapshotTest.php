@@ -916,7 +916,6 @@ it('does not mark a not-yet-reached station as skipped', function (): void {
         ->assertDontSee(__('snapshot.status_flow_skipped'));
 });
 
-
 it('displays the signed-in reviewers decision and review date', function (): void {
     $organisation = OrganisationTestHelper::create();
     $user = UserTestHelper::createForOrganisation($organisation);
@@ -930,4 +929,23 @@ it('displays the signed-in reviewers decision and review date', function (): voi
         ->createLivewireTestable(ViewSnapshot::class, ['record' => $snapshot->getRouteKey()])
         ->assertSee(__('snapshot_approval_status.approved'))
         ->assertSee(DateFormat::toDateTime($approval->updated_at));
+});
+
+it('shows the public fields for the website under the public data', function (): void {
+    config()->set('features.publishing', true);
+
+    $organisation = OrganisationTestHelper::create();
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create();
+    SnapshotData::factory()
+        ->for($snapshot)
+        ->create(['public_frontmatter' => ['record' => ['details' => ['summary' => 'uitlegvoorinwoners']]]]);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshot->getRouteKey(),
+        ])
+        ->assertSee(__('snapshot.public_details'))
+        ->assertSee('uitlegvoorinwoners');
 });
