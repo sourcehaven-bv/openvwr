@@ -13,3 +13,10 @@ params:
   debug: false
   darkMode: true
   defaultTheme: auto
+security:
+  node:
+    permissions:
+      # Tailwind 4 loads native addons (lightningcss, oxide) through PostCSS.
+      allowaddons:
+        - postcss
+        - tailwindcss

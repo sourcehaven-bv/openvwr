@@ -55,7 +55,7 @@ the selection screen.
 For a user who administers more than one organisation, the same content can be copied straight
 into another organisation without the download/upload round-trip. On the register overview
 pages, selecting rows shows a **Kopiëren naar organisatie** bulk action (visible only when the
-user may export here *and* holds the import permission in at least one other organisation).
+user holds `transfer.export` here *and* `transfer.import` in at least one other organisation).
 
 It opens the `TransferCopy` page, which lets the user pick a target organisation and the
 related items to include, then shows the same conflict preview as the file import. Confirming
@@ -63,7 +63,8 @@ runs `CrossOrgCopier`, which reuses the export graph collection and the import p
 memory (no zip); document files are read straight from the source media library.
 
 Authorization is enforced server-side, not only in the UI: the acting user must hold the
-`export` permission in the source organisation and the `import` permission in the destination,
+`transfer.export` permission in the source organisation and the `transfer.import` permission in
+the destination,
 each evaluated with the roles they hold *in that organisation* (see `CrossOrgAuthorization`).
 Both the page and `CrossOrgCopier` re-check this; every id and organisation from the request is
 re-scoped and re-authorized.

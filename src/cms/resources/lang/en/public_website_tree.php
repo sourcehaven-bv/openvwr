@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 return [
+    'public_from_hint_icon_text' => 'Please note: if you leave this field empty, this section and everything below it will not appear on the public website.',
     'header' => 'Website structure',
 
     'create' => 'Create new item',

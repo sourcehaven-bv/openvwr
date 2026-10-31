@@ -25,6 +25,17 @@ class JwksProvider
 {
     private const CACHE_KEY = 'pratique:jwks';
 
+    /** Set while a refetch is cooling down. */
+    private const REFETCH_KEY = 'pratique:jwks:refetched';
+
+    /**
+     * How long after a refetch the next one is refused. Long enough that a
+     * stream of tokens with made-up key ids costs one fetch per window rather
+     * than one per request; short enough that a real rotation in that window
+     * delays logins by seconds, not minutes.
+     */
+    private const REFETCH_COOLDOWN_SECONDS = 10;
+
     public function __construct(
         private readonly Http $http,
         private readonly Cache $cache,
@@ -51,15 +62,26 @@ class JwksProvider
      * have not picked up yet, or the token is bogus — and one refetch tells us
      * which, without waiting for the cache to lapse.
      *
+     * The key id comes from an unverified token, and the webhook endpoint is
+     * public, so anyone can ask for this. Hence at most one refetch per
+     * cooldown: within it, the cached keys are returned. And the cache is only
+     * replaced after a successful fetch, so a failing endpoint does not take the
+     * keys that still work down with it.
+     *
      * @return array<string, Key>
      *
      * @throws PratiqueAssertionException
      */
     public function freshKeys(): array
     {
-        $this->cache->forget(self::CACHE_KEY);
+        if (!$this->cache->add(self::REFETCH_KEY, true, self::REFETCH_COOLDOWN_SECONDS)) {
+            return $this->keys();
+        }
 
-        return $this->keys();
+        $document = $this->fetch();
+        $this->cache->put(self::CACHE_KEY, $document, $this->cacheSeconds);
+
+        return $this->parse($document);
     }
 
     /**

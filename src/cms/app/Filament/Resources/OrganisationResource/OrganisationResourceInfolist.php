@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrganisationResource;
 
-use App\Config\Feature;
-use App\Filament\Infolists\Components\DateTimeEntry;
 use App\Filament\Infolists\Components\EntityNumberPrefixEntry;
 use App\Filament\Infolists\Components\TextareaEntry;
 use App\Models\Organisation;
@@ -54,9 +52,6 @@ class OrganisationResourceInfolist
                 ->schema([
                     TextEntry::make('slug')
                         ->label(__('organisation.slug')),
-                    DateTimeEntry::make('public_from')
-                        ->label(__('general.public_from'))
-                        ->visible(Feature::publishingEnabled()),
                     TextareaEntry::make('allowed_ips')
                         ->label(__('organisation.allowed_ips')),
                     TextareaEntry::make('public_website_content')

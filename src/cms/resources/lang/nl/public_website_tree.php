@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 return [
+    'public_from_hint_icon_text' => 'Let op: laat u dit veld leeg, dan verschijnen dit onderdeel en alles eronder niet op de publieke website.',
     'header' => 'Website organogram',
 
     'create' => 'Nieuw item maken',

@@ -7,6 +7,7 @@ namespace App\Manual\Content\Chapters;
 use App\Enums\Authorization\Role;
 use App\Manual\Chapter;
 use App\Manual\FeatureGate;
+use App\Manual\Fragment;
 use App\Manual\Topic;
 
 /**
@@ -34,13 +35,24 @@ final class Registers
         return new Topic(
             id: 'verwerkingsregisters',
             title: 'Verwerkingsregisters',
-            body: <<<'MARKDOWN'
+            body: [
+                <<<'MARKDOWN'
                 ![Registers](/handleiding/02_registers/01_avg-responsible-processing-records.png)
 
                 Na het inloggen komt u in OpenVWR en ziet u links in het scherm het
-                navigatiemenu. Bovenaan staan de registers: AVG Verantwoordelijke
-                Verwerkingen en AVG Verwerker Verwerkingen.
-
+                navigatiemenu. Bovenaan staan de registers: Verwerkingen AVG
+                verantwoordelijke en Verwerkingen AVG verwerker.
+                MARKDOWN,
+                new Fragment(
+                    <<<'MARKDOWN'
+                    Daaronder staat het register Verwerkingen WPG verantwoordelijke, voor
+                    verwerkingen die onder de Wet politiegegevens (Wpg) vallen. Het werkt zoals
+                    hieronder beschreven; de verschillen staan bij
+                    [Verwerkingen WPG verantwoordelijke](#wpg-register).
+                    MARKDOWN,
+                    FeatureGate::WPG,
+                ),
+                <<<'MARKDOWN'
                 In deze registers kunnen verwerkingen toegevoegd worden. Na het klikken op een
                 register verschijnt er een overzicht van de verwerkingen in het register met
                 de volgende kolommen waarop u de tabel kunt sorteren:
@@ -82,6 +94,7 @@ final class Registers
                 > verwerkingen in te voeren met grotendeels dezelfde eigenschappen: u hoeft
                 > alleen maar de velden te wijzigen waar de verwerkingen niet overeenkomen.
                 MARKDOWN,
+            ],
             roles: [
                 Role::INPUT_PROCESSOR,
                 Role::CHIEF_PRIVACY_OFFICER,
@@ -99,18 +112,30 @@ final class Registers
     {
         return new Topic(
             id: 'wpg-register',
-            title: 'WPG Verantwoordelijke Verwerkingen',
+            title: 'Verwerkingen WPG verantwoordelijke',
             body: <<<'MARKDOWN'
-                Naast de AVG-registers kent OpenVWR het register WPG Verantwoordelijke
-                Verwerkingen, voor verwerkingen die onder de Wet politiegegevens vallen.
+                Naast de AVG-registers kent OpenVWR het register Verwerkingen WPG
+                verantwoordelijke, voor verwerkingen die onder de Wet politiegegevens (Wpg)
+                vallen in plaats van onder de AVG.
 
-                Het register werkt op identieke wijze als de AVG-verwerkingsregisters: u ziet
-                dezelfde kolommen in het overzicht, en op de detailpagina legt u de gegevens
-                van de verwerking op dezelfde manier vast. Ook het goedkeuringsproces, labels,
-                import en export werken er hetzelfde.
+                Het register werkt zoals de [Verwerkingsregisters](#verwerkingsregisters): u
+                ziet dezelfde kolommen in het overzicht, en u maakt een verwerking aan met de
+                knop "Verwerking aanmaken". Ook het goedkeuringsproces, labels, import en
+                export werken er hetzelfde.
 
-                Bij het WPG-register hoort een eigen opzoeklijst, die u beheert zoals de
-                andere opzoeklijsten.
+                De detailpagina heeft wel een aantal eigen domeinen:
+
+                - bij *Doel & grondslag* kiest u een of meer doelen uit de Wpg, zoals artikel
+                  8 (de dagelijkse politietaak);
+                - bij *Ontvanger* geeft u aan op grond van welk artikel uit de Wpg gegevens
+                  worden verstrekt;
+                - *Bijzondere politiegegevens* en *Categorieën betrokkenen* (zoals verdachten
+                  en slachtoffers) staan op de plaats van *Betrokkenen en gegevens*. Een
+                  bewaartermijn per gegeven vult u hier dus niet in;
+                - de domeinen *Doorgifte* en *Publiceren* ontbreken.
+
+                Bij het register hoort een eigen opzoeklijst, *WPG Verwerking Diensten*. Die
+                beheert u zoals de andere [Opzoeklijsten](#opzoeklijsten).
                 MARKDOWN,
             roles: [
                 Role::INPUT_PROCESSOR,

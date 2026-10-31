@@ -50,9 +50,9 @@ final class TaskContent
             self::algoritmeVastleggen(),
             self::dpiaPrescanDoen(),
             self::dpiaUitvoeren(),
-            self::wpgVerwerkingVastleggen(),
             self::datalekMelden(),
             self::versieIndienenEnLatenGoedkeuren(),
+            self::akkoordGevenOpEenVersie(),
             self::labelsGebruiken(),
             self::overzichtOpvragen(),
             self::verwerkingPubliceren(),
@@ -72,6 +72,14 @@ final class TaskContent
                 . 'verwerkingsregisters. U kunt tussentijds opslaan: pas als u de conceptversie '
                 . 'indient, wordt gecontroleerd of alles is ingevuld.',
             steps: [
+                new Step(
+                    title: 'Kies bij politiegegevens het register voor de Wpg',
+                    body: 'Valt de verwerking onder de Wet politiegegevens (Wpg), kies dan het register '
+                        . '"Verwerkingen WPG verantwoordelijke". Het werkt hetzelfde, maar heeft eigen '
+                        . 'domeinen en geen bewaartermijn per gegeven.',
+                    topicIds: ['wpg-register'],
+                    gate: FeatureGate::WPG,
+                ),
                 new Step(
                     title: 'Open het register en maak een verwerking aan',
                     body: 'Kies in het navigatiemenu het register en klik op "Verwerking '
@@ -137,42 +145,6 @@ final class TaskContent
                 readers: [Role::COUNSELOR, Role::DATA_PROTECTION_OFFICIAL, Role::MANDATE_HOLDER],
             ),
             done: 'Het algoritme staat in het register en kan worden vastgesteld.',
-        );
-    }
-
-    private static function wpgVerwerkingVastleggen(): Task
-    {
-        return new Task(
-            id: 'wpg-verwerking-vastleggen',
-            group: self::GROUP_REGISTREREN,
-            title: 'Een Wpg-verwerking vastleggen',
-            summary: 'Een verwerking die onder de Wet politiegegevens valt.',
-            intro: 'Het register WPG Verantwoordelijke Verwerkingen werkt hetzelfde als de '
-                . 'AVG-registers; alleen de opzoeklijst eromheen is eigen.',
-            steps: [
-                new Step(
-                    title: 'Open het WPG-register',
-                    body: 'Kies "WPG Verantwoordelijke Verwerkingen" in het navigatiemenu en klik '
-                        . 'op "Verwerking aanmaken".',
-                    topicIds: ['wpg-register'],
-                ),
-                new Step(
-                    title: 'Vul de gegevens in',
-                    body: 'De detailpagina werkt gelijk aan die van de AVG-registers.',
-                    topicIds: ['wpg-register', 'verwerkingsregisters'],
-                ),
-                new Step(
-                    title: 'Dien de conceptversie in',
-                    body: 'Ook het goedkeuringsproces is hetzelfde als bij de andere registers.',
-                    topicIds: ['versie-indienen'],
-                ),
-            ],
-            roles: new TaskRoles(
-                performers: [Role::INPUT_PROCESSOR, Role::CHIEF_PRIVACY_OFFICER, Role::PRIVACY_OFFICER],
-                readers: [Role::COUNSELOR, Role::DATA_PROTECTION_OFFICIAL, Role::MANDATE_HOLDER],
-            ),
-            gate: FeatureGate::WPG,
-            done: 'De Wpg-verwerking staat in het register.',
         );
     }
 
@@ -260,6 +232,51 @@ final class TaskContent
                 ],
             ),
             done: 'De versie is vastgesteld en geldt als de geldende versie van de verwerking.',
+        );
+    }
+
+    private static function akkoordGevenOpEenVersie(): Task
+    {
+        return new Task(
+            id: 'akkoord-geven-op-versie',
+            group: self::GROUP_VASTSTELLEN,
+            title: 'Akkoord geven op een versie',
+            summary: 'Als Mandaathouder een versie beoordelen die u is voorgelegd.',
+            intro: 'Koppelt een collega u als Mandaathouder aan een versie, dan vraagt die om uw '
+                . 'akkoord. U bekijkt de versie en geeft akkoord of niet akkoord. Daarna stelt een '
+                . 'Privacy Officer de versie vast.',
+            steps: [
+                new Step(
+                    title: 'Open de versies die op u wachten',
+                    body: 'Kies in het navigatiemenu "Overzichten" > "Mijn ondertekeningen". Op '
+                        . 'het dashboard staan dezelfde versies onder "Te ondertekenen".',
+                    topicIds: ['akkoord-geven'],
+                ),
+                new Step(
+                    title: 'Bekijk de versie',
+                    body: 'Klik op een versie in de lijst. Het tabblad "Informatie" toont de '
+                        . 'inhoud zoals die is ingediend.',
+                    topicIds: ['akkoord-geven', 'versiestatussen'],
+                ),
+                new Step(
+                    title: 'Geef akkoord of niet akkoord',
+                    body: 'Klik onderaan het tabblad op "Akkoord" of "Niet akkoord" en daarna op '
+                        . '"Bevestigen". Bij "Niet akkoord" kunt u een notitie achterlaten.',
+                    topicIds: ['akkoord-geven'],
+                ),
+                new Step(
+                    title: 'Ga door naar de volgende versie',
+                    body: 'Wacht er nog een versie op u, kies dan "Bevestigen en volgende". U '
+                        . 'komt direct bij die versie.',
+                    topicIds: ['akkoord-geven'],
+                ),
+            ],
+            roles: new TaskRoles(
+                performers: [Role::MANDATE_HOLDER],
+                readers: [Role::CHIEF_PRIVACY_OFFICER, Role::PRIVACY_OFFICER, Role::INPUT_PROCESSOR],
+            ),
+            done: 'Uw oordeel staat bij de versie onder "Ondertekeningen". Een Privacy Officer '
+                . 'ziet het daar en kan de versie vaststellen.',
         );
     }
 

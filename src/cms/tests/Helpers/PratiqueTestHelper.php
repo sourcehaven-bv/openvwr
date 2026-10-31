@@ -10,13 +10,19 @@ use OpenSSLAsymmetricKey;
 use RuntimeException;
 
 use function base64_encode;
+use function bin2hex;
+use function gmdate;
+use function is_array;
 use function openssl_pkey_get_details;
 use function openssl_pkey_new;
+use function random_bytes;
 use function rtrim;
+use function str_pad;
 use function strtr;
 use function time;
 
 use const OPENSSL_KEYTYPE_EC;
+use const STR_PAD_LEFT;
 
 /**
  * Mints assertions the way the proxy would, signed with a real ES256 key.
@@ -30,15 +36,26 @@ final class PratiqueTestHelper
     public const ISSUER = 'https://auth.test';
     public const AUDIENCE = 'app://openvwr-test';
     public const JWKS_URL = 'https://auth.test/.well-known/pratique/jwks.json';
-    public const KEY_ID = 'test-key-1';
+
+    /**
+     * Default key id prefix. Each helper appends a unique suffix, because two
+     * helpers generate DIFFERENT keypairs: sharing one id would let a token
+     * signed by helper A be checked against helper B's cached key — and since the
+     * ids matched, the verifier would see no reason to refetch. Tests running in
+     * parallel then fail with "OpenSSL unable to validate key" depending purely
+     * on interleaving.
+     */
+    public const KEY_ID = 'test-key';
 
     private OpenSSLAsymmetricKey $privateKey;
 
     /** @var array<string, mixed> */
     private array $jwk;
 
-    public function __construct(string $keyId = self::KEY_ID)
+    public function __construct(?string $keyId = null)
     {
+        $keyId ??= self::KEY_ID . '-' . bin2hex(random_bytes(8));
+
         $key = openssl_pkey_new([
             'digest_alg' => 'sha256',
             'private_key_type' => OPENSSL_KEYTYPE_EC,
@@ -74,13 +91,32 @@ final class PratiqueTestHelper
      */
     public function publishJwks(): void
     {
-        Cache::put('pratique:jwks', $this->jwks(), 300);
+        // ADD this helper's key to whatever is already published, and never drop
+        // one.
+        //
+        // The cache key is a single fixed string, so every helper in a test shares
+        // one document. Removing an earlier helper's key breaks the owner of that
+        // key: the verifier sees an unknown `kid`, treats it as a rotation it has
+        // not picked up, and refetches — and under `Http::fake()` the refetch
+        // returns an empty body, so the failure surfaces as "no keys array" or
+        // "OpenSSL unable to validate key" depending on what was left behind.
+        //
+        // Two earlier attempts got this wrong in opposite directions: keeping only
+        // the most recent two keys evicted the first of three publishers, and
+        // replacing outright evicted everyone but the last. There is no reason to
+        // bound the set — a test process publishes a handful of keys and the cache
+        // dies with the test.
+        $cached = Cache::get('pratique:jwks');
+        $keys = is_array($cached) && is_array($cached['keys'] ?? null) ? $cached['keys'] : [];
+        $keys[] = $this->jwk;
+
+        Cache::put('pratique:jwks', ['keys' => $keys], 300);
     }
 
-    /** Publish a key set that does not contain the key this helper signs with. */
+    /** Publish only a key set that does NOT contain the key this helper signs with. */
     public function publishForeignJwks(): void
     {
-        Cache::put('pratique:jwks', (new self('someone-elses-key'))->jwks(), 300);
+        Cache::put('pratique:jwks', (new self())->jwks(), 300);
     }
 
     /**
@@ -114,13 +150,57 @@ final class PratiqueTestHelper
     }
 
     /**
+     * A signed webhook delivery, shaped as the proxy mints them: the whole body
+     * is a JWT carrying id/event/occurred_at/data, stamped with iss/iat/exp and
+     * — unlike an assertion — no `aud`.
+     *
+     * @param array<string, mixed> $data
+     * @param array<string, mixed> $overrides
+     */
+    public function webhook(string $event, array $data = [], array $overrides = []): string
+    {
+        $now = time();
+
+        $claims = [
+            'id' => 'evt_' . $now,
+            'event' => $event,
+            'occurred_at' => gmdate('c', $now),
+            'data' => $data,
+            'iss' => self::ISSUER,
+            'iat' => $now,
+            'exp' => $now + 300,
+            ...$overrides,
+        ];
+
+        return JWT::encode($claims, $this->privateKey, 'ES256', $this->jwk['kid']);
+    }
+
+    /**
+     * A webhook signed by a key the proxy does not publish.
+     *
+     * The key id is left to the unique default. A fixed one ("attacker-key") let
+     * two parallel workers mint DIFFERENT keypairs under the SAME id, and the
+     * verifier — which only refetches on an unknown kid — then had no reason to
+     * look again, so a token could be checked against the other worker's key.
+     * Unpublished is what makes this key foreign, not the name.
+     *
+     * @param array<string, mixed> $data
+     */
+    public static function webhookFromForeignKey(string $event, array $data = []): string
+    {
+        return (new self())->webhook($event, $data);
+    }
+
+    /**
      * An assertion signed by a different key than the one the JWKS publishes.
+     *
+     * Unique key id, for the reason given on webhookFromForeignKey().
      *
      * @param array<string, mixed> $overrides
      */
     public static function assertionFromForeignKey(array $overrides = []): string
     {
-        return (new self('attacker-key'))->assertion($overrides);
+        return (new self())->assertion($overrides);
     }
 
     /**
@@ -140,9 +220,18 @@ final class PratiqueTestHelper
             'kid' => $keyId,
             'alg' => 'ES256',
             'use' => 'sig',
-            'x' => self::base64Url($details['ec']['x']),
-            'y' => self::base64Url($details['ec']['y']),
+            'x' => self::base64Url(self::coordinate($details['ec']['x'])),
+            'y' => self::base64Url(self::coordinate($details['ec']['y'])),
         ];
+    }
+
+    /**
+     * OpenSSL drops leading zero bytes, but a P-256 JWK coordinate must be
+     * exactly 32 bytes. Without padding, about one key in 128 is unreadable.
+     */
+    private static function coordinate(string $binary): string
+    {
+        return str_pad($binary, 32, "\0", STR_PAD_LEFT);
     }
 
     private static function base64Url(string $binary): string

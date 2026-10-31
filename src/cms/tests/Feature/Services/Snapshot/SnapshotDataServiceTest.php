@@ -54,6 +54,8 @@ it('creates new snapshot data for a AvgResponsibleProcessingRecord', function ()
             'updated_at' => CarbonImmutable::create(2024, 2, 5),
             'review_at' => CalendarDate::createFromFormat('Y-m-d', '2024-2-5'),
             'public_from' => CarbonImmutable::create(2024, 2, 5),
+            'public_summary' => 'Een korte uitleg voor inwoners.',
+            'has_processors' => false,
 
             'avg_responsible_processing_record_service_id' => AvgResponsibleProcessingRecordService::factory()->state([
                 'name' => 'Reiciendis rerum voluptas consequatur est animi.',

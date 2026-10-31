@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Enums\Authorization\Permission;
 use App\Enums\Authorization\Role;
 use App\Enums\Media\MediaGroup;
+use App\Facades\AuditLog;
 use App\Models\Avg\AvgGoal;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Document;
@@ -12,6 +13,7 @@ use App\Models\Organisation;
 use App\Models\System;
 use App\Models\Tag;
 use App\Models\User;
+use App\Services\AuditLog\Transfer\TransferImportEvent;
 use App\Services\CrossOrgAuthorization;
 use App\Transfer\CrossOrgCopier;
 use App\Transfer\Export\BundleBuilder;
@@ -19,6 +21,7 @@ use App\Transfer\Import\PreviewBuilder;
 use App\Transfer\TransferEntityType;
 use App\Transfer\TransferException;
 use Illuminate\Support\Facades\Storage;
+use Tests\Helpers\ConfigTestHelper;
 
 it('copies a record and its related graph into another organisation', function (): void {
     $source = Organisation::factory()->create();
@@ -116,6 +119,94 @@ it('rejects a copy when the user may not export from the source organisation', f
     );
 })->throws(TransferException::class);
 
+it('records an audit event for a successful copy', function (): void {
+    AuditLog::spy();
+
+    $source = Organisation::factory()->create();
+    $destination = Organisation::factory()->create();
+    $user = copyableUser($source, $destination);
+    [$record] = seedCopyableRecord($source);
+
+    app(CrossOrgCopier::class)->copy(
+        TransferEntityType::AVG_RESPONSIBLE_PROCESSING_RECORD,
+        [$record->id->toString()],
+        [],
+        [$record->id->toString() => ['selected' => true, 'strategy' => null]],
+        $source,
+        $destination,
+        $user,
+    );
+
+    $copied = AvgResponsibleProcessingRecord::query()->whereBelongsTo($destination)->firstOrFail();
+
+    AuditLog::shouldHaveReceived('register')
+        ->withArgs(fn (mixed $event): bool => $event instanceof TransferImportEvent
+            && $event->method === TransferImportEvent::METHOD_COPY
+            && $event->user?->id->equals($user->id) === true
+            && $event->sourceOrganisationId === $source->id->toString()
+            && $event->destinationOrganisationId === $destination->id->toString()
+            && $event->failedReason === null
+            && $event->result?->records === [
+                [
+                    'type' => TransferEntityType::AVG_RESPONSIBLE_PROCESSING_RECORD->value,
+                    'id' => $copied->id->toString(),
+                    'action' => 'created',
+                ]])
+        ->once();
+});
+
+it('records a failed audit event when a copy is rejected', function (): void {
+    AuditLog::spy();
+
+    $organisation = Organisation::factory()->create();
+    $user = copyableUser($organisation, Organisation::factory()->create());
+
+    expect(fn () => app(CrossOrgCopier::class)->copy(
+        TransferEntityType::AVG_RESPONSIBLE_PROCESSING_RECORD,
+        [],
+        [],
+        [],
+        $organisation,
+        $organisation,
+        $user,
+    ))->toThrow(TransferException::class);
+
+    AuditLog::shouldHaveReceived('register')
+        ->withArgs(fn (mixed $event): bool => $event instanceof TransferImportEvent
+            && $event->method === TransferImportEvent::METHOD_COPY
+            && $event->result === null
+            && $event->failedReason === 'cannot copy an organisation into itself')
+        ->once();
+});
+
+it('records the exception class, not its message, when a copy fails after authorization', function (): void {
+    AuditLog::spy();
+
+    $source = Organisation::factory()->create();
+    $destination = Organisation::factory()->create();
+    $user = copyableUser($source, $destination);
+
+    $this->mock(BundleBuilder::class)
+        ->shouldReceive('build')
+        ->andThrow(new RuntimeException('details that must not reach the audit log'));
+
+    expect(fn () => app(CrossOrgCopier::class)->copy(
+        TransferEntityType::AVG_RESPONSIBLE_PROCESSING_RECORD,
+        [],
+        [],
+        [],
+        $source,
+        $destination,
+        $user,
+    ))->toThrow(RuntimeException::class);
+
+    AuditLog::shouldHaveReceived('register')
+        ->withArgs(fn (mixed $event): bool => $event instanceof TransferImportEvent
+            && $event->result === null
+            && $event->failedReason === 'RuntimeException')
+        ->once();
+});
+
 it('copies a document with its media into another organisation', function (): void {
     Storage::fake('media-library');
 
@@ -198,8 +289,59 @@ it('takes the user global roles into account when resolving permissions in an or
     $authorized = app(App\Services\CrossOrgAuthorization::class)->userHasPermissionInOrganisation(
         $user,
         $organisation,
-        Permission::CORE_ENTITY_IMPORT,
+        Permission::TRANSFER_IMPORT,
     );
 
     expect($authorized)->toBeTrue();
+});
+
+it('rejects a copy when the user has generic export and import rights but no transfer rights', function (
+    array $sourcePermissions,
+    array $destinationPermissions,
+): void {
+    ConfigTestHelper::set('permissions.roles_and_permissions', [
+        Role::CHIEF_PRIVACY_OFFICER->value => array_map(static fn (Permission $p): string => $p->value, $sourcePermissions),
+        Role::PRIVACY_OFFICER->value => array_map(static fn (Permission $p): string => $p->value, $destinationPermissions),
+    ]);
+
+    $source = Organisation::factory()->create();
+    $destination = Organisation::factory()->create();
+    $user = User::factory()->hasAttached(collect([$source, $destination]))->create();
+    $user->organisationRoles()->create(['organisation_id' => $source->id, 'role' => Role::CHIEF_PRIVACY_OFFICER]);
+    $user->organisationRoles()->create(['organisation_id' => $destination->id, 'role' => Role::PRIVACY_OFFICER]);
+    [$record] = seedCopyableRecord($source);
+
+    app(CrossOrgCopier::class)->copy(
+        TransferEntityType::AVG_RESPONSIBLE_PROCESSING_RECORD,
+        [$record->id->toString()],
+        [],
+        [$record->id->toString() => ['selected' => true, 'strategy' => null]],
+        $source,
+        $destination,
+        $user,
+    );
+})->with([
+    'no transfer export in source' => [
+        [Permission::EXPORT, Permission::CORE_ENTITY_IMPORT],
+        [Permission::EXPORT, Permission::CORE_ENTITY_IMPORT, Permission::TRANSFER_IMPORT],
+    ],
+    'no transfer import in destination' => [
+        [Permission::EXPORT, Permission::TRANSFER_EXPORT],
+        [Permission::EXPORT, Permission::CORE_ENTITY_IMPORT],
+    ],
+])->throws(TransferException::class);
+
+it('does not offer organisations where the user only has generic import rights as copy targets', function (): void {
+    ConfigTestHelper::set('permissions.roles_and_permissions', [
+        Role::CHIEF_PRIVACY_OFFICER->value => [Permission::TRANSFER_EXPORT->value],
+        Role::PRIVACY_OFFICER->value => [Permission::CORE_ENTITY_IMPORT->value],
+    ]);
+
+    $source = Organisation::factory()->create();
+    $destination = Organisation::factory()->create();
+    $user = User::factory()->hasAttached(collect([$source, $destination]))->create();
+    $user->organisationRoles()->create(['organisation_id' => $source->id, 'role' => Role::CHIEF_PRIVACY_OFFICER]);
+    $user->organisationRoles()->create(['organisation_id' => $destination->id, 'role' => Role::PRIVACY_OFFICER]);
+
+    expect(app(CrossOrgAuthorization::class)->copyTargetsFor($user, $source))->toBe([]);
 });

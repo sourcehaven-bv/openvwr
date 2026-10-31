@@ -6,6 +6,7 @@ use App\Enums\RegisterLayout;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\ViewAvgResponsibleProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
+use App\Models\PublicWebsiteTree;
 use App\Models\Snapshot;
 use App\Models\States\Snapshot\Established;
 use App\Models\StaticWebsiteCheck;
@@ -80,16 +81,21 @@ it('shows current state as not published', function (): void {
         ->createLivewireTestable(ViewAvgResponsibleProcessingRecord::class, [
             'record' => $avgResponsibleProcessingRecord->getRouteKey(),
         ])
-        ->assertSee(__('static_website.public_from_section.public_state_not_public'));
+        ->assertSee(__('static_website.publication_state.not_no_established_version.label'));
 });
 
 it('shows the data of the publications when the record is published', function (): void {
     $organisation = OrganisationTestHelper::create();
+    PublicWebsiteTree::factory()
+        ->for($organisation)
+        ->create(['parent_id' => null, 'public_from' => '2020-01-01']);
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
         ->recycle($organisation)
-        ->create();
+        ->create(['public_from' => '2020-01-01 00:00:00']);
     $snapshot = Snapshot::factory()
         ->for($avgResponsibleProcessingRecord, 'snapshotSource')
+        ->recycle($organisation)
+        ->withSnapshotData(['forPublicWebsite' => true])
         ->create([
             'state' => Established::class,
         ]);
@@ -97,14 +103,14 @@ it('shows the data of the publications when the record is published', function (
         ->createForSnapshot($snapshot->id);
     StaticWebsiteSnapshotEntry::factory()
         ->create([
-            'last_static_website_check_id' => $staticWebsiteCheck,
+            'last_static_website_check_id' => $staticWebsiteCheck->id,
             'snapshot_id' => $snapshot->id,
             'start_date' => '2020-01-01 00:00:00',
             'end_date' => '2020-02-01 00:00:00',
         ]);
     StaticWebsiteSnapshotEntry::factory()
         ->create([
-            'last_static_website_check_id' => $staticWebsiteCheck,
+            'last_static_website_check_id' => $staticWebsiteCheck->id,
             'snapshot_id' => $snapshot->id,
             'start_date' => '2020-03-01 00:00:00',
             'end_date' => null,
@@ -114,11 +120,15 @@ it('shows the data of the publications when the record is published', function (
         ->createLivewireTestable(ViewAvgResponsibleProcessingRecord::class, [
             'record' => $avgResponsibleProcessingRecord->getRouteKey(),
         ])
-        ->assertSee(__('static_website.public_from_section.public_state_public'))
-        ->assertSee(__('static_website.public_from_section.public_history_since', ['start' => '01-03-2020 01:00']))
+        ->assertSee(__('static_website.publication_state.published.label'))
+        ->assertSee(__('static_website.public_from_section.public_history_since', [
+            'version' => (string) $snapshot->version,
+            'start' => '01-03-2020 01:00',
+        ]))
         ->assertSee(__('static_website.public_from_section.public_history_from_to', [
-            'start' => '1 januari 2020 01:00',
-            'end' => '1 februari 2020 01:00',
+            'version' => (string) $snapshot->version,
+            'start' => '01-01-2020 01:00',
+            'end' => '01-02-2020 01:00',
         ]));
 });
 

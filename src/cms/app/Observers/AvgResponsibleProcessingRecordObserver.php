@@ -6,11 +6,14 @@ namespace App\Observers;
 
 use App\Filament\Forms\GebDpiaQuestionnaire;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
+use App\Observers\Concerns\DetachesSharedRecords;
 
 use function __;
 
 class AvgResponsibleProcessingRecordObserver
 {
+    use DetachesSharedRecords;
+
     public function saving(AvgResponsibleProcessingRecord $avgResponsibleProcessingRecord): void
     {
         $this->resetProcessors($avgResponsibleProcessingRecord);
@@ -45,7 +48,7 @@ class AvgResponsibleProcessingRecordObserver
     private function resetProcessors(AvgResponsibleProcessingRecord $avgResponsibleProcessingRecord): void
     {
         if ($avgResponsibleProcessingRecord->has_processors === false) {
-            $avgResponsibleProcessingRecord->processors()->delete();
+            $this->detachShared($avgResponsibleProcessingRecord, $avgResponsibleProcessingRecord->processors());
         }
     }
 
@@ -57,21 +60,17 @@ class AvgResponsibleProcessingRecordObserver
         }
     }
 
-    /**
-     * Detach only the pivot rows: the algorithm records themselves are
-     * shared registrations that outlive any single processing.
-     */
     private function resetAlgorithms(AvgResponsibleProcessingRecord $avgResponsibleProcessingRecord): void
     {
         if ($avgResponsibleProcessingRecord->has_algorithms === false) {
-            $avgResponsibleProcessingRecord->algorithmRecords()->detach();
+            $this->detachShared($avgResponsibleProcessingRecord, $avgResponsibleProcessingRecord->algorithmRecords());
         }
     }
 
     private function resetSystems(AvgResponsibleProcessingRecord $avgResponsibleProcessingRecord): void
     {
         if ($avgResponsibleProcessingRecord->has_systems === false) {
-            $avgResponsibleProcessingRecord->systems()->delete();
+            $this->detachShared($avgResponsibleProcessingRecord, $avgResponsibleProcessingRecord->systems());
         }
     }
 

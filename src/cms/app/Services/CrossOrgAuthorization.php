@@ -76,7 +76,7 @@ readonly class CrossOrgAuthorization
                 continue;
             }
 
-            if ($this->userHasPermissionInOrganisation($user, $organisation, Permission::CORE_ENTITY_IMPORT)) {
+            if ($this->userHasPermissionInOrganisation($user, $organisation, Permission::TRANSFER_IMPORT)) {
                 $targets[] = $organisation;
             }
         }

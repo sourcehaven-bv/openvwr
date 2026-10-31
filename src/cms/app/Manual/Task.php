@@ -6,7 +6,9 @@ namespace App\Manual;
 
 use App\Enums\Authorization\Role;
 
+use function array_filter;
 use function array_map;
+use function array_values;
 use function implode;
 
 /**
@@ -52,13 +54,29 @@ readonly class Task
     }
 
     /**
+     * The steps whose feature flag is on. Everything that shows or searches a
+     * task goes through this, never through $steps directly.
+     *
+     * @return array<Step>
+     */
+    public function visibleSteps(): array
+    {
+        return array_values(array_filter(
+            $this->steps,
+            static fn (Step $step): bool => $step->isVisible(),
+        ));
+    }
+
+    /**
+     * The topics the visible steps link to.
+     *
      * @return array<non-empty-string>
      */
     public function topicIds(): array
     {
         $ids = [];
 
-        foreach ($this->steps as $step) {
+        foreach ($this->visibleSteps() as $step) {
             foreach ($step->topicIds as $topicId) {
                 $ids[] = $topicId;
             }
@@ -71,7 +89,7 @@ readonly class Task
     {
         $steps = array_map(
             static fn (Step $step): string => $step->title . ' ' . $step->body,
-            $this->steps,
+            $this->visibleSteps(),
         );
 
         return $this->title . ' ' . $this->summary . ' ' . $this->intro . ' ' . implode(' ', $steps);

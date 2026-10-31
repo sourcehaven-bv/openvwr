@@ -56,6 +56,8 @@ return [
     'outside_eu' => 'Transfer outside the EEA',
     'decision_making' => 'Automated decision-making',
     'logic' => 'Explanation of the decision-making',
+    'public_summary' => 'Explanation for residents',
+    'help_public_summary' => 'Two or three sentences in plain language: what does the organisation do and why does it need the data? For example: "Do you live in a street with paid parking? Then you can apply for a parking permit. Here you can read which data we use for that."',
     'importance_consequences' => 'Explanation of the significance and consequences',
     'dpia' => 'DPIA',
     'has_processors' => 'Has processors',

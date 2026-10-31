@@ -257,11 +257,16 @@ aanpak.
 handleiding — uit de navigatie, de zoekindex en de backlinks. Schrijf de tekst daarom alsof de
 functie gewoon bestaat; geen "als uw organisatie de Wpg-module heeft".
 
-**Goed** (Topic `wpg-register`, met `gate: FeatureGate::WPG`):
-`Naast de AVG-registers kent OpenVWR het register WPG Verantwoordelijke Verwerkingen.`
+Hoort maar een deel van de tekst bij de optionele functie, zet de `gate` dan op dat deel: op een
+`Step`, of op een `Fragment` in de body van een Topic. Alleen dat deel verdwijnt; de rest van de
+taak of het onderwerp blijft staan. Zo staat de Wpg in de algemene taak `verwerking-vastleggen` en
+het Topic `verwerkingsregisters`, en niet in een aparte taak.
 
-**Fout**: `Als de Wpg-module is aangezet, ziet u mogelijk ook het register WPG Verantwoordelijke
-Verwerkingen.`
+**Goed** (Topic `wpg-register`, met `gate: FeatureGate::WPG`):
+`Naast de AVG-registers kent OpenVWR het register Verwerkingen WPG verantwoordelijke.`
+
+**Fout**: `Als de Wpg-module is aangezet, ziet u mogelijk ook het register Verwerkingen WPG
+verantwoordelijke.`
 
 **Inrichtingskeuze**: die kunt u niet weggateen, dus benoemt u hem in de tekst. Doe dat één keer,
 kort, en zonder de lezer te laten raden.
@@ -322,7 +327,7 @@ spelling maakt de tekst onvindbaar voor wie zoekt.
 | --- | --- | --- |
 | AVG | A.V.G., avg | afkorting, hoofdletters |
 | Wpg | WPG, WpG | wet: alleen de eerste letter een hoofdletter |
-| WPG Verantwoordelijke Verwerkingen | Wpg-register | de registernaam luidt zo in de applicatie |
+| Verwerkingen WPG verantwoordelijke | Wpg-register | de registernaam luidt zo in de applicatie |
 | Wpg-verwerking | WPG verwerking | samenstelling met afkorting krijgt een koppelteken |
 | AVG-register, AVG-registers | AVG register | idem |
 | Autoriteit Persoonsgegevens (AP) | autoriteit persoonsgegevens | eigennaam; kort daarna "de AP" |
@@ -352,7 +357,7 @@ spelling maakt de tekst onvindbaar voor wie zoekt.
 Voor rolnamen: zie [Rollen benoemen](#8-rollen-benoemen).
 
 > Afwijking in de bestaande tekst: `Wpg` en `WPG` staan door elkaar, deels omdat de registernaam in
-> de applicatie `WPG Verantwoordelijke Verwerkingen` is. De wet is `Wpg`; de registernaam blijft
+> de applicatie `Verwerkingen WPG verantwoordelijke` is. De wet is `Wpg`; de registernaam blijft
 > zoals hij in het scherm staat. Ook staan `email` (zonder koppelteken) en `To Do lijst` nog in de
 > Topics `akkoord-geven`, `goedkeuren` en `rollen`. En `de datalek` in `datalekken` moet
 > `het datalek` zijn.

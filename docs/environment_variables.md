@@ -107,6 +107,8 @@ The following environment variables are used to configure the application in `sr
 - `UPLOADS_BUCKET` bucket for the media-library disk (default: `uploads`)
 - `EXPORTS_BUCKET` bucket for the filament disk (default: `exports`)
 - `TRANSFER_BUCKET` bucket for the transfer disk (default: `transfer`)
+- `AWS_SERVER_SIDE_ENCRYPTION` server-side encryption at rest for every object, `AES256` or `none` (default: `AES256`). See [object_storage.md](object_storage.md#versleuteling-at-rest)
+- `MINIO_KMS_SECRET_KEY` KMS key for the minio container, needed for `AES256` (default: a fixed development key in docker-compose)
 
 **LOGGING:**
 

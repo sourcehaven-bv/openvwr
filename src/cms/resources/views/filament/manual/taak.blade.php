@@ -41,7 +41,7 @@
     <p class="manual-detail__intro">{{ $task->intro }}</p>
 
     <ol class="manual-steps">
-        @foreach ($task->steps as $step)
+        @foreach ($task->visibleSteps() as $step)
             <li class="manual-steps__item">
                 <h2 class="manual-steps__title">{{ $step->title }}</h2>
                 <p class="manual-steps__body">{{ $step->body }}</p>
