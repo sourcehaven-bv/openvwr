@@ -1,0 +1,62 @@
+# Native (Docker-less) development processes.
+# See docs/local_development_without_docker.md. Run with `just dev` (or
+# `process-compose up`); PostgreSQL and minio stay Homebrew services.
+#
+# The just recipes pass `-p 8077`: process-compose serves its API on 8080 by
+# default, which is the port STATIC_WEBSITE_PORT already uses.
+version: "0.5"
+
+processes:
+  # Not supervised, only waited on: PostgreSQL runs as a brew service, so the
+  # other processes need a gate rather than a parent. Fails fast with the
+  # command that fixes it instead of letting artisan spew connection errors.
+  postgres-ready:
+    command: |
+      if pg_isready -h 127.0.0.1 -p "${DB_PORT:-5432}" -q; then
+        echo "PostgreSQL is reachable on port ${DB_PORT:-5432}"
+      else
+        echo "PostgreSQL is not reachable on 127.0.0.1:${DB_PORT:-5432}." >&2
+        echo "Start it with: brew services start postgresql@15" >&2
+        exit 1
+      fi
+    availability:
+      restart: "no"
+
+  serve:
+    command: '"$(brew --prefix php@8.4)/bin/php" artisan serve --host=127.0.0.1 --port="${APP_PORT:-8000}"'
+    working_dir: "src/cms"
+    depends_on:
+      postgres-ready:
+        condition: process_completed_successfully
+    readiness_probe:
+      http_get:
+        host: 127.0.0.1
+        port: "${APP_PORT:-8000}"
+        path: /up
+      initial_delay_seconds: 2
+      period_seconds: 5
+      failure_threshold: 12
+    availability:
+      restart: on_failure
+      backoff_seconds: 2
+
+  # QUEUE_CONNECTION=database in .env.nodocker.example, so exports and the
+  # notifications Filament sends on completion need a worker to run at all.
+  queue:
+    command: '"$(brew --prefix php@8.4)/bin/php" artisan queue:work --queue=high,default,low'
+    working_dir: "src/cms"
+    depends_on:
+      postgres-ready:
+        condition: process_completed_successfully
+    availability:
+      restart: on_failure
+      backoff_seconds: 2
+
+  # Hot reload for the frontend. The built assets in public/build keep working
+  # without it, so stop this one when you only touch PHP.
+  vite:
+    command: "npm run dev"
+    working_dir: "src/cms"
+    availability:
+      restart: on_failure
+      backoff_seconds: 2
