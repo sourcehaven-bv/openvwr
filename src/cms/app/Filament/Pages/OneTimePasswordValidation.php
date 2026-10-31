@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Config\Config;
+use App\Facades\AuditLog;
 use App\Facades\Otp;
+use App\Services\AuditLog\Authentication\TwoFactorFailedEvent;
 use App\Services\AuthenticationService;
 use App\ValueObjects\OneTimePassword\Code;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
@@ -111,6 +113,8 @@ class OneTimePasswordValidation extends SimplePage
                 Config::integer('auth.one_time_password.validation_rate_limit.decay_in_seconds'),
             );
         } catch (TooManyRequestsException $exception) {
+            AuditLog::register(TwoFactorFailedEvent::tooManyAttempts($this->authenticationService->user()));
+
             $secondsUntilAvailable = $exception->secondsUntilAvailable;
             Assert::integer($secondsUntilAvailable);
 

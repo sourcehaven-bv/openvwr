@@ -8,7 +8,6 @@ use App\Http\Controllers\Controller;
 use App\Models\UserLoginToken;
 use App\Services\AuditLog\AuditLogger;
 use App\Services\AuditLog\Authentication\AuthenticationFailedEvent;
-use App\Services\AuditLog\Authentication\AuthenticationSuccessEvent;
 use Carbon\CarbonImmutable;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\View\View;
@@ -66,8 +65,9 @@ class PasswordlessLoginController extends Controller
         $user = $userLoginToken->user;
         $user->userLoginTokens()->truncate();
 
+        // Only the first factor. The login is recorded once the one-time
+        // password is verified (OtpService::verifyCode).
         auth()->login($user);
-        $this->auditLogger->register(new AuthenticationSuccessEvent($user));
 
         return redirect($userLoginToken->destination ?? '/');
     }

@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-use MinVWS\Logging\Laravel\Models\AuditLog;
+use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
+use Monolog\Handler\SyslogHandler;
 use Monolog\Handler\SyslogUdpHandler;
 use Monolog\Processor\PsrLogMessageProcessor;
 
@@ -126,34 +127,29 @@ return [
             'handler' => NullHandler::class,
         ],
 
+        // One JSON object per line, under its own syslog identifier and the
+        // authpriv facility. The level is fixed so LOG_LEVEL cannot drop it.
+        'audit' => [
+            'driver' => 'monolog',
+            'level' => 'info',
+            'handler' => SyslogHandler::class,
+            'handler_with' => [
+                'ident' => 'openvwr-audit',
+                'facility' => LOG_AUTHPRIV,
+            ],
+            'formatter' => LineFormatter::class,
+            'formatter_with' => [
+                'format' => "%message%\n",
+            ],
+        ],
+
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
     ],
 
-    /**
-     * RDO Audit logs (minvws/laravel-logging, see minvws/laravel-logging package)
-     */
-    'dblog_enabled' => env('AUDIT_LOG_DBLOG_ENABLED', false),
-    'dblog_encrypt' => env('AUDIT_LOG_DBLOG_THEIR_PUB_KEY') !== null,
-    'dblog_pubkey' => env('AUDIT_LOG_DBLOG_THEIR_PUB_KEY'),
-    'dblog_secret' => env('AUDIT_LOG_DBLOG_OUR_PRIV_KEY'),
-    'syslog_enabled' => env('AUDIT_LOG_SYSLOG_ENABLED', true),
-    'rabbitmq_enabled' => env('AUDIT_LOG_RABBITMQ_ENABLED', false),
-
-    // The model we use to write data to the database via the dblogger
-    'auditlog_model' => env('AUDIT_LOG_MODEL', AuditLog::class),
-
-    // Automatically logs the complete HTTP request
-    'log_full_request' => env('AUDIT_LOG_FULL_REQUEST', false),
-
-    // Keys for encrypted logging
-    'syslog_encrypt' => env('AUDIT_LOG_SYSLOG_THEIR_PUB_KEY') !== null,
-    'syslog_pubkey' => env('AUDIT_LOG_SYSLOG_THEIR_PUB_KEY'),
-    'syslog_secret' => env('AUDIT_LOG_SYSLOG_OUR_PRIV_KEY'),
-    'syslog_channel' => env('AUDIT_LOG_SYSLOG_CHANNEL'),
-
-    'rabbitmq_additional_allowed_events' => [],
-    'rabbitmq_log_pii' => env('AUDIT_LOG_RABBITMQ_LOG_PII', false),
+    // Audit events (logins, logouts, account changes) go to their own channel,
+    // separate from application logs. See App\Services\AuditLog\AuditLogger.
+    'audit_channel' => env('AUDIT_LOG_CHANNEL', 'audit'),
 
 ];

@@ -7,6 +7,7 @@ namespace App\Providers;
 use App\Config\Config;
 use App\Http\Middleware\ResolveAuthGate;
 use App\Routing\UrlGenerator;
+use App\Services\AuditLog\AuditLogger;
 use App\Services\StaticWebsite\Publication\PublicationStatusResolver;
 use App\Services\StringService;
 use App\Services\Virusscanner\Virusscanner;
@@ -14,12 +15,14 @@ use App\Services\Virusscanner\VirusscannerManager;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
+use Illuminate\Log\LogManager;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Route as RouteFacade;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Mime\MimeTypesInterface;
 use Webmozart\Assert\Assert;
@@ -100,5 +103,14 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->bind(MimeTypesInterface::class, MimeTypes::class);
+
+        $this->app->when(AuditLogger::class)
+            ->needs(LoggerInterface::class)
+            ->give(static function (Application $application): LoggerInterface {
+                /** @var LogManager $logManager */
+                $logManager = $application->get(LogManager::class);
+
+                return $logManager->channel(Config::string('logging.audit_channel'));
+            });
     }
 }

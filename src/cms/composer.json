@@ -29,7 +29,7 @@
         "laravel/tinker": "^3.0",
         "league/flysystem-aws-s3-v3": "^3.31",
         "livewire/livewire": "^3.4",
-        "minvws/laravel-logging": "^4.0",
+        "minvws/audit-logger": "^0.4",
         "mlocati/ip-lib": "^1.18",
         "owen-it/laravel-auditing": "^14.0",
         "solution-forest/filament-tree": "^2.1",
