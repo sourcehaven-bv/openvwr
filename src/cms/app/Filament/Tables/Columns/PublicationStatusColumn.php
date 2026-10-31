@@ -16,7 +16,7 @@ use function app;
 
 class PublicationStatusColumn extends IconColumn
 {
-    public static function make(string $name = 'publication_status'): static
+    public static function make(?string $name = 'publication_status'): static
     {
         // State, icon, colour and tooltip each ask for the status; resolve it
         // once per row.

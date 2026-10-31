@@ -47,8 +47,8 @@ class PublicationOverview
         /** @var array<string, true> $confirmedSnapshotIds */
         $confirmedSnapshotIds = StaticWebsiteSnapshotEntry::query()
             ->whereNull('end_date')
-            ->pluck('snapshot_id')
-            ->mapWithKeys(static fn ($snapshotId): array => [(string) $snapshotId => true])
+            ->get(['snapshot_id'])
+            ->mapWithKeys(static fn (StaticWebsiteSnapshotEntry $entry): array => [$entry->snapshot_id->toString() => true])
             ->all();
 
         $unconfirmed = [];

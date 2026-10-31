@@ -31,7 +31,8 @@ it('reports nothing for an empty DPIA', function (): void {
     $organisation = OrganisationTestHelper::create();
     $dpiaRecord = DpiaRecord::factory()->recycle($organisation)->create(['outside_eea' => false]);
 
-    expect(findingKeys($dpiaRecord))->toBe([]);
+    expect(findingKeys($dpiaRecord))->toBe([])
+        ->and(app(DpiaQualityChecker::class)->hasFindings($dpiaRecord))->toBeFalse();
 });
 
 it('flags bijzondere persoonsgegevens without an exception ground', function (): void {
@@ -153,6 +154,10 @@ it('flags a high residual risk without AP consultation', function (): void {
     $measure->risks()->sync([$risk->id->toString()]);
 
     expect(findingKeys($dpiaRecord->fresh()))->toContain('high_residual_risk_without_ap');
+
+    $dpiaRecord->update(['residual_risk_acceptance' => null]);
+
+    expect(findingKeys($dpiaRecord->fresh()))->toContain('high_residual_risk_without_acceptance');
 });
 
 it('flags a measure that addresses no risk', function (): void {
@@ -241,4 +246,23 @@ it('names an undescribed maatregel with a placeholder in the findings', function
     }
 
     expect(implode(' ', $messages))->toContain(__('dpia_quality.unnamed'));
+});
+
+it('shortens long descriptions in findings without losing accented characters', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $dpiaRecord = DpiaRecord::factory()->recycle($organisation)->create(['outside_eea' => false]);
+    $description = str_repeat('één maatregel ', 8);
+    DpiaMeasure::factory()->recycle($organisation)->create([
+        'dpia_record_id' => $dpiaRecord->id,
+        'description' => $description,
+    ]);
+
+    $messages = [];
+    foreach (app(DpiaQualityChecker::class)->check($dpiaRecord->fresh()) as $finding) {
+        $messages[] = $finding->message();
+    }
+
+    expect(implode(' ', $messages))
+        ->toContain(mb_substr($description, 0, 57) . '...')
+        ->not->toContain(trim($description));
 });

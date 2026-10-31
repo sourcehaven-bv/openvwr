@@ -73,11 +73,9 @@ it('does not offer established in the status change list', function (): void {
     $test = $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(ViewSnapshot::class, ['record' => $snapshot->id]);
 
-    expect(static function () use ($test): void {
-        $test->callInfolistAction(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_status_change', data: [
-            'state' => Established::$name,
-        ]);
-    })->toThrow(InvalidArgumentException::class);
+    $test->callInfolistAction(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_status_change', data: [
+        'state' => Established::$name,
+    ])->assertHasFormErrors(['state']);
 
     expect($snapshot->refresh()->state)
         ->toBeInstanceOf(Approved::class);
@@ -105,7 +103,7 @@ it('is hidden on a version that is finished', function (): void {
 
     $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(ViewSnapshot::class, ['record' => $snapshot->id])
-        ->assertInfolistActionHidden(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_establish');
+        ->assertInfolistActionDoesNotExist(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_establish');
 });
 
 // The button's colour is the readiness signal: green once the approvals are in and every
@@ -174,26 +172,36 @@ function forgeEstablish(
 dataset('forged establish requests', [
     'mounting and calling the action' => [
         static function (Testable $livewire): void {
-            $livewire->call('mountInfolistAction', 'snapshot_establish', ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'infolist')
-                ->call('callMountedInfolistAction');
+            $livewire->call('mountAction', 'snapshot_establish', [], establishActionContext())
+                ->call('callMountedAction');
         },
     ],
-    // Marking the action as mounted in the same request skips mountInfolistAction()
+    // Marking the action as mounted in the same request skips mountAction()
     // altogether.
     'calling an action marked as mounted' => [
         static function (Testable $livewire): void {
             $livewire->update(
-                calls: [['method' => 'callMountedInfolistAction', 'params' => [], 'path' => '']],
+                calls: [['method' => 'callMountedAction', 'params' => [], 'path' => '']],
                 updates: [
-                    'mountedInfolistActions' => ['snapshot_establish'],
-                    'mountedInfolistActionsData' => [[]],
-                    'mountedInfolistActionsComponent' => ViewInfoTab::SECTION_KEY_STATUS_FLOW,
-                    'mountedInfolistActionsInfolist' => 'infolist',
+                    'mountedActions' => [
+                        [
+                            'name' => 'snapshot_establish',
+                            'arguments' => [],
+                            'context' => establishActionContext(),
+                            'data' => [],
+                        ],
+                    ],
                 ],
             );
         },
     ],
 ]);
+
+/** @return array{schemaComponent: string} */
+function establishActionContext(): array
+{
+    return ['schemaComponent' => 'infolist.' . ViewInfoTab::SECTION_KEY_STATUS_FLOW];
+}
 
 // The button is hidden without the permission, and Filament treats a hidden action as
 // disabled when it is mounted or called. A request that calls it anyway is refused on

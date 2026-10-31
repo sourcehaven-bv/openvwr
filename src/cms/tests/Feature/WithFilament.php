@@ -44,6 +44,16 @@ trait WithFilament
         SessionTestHelper::setOtpValid();
 
         $this->be($user);
+
+        // v5 attaches the tenant to a new record from a `creating` observer that
+        // the panel registers while booting, and the panel only boots from the
+        // SetUpPanel middleware -- which a Livewire unit test never runs. So it
+        // is booted here, through the manager's own guarded entry point: that
+        // one boots at most once per container, unlike calling Panel::boot()
+        // directly, which re-registers the render hooks on every call.
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        Filament::bootCurrentPanel();
+
         Filament::setTenant($organisation);
 
         return $this;

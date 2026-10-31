@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ResponsibleLegalEntityResource;
 
-use Filament\Infolists\Components\Component;
-use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 
 use function __;
 
 class ResponsibleLegalEntityResourceInfolist
 {
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist
+        return $schema
             ->columns(1)
-            ->schema([
+            ->components([
                 Section::make()
                     ->schema(self::getSchema()),
             ]);

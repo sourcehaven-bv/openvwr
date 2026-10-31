@@ -44,7 +44,7 @@ it('is hidden on a snapshot that can no longer move', function (): void {
 
     $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(ViewSnapshot::class, ['record' => $snapshot->id])
-        ->assertInfolistActionHidden(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_status_change');
+        ->assertInfolistActionDoesNotExist(ViewInfoTab::SECTION_KEY_STATUS_FLOW, 'snapshot_status_change');
 });
 
 it('no longer offers the status change in the page header', function (): void {

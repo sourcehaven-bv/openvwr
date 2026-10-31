@@ -79,3 +79,10 @@ it('returns a correct value for a model-queueable-id', function (): void {
     expect($user->getQueueableId())
         ->toBeString();
 });
+
+it('returns a scalar route key while retaining the UUID model key', function (): void {
+    $user = User::factory()->create();
+
+    expect($user->getRouteKey())->toBe($user->id->toString())
+        ->and($user->getKey())->toBeInstanceOf(UuidInterface::class);
+});

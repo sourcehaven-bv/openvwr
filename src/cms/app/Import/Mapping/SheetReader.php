@@ -244,11 +244,11 @@ class SheetReader
             throw new ImportFailedException(__('import_mapping.error.no_header'));
         }
 
-        foreach ($headers as $header) {
+        foreach ($headers as $column) {
             foreach ($headers as $other) {
-                if (str_starts_with($other, $header . '.')) {
+                if (str_starts_with($other, $column . '.')) {
                     throw new ImportFailedException(__('import_mapping.error.column_conflict', [
-                        'column' => $header,
+                        'column' => $column,
                         'other' => $other,
                     ]));
                 }

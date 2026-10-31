@@ -17,11 +17,12 @@ use App\Models\SnapshotApproval;
 use App\Models\User;
 use App\Services\DateFormatService;
 use App\Services\Snapshot\SnapshotApprovalService;
-use Filament\Forms\Components\Component as FilamentFormComponent;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
@@ -35,8 +36,9 @@ use Webmozart\Assert\Assert;
 use function __;
 use function view;
 
-class Approvals extends Component implements HasForms, HasTable
+class Approvals extends Component implements HasActions, HasForms, HasTable
 {
+    use InteractsWithActions;
     use InteractsWithTable;
     use InteractsWithForms;
 
@@ -77,7 +79,7 @@ class Approvals extends Component implements HasForms, HasTable
                     ->label(__('snapshot_approval.request'))
                     ->modalSubmitActionLabel(__('general.add'))
                     ->color('gray')
-                    ->form($this->createRequestApprovalForm())
+                    ->schema($this->createRequestApprovalForm())
                     ->visible(Authorization::hasPermission(Permission::SNAPSHOT_APPROVAL_CREATE))
                     ->action(function (array $data, SnapshotApprovalService $snapshotApprovalService): void {
                         $requestedBy = Authentication::user();
@@ -93,7 +95,7 @@ class Approvals extends Component implements HasForms, HasTable
                         $livewire->dispatch(ViewSnapshot::REFRESH_LIVEWIRE_COMPONENT);
                     }),
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 BulkAction::make('snapshot_approval_notify_bulk_delete')
                     ->label(__('general.delete'))
                     ->icon('heroicon-o-trash')
@@ -120,7 +122,7 @@ class Approvals extends Component implements HasForms, HasTable
     }
 
     /**
-     * @return array<FilamentFormComponent>
+     * @return array<\Filament\Schemas\Components\Component>
      */
     private function createRequestApprovalForm(): array
     {
@@ -141,7 +143,7 @@ class Approvals extends Component implements HasForms, HasTable
 
         return [
             CheckboxList::makeWithValidatedOptions('user_ids', $allowedUserIds)
-                ->label(''),
+                ->hiddenLabel(),
         ];
     }
 }

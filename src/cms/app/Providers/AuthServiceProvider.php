@@ -57,7 +57,7 @@ use App\Services\OneTimePassword\OneTimePasswordManager;
 use App\Services\OneTimePassword\TimedOneTimePassword;
 use App\Services\OtpService;
 use Filament\Actions\Exports\Models\Export;
-use Filament\Http\Responses\Auth\Contracts\LogoutResponse;
+use Filament\Auth\Http\Responses\Contracts\LogoutResponse;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as IlluminateAuthServiceProvider;
 use Illuminate\Http\Client\Factory as Http;

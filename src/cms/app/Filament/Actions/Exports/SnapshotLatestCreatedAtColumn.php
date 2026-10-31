@@ -13,7 +13,7 @@ use function __;
 
 class SnapshotLatestCreatedAtColumn extends ExportColumn
 {
-    public static function make(string $name = 'snapshot_latest_status_created_at'): static
+    public static function make(?string $name = 'snapshot_latest_status_created_at'): static
     {
         return parent::make($name)
             ->label(__('snapshot.latest_status_created_at'))

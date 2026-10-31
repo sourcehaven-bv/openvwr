@@ -10,11 +10,11 @@ use App\Filament\Pages\CreateRecord;
 use App\Filament\Resources\OrganisationResource;
 use App\Models\EntityNumberCounter;
 use App\Models\ResponsibleLegalEntity;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Wizard\Step;
 use Filament\Resources\Pages\CreateRecord\Concerns\HasWizard;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Wizard\Step;
 use Illuminate\Validation\Rules\Unique;
 
 use function __;

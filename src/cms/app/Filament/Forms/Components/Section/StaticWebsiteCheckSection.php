@@ -9,7 +9,7 @@ use App\Models\Contracts\Publishable;
 use App\Services\StaticWebsite\Publication\PublicationHistory;
 use App\Services\StaticWebsite\Publication\PublicationStatusResolver;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 
 use function __;
 use function app;

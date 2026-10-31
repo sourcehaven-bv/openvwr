@@ -41,7 +41,7 @@ abstract class RelationManager extends FilamentRelationManager
             return $table;
         }
 
-        return $table->bulkActions([
+        return $table->toolbarActions([
             DetachSharedBulkAction::make(),
         ]);
     }

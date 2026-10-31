@@ -15,7 +15,7 @@ use App\Services\AuditLog\Transfer\TransferFailureReason;
 use App\Transfer\Export\BundleExporter;
 use App\Transfer\TransferBundleStorage;
 use App\Transfer\TransferEntityType;
-use Filament\Notifications\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -55,11 +55,11 @@ class TransferExportJob implements ShouldQueue
 
     public function handle(BundleExporter $bundleExporter): void
     {
-        $organisation = Organisation::query()->findOrFail($this->organisationId);
+        $organisation = Organisation::query()->findOrFail($this->organisationId->toString());
 
         $path = $bundleExporter->export($this->recordType, $this->recordIds, $this->selectedRelated, $organisation);
 
-        $user = User::query()->find($this->userId);
+        $user = User::query()->find($this->userId->toString());
 
         AuditLog::register($this->auditEvent($user));
 
@@ -92,7 +92,7 @@ class TransferExportJob implements ShouldQueue
     public function failed(?Throwable $exception): void
     {
         AuditLog::register($this->auditEvent(
-            User::query()->find($this->userId),
+            User::query()->find($this->userId->toString()),
             TransferFailureReason::from($exception),
         ));
     }

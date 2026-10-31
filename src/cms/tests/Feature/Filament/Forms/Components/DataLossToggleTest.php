@@ -76,6 +76,6 @@ it('turns the toggle off once the confirmation is accepted', function (): void {
         'record' => $avgResponsibleProcessingRecord->getRouteKey(),
     ])
         ->set('data.has_processors', false)
-        ->call('callMountedFormComponentAction')
+        ->callMountedAction()
         ->assertFormSet(['has_processors' => false]);
 });

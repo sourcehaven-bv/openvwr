@@ -31,6 +31,13 @@ trait HasUuidAsId
         return $key;
     }
 
+    final public function getRouteKey(): string
+    {
+        // Route parameters, including Filament's Livewire re-authorisation,
+        // must be scalar even though the model exposes a UUID value object.
+        return $this->getKey()->toString();
+    }
+
     final public function getQueueableId(): string
     {
         return $this->getKey()->toString();

@@ -118,7 +118,7 @@ it('leaves a column unmapped rather than forcing a weak match', function (): voi
 
 it('produces a stable fingerprint regardless of column order', function (): void {
     $one = MappingProfile::fingerprint(['Naam', 'Datum melding']);
-    $two = App\Import\Mapping\MappingProfile::fingerprint(['Datum melding', 'Naam']);
+    $two = MappingProfile::fingerprint(['Datum melding', 'Naam']);
 
     expect($one)->toBe($two);
 });

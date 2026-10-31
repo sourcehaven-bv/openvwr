@@ -6,21 +6,21 @@ namespace App\Filament\Resources\ResponsibleResource;
 
 use App\Filament\Infolists\Components\AddressRepeatableEntry;
 use App\Filament\Infolists\Components\TagsEntry;
-use Filament\Infolists\Components\Component;
-use Filament\Infolists\Components\Grid;
-use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 
 use function __;
 
 class ResponsibleResourceInfolist
 {
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist
+        return $schema
             ->columns()
-            ->schema([
+            ->components([
                 Section::make()
                     ->schema(self::getSchema()),
             ]);

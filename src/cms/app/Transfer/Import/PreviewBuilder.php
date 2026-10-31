@@ -8,6 +8,7 @@ use App\Models\Document;
 use App\Models\Organisation;
 use App\Transfer\ConflictStrategy;
 use App\Transfer\TransferEntityType;
+use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Model;
 use Webmozart\Assert\Assert;
 
@@ -34,23 +35,30 @@ readonly class PreviewBuilder
      */
     public function build(TransferBundle $bundle, Organisation $organisation): array
     {
-        $items = [];
+        $previousTenant = Filament::getTenant();
+        Filament::setTenant($organisation, isQuiet: true);
 
-        foreach ($bundle->entities as $id => $entity) {
-            // BundleReader / BundleBuilder guarantee every entity carries a known type.
-            $typeValue = $entity['type'] ?? null;
-            Assert::string($typeValue);
+        try {
+            $items = [];
 
-            $type = TransferEntityType::from($typeValue);
+            foreach ($bundle->entities as $id => $entity) {
+                // BundleReader / BundleBuilder guarantee every entity carries a known type.
+                $typeValue = $entity['type'] ?? null;
+                Assert::string($typeValue);
 
-            if ($type->isOwned() || $type->isLookup()) {
-                continue;
+                $type = TransferEntityType::from($typeValue);
+
+                if ($type->isOwned() || $type->isLookup()) {
+                    continue;
+                }
+
+                $items[$id] = $this->buildItem($type, $id, $entity, $organisation);
             }
 
-            $items[$id] = $this->buildItem($type, $id, $entity, $organisation);
+            return $items;
+        } finally {
+            Filament::setTenant($previousTenant, isQuiet: true);
         }
-
-        return $items;
     }
 
     /**

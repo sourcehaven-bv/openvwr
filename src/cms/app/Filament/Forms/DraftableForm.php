@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Forms;
 
 use App\Filament\Pages\Contracts\SavesConcepts;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 
 use function array_map;
 use function is_string;
@@ -35,7 +35,7 @@ use function is_string;
  * there is no flag that can leak across requests. The page turns the relaxation off
  * while submitting for review, which is the moment the record must be complete.
  */
-class DraftableForm extends Form
+class DraftableForm extends Schema
 {
     /**
      * @return array<string, array<mixed>>

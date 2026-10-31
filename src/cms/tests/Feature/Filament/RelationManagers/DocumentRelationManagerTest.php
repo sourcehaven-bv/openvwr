@@ -11,16 +11,18 @@ use App\Models\DataBreachRecord;
 use App\Models\Document;
 use App\Models\DocumentType;
 use App\Services\AuditLog\Register\LinksDetachedEvent;
-use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Actions\DeleteBulkAction;
+use Tests\Helpers\Model\OrganisationTestHelper;
 
 it('loads the table', function (): void {
-    $document = Document::factory()
+    $organisation = OrganisationTestHelper::create();
+    $document = Document::factory()->for($organisation)
         ->create();
-    $dataBreachRecord = DataBreachRecord::factory()
+    $dataBreachRecord = DataBreachRecord::factory()->for($organisation)
         ->hasAttached($document)
         ->create();
 
-    $this->asFilamentUser()
+    $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(DocumentRelationManager::class, [
             'ownerRecord' => $dataBreachRecord,
             'pageClass' => EditDataBreachRecord::class,
@@ -31,14 +33,15 @@ it('loads the table', function (): void {
 it('detaches documents without deleting them and audit logs the removed links', function (): void {
     AuditLog::spy();
 
-    $documents = Document::factory()
+    $organisation = OrganisationTestHelper::create();
+    $documents = Document::factory()->for($organisation)
         ->count(3)
         ->create();
-    $dataBreachRecord = DataBreachRecord::factory()
+    $dataBreachRecord = DataBreachRecord::factory()->for($organisation)
         ->hasAttached($documents)
         ->create();
 
-    $this->asFilamentUser()
+    $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(DocumentRelationManager::class, [
             'ownerRecord' => $dataBreachRecord,
             'pageClass' => EditDataBreachRecord::class,
@@ -50,20 +53,34 @@ it('detaches documents without deleting them and audit logs the removed links', 
     expect($dataBreachRecord->documents()->pluck('documents.id')->all())->toEqual([$documents[2]->id])
         ->and(Document::query()->count())->toBe(3);
 
+    $detachedIds = null;
     AuditLog::shouldHaveReceived('register')
-        ->withArgs(static fn (mixed $event): bool => $event instanceof LinksDetachedEvent
-            && $event->recordType === $dataBreachRecord->getMorphClass()
-            && $event->recordId === $dataBreachRecord->id->toString()
-            && $event->relation === 'documents'
-            && $event->relatedIds === [$documents[0]->id->toString(), $documents[1]->id->toString()])
+        ->withArgs(static function (mixed $event) use ($dataBreachRecord, &$detachedIds): bool {
+            if (
+                !$event instanceof LinksDetachedEvent
+                || $event->recordType !== $dataBreachRecord->getMorphClass()
+                || $event->recordId !== $dataBreachRecord->id->toString()
+                || $event->relation !== 'documents'
+            ) {
+                return false;
+            }
+
+            $detachedIds = $event->relatedIds;
+
+            return true;
+        })
         ->once();
+
+    // The table sort decides the order of the selected records.
+    expect($detachedIds)->toEqualCanonicalizing([$documents[0]->id->toString(), $documents[1]->id->toString()]);
 });
 
 it('keeps the resource bulk actions for a has-many relation', function (): void {
-    $documentType = DocumentType::factory()
+    $organisation = OrganisationTestHelper::create();
+    $documentType = DocumentType::factory()->for($organisation)
         ->create();
 
-    $this->asFilamentUser()
+    $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(DocumentRelationManager::class, [
             'ownerRecord' => $documentType,
             'pageClass' => EditDocumentType::class,

@@ -54,6 +54,7 @@ it('shows the link to the static-website page when the record is published', fun
             'public_from' => $publishedAt,
         ]);
     Snapshot::factory()
+        ->recycle($organisation)
         ->for($avgResponsibleProcessingRecord, 'snapshotSource')
         ->create([
             'state' => Established::class,
@@ -93,6 +94,7 @@ it('shows the data of the publications when the record is published', function (
         ->recycle($organisation)
         ->create(['public_from' => '2020-01-01 00:00:00']);
     $snapshot = Snapshot::factory()
+        ->recycle($organisation)
         ->for($avgResponsibleProcessingRecord, 'snapshotSource')
         ->recycle($organisation)
         ->withSnapshotData(['forPublicWebsite' => true])

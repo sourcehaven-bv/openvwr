@@ -7,6 +7,7 @@ use App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\CreateAvgResponsibleProcessingRecord;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\EditAvgResponsibleProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
+use Filament\Forms\Components\Select;
 use Tests\Helpers\Model\OrganisationTestHelper;
 
 function createEditableRecord(mixed $organisation): AvgResponsibleProcessingRecord
@@ -144,9 +145,8 @@ it('offers only linkable verwerkingen in the picker', function (): void {
         ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
             'record' => $record->getRouteKey(),
         ])
-        ->call('getFormSelectSearchResults', 'data.children', 'zoekterm')
-        ->assertReturned(function (array $results) use ($standalone, $ownChild): bool {
-            $values = array_column($results, 'value');
+        ->assertFormFieldExists('children', function (Select $field) use ($standalone, $ownChild): bool {
+            $values = array_column($field->getSearchResultsForJs('zoekterm'), 'value');
             sort($values);
 
             $expected = [$standalone->id->toString(), $ownChild->id->toString()];
@@ -175,9 +175,8 @@ it('offers only standalone verwerkingen in the picker for a new record', functio
 
     $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(CreateAvgResponsibleProcessingRecord::class)
-        ->call('getFormSelectSearchResults', 'data.children', 'zoekterm')
-        ->assertReturned(function (array $results) use ($standalone): bool {
-            return array_column($results, 'value') === [$standalone->id->toString()];
+        ->assertFormFieldExists('children', function (Select $field) use ($standalone): bool {
+            return array_column($field->getSearchResultsForJs('zoekterm'), 'value') === [$standalone->id->toString()];
         });
 });
 
@@ -198,7 +197,11 @@ it('does not steal a subverwerking that belongs to another hoofdverwerking', fun
             'children' => [$otherChild->id->toString()],
         ])
         ->call('save')
-        ->assertHasNoFormErrors();
+        // The picker never offers another hoofdverwerking's subverwerking, so a
+        // value smuggled in past it fails the select's own `in` rule. v3 dropped
+        // it silently; being told is the better outcome, and either way the
+        // subverwerking keeps the parent it had.
+        ->assertHasFormErrors(['children.0']);
 
     expect($otherChild->refresh()->parent_id?->toString())
         ->toBe($otherParent->id->toString());
@@ -226,7 +229,10 @@ it('does not link its own hoofdverwerking as subverwerking', function (): void {
             'children' => [$parent->id->toString()],
         ])
         ->call('save')
-        ->assertHasNoFormErrors();
+        // Linking the record's own hoofdverwerking would make a cycle, so the
+        // picker leaves it out and the select's `in` rule refuses it. What
+        // matters either way: the hoofdverwerking keeps no parent of its own.
+        ->assertHasFormErrors(['children.0']);
 
     expect($parent->refresh()->parent_id)
         ->toBeNull();

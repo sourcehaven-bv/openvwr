@@ -29,13 +29,14 @@ use App\Import\Mapping\UnknownMappingTargetException;
 use App\Import\ZipImporter;
 use App\Rules\Virusscanner;
 use App\Services\BuildContextService;
+use BackedEnum;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
@@ -69,8 +70,8 @@ class ImportMapping extends Page implements HasForms
 
     protected static ?string $slug = 'import';
     protected static ?int $navigationSort = 3;
-    protected static string $view = 'filament.pages.import-mapping';
-    protected static ?string $navigationIcon = 'heroicon-o-table-cells';
+    protected string $view = 'filament.pages.import-mapping';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-table-cells';
 
     public const STEP_UPLOAD = 'upload';
     public const STEP_ARCHIVE = 'archive';
@@ -157,9 +158,9 @@ class ImportMapping extends Page implements HasForms
         return __('import_mapping.title');
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->components([
             Select::make('target')
                 ->label(__('import_mapping.target'))
                 ->helperText(__('import_mapping.target_help'))
@@ -224,7 +225,7 @@ class ImportMapping extends Page implements HasForms
      */
     private function validatedUpload(): TemporaryUploadedFile
     {
-        $state = $this->getForm('form')?->getState();
+        $state = $this->getSchema('form')?->getState();
         Assert::isArray($state);
 
         // The field is required and accepts a single file, so validation
@@ -511,7 +512,7 @@ class ImportMapping extends Page implements HasForms
         $this->groupBy = '';
 
         // Refill rather than clear: $target is required, so it must keep a value.
-        $this->getForm('form')?->fill(['target' => $this->target]);
+        $this->getSchema('form')?->fill(['target' => $this->target]);
     }
 
     /**

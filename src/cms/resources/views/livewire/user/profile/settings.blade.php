@@ -1,4 +1,4 @@
-<x-grid-section md=2 :title="__('user.profile.settings.heading')" :description="__('user.profile.settings.subheading')">
+<x-grid-section :title="__('user.profile.settings.heading')" :description="__('user.profile.settings.subheading')">
     <x-filament::card>
         <form wire:submit.prevent="submit" class="space-y-6">
 

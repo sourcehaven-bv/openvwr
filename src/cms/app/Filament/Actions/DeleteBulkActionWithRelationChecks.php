@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Actions;
 
+use Filament\Actions\DeleteBulkAction;
 use Filament\Notifications\Notification;
-use Filament\Tables\Actions\DeleteBulkAction;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Throwable;

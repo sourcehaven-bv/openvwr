@@ -1,14 +1,14 @@
 <x-filament-panels::page>
     @if ($bundlePath === null)
         {{ __('transfer.import_help') }}
-        <x-filament-panels::form wire:submit="analyse">
+        <x-form wire:submit="analyse">
             {{ $this->form }}
             <div>
                 <x-filament::button type="submit" size="sm">
                     {{ __('transfer.analyse') }}
                 </x-filament::button>
             </div>
-        </x-filament-panels::form>
+        </x-form>
     @else
         <x-filament::section>
             <x-slot name="heading">{{ __('transfer.preview_heading') }}</x-slot>

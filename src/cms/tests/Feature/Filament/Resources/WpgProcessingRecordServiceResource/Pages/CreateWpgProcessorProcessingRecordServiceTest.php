@@ -54,9 +54,7 @@ it('can create an entry with a new tag', function (): void {
             'name' => $name,
             'wpg_processing_record_service_id' => $wpgProcessingRecordService->id->toString(),
         ])
-        ->call('mountFormComponentAction', 'data.tags', 'createOption')
-        ->set('mountedFormComponentActionsData.0.name', $tagName)
-        ->call('callMountedFormComponentAction')
+        ->callFormComponentAction('tags', 'createOption', data: ['name' => $tagName])
         ->assertHasNoFormErrors()
         ->call('create')
         ->assertHasNoFormErrors();

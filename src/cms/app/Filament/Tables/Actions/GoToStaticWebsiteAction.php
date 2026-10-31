@@ -7,7 +7,7 @@ namespace App\Filament\Tables\Actions;
 use App\Config\Feature;
 use App\Models\Contracts\Publishable;
 use App\Models\StaticWebsiteSnapshotEntry;
-use Filament\Tables\Actions\Action;
+use Filament\Actions\Action;
 use Webmozart\Assert\Assert;
 
 use function __;

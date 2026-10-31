@@ -8,17 +8,17 @@ use App\Enums\Dpia\RiskLevel;
 use App\Facades\Authentication;
 use App\Filament\TenantScoped;
 use Closure;
-use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\Component;
-use Filament\Forms\Components\Grid;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Illuminate\Support\HtmlString;
 
 use function __;
@@ -34,7 +34,7 @@ use function is_string;
  */
 class DpiaRisksRepeater extends Repeater
 {
-    public static function make(string $name = 'risks'): static
+    public static function make(?string $name = 'risks'): static
     {
         return parent::make($name)
             ->label(__('dpia_record.risks'))

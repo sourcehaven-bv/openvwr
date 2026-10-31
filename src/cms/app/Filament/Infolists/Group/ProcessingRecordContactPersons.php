@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Infolists\Group;
 
 use App\Filament\Infolists\Components\SelectMultipleEntry;
-use Filament\Infolists\Components\Group;
+use Filament\Schemas\Components\Group;
 
 use function __;
 

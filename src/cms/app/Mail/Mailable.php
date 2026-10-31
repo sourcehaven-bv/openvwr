@@ -51,9 +51,9 @@ abstract class Mailable extends IlluminateMailable
         }, $recipients);
 
         $userIds = User::whereIn('email', $emailAddresses)
-            ->pluck('id')
-            ->map(static function (mixed $uuid): string {
-                return $uuid->toString();
+            ->get()
+            ->map(static function (User $user): string {
+                return $user->getKey()->toString();
             })
             ->toArray();
 

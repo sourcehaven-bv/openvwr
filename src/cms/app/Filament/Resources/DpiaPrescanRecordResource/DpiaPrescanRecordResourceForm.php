@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Filament\Resources\DpiaPrescanRecordResource;
 
 use App\Filament\Forms\Components\ProcessingRecordWizard;
-use Filament\Forms\Components\Component;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Wizard\Step;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Wizard\Step;
+use Filament\Schemas\Schema;
 
 use function __;
 
@@ -32,7 +32,7 @@ class DpiaPrescanRecordResourceForm
         ];
     }
 
-    public static function stepsForm(Form $form): Form
+    public static function stepsForm(Schema $form): Schema
     {
         $steps = [];
 
@@ -41,7 +41,7 @@ class DpiaPrescanRecordResourceForm
         }
 
         return $form
-            ->schema([
+            ->components([
                 ProcessingRecordWizard::make()
                     ->schema($steps)
                     ->skippable()
@@ -50,7 +50,7 @@ class DpiaPrescanRecordResourceForm
             ]);
     }
 
-    public static function onePageForm(Form $form): Form
+    public static function onePageForm(Schema $form): Schema
     {
         $sections = [];
 
@@ -60,6 +60,6 @@ class DpiaPrescanRecordResourceForm
                 ->extraAttributes(['data-onepage-section' => $key]);
         }
 
-        return $form->schema($sections);
+        return $form->components($sections);
     }
 }

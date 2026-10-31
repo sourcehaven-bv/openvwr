@@ -11,7 +11,7 @@ use function __;
 
 class CoreEntityDataCollectionSource extends Radio
 {
-    public static function make(string $name = 'data_collection_source'): static
+    public static function make(?string $name = 'data_collection_source'): static
     {
         return parent::make($name)
             ->label(__('general.data_collection_source'))

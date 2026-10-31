@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Enums\LabelColor;
 use App\Filament\Infolists\Components\TagsEntry;
 use App\Models\Tag;
+use Tests\Helpers\FilamentTestHelper;
 
 // The entry keys on the tag itself rather than on its name, so that a label's
 // colour and its name always come from the same record. These cover both
@@ -13,7 +14,7 @@ use App\Models\Tag;
 it('renders a label as a badge in its own colour', function (): void {
     $tag = Tag::factory()->create(['color' => LabelColor::EMERALD]);
 
-    $entry = TagsEntry::make();
+    $entry = TagsEntry::make()->container(FilamentTestHelper::createTestForm());
 
     expect($entry->formatState($tag))->toBe($tag->name)
         ->and($entry->getColor($tag))->toBe(LabelColor::EMERALD->value);
@@ -28,7 +29,7 @@ it('falls back to grey for a label without a colour', function (): void {
 });
 
 it('ignores a state that is not a label', function (): void {
-    $entry = TagsEntry::make();
+    $entry = TagsEntry::make()->container(FilamentTestHelper::createTestForm());
 
     expect($entry->formatState('not a tag'))->toBe('')
         ->and($entry->getColor('not a tag'))->toBe('gray');

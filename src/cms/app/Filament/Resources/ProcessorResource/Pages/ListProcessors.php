@@ -6,7 +6,7 @@ namespace App\Filament\Resources\ProcessorResource\Pages;
 
 use App\Filament\Resources\Pages\Concerns\PersistsFiltersInSession;
 use App\Filament\Resources\ProcessorResource;
-use Filament\Actions;
+use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListProcessors extends ListRecords
@@ -18,7 +18,7 @@ class ListProcessors extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

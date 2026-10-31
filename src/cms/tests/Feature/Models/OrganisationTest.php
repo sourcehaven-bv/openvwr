@@ -15,12 +15,14 @@ use App\Models\ContactPerson;
 use App\Models\ContactPersonPosition;
 use App\Models\DataBreachRecord;
 use App\Models\Document;
+use App\Models\DocumentType;
 use App\Models\Dpia\DpiaPrescanRecord;
 use App\Models\Dpia\DpiaRecord;
 use App\Models\Organisation;
 use App\Models\Processor;
 use App\Models\Receiver;
 use App\Models\Responsible;
+use App\Models\RetentionPeriod;
 use App\Models\Snapshot;
 use App\Models\Stakeholder;
 use App\Models\StakeholderDataItem;
@@ -359,4 +361,17 @@ it('has wpgProcessingRecordServices', function (): void {
 
     expect($organisation->wpgProcessingRecordServices()->count())
         ->toBe(1);
+});
+
+
+it('keeps lookup lists scoped to their owning organisation', function (): void {
+    $organisation = Organisation::factory()->create();
+    $other = Organisation::factory()->create();
+    $documentType = DocumentType::factory()->for($organisation)->create();
+    $retentionPeriod = RetentionPeriod::factory()->for($organisation)->create();
+    DocumentType::factory()->for($other)->create();
+    RetentionPeriod::factory()->for($other)->create();
+
+    expect($organisation->documentTypes()->get()->pluck('id')->map->toString()->all())->toBe([$documentType->id->toString()])
+        ->and($organisation->retentionPeriods()->get()->pluck('id')->map->toString()->all())->toBe([$retentionPeriod->id->toString()]);
 });

@@ -29,7 +29,7 @@ class SnapshotStatusFlow extends ViewEntry
      */
     private const MAIN_LINE = SnapshotState::FORWARD_LINE;
 
-    public static function make(string $name = 'status_flow'): static
+    public static function make(?string $name = 'status_flow'): static
     {
         return parent::make($name)
             ->hiddenLabel()

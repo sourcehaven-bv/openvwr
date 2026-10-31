@@ -7,7 +7,7 @@ namespace App\Filament\Actions;
 use App\Components\Uuid\UuidInterface;
 use App\Models\Contracts\TenantAware;
 use App\Observers\Concerns\DetachesSharedRecords;
-use Filament\Tables\Actions\DetachBulkAction;
+use Filament\Actions\DetachBulkAction;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -27,6 +27,8 @@ class DetachSharedBulkAction extends DetachBulkAction
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->fetchSelectedRecords();
 
         $this->action(function (): void {
             $this->process(function (Collection $records, Table $table): void {

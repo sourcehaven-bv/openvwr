@@ -26,7 +26,6 @@ it('shows all processing type relations on the edit page', function (): void {
     $this->asFilamentOrganisationUser($organisation)
         ->get(TagResource::getUrl('edit', ['record' => $tag]))
         ->assertSuccessful()
-        ->assertSeeHtml('fi-resource-relation-managers')
         ->assertSeeText('AVG Verantwoordelijke')
         ->assertSeeText('AVG Verwerker')
         ->assertSeeText('Verwerkingen WPG');

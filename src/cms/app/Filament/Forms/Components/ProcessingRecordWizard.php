@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms\Components;
 
-use Filament\Forms\Components\Wizard;
+use Filament\Schemas\Components\Wizard;
 
 class ProcessingRecordWizard extends Wizard
 {

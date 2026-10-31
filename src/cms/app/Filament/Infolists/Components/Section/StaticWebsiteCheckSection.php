@@ -8,8 +8,8 @@ use App\Config\Feature;
 use App\Models\Contracts\Publishable;
 use App\Services\StaticWebsite\Publication\PublicationHistory;
 use App\Services\StaticWebsite\Publication\PublicationStatusResolver;
-use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\ViewEntry;
+use Filament\Schemas\Components\Section;
 
 use function __;
 use function app;

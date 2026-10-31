@@ -13,10 +13,10 @@ use App\Filament\Resources\OrganisationResource\OrganisationResourceInfolist;
 use App\Filament\Resources\PublicWebsiteTreeResource\Pages\ListPublicWebsiteTrees;
 use App\Models\Organisation;
 use App\Models\PublicWebsiteTree;
+use App\Models\Snapshot;
 use Filament\Facades\Filament;
-use Filament\Forms\Form;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Infolist;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Tests\Helpers\LivewireTestHelper;
 use Tests\TestCase;
 use Throwable;
@@ -41,7 +41,11 @@ beforeEach(function (): void {
  */
 function snapshotSectionHeadings(): array
 {
-    $infolist = Infolist::make(LivewireTestHelper::createTestFormComponent())
+    // v5 resolves the sections' closures while walking the tree, so the schema
+    // needs the record those closures ask for. An unsaved model is enough: the
+    // publishing sections only look at the feature flag.
+    $infolist = Schema::make(LivewireTestHelper::createTestFormComponent())
+        ->record(new Snapshot())
         ->schema([ViewInfoTab::make('info')]);
 
     $tab = $infolist->getComponents()[0];
@@ -53,19 +57,19 @@ function snapshotSectionHeadings(): array
             continue;
         }
 
-        // Sections whose visibility depends on the snapshot record cannot be
-        // evaluated without one; the publishing sections do not need it.
+        // Sections whose visibility or heading depends on the snapshot record
+        // cannot be evaluated without one; the publishing sections do not need
+        // it. v5 resolves those closures eagerly, so the heading is read inside
+        // the same guard as the visibility.
         try {
-            $hidden = $component->isHidden();
+            if ($component->isHidden()) {
+                continue;
+            }
+
+            $headings[] = (string) $component->getHeading();
         } catch (Throwable) {
             continue;
         }
-
-        if ($hidden) {
-            continue;
-        }
-
-        $headings[] = (string) $component->getHeading();
     }
 
     return $headings;
@@ -84,7 +88,7 @@ function organisationFormHeadings(): array
     Filament::setTenant($organisation, isQuiet: true);
 
     $form = OrganisationResourceForm::form(
-        Form::make(LivewireTestHelper::createTestFormComponent()),
+        Schema::make(LivewireTestHelper::createTestFormComponent()),
     );
 
     $headings = [];
@@ -111,7 +115,12 @@ function treeRecordIcon(PublicWebsiteTree $tree): string
  */
 function organisationInfolistSection(string $heading): ?Section
 {
-    foreach (OrganisationResourceInfolist::getSchema() as $component) {
+    // v4 resolves a component's state through its container, so the schema is
+    // hung on a Livewire host rather than inspected as a bare array.
+    $schema = Schema::make(LivewireTestHelper::createTestFormComponent())
+        ->schema(OrganisationResourceInfolist::getSchema());
+
+    foreach ($schema->getComponents() as $component) {
         if (!$component instanceof Section) {
             continue;
         }

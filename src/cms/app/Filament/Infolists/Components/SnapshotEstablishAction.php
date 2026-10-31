@@ -12,10 +12,10 @@ use App\Models\Snapshot;
 use App\Models\States\Snapshot\Established;
 use App\Models\States\SnapshotState;
 use App\Services\Snapshot\SnapshotStateTransitionService;
-use Filament\Forms\Components\View;
-use Filament\Forms\Components\Wizard\Step;
-use Filament\Infolists\Components\Actions\Action;
-use Filament\Support\Enums\MaxWidth;
+use Filament\Actions\Action;
+use Filament\Schemas\Components\View;
+use Filament\Schemas\Components\Wizard\Step;
+use Filament\Support\Enums\Width;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
 use Webmozart\Assert\Assert;
@@ -62,7 +62,7 @@ class SnapshotEstablishAction extends Action
                             ->view('filament.actions.snapshot_transition.establish_action_step_validate_approvals'),
                     ]),
             ])
-            ->modalWidth(MaxWidth::FiveExtraLarge)
+            ->modalWidth(Width::FiveExtraLarge)
             ->action(static function (
                 Snapshot $record,
                 SnapshotStateTransitionService $snapshotStateTransitionService,

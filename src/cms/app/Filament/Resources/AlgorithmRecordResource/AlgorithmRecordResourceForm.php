@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace App\Filament\Resources\AlgorithmRecordResource;
 
 use App\Filament\Forms\Components\ProcessingRecordWizard;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Wizard\Step;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Wizard\Step;
+use Filament\Schemas\Schema;
 
 use function __;
 
 class AlgorithmRecordResourceForm
 {
-    public static function stepsForm(Form $form): Form
+    public static function stepsForm(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 ProcessingRecordWizard::make()
                     ->schema([
                         Step::make(__('algorithm_record.step_processing_name'))
@@ -40,10 +40,10 @@ class AlgorithmRecordResourceForm
             ]);
     }
 
-    public static function onePageForm(Form $form): Form
+    public static function onePageForm(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Section::make(__('algorithm_record.step_processing_name'))
                     ->schema(AlgorithmRecordResourceFormSchemas::getProcessingName())
                     ->extraAttributes(['data-onepage-section' => 'step_processing_name']),

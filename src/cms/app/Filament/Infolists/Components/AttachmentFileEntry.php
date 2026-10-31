@@ -12,7 +12,7 @@ class AttachmentFileEntry extends TextEntry
 {
     protected string $view = 'filament.infolists.components.entries.attachment_file_entry';
 
-    public static function make(string $name): static
+    public static function make(?string $name = null): static
     {
         return parent::make($name)
             ->label(__('general.attachments'))

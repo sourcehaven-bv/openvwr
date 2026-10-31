@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Infolists\Components\Section;
 
-use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Section;
 use Illuminate\Support\HtmlString;
 
 class InformationBlockSection extends Section
@@ -35,7 +35,7 @@ class InformationBlockSection extends Section
     private static function makePlaceholderWithHtmlString(string $info, string $name): TextEntry
     {
         return TextEntry::make($name)
-            ->label('')
+            ->hiddenLabel()
             ->formatStateUsing(static function () use ($info): HtmlString {
                 return self::makeHtmlString($info);
             });

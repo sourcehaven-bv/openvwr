@@ -356,7 +356,7 @@ it('leaves the checkboxes empty for a maatregel that is not saved yet', function
 
     $page = $this->createLivewireTestable(EditDpiaRecord::class, ['record' => $dpiaRecord->id->toString()]);
 
-    $page->call('mountFormComponentAction', 'data.measures', 'add')
+    $page->callFormComponentAction('measures', 'add')
         ->assertHasNoFormErrors();
 
     $measures = $page->get('data.measures');

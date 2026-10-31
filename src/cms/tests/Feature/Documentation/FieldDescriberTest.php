@@ -9,15 +9,17 @@ use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Text;
 use Illuminate\Support\HtmlString;
+use Tests\Helpers\FilamentTestHelper;
 
 beforeEach(function (): void {
     $this->describer = new FieldDescriber();
@@ -64,8 +66,8 @@ it('has no label for a layout component', function (): void {
     expect($this->describer->label(Grid::make()))->toBeNull();
 });
 
-it('has no label when the field has none', function (): void {
-    expect($this->describer->label(TextInput::make('a')->label('')))->toBeNull();
+it('uses the displayed fallback label when the label is blank', function (): void {
+    expect($this->describer->label(TextInput::make('a')->label('')))->toBe('A');
 });
 
 it('strips markup from a label', function (): void {
@@ -101,7 +103,7 @@ it('has no description when the section has none', function (): void {
 });
 
 it('uses the helper text as the explanation', function (): void {
-    $field = TextInput::make('a')->helperText('Zo vult u dit in.');
+    $field = TextInput::make('a')->container(FilamentTestHelper::createTestForm())->helperText('Zo vult u dit in.');
 
     expect($this->describer->help($field))->toBe('Zo vult u dit in.');
 });
@@ -118,6 +120,7 @@ it('adds the options of a choice list to the explanation', function (): void {
 
 it('combines the helper text with the options', function (): void {
     $field = Radio::make('a')
+        ->container(FilamentTestHelper::createTestForm())
         ->helperText('Kies er een.')
         ->options(['ja' => 'Ja']);
 
@@ -133,4 +136,16 @@ it('skips grouped options', function (): void {
 
 it('collapses whitespace into a single line', function (): void {
     expect($this->describer->tidy("een\n  lange   regel\n"))->toBe('een lange regel');
+});
+
+
+it('reads guidance while excluding interactive controls below a field', function (): void {
+    $field = TextInput::make('name')
+        ->container(FilamentTestHelper::createTestForm())
+        ->belowContent([
+            TextInput::make('internal_control'),
+            Text::make('Uitleg voor de gebruiker.'),
+        ]);
+
+    expect($this->describer->help($field))->toBe('Uitleg voor de gebruiker.');
 });

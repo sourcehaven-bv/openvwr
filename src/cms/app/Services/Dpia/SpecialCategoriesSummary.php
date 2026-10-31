@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Dpia;
 
 use App\Enums\Dpia\PersonalDataType;
-use Filament\Forms\Get;
+use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Support\HtmlString;
 
 use function __;

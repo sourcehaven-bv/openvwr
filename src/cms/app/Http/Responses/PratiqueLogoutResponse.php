@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Responses;
 
 use App\Config\Config;
-use Filament\Http\Responses\Auth\Contracts\LogoutResponse;
+use Filament\Auth\Http\Responses\Contracts\LogoutResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 

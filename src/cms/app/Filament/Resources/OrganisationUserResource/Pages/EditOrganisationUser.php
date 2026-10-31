@@ -38,7 +38,7 @@ class EditOrganisationUser extends EditRecord
                     $action->modalSubmitActionLabel(__('general.yes'));
                     $action->modalCancelActionLabel(__('general.no'));
                 })
-                ->form([
+                ->schema([
                     Select::make('alternate_user_id')
                         ->label(__('user.organisation_role_detach_alternate_primary_contact'))
                         ->options(static function (User $user): Collection {

@@ -8,8 +8,8 @@ use App\Enums\Authorization\Role;
 use App\Models\OrganisationUserRole;
 use App\Models\User;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Section;
 use Webmozart\Assert\Assert;
 
 use function __;
@@ -21,8 +21,11 @@ class OrganisationUserRolesRepeater extends Repeater
 {
     public static function makeForUser(string $name, User $user): static
     {
+        // The surrounding section already carries this heading. v4 treats an
+        // empty label as unset and falls back to one derived from the field name.
         return parent::make($name)
-            ->label('')
+            ->label(__('user.organisation_roles'))
+            ->hiddenLabel()
             ->addActionLabel(__('user.organisation_roles_add'))
             ->schema([
                 Select::make('organisation_id')
