@@ -24,7 +24,7 @@
         "filament/spatie-laravel-media-library-plugin": "^3.0-stable",
         "firebase/php-jwt": "^7.1",
         "guzzlehttp/guzzle": "^7.2",
-        "jfcherng/php-diff": "^6.0",
+        "jfcherng/php-diff": "^7.0",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^3.0",
         "league/flysystem-aws-s3-v3": "^3.31",
