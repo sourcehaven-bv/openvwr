@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fc1edb2a608eec1996059a313d4522f6",
+    "content-hash": "151eeeb356c21bc8e4f4af8ac727d2be",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -2875,30 +2875,29 @@
         },
         {
             "name": "jfcherng/php-diff",
-            "version": "6.16.3",
+            "version": "7.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jfcherng/php-diff.git",
-                "reference": "6d7332b6080cdd50011a364b58f24c8d0cdeb5da"
+                "reference": "38bd25b2ca59e2fe0d8dd209b5557ca193b73a43"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jfcherng/php-diff/zipball/6d7332b6080cdd50011a364b58f24c8d0cdeb5da",
-                "reference": "6d7332b6080cdd50011a364b58f24c8d0cdeb5da",
+                "url": "https://api.github.com/repos/jfcherng/php-diff/zipball/38bd25b2ca59e2fe0d8dd209b5557ca193b73a43",
+                "reference": "38bd25b2ca59e2fe0d8dd209b5557ca193b73a43",
                 "shasum": ""
             },
             "require": {
                 "jfcherng/php-color-output": "^3",
                 "jfcherng/php-mb-string": "^1.4.6 || ^2",
-                "jfcherng/php-sequence-matcher": "^3.2.10 || ^4",
-                "php": ">=7.4"
+                "jfcherng/php-sequence-matcher": "^5",
+                "php": ">=8.3"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.51",
-                "liip/rmt": "^1.6",
-                "phan/phan": "^5",
-                "phpunit/phpunit": "^9",
-                "squizlabs/php_codesniffer": "^3.6"
+                "friendsofphp/php-cs-fixer": "^3.94",
+                "phan/phan": "^6",
+                "phpunit/phpunit": "^12",
+                "squizlabs/php_codesniffer": "^4.0"
             },
             "type": "library",
             "autoload": {
@@ -2929,7 +2928,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jfcherng/php-diff/issues",
-                "source": "https://github.com/jfcherng/php-diff/tree/6.16.3"
+                "source": "https://github.com/jfcherng/php-diff/tree/7.0.1"
             },
             "funding": [
                 {
@@ -2937,7 +2936,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2026-06-22T13:08:56+00:00"
+            "time": "2026-06-22T13:04:52+00:00"
         },
         {
             "name": "jfcherng/php-mb-string",
@@ -2997,26 +2996,26 @@
         },
         {
             "name": "jfcherng/php-sequence-matcher",
-            "version": "4.0.3",
+            "version": "5.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jfcherng/php-sequence-matcher.git",
-                "reference": "d2038ac29627340a7458609072a8ba355e80ec5b"
+                "reference": "99dcf7480e4ef0a4c7a21a6aafa34c0cb2f112db"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jfcherng/php-sequence-matcher/zipball/d2038ac29627340a7458609072a8ba355e80ec5b",
-                "reference": "d2038ac29627340a7458609072a8ba355e80ec5b",
+                "url": "https://api.github.com/repos/jfcherng/php-sequence-matcher/zipball/99dcf7480e4ef0a4c7a21a6aafa34c0cb2f112db",
+                "reference": "99dcf7480e4ef0a4c7a21a6aafa34c0cb2f112db",
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.1"
+                "php": ">=8.3"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3",
-                "phan/phan": "^5",
-                "phpunit/phpunit": "^9 || ^10",
-                "squizlabs/php_codesniffer": "^3.7"
+                "friendsofphp/php-cs-fixer": "^3.94",
+                "phan/phan": "^6",
+                "phpunit/phpunit": "^12",
+                "squizlabs/php_codesniffer": "^4.0"
             },
             "type": "library",
             "autoload": {
@@ -3041,7 +3040,7 @@
             "description": "A longest sequence matcher. The logic is primarily based on the Python difflib package.",
             "support": {
                 "issues": "https://github.com/jfcherng/php-sequence-matcher/issues",
-                "source": "https://github.com/jfcherng/php-sequence-matcher/tree/4.0.3"
+                "source": "https://github.com/jfcherng/php-sequence-matcher/tree/5.0.0"
             },
             "funding": [
                 {
@@ -3049,7 +3048,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2023-05-21T07:57:08+00:00"
+            "time": "2026-04-06T14:59:12+00:00"
         },
         {
             "name": "kirschbaum-development/eloquent-power-joins",
