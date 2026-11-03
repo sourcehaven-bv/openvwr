@@ -7,6 +7,7 @@ namespace App\Filament\Pages;
 use App\Config\Config;
 use App\Livewire\User\Profile\OneTimePassword;
 use App\Livewire\User\Profile\PersonalInfo;
+use App\Livewire\User\Profile\PratiqueAccount;
 use App\Livewire\User\Profile\Settings;
 use App\Services\Authentication\AuthenticationStrategyFactory;
 use App\Services\AuthenticationService;
@@ -63,11 +64,17 @@ class Profile extends Page
             'settings' => Settings::class,
         ];
 
-        // OTP enrolment belongs to the builtin strategy. Under the dev driver the
-        // OTP gate is not in the middleware stack, so offering enrolment here
-        // would let a developer set up a factor that is never challenged.
-        if (Config::string('auth.driver', AuthenticationStrategyFactory::DRIVER_BUILTIN) !== AuthenticationStrategyFactory::DRIVER_DEV) {
+        $driver = Config::string('auth.driver', AuthenticationStrategyFactory::DRIVER_BUILTIN);
+
+        // OTP enrolment belongs to the builtin strategy. Under the dev and
+        // pratique drivers the OTP gate is not in the middleware stack, so a
+        // factor set up here would never be challenged.
+        if ($driver === AuthenticationStrategyFactory::DRIVER_BUILTIN) {
             $components['one_time_password'] = OneTimePassword::class;
+        }
+
+        if ($driver === AuthenticationStrategyFactory::DRIVER_PRATIQUE) {
+            $components['pratique_account'] = PratiqueAccount::class;
         }
 
         return $components;

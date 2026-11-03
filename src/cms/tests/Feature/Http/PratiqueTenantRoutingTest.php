@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Filament\Resources\ContactPersonResource;
 use App\Models\ContactPerson;
 use App\Models\Organisation;
+use App\Models\User;
 use Dotenv\Repository\Adapter\PutenvAdapter;
 use Dotenv\Repository\RepositoryBuilder;
 use Dotenv\Repository\RepositoryInterface;
@@ -99,6 +100,29 @@ it('follows a tenant switch made in the proxy', function (): void {
 
     asAliceIn('globex', '/globex')->assertSuccessful();
     asAliceIn('globex', '/acme')->assertForbidden();
+});
+
+/*
+ * Every tenant URL but the asserted one is refused, so the tenant menu must not
+ * offer them. Switching goes through the proxy's picker instead.
+ */
+it('offers a switch through the proxy instead of other tenants', function (): void {
+    asAliceIn('acme', '/acme')->assertSuccessful();
+    User::query()->where('email', 'alice@example.org')->sole()->organisations()->attach($this->globex);
+
+    asAliceIn('acme', '/acme')
+        ->assertSuccessful()
+        ->assertSee('/__pratique/auth/select-tenant?rd=%2F', false)
+        ->assertSee(__('user.switch_organisation'))
+        ->assertDontSee(url('/globex'));
+});
+
+it('links the profile to the proxy account page instead of OTP enrolment', function (): void {
+    asAliceIn('acme', '/acme/profile')
+        ->assertSuccessful()
+        ->assertSee('/__pratique/admin/account', false)
+        ->assertSee(__('user.profile.pratique_account.heading'))
+        ->assertDontSee(__('user.profile.one_time_password.title'));
 });
 
 it('refuses another organisation\'s tenant URL', function (): void {

@@ -39,6 +39,8 @@ return [
         'back_to_login_link' => 'Terug naar Inloggen',
     ],
 
+    'switch_organisation' => 'Wissel van organisatie',
+
     'profile' => [
         'my_profile' => 'Mijn profiel',
 
@@ -86,6 +88,12 @@ return [
                 'invalid_code' => 'De code die je hebt ingevoerd is ongeldig.',
                 'too_many_requests' => 'Te veel inlogpogingen, probeer het opnieuw over :seconds seconden.',
             ],
+        ],
+
+        'pratique_account' => [
+            'heading' => 'Inloggen en beveiliging',
+            'subheading' => 'Je inlogmethoden, zoals passkeys, en je actieve sessies beheer je in je account.',
+            'link' => 'Naar mijn account',
         ],
 
         'settings' => [
