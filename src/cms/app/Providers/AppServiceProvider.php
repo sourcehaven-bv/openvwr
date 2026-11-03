@@ -90,7 +90,13 @@ class AppServiceProvider extends ServiceProvider
                 $app['url']->setRequest($request);
             });
 
-            return new UrlGenerator($app['router']->getRoutes(), $request, Config::stringOrNull('app.asset_url'));
+            // Bind the collection as `routes`, as Laravel's own binding does.
+            // Loading cached routes rebinds `routes`; without this first binding
+            // that fires no rebind, and the generator keeps the stale collection.
+            $routes = $app['router']->getRoutes();
+            $app->instance('routes', $routes);
+
+            return new UrlGenerator($routes, $request, Config::stringOrNull('app.asset_url'));
         });
 
         $this->app->bind(Virusscanner::class, static function (Application $application): Virusscanner {
