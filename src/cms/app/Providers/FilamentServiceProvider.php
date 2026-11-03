@@ -16,6 +16,7 @@ use App\Http\Controllers\HealthController;
 use App\Http\Middleware\IPAllowFilter;
 use App\Models\Organisation;
 use App\Services\Authentication\AuthenticationStrategy;
+use App\Services\Authentication\AuthenticationStrategyFactory;
 use Exception;
 use Filament\Facades\Filament;
 use Filament\FontProviders\LocalFontProvider;
@@ -145,6 +146,19 @@ class FilamentServiceProvider extends PanelProvider
     }
 
     /**
+     * Under pratique the proxy selects the organisation, so switching goes
+     * through its picker. rd=/ lands on the newly selected one.
+     */
+    private function switchOrganisationMenuItem(): MenuItem
+    {
+        return MenuItem::make()
+            ->label(static fn (): string => __('user.switch_organisation'))
+            ->icon('heroicon-o-arrows-right-left')
+            ->url(static fn (): string => Config::string('auth.pratique.select_tenant_url') . '?rd=%2F')
+            ->visible(static fn (): bool => Config::string('auth.driver') === AuthenticationStrategyFactory::DRIVER_PRATIQUE);
+    }
+
+    /**
      * The manual, which lives in the panel itself so it can follow the same
      * feature flags as the rest of the interface.
      */
@@ -221,6 +235,7 @@ class FilamentServiceProvider extends PanelProvider
             ->tenantMenu(static function (): bool {
                 return Authentication::user()->organisations->count() > 1;
             })
+            ->tenantMenuItems(['switch' => $this->switchOrganisationMenuItem()])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')

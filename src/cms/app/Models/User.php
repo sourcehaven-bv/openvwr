@@ -19,6 +19,7 @@ use App\Models\Concerns\HasRoles;
 use App\Models\Concerns\HasSoftDeletes;
 use App\Models\Concerns\HasTimestamps;
 use App\Models\Concerns\HasUuidAsId;
+use App\Services\Authentication\Pratique\PratiqueContext;
 use Carbon\CarbonImmutable;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
@@ -40,6 +41,7 @@ use Illuminate\Support\Collection;
 use MinVWS\AuditLogger\Contracts\LoggableUser;
 use Webmozart\Assert\Assert;
 
+use function app;
 use function sprintf;
 
 /**
@@ -74,6 +76,17 @@ class User extends Authenticatable implements FilamentUser, HasTenants, Loggable
     use Notifiable;
 
     protected static string $collectionClass = UserCollection::class;
+
+    /**
+     * Matches the column default, so a user created in this request (the
+     * pratique resolver does that) has it before it is read back.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'notification_exclusions' => '[]',
+    ];
+
     protected $fillable = [
         'email',
         'mandateholder_notify_batch',
@@ -133,6 +146,16 @@ class User extends Authenticatable implements FilamentUser, HasTenants, Loggable
      */
     public function getTenants(Panel $panel): array|OrganisationCollection
     {
+        // Under pratique a session holds one organisation, and every other
+        // tenant URL is refused. Offer only that one; switching goes through
+        // the proxy's picker (the panel's tenant menu links there).
+        $pratiqueContext = app(PratiqueContext::class);
+        if ($pratiqueContext->has()) {
+            $active = $pratiqueContext->get()->organisation;
+
+            return $this->organisations->filter(static fn (Organisation $organisation): bool => $organisation->is($active));
+        }
+
         return $this->organisations;
     }
 

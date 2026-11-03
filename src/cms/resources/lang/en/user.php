@@ -39,6 +39,8 @@ return [
         'back_to_login_link' => 'Back to Login',
     ],
 
+    'switch_organisation' => 'Switch organisation',
+
     'profile' => [
         'my_profile' => 'My profile',
 
@@ -86,6 +88,12 @@ return [
                 'invalid_code' => 'The code you entered is invalid.',
                 'too_many_requests' => 'Too many login attempts, please try again in :seconds seconds.',
             ],
+        ],
+
+        'pratique_account' => [
+            'heading' => 'Sign-in and security',
+            'subheading' => 'You manage your sign-in methods, such as passkeys, and your active sessions in your account.',
+            'link' => 'Go to my account',
         ],
 
         'settings' => [
