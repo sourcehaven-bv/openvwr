@@ -120,9 +120,17 @@ it('offers a switch through the proxy instead of other tenants', function (): vo
 it('links the profile to the proxy account page instead of OTP enrolment', function (): void {
     asAliceIn('acme', '/acme/profile')
         ->assertSuccessful()
-        ->assertSee('/__pratique/admin/account', false)
+        ->assertSee('/__pratique/admin/account?rd=%2Facme%2Fprofile', false)
         ->assertSee(__('user.profile.pratique_account.heading'))
         ->assertDontSee(__('user.profile.one_time_password.title'));
+});
+
+it('appends the return page to an account URL that has a query', function (): void {
+    config(['auth.pratique.account_url' => 'https://id.example.org/admin/account?lang=nl']);
+
+    asAliceIn('acme', '/acme/profile')
+        ->assertSuccessful()
+        ->assertSee('https://id.example.org/admin/account?lang=nl&amp;rd=%2Facme%2Fprofile', false);
 });
 
 it('refuses another organisation\'s tenant URL', function (): void {
