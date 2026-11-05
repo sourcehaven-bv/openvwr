@@ -51,6 +51,11 @@ return [
             'sslrootcert' => env('DB_SSLROOTCERT', null),
             'sslcert' => env('DB_SSLCERT', null),
             'sslkey' => env('DB_SSLKEY', null),
+            // PDO ignores connect_timeout in the DSN; without this a node that
+            // drops packets stalls the first connection for ~30s.
+            'options' => extension_loaded('pdo_pgsql') ? [
+                PDO::ATTR_TIMEOUT => (int) env('DB_TIMEOUT', 3),
+            ] : [],
         ],
 
     ],
