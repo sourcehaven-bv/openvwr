@@ -55,7 +55,7 @@
         "pestphp/pest-plugin-laravel": "^3.0",
         "pestphp/pest-plugin-livewire": "^3.0",
         "phpcsstandards/phpcsextra": "^1.2.0",
-        "phpmd/phpmd": "^2.14",
+        "phpmd/phpmd": "^3.0",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2.1",
         "phpstan/phpstan-deprecation-rules": "^2.0",
