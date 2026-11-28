@@ -1,14 +1,22 @@
 version: 2
 
+# Daily, with a cooldown: a new version must be published for N days
+# before Dependabot proposes it, so malicious or broken releases are
+# usually retracted or flagged first. Security updates skip the cooldown.
+# dependabot-auto-merge.yml enables auto-merge for patch and minor only;
+# a human approval is still required by the ruleset.
+
 updates:
   # CMS npm dependencies
   - package-ecosystem: "npm"
     directory: "/src/cms"
     schedule:
-      interval: "weekly"
-      day: "monday"
+      interval: "daily"
       time: "06:00"
       timezone: "Europe/Amsterdam"
+    cooldown:
+      default-days: 3
+      semver-major-days: 7
     groups:
       minor-and-patch:
         patterns:
@@ -26,10 +34,12 @@ updates:
   - package-ecosystem: "npm"
     directory: "/src/static-website"
     schedule:
-      interval: "weekly"
-      day: "monday"
+      interval: "daily"
       time: "06:00"
       timezone: "Europe/Amsterdam"
+    cooldown:
+      default-days: 3
+      semver-major-days: 7
     groups:
       minor-and-patch:
         patterns:
@@ -47,10 +57,12 @@ updates:
   - package-ecosystem: "composer"
     directory: "/src/cms"
     schedule:
-      interval: "weekly"
-      day: "monday"
+      interval: "daily"
       time: "06:00"
       timezone: "Europe/Amsterdam"
+    cooldown:
+      default-days: 3
+      semver-major-days: 7
     # Majors are proposed too, but ungrouped: one breaking major in a
     # grouped PR would otherwise block every other update in it.
     groups:
@@ -70,10 +82,12 @@ updates:
   - package-ecosystem: "docker"
     directory: "/src/cms"
     schedule:
-      interval: "weekly"
-      day: "monday"
+      interval: "daily"
       time: "06:00"
       timezone: "Europe/Amsterdam"
+    cooldown:
+      default-days: 3
+      semver-major-days: 7
     commit-message:
       prefix: "deps(docker)"
     labels:
@@ -84,10 +98,12 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
+      interval: "daily"
       time: "06:00"
       timezone: "Europe/Amsterdam"
+    cooldown:
+      default-days: 3
+      semver-major-days: 7
     groups:
       actions:
         patterns:
